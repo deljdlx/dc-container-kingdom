@@ -1,0 +1,146 @@
+#viewport {
+  position: relative;
+  contain: strict;
+  /* border: solid 10px #ccc; */
+  top: 0;
+  left: 0;
+}
+
+/* ===================================== */
+.board {
+  position: absolute;
+  will-change: transform;
+}
+
+/* ===================================== */
+.map-element {
+  position: absolute;
+}
+
+
+.map-area {
+  position: absolute;
+  outline: dotted #f0f 4px;
+}
+/* ===================================== */
+
+
+.map-element__shadow {
+  contain: strict;
+  position: absolute;
+  background-color: #0004;
+  filter: blur(3px);
+  border-radius: 8px;
+  transform: skewX(8deg);
+}
+.map-element__sprite {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+}
+
+.map-element.character .map-element__sprite {
+  transform: scale(0.7);
+}
+.map-element.character .map-element__shadow {
+  width: 24px !important;
+  left: 14px !important;
+}
+
+.map-element.character .quickReaction {
+  position: absolute;
+  border: solid 1px #000;
+  border-radius: 4px;
+  padding: 4px 2px;
+  color: #000;
+  font-size: 11px;
+  background-color: #fff;
+  top: -30px;
+  display: none;
+
+  min-width: 150px;
+  padding: 8px;
+}
+
+.map-element.character .quickReaction--enable {
+  display: block;
+
+}
+
+/* ===================================== */
+
+.map-element.collided {
+  background-color: #0ff8;
+}
+
+
+@keyframes shake {
+  0% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  50% { transform: translateX(5px); }
+  75% { transform: translateX(-5px); }
+  100% { transform: translateX(0); }
+}
+
+.shake {
+  animation: shake 0.2s ease-in-out;
+}
+
+
+
+
+.map-element__bounding-box {
+  position: absolute;
+  outline: dotted #f0f 1px;
+  height: 100%;
+  width: 100%;
+
+  background-color: #fff4;
+}
+
+.map-element__collision-bounding-box {
+  position: absolute;
+  outline: dotted #ff0 1px;
+}
+
+.map-element__collision-zone {
+  position: absolute;
+  /*outline: solid #ff0 1px;*/
+  background-color: #ff08;
+}
+
+.map-element__collision-zone.collided {
+  position: absolute;
+  /*outline: solid #ff0 1px;*/
+  background-color: #f0f;
+}
+
+.map-element__collision-zone.debug {
+  position: absolute;
+  outline: solid #ff0 10px;
+}
+
+
+#light-test {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+
+  /* background-color: #fff; */
+
+  background-color: #00a;
+
+  z-index: 10000;
+  /* border-radius: 100%; */
+  /* filter: blur(20px); */
+
+  opacity: 0.5;
+  mix-blend-mode: soft-light; /*difference*/;
+  mix-blend-mode: multiply;
+  /* mix-blend-mode: overlay; */
+  /* mix-blend-mode: luminosity; */
+  /* mix-blend-mode: color-dodge; */
+
+}

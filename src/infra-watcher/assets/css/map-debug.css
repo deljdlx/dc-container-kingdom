@@ -1,0 +1,37 @@
+body.debug .map {
+  outline: dashed 2px #00f;
+}
+
+
+body.debug .map-layer {
+  outline: dashed 1px #ff0;
+}
+
+body.debug .map-area {
+  outline: dashed 2px #f0f;
+}
+
+body.debug .character {
+  outline: dashed 1px #f0f;
+}
+
+body.debug .map-element {
+  outline: dashed #0f0 2px;
+}
+
+body.debug .map-element.grid {
+  background-color: #fff4;
+  z-index: 1000000;
+}
+
+body.debug .element-zone {
+  outline: dotted 1px #fff;
+  background-color: #ff08;
+  z-index: 100;
+  position: absolute;
+}
+
+
+.map-element.collision {
+  outline: dotted 3px #0f0;
+}
