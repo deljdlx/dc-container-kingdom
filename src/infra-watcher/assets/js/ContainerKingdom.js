@@ -2,6 +2,8 @@ class ContainerKingdom
 {
   iframeContainer;
   consoleContainer;
+  containerInfoContainer;
+  containersListContainer;
 
   rpgEngine;
   viewer;
@@ -23,11 +25,30 @@ class ContainerKingdom
 
   constructor() {
     this.iframeContainer = document.querySelector('#iframe-container');
+    this.containerInfoContainer = document.querySelector('.console-container .container-info');
+    this.containersListContainer = document.querySelector('.containers-list');
+
     this.header = document.querySelector('#header');
     this.makeViewportZoomable();
     this.makeViewportDraggable()
 
     this.init();
+  }
+
+  async init() {
+    await this.initRpgEngine();
+    await this.initConsole();
+    this.viewer = new ContainerKingdomRenderer(this, this.rpgEngine.getViewport());
+
+    await this.loadContainers();
+    await this.loadContainersStats();
+
+    await this.viewer.drawContainers(this.containers);
+    await this.viewer.drawNetworks(this.containers);
+    await this.rpgEngine.getViewport().render();
+    this.drawNetworksSwitches();
+
+    await this.loop();
   }
 
   clear() {
@@ -48,27 +69,33 @@ class ContainerKingdom
     });
   }
 
-  async init() {
-    await this.initRpgEngine();
-    await this.initConsole();
-    this.viewer = new ContainerKingdomRenderer(this, this.rpgEngine.getViewport());
 
-    await this.loadContainers();
-    await this.loadContainersStats();
-
-    await this.viewer.drawContainers(this.containers);
-    await this.viewer.drawNetworks(this.containers);
-    await this.rpgEngine.getViewport().render();
-    this.drawNetworksSwitches();
-
-    await this.loop();
-  }
 
   async loop() {
     const currentChecksum = await this.getChecksum();
 
     await this.loadContainers();
     await this.loadContainersStats();
+
+    this.containersListContainer.innerHTML = '';
+    Object.values(this.containers).map(container => {
+
+      const entry = document.createElement('div');
+      entry.classList.add('container-list-entry');
+      entry.innerHTML = container.getName();
+      entry.addEventListener('click', async () => {
+        console.log('%cContainerKingdom.js :: 87 =============================', 'color: #f00; font-size: 1rem');
+        console.log(container.rpgEngine);
+        await this.handleClickOnContainer(container);
+      });
+
+
+      this.containersListContainer.append(entry);
+
+    });
+
+
+
 
     const newChecksum = await this.getChecksum();
 
@@ -297,9 +324,7 @@ class ContainerKingdom
     const lines = logs.split("\n");
     this.console.clear();
 
-    this.showConsole();
 
-    console.log(container);
 
     lines.map(line => {
       // clear all non printable characters
@@ -308,6 +333,27 @@ class ContainerKingdom
       lineContainer.innerHTML = line;
       this.console.addEntry(lineContainer);
     });
+
+    this.containerInfoContainer.innerHTML = '';
+
+    this.containerInfoContainer.innerHTML = `
+      <div class="container-info-entry">
+        🗒️ Container name: ${container.getName()}
+      </div>
+      <div class="container-info-entry">
+        📀 Image: ${container.getImage()}
+      </div>
+      <div class="container-info-entry">
+        🧠 Memory usage: ${container.getMemoryUsage(true)}
+      </div>
+      <div class="container-info-entry">
+        ⚙️ CPU load: ${Math.round(container.getCpuUsage() * 100) / 100}%
+      </div>
+      <div class="container-info-entry">
+        🚀 Demo url: ${container.getDemoUrl()}
+      </div>
+    `;
+    this.showConsole();
 
   }
 

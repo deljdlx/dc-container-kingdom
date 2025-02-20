@@ -106,6 +106,7 @@ class ContainerKingdomRenderer
 
       let {x, y} = this.computeContainerCoords(container);
       ({x, y} = this.getClosestFreeCoords(layoutMatrix, x, y));
+      layoutMatrix[x][y].push(container);
       const house = await this.drawHouse(container, x, y);
       // house.addClass('smoke');
       layoutMatrix[x][y].push(house);
@@ -164,6 +165,9 @@ class ContainerKingdomRenderer
       house.addClass('memory--' + memoryThreshold.caption);
     }
 
+    house.getDom().dataset.containerId = container.getId();
+    house.getDom().dataset.containerName = container.getName();
+
     house.addClass('container');
     for(let networkName in container.NetworkSettings.Networks) {
       house.addClass('network--' + networkName);
@@ -172,10 +176,10 @@ class ContainerKingdomRenderer
     house.addClass('state--' + container.State)
     house.setInnerHTML(`
       <div class="container__name">
-        ${container.Names[0]}
+        ${container.getName()}
       </div>
       <div class="container__memory-usage">
-        ${memoryUsage ? (memoryUsage / 1024 / 1024).toFixed(2) + 'mb' : 'N/A'}
+        ${container.getMemoryUsage(true)}
       </div>
       <div class="cpu-indicator"></div>
     `);

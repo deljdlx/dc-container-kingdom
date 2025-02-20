@@ -40,9 +40,14 @@ class Container
 
     if(this.rpgEngine && this.rpgEngine.data.element) {
       const dom = this.rpgEngine.data.element.getDom()
-      setTimeout(() => {
-        dom.dataset.cpuUsage = this.getCpuUsageThreshold().css;
-      }, Math.random() * 1000);
+      dom.dataset.cpuUsage = this.getCpuUsageThreshold().css;
+
+      const memoryUsageContainer = dom.querySelector('.container__memory-usage');
+      if(memoryUsageContainer) {
+        memoryUsageContainer.innerHTML = this.getMemoryUsage(true);
+      }
+
+
     }
 
 
@@ -101,7 +106,11 @@ class Container
     return this.cpuUsage;
   }
 
-  getMemoryUsage() {
+  getMemoryUsage(human = false) {
+    if(human) {
+      const usageInMb = this.stats.memory_stats.usage / 1024 / 1024;
+      return `${usageInMb.toFixed(2)} MB`;
+    }
     return this.stats.memory_stats.usage;
   }
 
@@ -111,6 +120,10 @@ class Container
 
   setRpgEngineData(data) {
     this.rpgEngine.data = data;
+  }
+
+  getImage() {
+    return this.Image;
   }
 
   getId() {

@@ -30,6 +30,32 @@
   font-size: 2rem;
 }
 
+
+/* =============================================== */
+
+.containers-list-container {
+  position: fixed;
+  top: 60px;
+  left: 30px;
+  width: 300px;
+  height: calc(100vh - 90px);
+  background-color: #000a;
+  z-index: 10;
+  overflow: auto;
+}
+
+.containers-list .container-list-entry {
+  padding: 2px 4px;
+  border: 1px solid #fff;
+  background-color: #000;
+  color: #fff;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+/* =============================================== */
+
+
 /* =============================================== */
 
 .console-container {
@@ -50,9 +76,32 @@
   font-size: 2rem;
 }
 
+#console-container__content {
+  height: 100%;
+  display: flex;
+}
+
+#console-container__content .container-info {
+  width: 300px;
+  flex-shrink: 0;
+  padding-right: 8px;
+}
+
+.container-info-entry {
+  padding: 2px 4px;
+  border: 1px solid #fff;
+  background-color: #000;
+  color: #fff;
+  border-radius: 8px;
+  margin-bottom: 8px;
+}
+
+
 #game-console {
   height: 100%;
   overflow: auto;
+  flex-shrink: 1;
+  flex-grow: 1;
 }
 
 
