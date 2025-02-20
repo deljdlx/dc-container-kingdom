@@ -50,9 +50,14 @@ class Character extends Element
     this.direction = direction;
   }
 
-  quickReaction(content) {
+  quickReaction(content, autoClose = true, closeAfter = 10000) {
     this.getRenderer()._domQuickReaction.innerHTML = content;
     this.getRenderer()._domQuickReaction.classList.add('quickReaction--enable');
+    if(autoClose) {
+      setTimeout(() => {
+        this.clearQuickReaction();
+      }, closeAfter);
+    }
     return this;
   }
 

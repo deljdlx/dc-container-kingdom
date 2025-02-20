@@ -1,6 +1,8 @@
-class InfraWatcher
+class ContainerKingdom
 {
   iframeContainer;
+  consoleContainer;
+
   rpgEngine;
   viewer;
   console;
@@ -35,14 +37,24 @@ class InfraWatcher
     });
   }
 
+  async loadContainersStats() {
+    const stats = await this.getAllContainersStats();
+    stats.map((containerStats) => {
+      const containerId = containerStats.id;
+      const container = this.containers[containerId];
+      if(container) {
+        container.setStats(containerStats);
+      }
+    });
+  }
+
   async init() {
     await this.initRpgEngine();
-    this.viewer = new DockerNetworkViewer(this, this.rpgEngine.getViewport());
+    await this.initConsole();
+    this.viewer = new ContainerKingdomRenderer(this, this.rpgEngine.getViewport());
+
     await this.loadContainers();
-    const stats = await this.getAllContainersStats();
-    stats.map(stat => {
-      this.containersStats[stat.id] = stat;
-    });
+    await this.loadContainersStats();
 
     await this.viewer.drawContainers(this.containers);
     await this.viewer.drawNetworks(this.containers);
@@ -53,16 +65,10 @@ class InfraWatcher
   }
 
   async loop() {
-    console.log(
-      '%c' +
-      (new Date()).toLocaleTimeString() +
-      "LOOP",
-      'color: #f00; font-size: 1rem'
-    );
-
     const currentChecksum = await this.getChecksum();
 
     await this.loadContainers();
+    await this.loadContainersStats();
 
     const newChecksum = await this.getChecksum();
 
@@ -205,6 +211,8 @@ class InfraWatcher
     this.rpgEngine.registerElement('Fountain00', Fountain00);
 
     this.rpgEngine.registerElement('Woman00', Woman00);
+    this.rpgEngine.registerElement('Woman01', Woman01);
+    this.rpgEngine.registerElement('Woman01', Woman02);
     this.rpgEngine.registerElement('Man00', Man00);
 
     this.rpgEngine.registerElement('Flower00', Flower00);
@@ -212,11 +220,8 @@ class InfraWatcher
     this.rpgEngine.registerElement('Sunflower00', Sunflower00);
     this.rpgEngine.registerElement('Ground00', Ground00);
 
-    this.console = new GameConsole(this.rpgEngine, '#game-console');
-    this.console.addEntry('<em>Hello my friend, what can I do for you ?</em>');
-
     this.rpgEngine.addEventListener('map.update', (event) => {
-      // console.log(event);
+
     });
 
     document.querySelector('#close-iframe-container').addEventListener('click', () => {
@@ -272,7 +277,6 @@ class InfraWatcher
     if(container.Labels) {
       Object.keys(container.Labels).map((label) => {
         let value = container.Labels[label];
-        // console.log(value)
         if(value.match(/Host\(.+?\)/)) {
             let url = value.replace(/Host\((.*?)\).*/, '$1');
             url = url.replace(/"/gi, '');
@@ -292,8 +296,17 @@ class InfraWatcher
     const logs = await this.getContainerLogs(container.Id);
     const lines = logs.split("\n");
     this.console.clear();
+
+    this.showConsole();
+
+    console.log(container);
+
     lines.map(line => {
-      this.console.addEntry(line);
+      // clear all non printable characters
+      line = line.replace(/[^\x20-\x7E]/g, '');
+      const lineContainer = document.createElement('div');
+      lineContainer.innerHTML = line;
+      this.console.addEntry(lineContainer);
     });
 
   }
@@ -387,6 +400,22 @@ class InfraWatcher
           document.body.removeEventListener('mousemove', onMouseMove);
       }, { once: true }); // Supprime `mouseup` après un seul appel
     });
+  }
+
+  initConsole() {
+    this.console = new GameConsole(this.rpgEngine, '#game-console');
+    this.console.addEntry('<em>Hello my friend, what can I do for you ?</em>');
+
+    this.consoleContainer = document.querySelector('.console-container')
+
+    const closeTrigger = document.querySelector('#close-console-container');
+    closeTrigger.addEventListener('click', () => {
+      this.consoleContainer.classList.add('hidden');
+    });
+  }
+
+  showConsole() {
+    this.consoleContainer.classList.remove('hidden');
   }
 
   showIframe(url) {

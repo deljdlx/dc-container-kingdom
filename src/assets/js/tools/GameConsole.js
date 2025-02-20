@@ -16,7 +16,12 @@ class GameConsole
   addEntry(content) {
     const entry = document.createElement('div');
     entry.classList.add('controle-entry');
-    entry.innerHTML = content;
+    if(content instanceof HTMLElement) {
+      entry.appendChild(content);
+    }
+    else {
+      entry.innerHTML = content;
+    }
     this.container.appendChild(entry);
   }
 }

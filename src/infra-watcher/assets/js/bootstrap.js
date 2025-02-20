@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  const infraWatcher = new InfraWatcher();
+  const instance = new ContainerKingdom();
 });
 
 

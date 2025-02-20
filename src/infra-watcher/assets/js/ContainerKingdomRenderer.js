@@ -1,4 +1,4 @@
-class DockerNetworkViewer
+class ContainerKingdomRenderer
 {
   application;
   viewport;
@@ -154,9 +154,10 @@ class DockerNetworkViewer
       }
     });
 
-    const stats = await this.application.getContainerStats(container.Id);
+    //const stats = await this.application.getContainerStats(container.Id);
 
-    const memoryUsage = stats.memory_stats.usage;
+    const memoryUsage = container.getMemoryUsage();
+
     if(memoryUsage) {
       const memoryThreshold = this.getMemoryThreshold(memoryUsage);
       house.addClass('memory--' + memoryThreshold.humanCaption);
@@ -176,8 +177,49 @@ class DockerNetworkViewer
       <div class="container__memory-usage">
         ${memoryUsage ? (memoryUsage / 1024 / 1024).toFixed(2) + 'mb' : 'N/A'}
       </div>
+      <div class="cpu-indicator"></div>
     `);
     house.data.container = container;
+
+    const characterIndex = Math.floor(Math.random() * 4);
+    let character = null
+
+    switch(characterIndex) {
+      case 0: {
+        character = new Woman00();
+        break;
+      }
+      case 1: {
+        character = new Woman01();
+        break;
+      }
+      case 2: {
+        character = new Woman02();
+        break;
+      }
+      case 3: {
+        character = new Man00();
+        break;
+      }
+    }
+
+    character.addEventListener('element.click', (event) => {
+      if(container.getDemoUrl())
+        character.quickReaction(`
+          Hello my friend. Do you want to visit
+          <a href="//${container.getDemoUrl()}" target="_blank">${container.getDemoUrl()}</a> ?
+        `);
+    });
+
+
+
+    area.addElement(
+      x * this.cellWidth + 80,
+      y * this.cellHeight +  this.cellHeight - 40,
+      character
+    );
+    console.log('%cContainerKingdomRenderer.js :: 189 =============================', 'color: #f00; font-size: 1rem');
+    console.log(character);
 
     return house;
   }

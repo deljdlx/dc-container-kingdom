@@ -10,9 +10,99 @@ class Container
     },
   };
 
+  stats = null;
+  previousStats = null;
+  cpuUsage = 0;
+
+
+  cpuUsageThresholds = [
+    {value: 1, css: 'xxs'},
+    {value: 5, css: 'xs'},
+    {value: 10, css: 's'},
+    {value: 20, css: 'm'},
+    {value: 30, css: 'xm'},
+    {value: 40, css: 'xxm'},
+    {value: 50, css: 'l'},
+    {value: 60, css: 'xl'},
+    {value: 70, css: 'xxl'},
+    {value: 80, css: 'xxxl'},
+  ];
+
+
+
 
   constructor(descriptor) {
     Object.assign(this, descriptor);
+    this.watch();
+  }
+
+  watch() {
+
+    if(this.rpgEngine && this.rpgEngine.data.element) {
+      const dom = this.rpgEngine.data.element.getDom()
+      setTimeout(() => {
+        dom.dataset.cpuUsage = this.getCpuUsageThreshold().css;
+      }, Math.random() * 1000);
+    }
+
+
+
+    setTimeout(() => {
+      this.watch();
+    }, 10000);
+  }
+
+  getCpuUsageThreshold() {
+    for (let i = 0; i < this.cpuUsageThresholds.length; i++) {
+      if (this.cpuUsage < this.cpuUsageThresholds[i].value) {
+        return this.cpuUsageThresholds[i];
+      }
+    }
+
+    return {value: 90, css: 'critical'};
+  }
+
+  getDemoUrl() {
+    let demoUrl =false;
+    if(this.Labels) {
+      Object.keys(this.Labels).map((label) => {
+        let value = this.Labels[label];
+        if(value.match(/Host\(.+?\)/)) {
+          let url = value.replace(/Host\((.*?)\).*/, '$1');
+          url = url.replace(/"/gi, '');
+          url = url.replace(/'/gi, '');
+          url = url.replace(/`/gi, '');
+          console.log(url);
+          if(url) {
+            demoUrl = url;
+          };
+        }
+      });
+    }
+
+    return demoUrl;
+  }
+
+
+  setStats(stats) {
+    this.stats = stats;
+
+    if (this.previousStats) {
+      const totalDiff = this.stats.cpu_stats.cpu_usage.total_usage - this.previousStats.cpu_stats.cpu_usage.total_usage;
+      const systemDiff = this.stats.cpu_stats.system_cpu_usage - this.previousStats.cpu_stats.system_cpu_usage;
+      const numCores = this.stats.cpu_stats.online_cpus;
+      this.cpuUsage = (totalDiff / systemDiff) * numCores * 100;
+    }
+
+    this.previousStats = this.stats;
+  }
+
+  getCpuUsage() {
+    return this.cpuUsage;
+  }
+
+  getMemoryUsage() {
+    return this.stats.memory_stats.usage;
   }
 
   destroy() {
@@ -29,6 +119,10 @@ class Container
 
   getLabel(label) {
     return this.Labels[label] ??  null;
+  }
+
+  getName() {
+    return this.Names[0];
   }
 
   getComposeName() {
