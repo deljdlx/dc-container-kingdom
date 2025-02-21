@@ -11,7 +11,7 @@ jobs:
     uses: deljdlx/github-tools/.github/workflows/deploy.yml@main
     with:
       host_name: "container-kingdom.jlb.ninja"
-      repo_name: "dc-docker-api"
+      repo_name: "dc-container-kingdom"
       repo_owner: "deljdlx"
       deploy_folder: "/home/jdlxt/stack"
     secrets:
