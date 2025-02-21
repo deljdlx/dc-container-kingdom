@@ -1,13 +1,13 @@
 services:
   container-kingdom:
     container_name: container-kingdom
-    build: .
+    build: ./compose
     restart: always
     env_file:
       - .env
     volumes:
-      - ./nginx.conf:/etc/nginx/conf.d/default.conf
-      - "../src:/var/www/html"
+      - ./compose/nginx.conf:/etc/nginx/conf.d/default.conf
+      - "./src:/var/www/html"
     labels:
       - "traefik.enable=true"
       - "traefik.docker.network=web"

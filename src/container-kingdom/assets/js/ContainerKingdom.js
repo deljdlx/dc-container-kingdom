@@ -339,7 +339,7 @@ class ContainerKingdom
       </div>
 
       <div class="container-info-entry">
-        📦 Image: ${container.getComposeName()}
+        📦 Compose: ${container.getComposeName()}
       </div>
 
 
