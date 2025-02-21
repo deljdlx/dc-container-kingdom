@@ -337,6 +337,12 @@ class ContainerKingdom
       <div class="container-info-entry">
         📀 Image: ${container.getImage()}
       </div>
+
+      <div class="container-info-entry">
+        📦 Image: ${container.getComposeName()}
+      </div>
+
+
       <div class="container-info-entry">
         🧠 Memory usage: ${container.getMemoryUsage(true)}
       </div>
