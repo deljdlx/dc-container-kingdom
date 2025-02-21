@@ -1,5 +1,6 @@
 document.addEventListener('DOMContentLoaded', async () => {
-  const instance = new ContainerKingdom();
+  const dockerApiClient = new DockerApiClient();
+  const instance = new ContainerKingdom(dockerApiClient);
 });
 
 

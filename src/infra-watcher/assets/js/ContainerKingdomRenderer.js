@@ -16,6 +16,8 @@ class ContainerKingdomRenderer
   xCells = 0;
   yCells = 0;
 
+  matrix = {};
+
   memoryUsageThresholds = [
     {thresholds: 4 * 1024 *1024, caption: '4mb', humanCaption: 'xxs'},
     {thresholds: 8 * 1024 *1024, caption: '8mb', humanCaption: 'xs'},
@@ -47,9 +49,11 @@ class ContainerKingdomRenderer
     const roadElement = new Ground00();
     this.roadWidth = roadElement.width();
     this.roadHeight = roadElement.height();
+
+    this.matrix = this.initMatrix();
   }
 
-  initContainersMatrix()  {
+  initMatrix()  {
     let layoutMatrix = [];
     for (let x = 0; x < this.xCells; x++) {
       layoutMatrix[x] = [];
@@ -87,7 +91,7 @@ class ContainerKingdomRenderer
   }
 
   async drawContainers(containers) {
-    const layoutMatrix = this.initContainersMatrix();
+
     this.computeBounds(containers);
 
     Object.values(containers).map(async (container) => {
@@ -98,37 +102,38 @@ class ContainerKingdomRenderer
           const friendContainers = compose.getContainers();
 
           if(Object.values(friendContainers).length > 1) {
-            this.drawHouseGroup(layoutMatrix, friendContainers);
+            this.drawHouseGroup(friendContainers);
             return;
           }
         }
       }
 
       let {x, y} = this.computeContainerCoords(container);
-      ({x, y} = this.getClosestFreeCoords(layoutMatrix, x, y));
-      layoutMatrix[x][y].push(container);
+      ({x, y} = this.getClosestFreeCoords(x, y));
+
+      if(this.hasAdjacentCell(x, y)) {
+        ({x, y} = this.getClosestFreeCoords(x + 2, y + 2));
+      }
+
       const house = await this.drawHouse(container, x, y);
       // house.addClass('smoke');
-      layoutMatrix[x][y].push(house);
     });
   }
 
-  async drawHouseGroup(layoutMatrix, containers) {
+  async drawHouseGroup(containers) {
 
     const firstContainer = Object.values(containers)[0];
     let {x, y} = this.computeContainerCoords(firstContainer);
-    ({x, y} = this.getClosestFreeCoords(layoutMatrix, x, y));
+    ({x, y} = this.getClosestFreeCoords(x, y));
     let house = await this.drawHouse(firstContainer, x, y);
-    layoutMatrix[x][y].push(house);
 
     Object.values(containers).map(async (container, index) => {
       if(index === 0) {
         return;
       }
 
-      ({x, y} = this.getClosestFreeCoords(layoutMatrix, x, y));
+      ({x, y} = this.getClosestFreeCoords(x, y, 0));
       let house = await this.drawHouse(container, x, y);
-      layoutMatrix[x][y].push(house);
     });
   }
 
@@ -146,6 +151,7 @@ class ContainerKingdomRenderer
     );
 
     container.rendered = true;
+    this.matrix[x][y].push(house);
 
     container.setRpgEngineData({
       element: house,
@@ -222,8 +228,6 @@ class ContainerKingdomRenderer
       y * this.cellHeight +  this.cellHeight - 40,
       character
     );
-    console.log('%cContainerKingdomRenderer.js :: 189 =============================', 'color: #f00; font-size: 1rem');
-    console.log(character);
 
     return house;
   }
@@ -454,39 +458,83 @@ class ContainerKingdomRenderer
     return this.bounds;
   }
 
-  getClosestFreeCoords(layoutMatrix, startX, startY) {
-    const rows = layoutMatrix.length;
-    const cols = layoutMatrix[0].length;
 
+  hasAdjacentCell(x, y) {
+    if(
+        this.matrix[x + 1] && this.matrix[x + 1][y + 1]
+        || this.matrix[x + 1] && this.matrix[x + 1][y]
+        || this.matrix[x + 1] && this.matrix[x + 1][y - 1]
+
+        || this.matrix[x] && this.matrix[x][y + 1]
+        || this.matrix[x] && this.matrix[x][y - 1]
+
+        || this.matrix[x - 1] && this.matrix[x - 1][y - 1]
+        || this.matrix[x - 1] && this.matrix[x - 1][y]
+        || this.matrix[x - 1] && this.matrix[x - 1][y + 1]
+    ) {
+      return true;
+    }
+
+    return false;
+  };
+
+  getClosestFreeCoords(startX, startY, minDistance = 1) {
+    const rows = this.matrix.length;
+    const cols = this.matrix[0].length;
     let x = startX, y = startY;
     let step = 1, dir = 0;
 
     const directions = [
-      [1, 0],  // Droite
-      [0, 1],  // Bas
-      [-1, 0], // Gauche
-      [0, -1]  // Haut
+        [1, 0],  // Droite
+        [0, 1],  // Bas
+        [-1, 0], // Gauche
+        [0, -1]  // Haut
     ];
 
-    if (layoutMatrix[x][y].length === 0) return {x, y}; // Déjà libre
+    // Vérifier si la position de départ respecte déjà la distance minimale
+    if (this.isPositionValid(x, y, minDistance)) return { x, y };
 
     while (step < Math.max(rows, cols)) {
-      for (let i = 0; i < 2; i++) { // 2 fois chaque step avant d'incrémenter
-        for (let j = 0; j < step; j++) {
-          x += directions[dir][0];
-          y += directions[dir][1];
+        for (let i = 0; i < 2; i++) { // 2 fois chaque step avant d'incrémenter
+            for (let j = 0; j < step; j++) {
+                x += directions[dir][0];
+                y += directions[dir][1];
 
-          if (x >= 0 && y >= 0 && x < rows && y < cols && layoutMatrix[x][y].length === 0) {
-            return {x, y}; // Premier emplacement libre trouvé
-          }
+                if (x >= 0 && y >= 0 && x < rows && y < cols && this.isPositionValid(x, y, minDistance)) {
+                    return { x, y }; // Premier emplacement libre respectant la distance
+                }
+            }
+            dir = (dir + 1) % 4; // Tourner dans la spirale
         }
-        dir = (dir + 1) % 4; // Tourner dans la spirale
-      }
-      step++; // Augmenter le pas après 2 itérations
+        step++; // Augmenter le pas après 2 itérations
     }
 
     return null; // Aucun espace libre trouvé
+}
+
+// ✅ Fonction auxiliaire pour vérifier la distance minimale
+isPositionValid(x, y, minDistance) {
+
+    if(x < 0 || y < 0 || x >= this.matrix.length || y >= this.matrix[0].length) {
+      return false;
+    }
+
+    if (this.matrix[x][y].length !== 0) return false; // Pas vide, on refuse
+
+    // Vérifier que toutes les cases dans un rayon de `minDistance` sont vides
+    for (let dx = -minDistance; dx <= minDistance; dx++) {
+        for (let dy = -minDistance; dy <= minDistance; dy++) {
+            let nx = x + dx, ny = y + dy;
+            if (nx >= 0 && ny >= 0 && nx < this.matrix.length && ny < this.matrix[0].length) {
+                if (this.matrix[nx][ny].length !== 0) {
+                    return false; // Une case trop proche est occupée
+                }
+            }
+        }
+    }
+    return true;
   }
+
 
   computeContainerCoords(container) {
 

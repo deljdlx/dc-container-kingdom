@@ -24,5 +24,9 @@ class GameConsole
     }
     this.container.appendChild(entry);
   }
+
+  scrollToBottom() {
+    this.container.scrollTop = this.container.scrollHeight;
+  }
 }
 

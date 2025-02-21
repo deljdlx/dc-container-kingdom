@@ -55,9 +55,6 @@
 
 /* =============================================== */
 
-
-/* =============================================== */
-
 .console-container {
   position: absolute;
   z-index: 2000;
@@ -67,6 +64,7 @@
   height: calc(100vh - 60px);
   top: 30px;
   left: 30px;
+  backdrop-filter: blur(5px);
 }
 #close-console-container {
   cursor: pointer;
@@ -97,11 +95,26 @@
 }
 
 
-#game-console {
+.console-container #game-console {
   height: 100%;
   overflow: auto;
   flex-shrink: 1;
   flex-grow: 1;
+}
+
+.console-container .log-entry {
+  padding: 2px 4px;
+  border: solid 1px #fff8;
+  margin-bottom: 8px;
+  line-height: 2rem;
+}
+.log-entry--error {
+  background-color: #f00;
+  color: #fff;
+}
+
+.console-container .log-entry details summary * {
+  display: inline;
 }
 
 

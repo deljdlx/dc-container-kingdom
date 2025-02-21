@@ -8,6 +8,7 @@ class ContainerKingdom
   rpgEngine;
   viewer;
   console;
+  dockerApiClient;
 
 
   containers = {};
@@ -23,7 +24,10 @@ class ContainerKingdom
   lastContainersChecksum = null;
 
 
-  constructor() {
+  constructor(dockerApiClient) {
+
+    this.dockerApiClient = dockerApiClient;
+
     this.iframeContainer = document.querySelector('#iframe-container');
     this.containerInfoContainer = document.querySelector('.console-container .container-info');
     this.containersListContainer = document.querySelector('.containers-list');
@@ -59,7 +63,7 @@ class ContainerKingdom
   }
 
   async loadContainersStats() {
-    const stats = await this.getAllContainersStats();
+    const stats = await this.dockerApiClient.getAllContainersStats();
     stats.map((containerStats) => {
       const containerId = containerStats.id;
       const container = this.containers[containerId];
@@ -88,14 +92,8 @@ class ContainerKingdom
         console.log(container.rpgEngine);
         await this.handleClickOnContainer(container);
       });
-
-
       this.containersListContainer.append(entry);
-
     });
-
-
-
 
     const newChecksum = await this.getChecksum();
 
@@ -120,7 +118,7 @@ class ContainerKingdom
 
   async loadContainers() {
 
-    const containers = await this.getContainersDescriptors();
+    const containers = await this.dockerApiClient.getContainersDescriptors();
     containers.map(containerDescriptor => {
 
       if(this.containers[containerDescriptor.Id]) {
@@ -320,18 +318,13 @@ class ContainerKingdom
   }
 
   async handleClickOnContainer(container) {
-    const logs = await this.getContainerLogs(container.Id);
-    const lines = logs.split("\n");
     this.console.clear();
+    const buffer = await this.dockerApiClient.getContainerLogs(container.Id);
+    const log = new Log(buffer)
+    const entries = log.getEntries();
 
-
-
-    lines.map(line => {
-      // clear all non printable characters
-      line = line.replace(/[^\x20-\x7E]/g, '');
-      const lineContainer = document.createElement('div');
-      lineContainer.innerHTML = line;
-      this.console.addEntry(lineContainer);
+    entries.map(logEntry => {
+      this.console.addEntry(logEntry.getElement());
     });
 
     this.containerInfoContainer.innerHTML = '';
@@ -353,8 +346,9 @@ class ContainerKingdom
         🚀 Demo url: ${container.getDemoUrl()}
       </div>
     `;
-    this.showConsole();
 
+    this.showConsole();
+    this.console.scrollToBottom();
   }
 
   drawRandomFlowers(quantity) {
@@ -369,38 +363,6 @@ class ContainerKingdom
   }
 
 
-  async getContainersDescriptors() {
-    const response = await fetch('/api/docker/containers/json?all=true');
-    const containers = await response.json();
-    return containers;
-  }
-
-  async getAllContainersStats() {
-    const response = await fetch('/api/docker/containers/json?all=true&size=true');
-    const containers = await response.json();
-
-    const statsPromises = containers.map(container =>
-        fetch(`/api/docker/containers/${container.Id}/stats?stream=false`)
-            .then(res => res.json())
-            .catch(() => null)
-    );
-    const stats = await Promise.all(statsPromises);
-
-    return stats.filter(stat => stat !== null);
-  }
-
-  async loadContainerStats(containerId) {
-    const response = await fetch(`/api/docker/containers/${containerId}/stats?stream=false`);
-    const stats = await response.json();
-
-    return stats;
-  }
-
-  async getContainerLogs(containerId) {
-    const response = await fetch(`/api/docker/containers/${containerId}/logs?stdout=true&stderr=true&tail=50`);
-    const logs = await response.text();
-    return logs;
-  }
 
 
   makeViewportZoomable() {
