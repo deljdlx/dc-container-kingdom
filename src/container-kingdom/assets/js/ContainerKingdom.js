@@ -73,8 +73,6 @@ class ContainerKingdom
     });
   }
 
-
-
   async loop() {
     const currentChecksum = await this.getChecksum();
 
@@ -318,6 +316,9 @@ class ContainerKingdom
   }
 
   async handleClickOnContainer(container) {
+
+    this.focusOnContainer(container);
+
     this.console.clear();
     const buffer = await this.dockerApiClient.getContainerLogs(container.Id);
     const log = new Log(buffer)
@@ -351,6 +352,21 @@ class ContainerKingdom
     this.console.scrollToBottom();
   }
 
+  async focusOnContainer(container) {
+    const absoluteX = container.getElement().x();
+    const absoluteY = container.getElement().y();
+
+    const board = document.querySelector('#viewport').firstElementChild;
+
+    let moveX = (window.innerWidth / 2 - absoluteX) * 1.5;
+    let moveY = (window.innerHeight / 2 - absoluteY) * 1.5 - container.getElement().height();
+
+    board.style.left = moveX + 'px';
+    board.style.top = moveY + 'px';
+
+    board.style.transform = 'scale(1.5)';
+  }
+
   drawRandomFlowers(quantity) {
     const board = this.rpgEngine.getViewport().getBoard();
     for(let i = 0; i < quantity ; i++) {
@@ -361,9 +377,6 @@ class ContainerKingdom
       area.addElement(x, y, new Sunflower00());
     }
   }
-
-
-
 
   makeViewportZoomable() {
     document.querySelector('#viewport').addEventListener('wheel', (event) => {

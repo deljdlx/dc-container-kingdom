@@ -36,6 +36,10 @@ class Container
     this.watch();
   }
 
+  getElement() {
+    return this.rpgEngine.data.element;
+  }
+
   watch() {
 
     if(this.rpgEngine && this.rpgEngine.data.element) {

@@ -161,8 +161,6 @@ class ContainerKingdomRenderer
       }
     });
 
-    //const stats = await this.application.getContainerStats(container.Id);
-
     const memoryUsage = container.getMemoryUsage();
 
     if(memoryUsage) {
