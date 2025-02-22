@@ -1,0 +1,113 @@
+
+
+.container.memory--xxs .container__name::before {
+  content: "🌈";
+  font-size: 1rem;
+}
+.container.memory--xs .container__name::before {
+  content: "🌟";
+  font-size: 1rem;
+}
+.container.memory--s .container__name::before {
+  content: "🌞";
+  font-size: 1rem;
+}
+.container.memory--m .container__name::before {
+  content: "☀️";
+  font-size: 1rem;
+}
+
+/* =============================================== */
+.container.memory--xm .container__name::before {
+  content: "⛅";
+  font-size: 1rem;
+}
+
+.container.memory--xm .map-element__sprite{
+  filter: sepia(1) hue-rotate(45deg) saturate(3);
+}
+
+.container.memory--xm::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #aca;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #aca8;
+}
+
+/* =============================================== */
+.container.memory--xxm .container__name::before {
+  content: "☁️";
+  font-size: 1rem;
+}
+.container.memory--xxm .map-element__sprite{
+  filter: sepia(1) hue-rotate(0deg) saturate(3);
+  border-radius: 50%;
+
+  animation: pulsar 1.5s infinite ease-in-out;
+}
+.container.memory--xxm::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #ff0;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #ff08;
+}
+/* =============================================== */
+
+.container.memory--xl .container__name::before {
+  content: "🌧️";
+  font-size: 1rem;
+}
+.container.memory--xl .map-element__sprite{
+  filter: sepia(1) hue-rotate(-35deg) saturate(3);
+
+  animation: pulsar 1.5s infinite ease-in-out;
+  border-radius: 50%;
+}
+.container.memory--xl::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #fa0;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #fa08;
+}
+/* =============================================== */
+.container.memory--l .container__name::before {
+  content: "☁️";
+  font-size: 1rem;
+}
+.container.memory--l .map-element__sprite{
+  filter: sepia(1) hue-rotate(-45deg) saturate(3);
+  border-radius: 50%;
+
+  animation: pulsar 1.5s infinite ease-in-out;
+}
+.container.memory--l::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #f30;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #f308;
+}
+/* =============================================== */
