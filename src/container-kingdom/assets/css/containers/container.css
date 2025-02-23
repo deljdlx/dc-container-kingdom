@@ -80,3 +80,11 @@
     transform: scale(1);
   }
 }
+
+/* =============================================== */
+
+.compose-cluster {
+  background-color: #0f08;
+  border: 1px solid #0f0;
+  border-radius: 16px;
+}

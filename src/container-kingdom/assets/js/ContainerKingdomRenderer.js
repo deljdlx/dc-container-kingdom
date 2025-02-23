@@ -135,15 +135,13 @@ class ContainerKingdomRenderer
     let xMax = Number.MIN_SAFE_INTEGER;
     let yMin = Number.MAX_SAFE_INTEGER;
     let yMax = Number.MIN_SAFE_INTEGER;
+
     houses.map((house) => {
       xMin = Math.min(xMin, house.x());
       xMax = Math.max(xMax, house.x() + house.width());
       yMin = Math.min(yMin, house.y());
       yMax = Math.max(yMax, house.y() + house.height());
     });
-    console.log({
-      xMin, xMax, yMin, yMax
-    })
 
     xMin -= 20;
     xMax += 20;
@@ -152,40 +150,73 @@ class ContainerKingdomRenderer
 
     const board = this.viewport.getBoard();
     const area = board.getAreaAt(0, 0);
-    const horizontalFences = Math.floor((xMax - xMin) / 16);
-    const verticalFences = Math.floor((yMax - yMin) / 16);
+    let element = new Element(
+      0,
+      0,
+      xMax - xMin,
+      yMax - yMin
+    )
+    
+    element.getDom().classList.add('compose-cluster');
 
-    for(let h = 0 ; h <= horizontalFences ; h++) {
-      area.addElement(
-        xMin + h * 16,
-        yMin,
-        new Fence00H()
-      );
+    houses[0].addElement(
+      -20,
+      -20,
+      element
+    )
 
-      if(h > 4 && h < 8) {
-        continue;
-      }
-      area.addElement(
-        xMin + h * 16,
-        yMax,
-        new Fence00H()
-      );
-    }
+    // area.addElement(
+    //   xMin,
+    //   yMin,
+    //   element
+    // );
 
-    for(let v = 0 ; v <= verticalFences ; v++) {
-      area.addElement(
-        xMin,
-        yMin + v * 16,
-        new Fence00V()
-      );
 
-      area.addElement(
-        xMax,
-        yMin + v * 16,
-        new Fence00V()
-      );
-    }
 
+    return;
+
+
+    // houses.map((house) => {
+    //   xMin = Math.min(xMin, house.x());
+    //   xMax = Math.max(xMax, house.x() + house.width());
+    //   yMin = Math.min(yMin, house.y());
+    //   yMax = Math.max(yMax, house.y() + house.height());
+    // });
+    // console.log({
+    //   xMin, xMax, yMin, yMax
+    // })
+
+    // xMin -= 20;
+    // xMax += 20;
+    // yMin -= 20;
+    // yMax += 20;
+
+    // const board = this.viewport.getBoard();
+    // const area = board.getAreaAt(0, 0);
+    // const horizontalFences = Math.floor((xMax - xMin) / 16);
+    // const verticalFences = Math.floor((yMax - yMin) / 16);
+
+    // for(let h = 0 ; h <= horizontalFences ; h++) {
+    //   area.addElement(
+    //     xMin + h * 16,
+    //     yMin,
+    //     new Fence00H()
+    //   );
+    // }
+
+    // for(let v = 0 ; v <= verticalFences ; v++) {
+    //   area.addElement(
+    //     xMin,
+    //     yMin + v * 16,
+    //     new Fence00V()
+    //   );
+
+    //   area.addElement(
+    //     xMax,
+    //     yMin + v * 16,
+    //     new Fence00V()
+    //   );
+    // }
   }
 
 

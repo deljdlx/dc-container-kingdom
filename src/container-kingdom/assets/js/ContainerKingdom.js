@@ -425,7 +425,8 @@ class ContainerKingdom
       const offsetX = board.offsetLeft;
       const offsetY = board.offsetTop;
 
-      board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
+      // const savedTransformOrigin = board.style.transform;
+      // board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
 
       const scale = board.style.transform.match(/scale\((.*)\)/);
       let currentScale = 1;
@@ -445,6 +446,8 @@ class ContainerKingdom
         }
         board.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
       }
+
+      // board.style.transformOrigin = savedTransformOrigin;
 
     });
   }
