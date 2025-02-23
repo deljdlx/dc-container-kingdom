@@ -188,8 +188,9 @@ class ContainerKingdom
 
     const descriptor = {
       ids: containers.map(container => container.Id),
-      networks: containers.map(container => container.NetworkSettings.Networks),
-      labels: containers.map(container => container.Labels),
+      networks: containers.map(container => container.getNetworks()),
+      labels: containers.map(container => container.getLabels()),
+      status: containers.map(container => container.getStatus()),
     };
 
     const newChecksum = await this.getChecksum(descriptor);
@@ -420,11 +421,11 @@ class ContainerKingdom
         return;
       }
 
-      const clientX = event.clientX;
-      const clientY = event.clientY;
-      const offsetX = board.offsetLeft;
-      const offsetY = board.offsetTop;
-
+      // JDLX_TODO : Fix zoom origin
+      // const clientX = event.clientX;
+      // const clientY = event.clientY;
+      // const offsetX = board.offsetLeft;
+      // const offsetY = board.offsetTop;
       // const savedTransformOrigin = board.style.transform;
       // board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
 
@@ -447,6 +448,7 @@ class ContainerKingdom
         board.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
       }
 
+      // JDLX_TODO : Fix zoom origin
       // board.style.transformOrigin = savedTransformOrigin;
 
     });

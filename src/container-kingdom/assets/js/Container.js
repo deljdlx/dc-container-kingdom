@@ -93,11 +93,7 @@ class Container
       if(memoryUsageContainer) {
         memoryUsageContainer.innerHTML = this.getMemoryUsage(true);
       }
-
-
     }
-
-
 
     setTimeout(() => {
       this.watch();
@@ -168,6 +164,11 @@ class Container
     this.rpgEngine.data = data;
   }
 
+  getStatus() {
+    return this.Status;
+  }
+
+
   getImage() {
     return this.Image;
   }
@@ -178,6 +179,9 @@ class Container
 
   getLabel(label) {
     return this.Labels[label] ??  null;
+  }
+  getLabels() {
+    return this.Labels;
   }
 
   getName() {
