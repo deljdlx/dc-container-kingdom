@@ -106,20 +106,98 @@ class ContainerKingdomRenderer
 
   async drawHouseGroup(containers) {
 
+    console.log('%cContainerKingdomRenderer.js :: 109 =============================', 'color: #f0f; font-size: 1rem');
+    console.log(containers.length);
+
+    const houses = [];
     const firstContainer = Object.values(containers)[0];
     let {x, y} = this.computeContainerCoords(firstContainer);
     ({x, y} = this.getClosestFreeCoords(x, y, 2));
     let house = await this.drawHouse(firstContainer, x, y);
+    houses.push(house);
 
-    Object.values(containers).map(async (container, index) => {
+    await Object.values(containers).map(async (container, index) => {
       if(index === 0) {
         return;
       }
 
       ({x, y} = this.getClosestFreeCoords(x, y, 0));
       let house = await this.drawHouse(container, x, y);
+      console.log('%cContainerKingdomRenderer.js :: 126 =============================', 'color: #ff0; font-size: 1rem');
+      console.log("ICI");
+      houses.push(house);
     });
+
+
+    console.log('%cContainerKingdomRenderer.js :: 126 =============================', 'color: #f00; font-size: 1rem');
+    console.log(houses.length);
+
+    if(houses.length > 1) {
+      this.drawFences(houses);
+    }
   }
+
+  drawFences(
+    houses
+  ) {
+
+    let xMin = Number.MAX_SAFE_INTEGER;
+    let xMax = Number.MIN_SAFE_INTEGER;
+    let yMin = Number.MAX_SAFE_INTEGER;
+    let yMax = Number.MIN_SAFE_INTEGER;
+    houses.map((house) => {
+      xMin = Math.min(xMin, house.x());
+      xMax = Math.max(xMax, house.x() + house.width());
+      yMin = Math.min(yMin, house.y());
+      yMax = Math.max(yMax, house.y() + house.height());
+    });
+    console.log({
+      xMin, xMax, yMin, yMax
+    })
+
+    xMin -= 20;
+    xMax += 20;
+    yMin -= 20;
+    yMax += 20;
+
+    const board = this.viewport.getBoard();
+    const area = board.getAreaAt(0, 0);
+    const horizontalFences = Math.floor((xMax - xMin) / 16);
+    const verticalFences = Math.floor((yMax - yMin) / 16);
+
+    for(let h = 0 ; h <= horizontalFences ; h++) {
+      area.addElement(
+        xMin + h * 16,
+        yMin,
+        new Fence00H()
+      );
+
+      if(h > 4 && h < 8) {
+        continue;
+      }
+      area.addElement(
+        xMin + h * 16,
+        yMax,
+        new Fence00H()
+      );
+    }
+
+    for(let v = 0 ; v <= verticalFences ; v++) {
+      area.addElement(
+        xMin,
+        yMin + v * 16,
+        new Fence00V()
+      );
+
+      area.addElement(
+        xMax,
+        yMin + v * 16,
+        new Fence00V()
+      );
+    }
+
+  }
+
 
   async drawHouse(container, x, y) {
     if(container.rendered) {

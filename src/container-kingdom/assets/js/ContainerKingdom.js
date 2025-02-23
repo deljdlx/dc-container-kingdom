@@ -280,6 +280,9 @@ class ContainerKingdom
     );
 
     this.rpgEngine.registerElement('FenceGroup00', FenceGroup00);
+    this.rpgEngine.registerElement('Fence00H', Fence00H);
+    this.rpgEngine.registerElement('Fence00V', Fence00V);
+
     this.rpgEngine.registerElement('House00', House00);
     this.rpgEngine.registerElement('House01', House01);
     this.rpgEngine.registerElement('Fountain00', Fountain00);
