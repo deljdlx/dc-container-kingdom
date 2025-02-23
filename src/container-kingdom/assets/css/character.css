@@ -1,5 +1,6 @@
 .map-element.character {
-  transition: all 0.2s linear;
+  will-change: transform;
+  transition: left 0.2s linear, top 0.2s linear;
 }
 
 .map-element.character.character--main {

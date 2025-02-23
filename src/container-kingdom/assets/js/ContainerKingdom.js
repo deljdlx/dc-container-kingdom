@@ -10,10 +10,16 @@ class ContainerKingdom
   console;
   dockerApiClient;
 
-
+  /**
+   * @type {Object<string, Container>}
+   */
   containers = {};
   containersStats = {};
 
+
+  /**
+   * @type {Object<string, DockerCompose>}
+   */
   composes = {};
   networks = {};
 
@@ -275,8 +281,8 @@ class ContainerKingdom
       '#viewport',
       MAP_CONFIGURATION.width,
       MAP_CONFIGURATION.height,
-      // MAP_CONFIGURATION.width * 3,
-      // MAP_CONFIGURATION.height * 3,
+      MAP_CONFIGURATION.width * 3,
+      MAP_CONFIGURATION.height * 3,
       // MAP_CONFIGURATION.width / 2,
       // MAP_CONFIGURATION.height / 2,
     );
