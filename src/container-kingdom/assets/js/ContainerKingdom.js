@@ -188,9 +188,9 @@ class ContainerKingdom
 
     const descriptor = {
       ids: containers.map(container => container.Id),
-      networks: containers.map(container => container.getNetworks()),
-      labels: containers.map(container => container.getLabels()),
-      status: containers.map(container => container.getStatus()),
+      networks: containers.map(container => container.NetworkSettings.Networks),
+      labels: containers.map(container => container.Labels),
+      status: containers.map(container => container.Status),
     };
 
     const newChecksum = await this.getChecksum(descriptor);
