@@ -124,7 +124,6 @@ class Container
           url = url.replace(/"/gi, '');
           url = url.replace(/'/gi, '');
           url = url.replace(/`/gi, '');
-          console.log(url);
           if(url) {
             demoUrl = url;
           };
