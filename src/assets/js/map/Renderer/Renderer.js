@@ -84,7 +84,7 @@ class Renderer
     this.dom.style.left = left + 'px';
     this.dom.style.top = top + 'px';
 
-    if(!this._element.manualZ) {
+    if(this._element.manualZ === false) {
       this.dom.style.zIndex = zIndex + this._element.height();
     }
 

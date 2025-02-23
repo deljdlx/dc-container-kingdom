@@ -200,6 +200,7 @@ class ContainerKingdom
 
     if(this.lastContainersChecksum !== newChecksum) {
       document.location.reload();
+      return;
     }
     this.lastContainersChecksum = newChecksum;
   }

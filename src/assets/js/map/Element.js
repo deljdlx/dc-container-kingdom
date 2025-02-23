@@ -88,7 +88,7 @@ class Element
   _listeners = {};
 
 
-  constructor(x = null, y = null, width = null, height = null)
+  constructor(x = null, y = null, width = null, height = null,)
   {
 
     this._application = Application.mainInstance;

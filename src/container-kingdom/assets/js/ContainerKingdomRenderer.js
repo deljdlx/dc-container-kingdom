@@ -151,12 +151,14 @@ class ContainerKingdomRenderer
     const board = this.viewport.getBoard();
     const area = board.getAreaAt(0, 0);
     let element = new Element(
-      0,
-      0,
+      -16,
+      -16,
       xMax - xMin,
-      yMax - yMin
+      yMax - yMin,
+      true,
     )
-    
+    element.manualZ = 0;
+
     element.getDom().classList.add('compose-cluster');
 
     houses[0].addElement(
