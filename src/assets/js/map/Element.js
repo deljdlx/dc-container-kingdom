@@ -109,6 +109,10 @@ class Element
     this.boundingBox = new BoundingBox(this);
   }
 
+  getBoard() {
+    return this._application.getViewport().getBoard();
+  }
+
   clear() {
     this.getRenderer().clear();
     this.children.forEach(child => {
@@ -446,7 +450,6 @@ class Element
   // ===========================
 
   collided(value = null, type = 'collision') {
-
     if(value !== null) {
       if(value !== this._collided[type]) {
         this._collided[type] = value;

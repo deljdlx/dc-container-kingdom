@@ -67,7 +67,15 @@ class Viewport
    * @param {number} width
    * @param {number} height
    */
-  constructor(application, container, width = 500, height = 500) {
+  constructor(
+    application,
+    container,
+    width = 500,
+    height = 500,
+    mainCharacterX = null,
+    mainCharacterY = null
+
+  ) {
 
     console.log({
       width,
@@ -86,13 +94,22 @@ class Viewport
     this.geometry.height(height);
     this.renderer = new ViewportRenderer(this);
 
+    this.board = new Board(this);
+  }
+
+  enableMainCharacter(mainCharacterX, mainCharacterY) {
     this.character = new Character();
-    this.character.x(this.width() / 2);
-    this.character.y(this.height() / 2);
+    this.character.setRenderer(new MainCharacterRenderer(this.character));
+    if(mainCharacterX === null) {
+      mainCharacterX = width / 2;
+    }
+    if(mainCharacterY === null) {
+      mainCharacterY = height / 2;
+    }
+    this.character.x(mainCharacterX);
+    this.character.y(mainCharacterY);
     this.character.moveSpeed(300);
     this.character.setApplication(this.getApplication());
-
-    this.board = new Board(this);
   }
 
   clear() {
@@ -234,6 +251,11 @@ class Viewport
   // ===========================
 
   update(timestamp) {
+
+    if(!this.character) {
+      return;
+    }
+
     const increment = Math.round((timestamp - this._timestamp) * this.character.moveSpeed() / 1000);
 
     if(increment < 1) {
@@ -258,6 +280,11 @@ class Viewport
   }
 
   updateCharacter(increment) {
+
+    if(!this.character) {
+      return;
+    }
+
     const saveGeometry = this.geometry.clone();
 
     switch(this.direction) {
@@ -313,6 +340,12 @@ class Viewport
   }
 
   run() {
+
+    if(!this.character) {
+      return;
+    }
+
+
     document.body.addEventListener('keyup', (event) => {
       this.stop();
       return;

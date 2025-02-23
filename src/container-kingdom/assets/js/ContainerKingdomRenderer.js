@@ -97,7 +97,6 @@ class ContainerKingdomRenderer
       this.application.getContainers(true)
     );
     Object.values(this.application.getComposes()).map(async (compose) => {
-      console.log(compose);
       this.drawHouseGroup(
         Object.values(compose.getContainers())
       );
@@ -195,6 +194,8 @@ class ContainerKingdomRenderer
         break;
       }
     }
+
+    character.live(3000 + Math.random() * 3000);
 
     character.addEventListener('element.click', (event) => {
       if(container.getDemoUrl())

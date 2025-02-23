@@ -21,7 +21,15 @@ class Application
    * @param {int} width
    * @param {int} height
    */
-  constructor(selector, width, height, viewportWidth = null, viewportHeight = null) {
+  constructor(
+    selector,
+    width,
+    height,
+    viewportWidth = null,
+    viewportHeight = null,
+    mainCharacterX = null,
+    mainCharacterY = null,
+  ) {
     this._container = document.querySelector(selector);
     this._width = width;
     this._height = height;
@@ -47,6 +55,8 @@ class Application
       this._container,
       this._viewportWidth,
       this._viewportHeight,
+      mainCharacterX,
+      mainCharacterY
     );
   }
 

@@ -11,7 +11,21 @@ class Character extends Element
   tickInterval = 7;
   tick = 0;
 
-  constructor(x = null, y = null, spriteSheetOffsetLeft = 0, spriteSheetOffsetTop = 0) {
+  pixelsPerTick = 6;
+
+
+
+  alive = false;
+  lastActionTime = null;
+  actionDuration = 5000;
+  newActionThreshold = 0.5;
+
+  constructor(
+    x = null,
+    y = null,
+    spriteSheetOffsetLeft = 0,
+    spriteSheetOffsetTop = 0
+  ) {
     super(x, y, 48, 48);
 
     this.spriteSheetOffsetLeft = spriteSheetOffsetLeft;
@@ -19,6 +33,79 @@ class Character extends Element
 
     this.createCollisionZone(16, 24, 14, 12);
     this.setRenderer(new CharacterRenderer(this));
+  }
+
+  getTimeSinceLastAction() {
+    return new Date().getTime() - this.lastActionTime;
+  }
+
+  startNewAction() {
+    this.lastActionTime = new Date().getTime();
+  }
+
+  live(actionDuration) {
+    this.actionDuration = actionDuration;
+    this.alive = true;
+    this.lastActionTime = new Date().getTime();
+    this.loop();
+  }
+
+  loop() {
+
+    if(this.alive && !this.getDirection()) {
+      this.setDirection(
+        this.getRandomDirection()
+      );
+    }
+
+    if(
+      this.getTimeSinceLastAction() >= this.actionDuration
+      && Math.random() > this.newActionThreshold
+    ) {
+      this.startNewAction();
+      this.setDirection(
+        this.getRandomDirection()
+      );
+    }
+
+    const savedGeometry = this.geometry.clone();
+
+    switch(this.getDirection()) {
+      case 'up':
+        this.y(this.y() - this.pixelsPerTick);
+        break;
+      case 'down':
+        this.y(this.y() + this.pixelsPerTick);
+        break;
+      case 'left':
+        this.x(this.x() - this.pixelsPerTick);
+        break;
+      case 'right':
+        this.x(this.x() + this.pixelsPerTick);
+        break;
+    }
+
+
+    const collisions = this.getCollision(this.getBoard());
+    if(collisions.length > 0) {
+      this.direction = this.getRandomDirection();
+      this.geometry = savedGeometry;
+    }
+
+    this.update();
+
+    setTimeout(() => {
+      this.loop();
+    }, 100);
+  }
+
+  getRandomDirection() {
+    const directions = ['up', 'down', 'left', 'right'];
+    return directions[Math.floor(Math.random() * directions.length)];
+  }
+
+  stop() {
+    this.direction = null;
   }
 
   getSpriteSheetOffsetLeft() {

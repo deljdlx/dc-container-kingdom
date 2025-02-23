@@ -270,6 +270,8 @@ class ContainerKingdom
       MAP_CONFIGURATION.height,
       MAP_CONFIGURATION.width * 3,
       MAP_CONFIGURATION.height * 3,
+      // MAP_CONFIGURATION.width / 2,
+      // MAP_CONFIGURATION.height / 2,
     );
 
     this.rpgEngine.registerElement('FenceGroup00', FenceGroup00);
@@ -303,9 +305,9 @@ class ContainerKingdom
         event.target.getRenderer().getDom().classList.remove('shake');
       }, 500);
 
-      if(event.target.data.container) {
-        this.gotoContainerUrl(event.target.data.container);
-      }
+      // if(event.target.data.container) {
+      //   this.gotoContainerUrl(event.target.data.container);
+      // }
     });
 
 
@@ -418,16 +420,7 @@ class ContainerKingdom
       const offsetX = board.offsetLeft;
       const offsetY = board.offsetTop;
 
-      console.log({
-        clientX,
-        clientY,
-        offsetX,
-        offsetY,
-      })
-
       board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
-
-
 
       const scale = board.style.transform.match(/scale\((.*)\)/);
       let currentScale = 1;
@@ -470,7 +463,7 @@ class ContainerKingdom
 
       document.body.addEventListener('mouseup', () => {
           document.body.removeEventListener('mousemove', onMouseMove);
-      }, { once: true }); // Supprime `mouseup` après un seul appel
+      }, { once: true });
     });
   }
 

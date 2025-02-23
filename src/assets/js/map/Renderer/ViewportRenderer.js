@@ -38,19 +38,26 @@ class ViewportRenderer
     this._container.append(this._viewport.getBoard().render());
 
 
-    this.domCharacter = this._viewport.getCharacter().getRenderer().render();
-    this._viewport.getBoard().getRenderer().getDom().append(this.domCharacter);
-
-    // this.renderDebug();
+    if(this._viewport.getCharacter()) {
+      this.domCharacter = this._viewport.getCharacter().getRenderer().render();
+      this._viewport.getBoard().getRenderer().getDom().append(this.domCharacter);
+    }
 
   }
 
   renderDebug() {
     this._board.getRenderer().renderDebug();
-    this._viewport.getCharacter().getRenderer().renderCollisionZones();
+    if(this._viewport.getCharacter()) {
+      this._viewport.getCharacter().getRenderer().renderCollisionZones();
+    }
   }
 
   update() {
+
+    if(!this._viewport.getCharacter()) {
+      return;
+    }
+
     this._board = this._viewport.getBoard();
     const left = -this._viewport.x();
     const top = -this._viewport.y();

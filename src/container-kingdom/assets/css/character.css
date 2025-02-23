@@ -1,0 +1,35 @@
+.map-element.character {
+  transition: all 0.2s linear;
+}
+
+.map-element.character.character--main {
+  transition: none;
+}
+
+.map-element.character .map-element__sprite {
+  transform: scale(0.7);
+}
+.map-element.character .map-element__shadow {
+  width: 24px !important;
+  left: 14px !important;
+}
+
+.map-element.character .quickReaction {
+  position: absolute;
+  border: solid 1px #000;
+  border-radius: 4px;
+  padding: 4px 2px;
+  color: #000;
+  font-size: 11px;
+  background-color: #fff;
+  top: -30px;
+  display: none;
+
+  min-width: 150px;
+  padding: 8px;
+}
+
+.map-element.character .quickReaction--enable {
+  display: block;
+
+}
