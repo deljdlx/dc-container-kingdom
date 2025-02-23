@@ -13,7 +13,8 @@ class ContainersListEntry
     this.element = document.createElement('div');
     this.element.classList.add('container-list-entry');
 
-    const caption = document.createElement('span')
+    const caption = document.createElement('span');
+    caption.classList.add('container-name');
     caption.innerHTML = container.getName();
     this.element.appendChild(caption);
 

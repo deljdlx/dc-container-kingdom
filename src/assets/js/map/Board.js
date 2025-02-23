@@ -11,8 +11,8 @@ class Board extends Element
   }
 
   initialize() {
-    for(let x = -1 ; x < 2 ; x++) {
-      for(let y = -1 ; y < 2 ; y++) {
+    for(let x = -3 ; x < 4 ; x++) {
+      for(let y = -3 ; y < 4 ; y++) {
         this.createAreaAt(x, y);
       }
     }

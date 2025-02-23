@@ -195,7 +195,7 @@ class ContainerKingdomRenderer
       }
     }
 
-    character.live(3000 + Math.random() * 3000);
+    character.live(3000 + Math.random() * 3);
 
     character.addEventListener('element.click', (event) => {
       if(container.getDemoUrl())

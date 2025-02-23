@@ -36,12 +36,16 @@ class Container
     this.watch();
   }
 
+  getNetworks() {
+    return Object.keys(this.NetworkSettings.Networks);
+  }
+
   getElement() {
     return this.rpgEngine.data.element;
   }
 
   getHtmlInfo() {
-    return `
+    let html =  `
       <div class="container-info-entry">
         🗒️ Container name: ${this.getName()}
       </div>
@@ -61,9 +65,22 @@ class Container
         ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
       </div>
       <div class="container-info-entry">
-        🚀 Demo url: ${this.getDemoUrl()}
+        🚀 Demo
+        <div>
+          <a class="demo-url" href="//${this.getDemoUrl()}" target="_blank">${this.getDemoUrl()}</a>
+        </div>
       </div>
-    `
+    `;
+
+    this.getNetworks();
+
+    html += '<div class="container-info-entry">🔌 Networks: <ul class="networks">';
+    this.getNetworks().forEach((network) => {
+      html += `<li class="network">${network}</li>`;
+    });
+    html += '</ul></div>';
+
+    return html;
   }
 
   watch() {

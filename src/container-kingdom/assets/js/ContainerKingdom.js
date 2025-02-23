@@ -210,6 +210,11 @@ class ContainerKingdom
       container.classList.add('networks-switches');
     }
     container.innerHTML = '';
+    const caption = document.createElement('h2');
+    caption.innerHTML = 'Networks';
+    container.append(caption);
+
+
     Object.keys(this.networks).map(networkName => {
       const label = document.createElement('label');
       label.classList.add('network-switch');
@@ -260,7 +265,7 @@ class ContainerKingdom
   async initRpgEngine() {
     const MAP_CONFIGURATION = {
       width: window.innerWidth,
-      height: window.innerHeight,
+      height: window.innerHeight - 50,
     }
 
 
@@ -268,8 +273,8 @@ class ContainerKingdom
       '#viewport',
       MAP_CONFIGURATION.width,
       MAP_CONFIGURATION.height,
-      MAP_CONFIGURATION.width * 3,
-      MAP_CONFIGURATION.height * 3,
+      // MAP_CONFIGURATION.width * 3,
+      // MAP_CONFIGURATION.height * 3,
       // MAP_CONFIGURATION.width / 2,
       // MAP_CONFIGURATION.height / 2,
     );
@@ -362,9 +367,6 @@ class ContainerKingdom
   }
 
   async handleClickOnContainer(container) {
-
-    this.focusOnContainer(container);
-
     this.console.clear();
     const buffer = await this.dockerApiClient.getContainerLogs(container.Id);
     const log = new Log(buffer)
