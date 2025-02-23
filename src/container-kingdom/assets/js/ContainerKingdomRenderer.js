@@ -105,10 +105,6 @@ class ContainerKingdomRenderer
 
 
   async drawHouseGroup(containers) {
-
-    console.log('%cContainerKingdomRenderer.js :: 109 =============================', 'color: #f0f; font-size: 1rem');
-    console.log(containers.length);
-
     const houses = [];
     const firstContainer = Object.values(containers)[0];
     let {x, y} = this.computeContainerCoords(firstContainer);
@@ -123,14 +119,8 @@ class ContainerKingdomRenderer
 
       ({x, y} = this.getClosestFreeCoords(x, y, 0));
       let house = await this.drawHouse(container, x, y);
-      console.log('%cContainerKingdomRenderer.js :: 126 =============================', 'color: #ff0; font-size: 1rem');
-      console.log("ICI");
       houses.push(house);
     });
-
-
-    console.log('%cContainerKingdomRenderer.js :: 126 =============================', 'color: #f00; font-size: 1rem');
-    console.log(houses.length);
 
     if(houses.length > 1) {
       this.drawFences(houses);
