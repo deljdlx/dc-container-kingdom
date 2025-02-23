@@ -190,7 +190,7 @@ class ContainerKingdom
       ids: containers.map(container => container.Id),
       networks: containers.map(container => container.NetworkSettings.Networks),
       labels: containers.map(container => container.Labels),
-      status: containers.map(container => container.Status),
+      status: containers.map(container => container.ImageID),
     };
 
     const newChecksum = await this.getChecksum(descriptor);
