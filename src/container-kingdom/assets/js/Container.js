@@ -40,6 +40,32 @@ class Container
     return this.rpgEngine.data.element;
   }
 
+  getHtmlInfo() {
+    return `
+      <div class="container-info-entry">
+        🗒️ Container name: ${this.getName()}
+      </div>
+      <div class="container-info-entry">
+        📀 Image: ${this.getImage()}
+      </div>
+
+      <div class="container-info-entry">
+        📦 Compose: ${this.getComposeName()}
+      </div>
+
+
+      <div class="container-info-entry">
+        🧠 Memory usage: ${this.getMemoryUsage(true)}
+      </div>
+      <div class="container-info-entry">
+        ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
+      </div>
+      <div class="container-info-entry">
+        🚀 Demo url: ${this.getDemoUrl()}
+      </div>
+    `
+  }
+
   watch() {
 
     if(this.rpgEngine && this.rpgEngine.data.element) {

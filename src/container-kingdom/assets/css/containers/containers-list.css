@@ -17,11 +17,31 @@
 }
 
 
+.containers-list-container .compose-container {
+  border: 1px solid #0f0;
+  padding: 4px 8px;
+  border-radius: 8px;
+  margin: 0 8px 8px 8px;
+}
+.containers-list-container .compose-container summary {
+  cursor: pointer;
+  margin-bottom: 8px;
+}
+
+
+
+
 .containers-list .container-list-entry {
-  padding: 2px 4px;
-  border: 1px solid #fff;
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 8px;
+  border: 1px solid #0f0;
   background-color: #000;
   color: #fff;
   border-radius: 8px;
-  margin-bottom: 8px;
+  margin: 0 8px 8px 8px;
+}
+
+.containers-list .focus-on-container {
+  cursor: pointer;
 }

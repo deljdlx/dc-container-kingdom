@@ -68,6 +68,13 @@ class Viewport
    * @param {number} height
    */
   constructor(application, container, width = 500, height = 500) {
+
+    console.log({
+      width,
+      height
+    });
+
+
     this._application = application;
 
     this.container = container;

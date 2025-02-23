@@ -45,12 +45,15 @@ class ContainerKingdom
     this.viewer = new ContainerKingdomRenderer(this, this.rpgEngine.getViewport());
 
     await this.loadContainers();
+    this.renderContainersList();
     await this.loadContainersStats();
 
     await this.viewer.drawContainers(this.containers);
     await this.viewer.drawNetworks(this.containers);
     await this.rpgEngine.getViewport().render();
     this.drawNetworksSwitches();
+
+
 
     await this.loop();
   }
@@ -79,22 +82,9 @@ class ContainerKingdom
     await this.loadContainers();
     await this.loadContainersStats();
 
-    this.containersListContainer.innerHTML = '';
-    Object.values(this.containers).map(container => {
-
-      const entry = document.createElement('div');
-      entry.classList.add('container-list-entry');
-      entry.innerHTML = container.getName();
-      entry.addEventListener('click', async () => {
-        console.log('%cContainerKingdom.js :: 87 =============================', 'color: #f00; font-size: 1rem');
-        console.log(container.rpgEngine);
-        await this.handleClickOnContainer(container);
-      });
-      this.containersListContainer.append(entry);
-    });
+    this.renderContainersList();
 
     const newChecksum = await this.getChecksum();
-
     if(currentChecksum !== newChecksum) {
       document.location.reload();
     }
@@ -104,8 +94,48 @@ class ContainerKingdom
     }, 5000);
   }
 
+  renderContainersList() {
+
+    this.containersListContainer.innerHTML = '';
+
+    Object.keys(this.composes).map(composeName => {
+      if(this.composes[composeName].length() > 1 ) {
+        const composeContainer = document.createElement('details');
+        composeContainer.open = true;
+        composeContainer.classList.add('compose-container');
+        const caption = document.createElement('summary');
+        caption.classList.add('compose-caption');
+        caption.innerHTML = composeName;
+        composeContainer.append(caption);
+
+        Object.values(this.composes[composeName].getContainers()).map(container => {
+          const entry = new ContainersListEntry(this, container);
+          composeContainer.append(entry.getElement());
+          this.containersListContainer.append(composeContainer);
+        });
+        return
+      }
+
+      const container = this.composes[composeName].getByIndex(0);
+      const entry = new ContainersListEntry(this, container);
+      this.containersListContainer.append(entry.getElement());
+    });
+  }
+
+  getContainers(toArray = false) {
+    if(toArray) {
+      return Object.values(this.containers);
+    }
+    return this.containers;
+
+  }
+
   getCompose(composeName) {
     return this.composes[composeName] || null;
+  }
+
+  getComposes() {
+    return this.composes;
   }
 
 
@@ -118,20 +148,11 @@ class ContainerKingdom
 
     const containers = await this.dockerApiClient.getContainersDescriptors();
     containers.map(containerDescriptor => {
-
       if(this.containers[containerDescriptor.Id]) {
         return;
       }
 
       const container = new Container(containerDescriptor);
-      const composeName = container.getComposeName();
-      if(composeName) {
-        if(!this.composes[composeName]) {
-          this.composes[composeName] = new DockerCompose(composeName);
-        }
-        this.composes[composeName].addContainer(container);
-      }
-
       this.containers[container.Id] = container;
 
       const networks = container.NetworkSettings.Networks;
@@ -141,6 +162,27 @@ class ContainerKingdom
         }
         this.selectedNetworks[networkName] = true;
         this.networks[networkName].push(container);
+      });
+    });
+
+
+    const composes = {};
+
+    Object.values(this.containers).map(container => {
+      if(!composes[container.getComposeName()]) {
+        composes[container.getComposeName()] = [];
+      }
+      composes[container.getComposeName()].push(container);
+    });
+
+    const sortedComposes = Object.fromEntries(
+      Object.entries(composes)
+        .sort(([, containersA], [, containersB]) => containersB.length - containersA.length)
+    );
+    Object.entries(sortedComposes).map(([composeName, containers]) => {
+      this.composes[composeName] = new DockerCompose(composeName);
+      containers.map(container => {
+        this.composes[composeName].addContainer(container);
       });
     });
 
@@ -226,6 +268,8 @@ class ContainerKingdom
       '#viewport',
       MAP_CONFIGURATION.width,
       MAP_CONFIGURATION.height,
+      MAP_CONFIGURATION.width * 3,
+      MAP_CONFIGURATION.height * 3,
     );
 
     this.rpgEngine.registerElement('FenceGroup00', FenceGroup00);
@@ -330,29 +374,7 @@ class ContainerKingdom
 
     this.containerInfoContainer.innerHTML = '';
 
-    this.containerInfoContainer.innerHTML = `
-      <div class="container-info-entry">
-        🗒️ Container name: ${container.getName()}
-      </div>
-      <div class="container-info-entry">
-        📀 Image: ${container.getImage()}
-      </div>
-
-      <div class="container-info-entry">
-        📦 Compose: ${container.getComposeName()}
-      </div>
-
-
-      <div class="container-info-entry">
-        🧠 Memory usage: ${container.getMemoryUsage(true)}
-      </div>
-      <div class="container-info-entry">
-        ⚙️ CPU load: ${Math.round(container.getCpuUsage() * 100) / 100}%
-      </div>
-      <div class="container-info-entry">
-        🚀 Demo url: ${container.getDemoUrl()}
-      </div>
-    `;
+    this.containerInfoContainer.innerHTML = container.getHtmlInfo();
 
     this.showConsole();
     this.console.scrollToBottom();
@@ -386,12 +408,28 @@ class ContainerKingdom
 
   makeViewportZoomable() {
     document.querySelector('#viewport').addEventListener('wheel', (event) => {
-      const firstChild = document.querySelector('#viewport').firstElementChild;
-      if(!firstChild) {
+      const board = document.querySelector('#viewport').firstElementChild;
+      if(!board) {
         return;
       }
 
-      const scale = firstChild.style.transform.match(/scale\((.*)\)/);
+      const clientX = event.clientX;
+      const clientY = event.clientY;
+      const offsetX = board.offsetLeft;
+      const offsetY = board.offsetTop;
+
+      console.log({
+        clientX,
+        clientY,
+        offsetX,
+        offsetY,
+      })
+
+      board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
+
+
+
+      const scale = board.style.transform.match(/scale\((.*)\)/);
       let currentScale = 1;
 
       if(scale) {
@@ -399,10 +437,17 @@ class ContainerKingdom
       }
 
       if(event.deltaY > 0) {
-        firstChild.style.transform = `scale(${parseFloat(currentScale) - 0.05})`;
+        if(currentScale <= 0.1) {
+          return;
+        }
+        board.style.transform = `scale(${parseFloat(currentScale) - 0.05})`;
       } else {
-        firstChild.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
+        if(currentScale >= 3) {
+          return;
+        }
+        board.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
       }
+
     });
   }
 

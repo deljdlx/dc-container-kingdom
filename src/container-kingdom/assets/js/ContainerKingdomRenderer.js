@@ -90,41 +90,26 @@ class ContainerKingdomRenderer
     }
   }
 
-  async drawContainers(containers) {
 
-    this.computeBounds(containers);
+  async drawContainers() {
 
-    Object.values(containers).map(async (container) => {
-      const composeName = container.getComposeName();
-      if(composeName) {
-        const compose = this.application.getCompose(composeName);
-        if(compose) {
-          const friendContainers = compose.getContainers();
-
-          if(Object.values(friendContainers).length > 1) {
-            this.drawHouseGroup(friendContainers);
-            return;
-          }
-        }
-      }
-
-      let {x, y} = this.computeContainerCoords(container);
-      ({x, y} = this.getClosestFreeCoords(x, y));
-
-      if(this.hasAdjacentCell(x, y)) {
-        ({x, y} = this.getClosestFreeCoords(x + 2, y + 2));
-      }
-
-      const house = await this.drawHouse(container, x, y);
-      // house.addClass('smoke');
+    this.computeBounds(
+      this.application.getContainers(true)
+    );
+    Object.values(this.application.getComposes()).map(async (compose) => {
+      console.log(compose);
+      this.drawHouseGroup(
+        Object.values(compose.getContainers())
+      );
     });
   }
+
 
   async drawHouseGroup(containers) {
 
     const firstContainer = Object.values(containers)[0];
     let {x, y} = this.computeContainerCoords(firstContainer);
-    ({x, y} = this.getClosestFreeCoords(x, y));
+    ({x, y} = this.getClosestFreeCoords(x, y, 2));
     let house = await this.drawHouse(firstContainer, x, y);
 
     Object.values(containers).map(async (container, index) => {

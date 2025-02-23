@@ -7,6 +7,9 @@ class Application
   _width;
   _height;
 
+  _viewportWidth;
+  _viewportHeight;
+
 
   listeners = {};
 
@@ -18,22 +21,32 @@ class Application
    * @param {int} width
    * @param {int} height
    */
-  constructor(selector, width, height) {
+  constructor(selector, width, height, viewportWidth = null, viewportHeight = null) {
     this._container = document.querySelector(selector);
     this._width = width;
     this._height = height;
 
-    console.log('%cApplication.js :: 26 =============================', 'color: #f00; font-size: 1rem');
-    console.log(this._width);
-    console.log(this._height);
+    if(viewportWidth === null) {
+      viewportWidth = width;
+    }
+    if(viewportHeight === null) {
+      viewportHeight = height;
+    }
 
+    this._viewportWidth = viewportWidth;
+    this._viewportHeight = viewportHeight;
+
+    console.log(
+      this._viewportWidth,
+      this._viewportHeight
+    )
 
     Application.mainInstance = this;
     this._viewport = new Viewport(
       this,
       this._container,
-      this._width,
-      this._height,
+      this._viewportWidth,
+      this._viewportHeight,
     );
   }
 
