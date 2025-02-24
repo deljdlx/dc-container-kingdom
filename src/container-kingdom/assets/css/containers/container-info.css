@@ -1,0 +1,62 @@
+
+.console-container {
+  position: absolute;
+  z-index: 2000;
+  background-color: #000a;
+
+  width: calc(100vw - 60px);
+  height: calc(100vh - 60px);
+  top: 30px;
+  left: 30px;
+  backdrop-filter: blur(5px);
+}
+
+.console-container h2 {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+
+
+#close-console-container {
+  cursor: pointer;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  font-size: 2rem;
+}
+
+#console-container__content {
+  height: 100%;
+  display: flex;
+}
+
+#console-container__content .container-info {
+  width: 300px;
+  flex-shrink: 0;
+  padding-right: 8px;
+}
+
+
+
+.console-container #game-console {
+  height: 100%;
+  overflow: auto;
+  flex-shrink: 1;
+  flex-grow: 1;
+}
+
+.console-container .log-entry {
+  padding: 2px 4px;
+  border: solid 1px #fff8;
+  margin-bottom: 8px;
+  line-height: 2rem;
+}
+.log-entry--error {
+  background-color: #f00;
+  color: #fff;
+}
+
+.console-container .log-entry details summary * {
+  display: inline;
+}

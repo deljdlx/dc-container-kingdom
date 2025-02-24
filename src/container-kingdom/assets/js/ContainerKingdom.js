@@ -8,6 +8,8 @@ class ContainerKingdom
   rpgEngine;
   viewer;
   console;
+
+  containersList;
   dockerApiClient;
 
   /**
@@ -33,6 +35,7 @@ class ContainerKingdom
   constructor(dockerApiClient) {
 
     this.dockerApiClient = dockerApiClient;
+    this.containersList = new ContainersList(this);
 
     this.iframeContainer = document.querySelector('#iframe-container');
     this.containerInfoContainer = document.querySelector('.console-container .container-info');
@@ -101,31 +104,8 @@ class ContainerKingdom
   }
 
   renderContainersList() {
-
-    this.containersListContainer.innerHTML = '';
-
-    Object.keys(this.composes).map(composeName => {
-      if(this.composes[composeName].length() > 1 ) {
-        const composeContainer = document.createElement('details');
-        composeContainer.open = true;
-        composeContainer.classList.add('compose-container');
-        const caption = document.createElement('summary');
-        caption.classList.add('compose-caption');
-        caption.innerHTML = composeName;
-        composeContainer.append(caption);
-
-        Object.values(this.composes[composeName].getContainers()).map(container => {
-          const entry = new ContainersListEntry(this, container);
-          composeContainer.append(entry.getElement());
-          this.containersListContainer.append(composeContainer);
-        });
-        return
-      }
-
-      const container = this.composes[composeName].getByIndex(0);
-      const entry = new ContainersListEntry(this, container);
-      this.containersListContainer.append(entry.getElement());
-    });
+    this.containersList.clear();
+    this.containersList.load(this.composes);
   }
 
   getContainers(toArray = false) {
@@ -133,7 +113,6 @@ class ContainerKingdom
       return Object.values(this.containers);
     }
     return this.containers;
-
   }
 
   getCompose(composeName) {
@@ -276,13 +255,12 @@ class ContainerKingdom
       height: window.innerHeight - 50,
     }
 
-
     this.rpgEngine = new Application(
       '#viewport',
       MAP_CONFIGURATION.width,
       MAP_CONFIGURATION.height,
-      MAP_CONFIGURATION.width * 3,
-      MAP_CONFIGURATION.height * 3,
+      MAP_CONFIGURATION.width,
+      MAP_CONFIGURATION.height,
       // MAP_CONFIGURATION.width / 2,
       // MAP_CONFIGURATION.height / 2,
     );
@@ -314,17 +292,14 @@ class ContainerKingdom
     });
 
 
-    this.rpgEngine.addEventListener('element.collision', (event) => {
-      event.target.getRenderer().getDom().classList.add('collided');
-      event.target.getRenderer().getDom().classList.add('shake');
-      setTimeout(() => {
-        event.target.getRenderer().getDom().classList.remove('shake');
-      }, 500);
-
-      // if(event.target.data.container) {
-      //   this.gotoContainerUrl(event.target.data.container);
-      // }
-    });
+    // collision are disabled ; maybe later
+    // this.rpgEngine.addEventListener('element.collision', (event) => {
+    //   event.target.getRenderer().getDom().classList.add('collided');
+    //   event.target.getRenderer().getDom().classList.add('shake');
+    //   setTimeout(() => {
+    //     event.target.getRenderer().getDom().classList.remove('shake');
+    //   }, 500);
+    // });
 
 
     this.rpgEngine.addEventListener('element.click', async (event) => {

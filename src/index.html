@@ -4,7 +4,10 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>👑 Container Kingdom</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👑</text></svg>">
+
+
+    <title>Container Kingdom</title>
 
     <link rel="stylesheet" href="assets/css/reset.css">
 
@@ -24,6 +27,7 @@
 
     <link rel="stylesheet" href="container-kingdom/assets/css/character.css">
     <link rel="stylesheet" href="container-kingdom/assets/css/containers/container.css">
+    <link rel="stylesheet" href="container-kingdom/assets/css/containers/container-info.css">
 
 
     <link rel="stylesheet" href="container-kingdom/assets/css/infra-viewer.css">
@@ -55,6 +59,7 @@
 
     <div class="frame-00 console-container hidden">
         <span id="close-console-container">❌</span>
+        <h2>Container infos</h2>
         <div id="console-container__content">
             <div class="container-info"></div>
             <div id="game-console"></div>
@@ -72,31 +77,7 @@
         </div>
     </div>
 
-
-
-
-    <!-- ==================================== -->
-    <template id="chat-entry">
-        <div class="chat-entry">
-            <div class="frame-00 chat-entry__avatar-container">
-                <div class="chat-entry__avatar" style="background-image: url(assets/images/characters/face-00.png);"></div>
-            </div>
-        </div>
-    </template>
-
-
-    <!--
-    <div id="light-test"></div>
-    // -->
-
-
-    <!-- ==================================== -->
-
-
-
-
     <script src="assets/js/map/Application.js"></script>
-
 
     <script src="assets/js/map/Coordinates.js"></script>
     <script src="assets/js/map/Geometry.js"></script>
@@ -147,7 +128,10 @@
     <script src="container-kingdom/assets/js/LogEntry.js"></script>
 
 
+    <script src="container-kingdom/assets/js/ContainersList.js"></script>
     <script src="container-kingdom/assets/js/ContainersListEntry.js"></script>
+
+
     <script src="container-kingdom/assets/js/DockerApiClient.js"></script>
     <script src="container-kingdom/assets/js/Container.js"></script>
     <script src="container-kingdom/assets/js/DockerCompose.js"></script>

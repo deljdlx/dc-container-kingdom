@@ -8,8 +8,6 @@ class ContainersListEntry
     this.application = application;
     this.container = container;
 
-
-
     this.element = document.createElement('div');
     this.element.classList.add('container-list-entry');
 
