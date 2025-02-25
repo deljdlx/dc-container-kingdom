@@ -145,7 +145,7 @@ class ContainerKingdom
 
     setTimeout(() => {
       this.loop();
-    }, 5000);
+    }, 2000);
   }
 
   // renderContainersList() {
