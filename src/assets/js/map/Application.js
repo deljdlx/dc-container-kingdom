@@ -44,11 +44,6 @@ class Application
     this._viewportWidth = viewportWidth;
     this._viewportHeight = viewportHeight;
 
-    console.log(
-      this._viewportWidth,
-      this._viewportHeight
-    )
-
     Application.mainInstance = this;
     this._viewport = new Viewport(
       this,

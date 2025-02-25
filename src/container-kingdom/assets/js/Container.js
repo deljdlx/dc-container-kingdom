@@ -64,13 +64,16 @@ class Container
       <div class="container-info-entry">
         ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
       </div>
-      <div class="container-info-entry">
+    `;
+
+    if(this.getDemoUrl()) {
+      html += `<div class="container-info-entry">
         🚀 Demo
         <div>
           <a class="demo-url" href="//${this.getDemoUrl()}" target="_blank">${this.getDemoUrl()}</a>
         </div>
-      </div>
-    `;
+      </div>`;
+    }
 
     this.getNetworks();
 
@@ -89,7 +92,7 @@ class Container
       const dom = this.rpgEngine.data.element.getDom()
       dom.dataset.cpuUsage = this.getCpuUsageThreshold().css;
 
-      const memoryUsageContainer = dom.querySelector('.container__memory-usage');
+      let memoryUsageContainer = document.querySelector(`[data-container-id="${this.Id}"] .memory-usage`);
       if(memoryUsageContainer) {
         memoryUsageContainer.innerHTML = this.getMemoryUsage(true);
       }
@@ -97,7 +100,7 @@ class Container
 
     setTimeout(() => {
       this.watch();
-    }, 10000);
+    }, 1000);
   }
 
   getCpuUsageThreshold() {
@@ -111,7 +114,7 @@ class Container
   }
 
   getDemoUrl() {
-    let demoUrl =false;
+    let demoUrl = false;
     if(this.Labels) {
       Object.keys(this.Labels).map((label) => {
         let value = this.Labels[label];

@@ -25,7 +25,7 @@ class ContainersListEntry
     });
 
     caption.addEventListener('click', async () => {
-      await this.application.handleClickOnContainer(container);
+      await this.application.getLayout().handleClickOnContainer(container);
     });
   }
 

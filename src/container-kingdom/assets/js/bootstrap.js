@@ -1,89 +1,29 @@
+console.log(
+	`%cWanna see some of my projects ? https://github.com/deljdlx`,  `
+	color: #FFA;
+	font-size: 30px;
+	text-align: center;
+	border: 1px solid #FFA;
+	border-radius: 5px;
+	padding: 200px 100px;
+	background: linear-gradient(to bottom,  #101727 0%,#233645 100%);
+	background:
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.15) 30%, rgba(255,255,255,.3) 32%, rgba(255,255,255,0) 53%) 0 0,
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.1) 11%, rgba(255,255,255,.2) 13%, rgba(255,255,255,0) 14%) 0 0,
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.2) 17%, rgba(255,255,255,.3) 19%, rgba(255,255,255,0) 20%) 0 110px,
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.2) 11%, rgba(255,255,255,.3) 13%, rgba(255,255,255,0) 14%) -130px -170px,
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.2) 11%, rgba(255,255,255,.4) 13%, rgba(255,255,255,0) 14%) 300px 370px,
+		radial-gradient(rgba(255,255,255,0) 0, rgba(255,255,255,.1) 11%, rgba(255,255,255,.2) 13%, rgba(255,255,255,0) 14%) 0 0,
+		linear-gradient(to bottom,  #101727 0%,#233645 100%);
+		background-size: 1470px 1470px, 970px 970px, 410px 410px, 610px 610px, 530px 530px, 200px 200px, 100% 100%;
+		background-color: #840b2a;
+		background-repeat: no-repeat;
+	`
+);
+
+
 document.addEventListener('DOMContentLoaded', async () => {
   const dockerApiClient = new DockerApiClient();
   const instance = new ContainerKingdom(dockerApiClient);
+  instance.zoom(0.5);
 });
-
-
-
-console.log('%cbootstrap.js :: 118 =============================', 'color: #f00; font-size: 1rem');
-console.log("STARTED");
-
-
-
-
-
-
-  /*
-  board.initialize();
-  const area = board.getAreaAt(0, 0);
-  for(let i = 0 ; i < 8 ; i++) {
-    area.addElement(384 - i * 50, 263, new Ground00());
-  }
-
-  area.addElement(300, 50, new House01());
-  area.addElement(300, 300, new House01());
-  area.addElement(50, 50, new FenceGroup00());
-  area.addElement(200, 360, new Fountain00());
-  area.addElement(100, 260, new Character(0, 0, 48 * 3));
-
-  for(let x = 0 ; x < 20 ; x++) {
-    area.addElement(
-      70 + Math.random() * 200,
-      60 + Math.random() * 150,
-      new Sunflower00()
-    );
-  }
-  */
-
-
-  // viewport.render();
-  // viewport.run();
-
-
-  // this.rpgEngine.run();
-
-  /*
-  const MAP_CONFIGURATION = {
-    width: 400,
-    height: 400,
-  }
-
-  const board = new Board(MAP_CONFIGURATION.width * 3, MAP_CONFIGURATION.height * 3);
-
-  const area = board.getAreaAt(0, 0);
-
-
-  for(let i = 0 ; i < 8 ; i++) {
-    area.addElement(384 - i * 50, 263, new Ground00());
-  }
-
-  area.addElement(300, 50, new House01());
-  area.addElement(300, 300, new House01());
-  area.addElement(50, 50, new FenceGroup00());
-
-  area.addElement(200, 360, new Fountain00());
-
-  area.addElement(100, 260, new Character(0, 0, 48 * 3));
-
-
-  for(let x = 0 ; x < 20 ; x++) {
-    area.addElement(
-      70 + Math.random() * 200,
-      60 + Math.random() * 150,
-      new Sunflower00()
-    );
-  }
-
-
-  const viewport = new Viewport(
-    document.querySelector('#viewport'),
-    board,
-    0,
-    0,
-    MAP_CONFIGURATION.width,
-    MAP_CONFIGURATION.height,
-  );
-  viewport.render();
-  viewport.run();
-  */
-

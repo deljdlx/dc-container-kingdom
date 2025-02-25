@@ -76,13 +76,6 @@ class Viewport
     mainCharacterY = null
 
   ) {
-
-    console.log({
-      width,
-      height
-    });
-
-
     this._application = application;
 
     this.container = container;

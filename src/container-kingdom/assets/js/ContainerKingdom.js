@@ -1,11 +1,10 @@
 class ContainerKingdom
 {
-  iframeContainer;
   consoleContainer;
-  containerInfoContainer;
-  containersListContainer;
-
-  rpgEngine;
+  /**
+   * @type {ContainerKingdomLayout}
+   */
+  layout;
   viewer;
   console;
 
@@ -35,36 +34,80 @@ class ContainerKingdom
   constructor(dockerApiClient) {
 
     this.dockerApiClient = dockerApiClient;
-    this.containersList = new ContainersList(this);
+    this.layout = new ContainerKingdomLayout(this);
 
-    this.iframeContainer = document.querySelector('#iframe-container');
-    this.containerInfoContainer = document.querySelector('.console-container .container-info');
-    this.containersListContainer = document.querySelector('.containers-list');
+    // this.containersList = new ContainersList(this);
+
 
     this.header = document.querySelector('#header');
-    this.makeViewportZoomable();
-    this.makeViewportDraggable()
+
 
     this.init();
   }
 
   async init() {
-    await this.initRpgEngine();
-    await this.initConsole();
-    this.viewer = new ContainerKingdomRenderer(this, this.rpgEngine.getViewport());
+    // await this.initConsole();
+    this.layout.init();
+
+    this.viewer = new ContainerKingdomRenderer(this, this.layout.getViewport());
+
 
     await this.loadContainers();
-    this.renderContainersList();
+    this.layout.renderContainersList();
     await this.loadContainersStats();
 
     await this.viewer.drawContainers(this.containers);
     await this.viewer.drawNetworks(this.containers);
-    await this.rpgEngine.getViewport().render();
+    await this.layout.getViewport().render();
     this.drawNetworksSwitches();
 
-
-
     await this.loop();
+  }
+
+  getTotalMemoryUsage() {
+    return Object.values(this.containers).reduce((acc, container) => {
+      return acc + container.getMemoryUsage();
+    }, 0);
+  }
+
+  getGlobalCpuUsage() {
+    return Object.values(this.containers).reduce((acc, container) => {
+      return acc + container.getCpuUsage();
+    }, 0);
+  }
+
+  /**
+   * @returns {ContainerKingdomLayout}
+   */
+  getLayout() {
+    return this.layout;
+  }
+
+  renderClusterInfo() {
+    let element = document.querySelector('.cluster-info');
+    if(!element) {
+      element = document.createElement('div');
+      element.classList.add('cluster-info');
+      this.header.append(element);
+    }
+
+    let memoryUsage = this.getTotalMemoryUsage();
+    memoryUsage = Math.round(memoryUsage / 1024 / 1024 * 100) / 100 + ' MB';
+
+    element.innerHTML = '';
+
+    let memoryUsageContainer = document.createElement('div');
+    memoryUsageContainer.classList.add('memory-usage');
+    memoryUsageContainer.innerHTML = 'Memory usage: ' + memoryUsage;
+    element.append(memoryUsageContainer);
+
+    let cpuUsage = this.getGlobalCpuUsage();
+    cpuUsage = Math.round(cpuUsage * 100) / 100 + '%';
+
+    let cpuUsageContainer = document.createElement('div');
+    cpuUsageContainer.classList.add('cpu-usage');
+    cpuUsageContainer.innerHTML = 'CPU usage: ' + cpuUsage;
+    element.append(cpuUsageContainer);
   }
 
   clear() {
@@ -83,6 +126,8 @@ class ContainerKingdom
         container.setStats(containerStats);
       }
     });
+
+    this.renderClusterInfo();
   }
 
   async loop() {
@@ -91,7 +136,7 @@ class ContainerKingdom
     await this.loadContainers();
     await this.loadContainersStats();
 
-    this.renderContainersList();
+    this.layout.renderContainersList();
 
     const newChecksum = await this.getChecksum();
     if(currentChecksum !== newChecksum) {
@@ -103,10 +148,10 @@ class ContainerKingdom
     }, 5000);
   }
 
-  renderContainersList() {
-    this.containersList.clear();
-    this.containersList.load(this.composes);
-  }
+  // renderContainersList() {
+  //   this.containersList.clear();
+  //   this.containersList.load(this.composes);
+  // }
 
   getContainers(toArray = false) {
     if(toArray) {
@@ -249,90 +294,6 @@ class ContainerKingdom
 
   }
 
-  async initRpgEngine() {
-    const MAP_CONFIGURATION = {
-      width: window.innerWidth,
-      height: window.innerHeight - 50,
-    }
-
-    this.rpgEngine = new Application(
-      '#viewport',
-      MAP_CONFIGURATION.width,
-      MAP_CONFIGURATION.height,
-      MAP_CONFIGURATION.width,
-      MAP_CONFIGURATION.height,
-      // MAP_CONFIGURATION.width / 2,
-      // MAP_CONFIGURATION.height / 2,
-    );
-
-    this.rpgEngine.registerElement('FenceGroup00', FenceGroup00);
-    this.rpgEngine.registerElement('Fence00H', Fence00H);
-    this.rpgEngine.registerElement('Fence00V', Fence00V);
-
-    this.rpgEngine.registerElement('House00', House00);
-    this.rpgEngine.registerElement('House01', House01);
-    this.rpgEngine.registerElement('Fountain00', Fountain00);
-
-    this.rpgEngine.registerElement('Woman00', Woman00);
-    this.rpgEngine.registerElement('Woman01', Woman01);
-    this.rpgEngine.registerElement('Woman01', Woman02);
-    this.rpgEngine.registerElement('Man00', Man00);
-
-    this.rpgEngine.registerElement('Flower00', Flower00);
-    this.rpgEngine.registerElement('Tree00', Tree00);
-    this.rpgEngine.registerElement('Sunflower00', Sunflower00);
-    this.rpgEngine.registerElement('Ground00', Ground00);
-
-    this.rpgEngine.addEventListener('map.update', (event) => {
-
-    });
-
-    document.querySelector('#close-iframe-container').addEventListener('click', () => {
-      document.querySelector('#iframe-container').classList.add('hidden');
-    });
-
-
-    // collision are disabled ; maybe later
-    // this.rpgEngine.addEventListener('element.collision', (event) => {
-    //   event.target.getRenderer().getDom().classList.add('collided');
-    //   event.target.getRenderer().getDom().classList.add('shake');
-    //   setTimeout(() => {
-    //     event.target.getRenderer().getDom().classList.remove('shake');
-    //   }, 500);
-    // });
-
-
-    this.rpgEngine.addEventListener('element.click', async (event) => {
-
-      if(!event.element.data.container) {
-        return;
-      }
-      await this.handleClickOnContainer(event.element.data.container);
-    });
-
-    this.rpgEngine.addEventListener('element.collision.end', (event) => {
-      event.target.getRenderer().getDom().classList.remove('collided');
-    });
-
-    this.rpgEngine.addEventListener('element.trigger', (event) => {
-      event.target.getRenderer().getDom().classList.add('collided');
-    });
-
-    this.rpgEngine.addEventListener('element.trigger.end', (event) => {
-      event.target.getRenderer().getDom().classList.remove('collided');
-    });
-
-    const viewport = this.rpgEngine.getViewport();
-    const board = viewport.getBoard();
-
-    board.initialize();
-
-    this.drawRandomFlowers(50);
-
-    viewport.render();
-    viewport.run();
-  }
-
   async gotoContainerUrl(container) {
     if(container.Labels) {
       Object.keys(container.Labels).map((label) => {
@@ -352,41 +313,14 @@ class ContainerKingdom
     }
   }
 
-  async handleClickOnContainer(container) {
-    this.console.clear();
-    const buffer = await this.dockerApiClient.getContainerLogs(container.Id);
-    const log = new Log(buffer)
-    const entries = log.getEntries();
 
-    entries.map(logEntry => {
-      this.console.addEntry(logEntry.getElement());
-    });
-
-    this.containerInfoContainer.innerHTML = '';
-
-    this.containerInfoContainer.innerHTML = container.getHtmlInfo();
-
-    this.showConsole();
-    this.console.scrollToBottom();
-  }
 
   async focusOnContainer(container) {
-    const absoluteX = container.getElement().x();
-    const absoluteY = container.getElement().y();
-
-    const board = document.querySelector('#viewport').firstElementChild;
-
-    let moveX = (window.innerWidth / 2 - absoluteX) * 1.5;
-    let moveY = (window.innerHeight / 2 - absoluteY) * 1.5 - container.getElement().height();
-
-    board.style.left = moveX + 'px';
-    board.style.top = moveY + 'px';
-
-    board.style.transform = 'scale(1.5)';
+    this.layout.focusOnContainer(container);
   }
 
   drawRandomFlowers(quantity) {
-    const board = this.rpgEngine.getViewport().getBoard();
+    const board = this.layout.getViewport().getBoard();
     for(let i = 0; i < quantity ; i++) {
       const x = Math.random() * 1800;
       const y = Math.random() * window.innerHeight;
@@ -396,93 +330,20 @@ class ContainerKingdom
     }
   }
 
-  makeViewportZoomable() {
-    document.querySelector('#viewport').addEventListener('wheel', (event) => {
-      const board = document.querySelector('#viewport').firstElementChild;
-      if(!board) {
-        return;
-      }
-
-      // JDLX_TODO : Fix zoom origin
-      // const clientX = event.clientX;
-      // const clientY = event.clientY;
-      // const offsetX = board.offsetLeft;
-      // const offsetY = board.offsetTop;
-      // const savedTransformOrigin = board.style.transform;
-      // board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
-
-      const scale = board.style.transform.match(/scale\((.*)\)/);
-      let currentScale = 1;
-
-      if(scale) {
-        currentScale = parseFloat(scale[1]);
-      }
-
-      if(event.deltaY > 0) {
-        if(currentScale <= 0.1) {
-          return;
-        }
-        board.style.transform = `scale(${parseFloat(currentScale) - 0.05})`;
-      } else {
-        if(currentScale >= 3) {
-          return;
-        }
-        board.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
-      }
-
-      // JDLX_TODO : Fix zoom origin
-      // board.style.transformOrigin = savedTransformOrigin;
-
-    });
+  getContainerLogs(container) {
+    return this.dockerApiClient.getContainerLogs(container.Id);
   }
 
-  makeViewportDraggable() {
-    document.querySelector('#viewport').addEventListener('mousedown', (event) => {
-      const firstChild = document.querySelector('#viewport').firstElementChild;
-      if (!firstChild) {
-          return;
-      }
 
-      const offsetX = event.clientX - firstChild.offsetLeft;
-      const offsetY = event.clientY - firstChild.offsetTop;
-
-      function onMouseMove(event) {
-          firstChild.style.left = (event.clientX - offsetX) + 'px';
-          firstChild.style.top = (event.clientY - offsetY) + 'px';
-      }
-
-      document.body.addEventListener('mousemove', onMouseMove);
-
-      document.body.addEventListener('mouseup', () => {
-          document.body.removeEventListener('mousemove', onMouseMove);
-      }, { once: true });
-    });
+  zoom(zoom) {
+      this.layout.zoom(zoom);
   }
 
-  initConsole() {
-    this.console = new GameConsole(this.rpgEngine, '#game-console');
-    this.console.addEntry('<em>Hello my friend, what can I do for you ?</em>');
 
-    this.consoleContainer = document.querySelector('.console-container')
 
-    const closeTrigger = document.querySelector('#close-console-container');
-    closeTrigger.addEventListener('click', () => {
-      this.consoleContainer.classList.add('hidden');
-    });
-  }
 
-  showConsole() {
-    this.consoleContainer.classList.remove('hidden');
-  }
 
-  showIframe(url) {
-    this.iframeContainer.classList.remove('hidden');
-    document.querySelector('#iframe-preview').src = '//' + url;
-  }
 
-  hideIframe() {
-    this.iframeContainer.classList.add('hidden');
-  }
 
   async getChecksum(object) {
     const json = JSON.stringify(object);

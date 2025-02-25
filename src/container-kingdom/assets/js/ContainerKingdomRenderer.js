@@ -108,7 +108,16 @@ class ContainerKingdomRenderer
     const houses = [];
     const firstContainer = Object.values(containers)[0];
     let {x, y} = this.computeContainerCoords(firstContainer);
-    ({x, y} = this.getClosestFreeCoords(x, y, 2));
+    try {
+      ({x, y} = this.getClosestFreeCoords(x, y, 2));
+    } catch(e) {
+      try {
+        ({x, y} = this.getClosestFreeCoords(x, y, 1));
+      }
+      catch(e) {
+        console.error('No space available for container', firstContainer);
+      }
+    }
     let house = await this.drawHouse(firstContainer, x, y);
     houses.push(house);
 
