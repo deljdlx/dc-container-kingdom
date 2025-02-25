@@ -1,9 +1,23 @@
 class DockerApiClient
 {
   async getContainersDescriptors() {
-    const response = await fetch('/api/docker/containers/json?all=true');
-    const containers = await response.json();
-    return containers;
+    let response;
+    try {
+      response = await fetch('/api/docker/containers/json?all=true');
+    }
+    catch (error) {
+      console.error('Error while fetching containers descriptors', error);
+      return [];
+    }
+
+    try {
+      const containers = await response.json();
+      return containers;
+    } catch (error) {
+      console.error('Error while parsing containers descriptors', error);
+      return [];
+    }
+
   }
 
   async getAllContainersStats() {
