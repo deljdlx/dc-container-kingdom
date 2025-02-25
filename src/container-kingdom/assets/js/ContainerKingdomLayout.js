@@ -48,8 +48,10 @@ class ContainerKingdomLayout
     this.iframeContainer = document.querySelector('#iframe-container');
     this.initRpgEngine();
     this.initConsole();
+    this.drawRandomFlowers(100);
     this.makeViewportZoomable();
-    this.makeViewportDraggable()
+    this.makeViewportDraggable();
+
   }
 
   async focusOnContainer(container) {
@@ -103,13 +105,15 @@ class ContainerKingdomLayout
   }
 
   drawRandomFlowers(quantity) {
-    const board = this.application.rpgEngine.getViewport().getBoard();
+    const board = this.getViewport().getBoard();
     for(let i = 0; i < quantity ; i++) {
-      const x = Math.random() * 1800;
-      const y = Math.random() * window.innerHeight;
+      const x = Math.random() * window.innerWidth * 2;
+      const y = Math.random() * window.innerHeight * 3;
 
       const area = board.getAreaAt(0, 0);
-      area.addElement(x, y, new Sunflower00());
+      let flower = area.addElement(x, y, new Sunflower00());
+      console.log('%cContainerKingdomLayout.js :: 115 =============================', 'color: #f00; font-size: 1rem');
+      console.log(flower);
     }
   }
 
