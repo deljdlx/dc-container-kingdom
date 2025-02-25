@@ -44,5 +44,5 @@ networks:
     external: true
   docker-api:
     name: docker-api
-    external: true
+    driver: bridge
 
