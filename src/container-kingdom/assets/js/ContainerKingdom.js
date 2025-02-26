@@ -66,15 +66,15 @@ class ContainerKingdom
 
   getTotalMemoryUsage() {
     return Object.values(this.containers).reduce((acc, container) => {
-      const usage = acc + container.getMemoryUsage();
-      return isNaN(usage) ? 0 : usage;
+      const newUsage = acc + container.getMemoryUsage();
+      return isNaN(newUsage) ? acc : newUsage;
     }, 0);
   }
 
   getGlobalCpuUsage() {
     return Object.values(this.containers).reduce((acc, container) => {
-      const usage =acc + container.getCpuUsage();
-      return isNaN(usage) ? 0 : usage;
+      const newUsage =acc + container.getCpuUsage();
+      return isNaN(newUsage) ? acc : newUsage;
     }, 0);
   }
 
