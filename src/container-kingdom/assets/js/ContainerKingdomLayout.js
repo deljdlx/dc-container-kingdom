@@ -112,8 +112,6 @@ class ContainerKingdomLayout
 
       const area = board.getAreaAt(0, 0);
       let flower = area.addElement(x, y, new Sunflower00());
-      console.log('%cContainerKingdomLayout.js :: 115 =============================', 'color: #f00; font-size: 1rem');
-      console.log(flower);
     }
   }
 

@@ -66,13 +66,15 @@ class ContainerKingdom
 
   getTotalMemoryUsage() {
     return Object.values(this.containers).reduce((acc, container) => {
-      return acc + container.getMemoryUsage();
+      const usage = acc + container.getMemoryUsage();
+      return isNaN(usage) ? 0 : usage;
     }, 0);
   }
 
   getGlobalCpuUsage() {
     return Object.values(this.containers).reduce((acc, container) => {
-      return acc + container.getCpuUsage();
+      const usage =acc + container.getCpuUsage();
+      return isNaN(usage) ? 0 : usage;
     }, 0);
   }
 
@@ -147,11 +149,6 @@ class ContainerKingdom
       this.loop();
     }, 2000);
   }
-
-  // renderContainersList() {
-  //   this.containersList.clear();
-  //   this.containersList.load(this.composes);
-  // }
 
   getContainers(toArray = false) {
     if(toArray) {
