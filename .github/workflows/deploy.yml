@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  deploy-sandbox:
+  deploy:
     uses: deljdlx/github-tools/.github/workflows/deploy.yml@main
     with:
       host_name: "container-kingdom.jlb.ninja"
