@@ -58,6 +58,12 @@ class Container
       const containerName = this.createEntry('🗒️ Container name', this.getName());
       container.appendChild(containerName);
 
+      const containerStatus = this.createEntry('🔥 Status', this.getStatus())
+      container.appendChild(containerStatus);
+
+      const containerCreatedUptime = this.createEntry('🗒️ Container created', this.getCreatedSince());
+      container.appendChild(containerCreatedUptime);
+
       const containerImage = this.createEntry('📀 Image', this.getImage());
       container.appendChild(containerImage);
 
@@ -79,7 +85,7 @@ class Container
       const networks = this.getNetworks();
       const containerNetworks = this.createEntry('🔌 Networks', `<ul class="networks">${networks.map(network => `<li class="network">${network}</li>`).join('')}</ul>`)
       container.appendChild(containerNetworks);
-      
+
     return container;
 
 
@@ -185,6 +191,19 @@ class Container
     }
 
     this.previousStats = this.stats;
+  }
+
+
+  getStatus() {
+    return this.Status;
+  }
+
+  getCreatedSince() {
+    const created = new Date(this.Created * 1000);
+    const now = new Date();
+    const diff = now - created;
+    const diffInDays = diff / (1000 * 60 * 60 * 24);
+    return `${diffInDays.toFixed(2)} days`;
   }
 
   getCpuUsage() {
