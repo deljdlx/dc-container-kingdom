@@ -98,7 +98,8 @@ class ContainerKingdomLayout
 
     this.containerInfoContainer.innerHTML = '';
 
-    this.containerInfoContainer.innerHTML = container.getHtmlInfo();
+    // this.containerInfoContainer.innerHTML = container.getHtmlInfo();
+    this.containerInfoContainer.appendChild(container.getHtmlInfo());
 
     this.showConsole();
     this.console.scrollToBottom();

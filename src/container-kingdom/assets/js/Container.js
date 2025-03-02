@@ -44,44 +44,84 @@ class Container
     return this.rpgEngine.data.element;
   }
 
+  createEntry(caption, content) {
+    let entry = document.createElement('div');
+    entry.classList.add('container-info-entry');
+    entry.innerHTML = caption + ': ' + content
+    return entry
+  }
+
   getHtmlInfo() {
-    let html =  `
-      <div class="container-info-entry">
-        🗒️ Container name: ${this.getName()}
-      </div>
-      <div class="container-info-entry">
-        📀 Image: ${this.getImage()}
-      </div>
 
-      <div class="container-info-entry">
-        📦 Compose: ${this.getComposeName()}
-      </div>
+    const container = document.createElement('div');
+
+      const containerName = this.createEntry('🗒️ Container name', this.getName());
+      container.appendChild(containerName);
+
+      const containerImage = this.createEntry('📀 Image', this.getImage());
+      container.appendChild(containerImage);
+
+      const containerCompose = this.createEntry('📦 Compose', this.getComposeName());
+      container.appendChild(containerCompose);
+
+      const containerMemoryUsage = this.createEntry('🧠 Memory usage', this.getMemoryUsage(true))
+      container.appendChild(containerMemoryUsage);
+
+      const containerCpuUsage = this.createEntry('⚙️ CPU load', `${Math.round(this.getCpuUsage() * 100) / 100}%`)
+      container.appendChild(containerCpuUsage);
+
+      const demoUrl = this.getDemoUrl();
+      if(demoUrl) {
+        const containerDemo = this.createEntry('🚀 Demo', `<a class="demo-url" href="//${demoUrl}" target="_blank">${demoUrl}</a>`);
+        container.appendChild(containerDemo);
+      }
+
+      const networks = this.getNetworks();
+      const containerNetworks = this.createEntry('🔌 Networks', `<ul class="networks">${networks.map(network => `<li class="network">${network}</li>`).join('')}</ul>`)
+      container.appendChild(containerNetworks);
+      
+    return container;
 
 
-      <div class="container-info-entry">
-        🧠 Memory usage: ${this.getMemoryUsage(true)}
-      </div>
-      <div class="container-info-entry">
-        ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
-      </div>
-    `;
 
-    if(this.getDemoUrl()) {
-      html += `<div class="container-info-entry">
-        🚀 Demo
-        <div>
-          <a class="demo-url" href="//${this.getDemoUrl()}" target="_blank">${this.getDemoUrl()}</a>
-        </div>
-      </div>`;
-    }
 
-    this.getNetworks();
+    // let html =  `
+    //   <div class="container-info-entry">
+    //     🗒️ Container name: ${this.getName()}
+    //   </div>
+    //   <div class="container-info-entry">
+    //     📀 Image: ${this.getImage()}
+    //   </div>
 
-    html += '<div class="container-info-entry">🔌 Networks: <ul class="networks">';
-    this.getNetworks().forEach((network) => {
-      html += `<li class="network">${network}</li>`;
-    });
-    html += '</ul></div>';
+    //   <div class="container-info-entry">
+    //     📦 Compose: ${this.getComposeName()}
+    //   </div>
+
+
+    //   <div class="container-info-entry">
+    //     🧠 Memory usage: ${this.getMemoryUsage(true)}
+    //   </div>
+    //   <div class="container-info-entry">
+    //     ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
+    //   </div>
+    // `;
+
+    // if(this.getDemoUrl()) {
+    //   html += `<div class="container-info-entry">
+    //     🚀 Demo
+    //     <div>
+    //       <a class="demo-url" href="//${this.getDemoUrl()}" target="_blank">${this.getDemoUrl()}</a>
+    //     </div>
+    //   </div>`;
+    // }
+
+    // this.getNetworks();
+
+    // html += '<div class="container-info-entry">🔌 Networks: <ul class="networks">';
+    // this.getNetworks().forEach((network) => {
+    //   html += `<li class="network">${network}</li>`;
+    // });
+    // html += '</ul></div>';
 
     return html;
   }
