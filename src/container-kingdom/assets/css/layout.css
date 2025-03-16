@@ -15,7 +15,29 @@ html, body {
 }
 
 
+#loading-screen {
+  position: absolute;
+  z-index: 1000000;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #0008;
+  backdrop-filter: blur(5px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+}
 
+#loading-screen.hidden {
+  display: none;
+}
+
+#loading-screen h1 {
+  font-size: 2rem;
+  color: #fff;
+}
 
 
 

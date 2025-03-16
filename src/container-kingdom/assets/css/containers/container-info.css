@@ -26,6 +26,24 @@
   font-size: 2rem;
 }
 
+
+.console-container .actions-container {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 1rem;
+}
+
+.console-container .container-action-button {
+  display: block;
+  padding: 8px 16px;
+  border: solid 1px #fff;
+  border-radius: 4px;
+  background-color: #0008;
+  color: #fff;
+  cursor: pointer;
+  flex-shrink: 1;
+}
+
 #console-container__content {
   height: 100%;
   display: flex;

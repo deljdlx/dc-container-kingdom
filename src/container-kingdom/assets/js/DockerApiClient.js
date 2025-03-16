@@ -17,7 +17,19 @@ class DockerApiClient
       console.error('Error while parsing containers descriptors', error);
       return [];
     }
+  }
 
+  async startContainer(containerId) {
+    const response = await fetch(`/api/docker/containers/${containerId}/start`, {
+      method: 'POST',
+    });
+    return response;
+  }
+  async destroyContainer(containerId) {
+    const response = await fetch(`/api/docker/containers/${containerId}`, {
+      method: 'DELETE',
+    });
+    return response;
   }
 
   async getAllContainersStats() {

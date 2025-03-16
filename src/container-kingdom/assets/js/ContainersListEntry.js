@@ -13,7 +13,15 @@ class ContainersListEntry
 
     const caption = document.createElement('span');
     caption.classList.add('container-name');
-    caption.innerHTML = container.getName();
+
+    if(container.isRunning()) {
+      this.element.classList.add('container-status-running');
+      caption.innerHTML = '▶️' + container.getName();
+    }
+    else {
+      this.element.classList.add('container-status-stopped');
+      caption.innerHTML = '⏹️' + container.getName();
+    }
     this.element.appendChild(caption);
 
     const focusTrigger = document.createElement('div');

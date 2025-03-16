@@ -17,6 +17,8 @@ class ContainerKingdom
   containers = {};
   containersStats = {};
 
+  _previousContainers = {};
+
 
   /**
    * @type {Object<string, DockerCompose>}
@@ -60,6 +62,8 @@ class ContainerKingdom
     await this.viewer.drawNetworks(this.containers);
     await this.layout.getViewport().render();
     this.drawNetworksSwitches();
+
+    this.layout.hideLoadingScreen();
 
     await this.loop();
   }
@@ -147,7 +151,7 @@ class ContainerKingdom
 
     setTimeout(() => {
       this.loop();
-    }, 2000);
+    }, 5000);
   }
 
   getContainers(toArray = false) {
@@ -174,12 +178,19 @@ class ContainerKingdom
   async loadContainers() {
 
     const containers = await this.dockerApiClient.getContainersDescriptors();
+
+    this._previousContainers = this.containers;
+    this.containers = {};
+
     containers.map(containerDescriptor => {
       if(this.containers[containerDescriptor.Id]) {
         return;
       }
 
-      const container = new Container(containerDescriptor);
+      const container = new Container(
+        this.dockerApiClient,
+        containerDescriptor,
+      );
       this.containers[container.Id] = container;
 
       const networks = container.NetworkSettings.Networks;
@@ -191,7 +202,6 @@ class ContainerKingdom
         this.networks[networkName].push(container);
       });
     });
-
 
     const composes = {};
 
@@ -226,11 +236,28 @@ class ContainerKingdom
     }
 
     if(this.lastContainersChecksum !== newChecksum) {
-      document.location.reload();
+
+      this.cleanContainers();
+      this.handleNewContainers();
+
+      // document.location.reload();
       return;
     }
     this.lastContainersChecksum = newChecksum;
   }
+
+  handleNewContainers() {
+
+  }
+
+  cleanContainers() {
+    Object.values(this._previousContainers).map(container => {
+      if(!this.containers[container.Id]) {
+        container.getElement().destroy();
+      }
+    });
+  }
+
 
   drawNetworksSwitches() {
     let container = document.querySelector('.networks-switches');

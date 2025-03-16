@@ -44,6 +44,15 @@
   margin: 0 8px 8px 8px;
 }
 
+.containers-list .container-status-stopped {
+  background-color: #fff8;
+}
+
+.containers-list .container-status-running {
+  background-color: #0f08;
+}
+
+
 .containers-list .container-name {
   cursor: pointer;
 }

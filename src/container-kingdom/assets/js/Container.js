@@ -28,10 +28,23 @@ class Container
     {value: 80, css: 'xxxl'},
   ];
 
+  /**
+   * @type {DockerApiClient}
+   * @private
+   */
+  _dockerApiClient = null;
+  _actionsEnabled = false;
 
 
 
-  constructor(descriptor) {
+
+  constructor(
+    dockerApiClient,
+    descriptor,
+    actionsEnabled = false
+  ) {
+    this._dockerApiClient = dockerApiClient;
+    this._actionsEnabled = actionsEnabled;
     Object.assign(this, descriptor);
     this.watch();
   }
@@ -51,9 +64,48 @@ class Container
     return entry
   }
 
+  async start() {
+    const response = this._dockerApiClient.startContainer(this.Id);
+  }
+
+  async destroy() {
+    // this.rpgEngine.data.element.destroy();
+    const response = this._dockerApiClient.destroyContainer(this.Id);
+  }
+
   getHtmlInfo() {
 
     const container = document.createElement('div');
+
+
+      if(this._actionsEnabled)  {
+        const actionContainer = document.createElement('div');
+        actionContainer.classList.add('actions-container');
+        container.appendChild(actionContainer);
+
+        if(!this.isRunning()) {
+          const startButton = document.createElement('button');
+          startButton.classList.add('container-action-button', 'start-button');
+          startButton.innerHTML = 'Start';
+          startButton.addEventListener('click', async () => {
+            await this.start();
+          });
+          actionContainer.appendChild(startButton);
+
+          const deleteButton = document.createElement('button');
+          deleteButton.classList.add('container-action-button', 'destroy-button');
+          deleteButton.innerHTML = 'Destroy';
+          deleteButton.addEventListener('click', async () => {
+            await this.destroy();
+          });
+          actionContainer.appendChild(deleteButton);
+        }
+      }
+
+
+
+
+
 
       const containerName = this.createEntry('🗒️ Container name', this.getName());
       container.appendChild(containerName);
@@ -87,49 +139,6 @@ class Container
       container.appendChild(containerNetworks);
 
     return container;
-
-
-
-
-    // let html =  `
-    //   <div class="container-info-entry">
-    //     🗒️ Container name: ${this.getName()}
-    //   </div>
-    //   <div class="container-info-entry">
-    //     📀 Image: ${this.getImage()}
-    //   </div>
-
-    //   <div class="container-info-entry">
-    //     📦 Compose: ${this.getComposeName()}
-    //   </div>
-
-
-    //   <div class="container-info-entry">
-    //     🧠 Memory usage: ${this.getMemoryUsage(true)}
-    //   </div>
-    //   <div class="container-info-entry">
-    //     ⚙️ CPU load: ${Math.round(this.getCpuUsage() * 100) / 100}%
-    //   </div>
-    // `;
-
-    // if(this.getDemoUrl()) {
-    //   html += `<div class="container-info-entry">
-    //     🚀 Demo
-    //     <div>
-    //       <a class="demo-url" href="//${this.getDemoUrl()}" target="_blank">${this.getDemoUrl()}</a>
-    //     </div>
-    //   </div>`;
-    // }
-
-    // this.getNetworks();
-
-    // html += '<div class="container-info-entry">🔌 Networks: <ul class="networks">';
-    // this.getNetworks().forEach((network) => {
-    //   html += `<li class="network">${network}</li>`;
-    // });
-    // html += '</ul></div>';
-
-    return html;
   }
 
   watch() {
@@ -194,6 +203,13 @@ class Container
   }
 
 
+  isRunning() {
+    if(this.State === 'running') {
+      return true;
+    }
+    return false;
+  }
+
   getStatus() {
     return this.Status;
   }
@@ -218,9 +234,9 @@ class Container
     return this.stats.memory_stats.usage;
   }
 
-  destroy() {
-    this.rpgEngine.data.element.destro();
-  }
+  // destroy() {
+  //   this.rpgEngine.data.element.destroy();
+  // }
 
   setRpgEngineData(data) {
     this.rpgEngine.data = data;

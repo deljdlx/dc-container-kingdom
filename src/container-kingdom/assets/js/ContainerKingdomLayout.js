@@ -51,7 +51,10 @@ class ContainerKingdomLayout
     this.drawRandomFlowers(100);
     this.makeViewportZoomable();
     this.makeViewportDraggable();
+  }
 
+  hideLoadingScreen() {
+    document.querySelector('#loading-screen').classList.add('hidden');
   }
 
   async focusOnContainer(container) {
