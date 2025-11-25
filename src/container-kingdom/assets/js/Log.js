@@ -16,10 +16,10 @@ class Log
 
   getEntries() {
     return this.lines.map((line) => {
-      const logEntry =  new LogEntry(line);
+      const logEntry = new LogEntry(line);
       logEntry.addFormatter(this.highlightErrors);
       return logEntry;
-    })
+    });
   }
 
   highlightErrors(element) {
@@ -28,6 +28,4 @@ class Log
     }
     return element;
   }
-
-
 }

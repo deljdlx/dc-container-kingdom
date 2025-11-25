@@ -1,5 +1,8 @@
 class ContainerKingdom
 {
+  // Constants
+  static LOOP_INTERVAL_MS = 5000;
+
   consoleContainer;
   /**
    * @type {ContainerKingdomLayout}
@@ -18,6 +21,7 @@ class ContainerKingdom
   containersStats = {};
 
   _previousContainers = {};
+  _loopTimeoutId = null;
 
 
   /**
@@ -117,23 +121,39 @@ class ContainerKingdom
   }
 
   clear() {
-    Object.values(this.containers).map(container => {
+    // Stop the loop before clearing
+    this.stopLoop();
+    Object.values(this.containers).forEach(container => {
+      container.stopWatch();
       delete this.containers[container.Id];
-      container.destroy();
     });
   }
 
-  async loadContainersStats() {
-    const stats = await this.dockerApiClient.getAllContainersStats();
-    stats.map((containerStats) => {
-      const containerId = containerStats.id;
-      const container = this.containers[containerId];
-      if(container) {
-        container.setStats(containerStats);
-      }
-    });
+  /**
+   * Stop the main loop to prevent memory leaks
+   */
+  stopLoop() {
+    if (this._loopTimeoutId) {
+      clearTimeout(this._loopTimeoutId);
+      this._loopTimeoutId = null;
+    }
+  }
 
-    this.renderClusterInfo();
+  async loadContainersStats() {
+    try {
+      const stats = await this.dockerApiClient.getAllContainersStats();
+      stats.forEach((containerStats) => {
+        const containerId = containerStats.id;
+        const container = this.containers[containerId];
+        if(container) {
+          container.setStats(containerStats);
+        }
+      });
+
+      this.renderClusterInfo();
+    } catch (error) {
+      console.error('Error loading container stats:', error);
+    }
   }
 
   async loop() {
@@ -149,9 +169,9 @@ class ContainerKingdom
       document.location.reload();
     }
 
-    setTimeout(() => {
+    this._loopTimeoutId = setTimeout(() => {
       this.loop();
-    }, 5000);
+    }, ContainerKingdom.LOOP_INTERVAL_MS);
   }
 
   getContainers(toArray = false) {
@@ -176,13 +196,12 @@ class ContainerKingdom
 
 
   async loadContainers() {
-
     const containers = await this.dockerApiClient.getContainersDescriptors();
 
     this._previousContainers = this.containers;
     this.containers = {};
 
-    containers.map(containerDescriptor => {
+    containers.forEach(containerDescriptor => {
       if(this.containers[containerDescriptor.Id]) {
         return;
       }
@@ -194,7 +213,7 @@ class ContainerKingdom
       this.containers[container.Id] = container;
 
       const networks = container.NetworkSettings.Networks;
-      Object.keys(networks).map(networkName => {
+      Object.keys(networks).forEach(networkName => {
         if(!this.networks[networkName]) {
           this.networks[networkName] = [];
         }
@@ -205,20 +224,21 @@ class ContainerKingdom
 
     const composes = {};
 
-    Object.values(this.containers).map(container => {
-      if(!composes[container.getComposeName()]) {
-        composes[container.getComposeName()] = [];
+    Object.values(this.containers).forEach(container => {
+      const composeName = container.getComposeName();
+      if(!composes[composeName]) {
+        composes[composeName] = [];
       }
-      composes[container.getComposeName()].push(container);
+      composes[composeName].push(container);
     });
 
     const sortedComposes = Object.fromEntries(
       Object.entries(composes)
         .sort(([, containersA], [, containersB]) => containersB.length - containersA.length)
     );
-    Object.entries(sortedComposes).map(([composeName, containers]) => {
+    Object.entries(sortedComposes).forEach(([composeName, composeContainers]) => {
       this.composes[composeName] = new DockerCompose(composeName);
-      containers.map(container => {
+      composeContainers.forEach(container => {
         this.composes[composeName].addContainer(container);
       });
     });
@@ -236,24 +256,25 @@ class ContainerKingdom
     }
 
     if(this.lastContainersChecksum !== newChecksum) {
-
       this.cleanContainers();
       this.handleNewContainers();
-
-      // document.location.reload();
       return;
     }
     this.lastContainersChecksum = newChecksum;
   }
 
   handleNewContainers() {
-
+    // Placeholder for future implementation
   }
 
   cleanContainers() {
-    Object.values(this._previousContainers).map(container => {
+    Object.values(this._previousContainers).forEach(container => {
       if(!this.containers[container.Id]) {
-        container.getElement().destroy();
+        container.stopWatch();
+        const element = container.getElement();
+        if (element) {
+          element.destroy();
+        }
       }
     });
   }
@@ -271,7 +292,7 @@ class ContainerKingdom
     container.append(caption);
 
 
-    Object.keys(this.networks).map(networkName => {
+    Object.keys(this.networks).forEach(networkName => {
       const label = document.createElement('label');
       label.classList.add('network-switch');
       const checkbox = document.createElement('input');
@@ -301,39 +322,28 @@ class ContainerKingdom
     });
 
     const containers = document.querySelectorAll('.map-element.container.network--' + networkName);
-    containers.forEach(container => {
+    containers.forEach(containerElement => {
       let mustBeHidden = true;
-      Object.keys(this.selectedNetworks).map(networkName => {
-        if(this.selectedNetworks[networkName] && container.classList.contains('network--' + networkName)) {
+      Object.keys(this.selectedNetworks).forEach(netName => {
+        if(this.selectedNetworks[netName] && containerElement.classList.contains('network--' + netName)) {
           mustBeHidden = false;
         }
       });
       if(mustBeHidden) {
-        container.classList.add('hidden');
+        containerElement.classList.add('hidden');
       }
       else {
-        container.classList.remove('hidden');
+        containerElement.classList.remove('hidden');
       }
     });
 
   }
 
   async gotoContainerUrl(container) {
-    if(container.Labels) {
-      Object.keys(container.Labels).map((label) => {
-        let value = container.Labels[label];
-        if(value.match(/Host\(.+?\)/)) {
-            let url = value.replace(/Host\((.*?)\).*/, '$1');
-            url = url.replace(/"/gi, '');
-            url = url.replace(/'/gi, '');
-            url = url.replace(/`/gi, '');
-            console.log(url);
-            if(url) {
-              document.querySelector('#iframe-container').classList.remove('hidden');
-              document.querySelector('#iframe-preview').src = '//' + url;
-            }
-        }
-      });
+    const demoUrl = container.getDemoUrl();
+    if (demoUrl) {
+      document.querySelector('#iframe-container').classList.remove('hidden');
+      document.querySelector('#iframe-preview').src = '//' + demoUrl;
     }
   }
 
@@ -344,14 +354,7 @@ class ContainerKingdom
   }
 
   drawRandomFlowers(quantity) {
-    const board = this.layout.getViewport().getBoard();
-    for(let i = 0; i < quantity ; i++) {
-      const x = Math.random() * 1800;
-      const y = Math.random() * window.innerHeight;
-
-      const area = board.getAreaAt(0, 0);
-      area.addElement(x, y, new Sunflower00());
-    }
+    this.layout.drawRandomFlowers(quantity);
   }
 
   getContainerLogs(container) {
@@ -359,24 +362,18 @@ class ContainerKingdom
   }
 
 
-  zoom(zoom) {
-      this.layout.zoom(zoom);
+  zoom(zoomLevel) {
+    this.layout.zoom(zoomLevel);
   }
-
-
-
-
-
-
 
   async getChecksum(object) {
     const json = JSON.stringify(object);
 
     const encoder = new TextEncoder();
-    const data = encoder.encode(json); // Encoder en Uint8Array
+    const data = encoder.encode(json);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-    const hash = [...new Uint8Array(hashBuffer)] // Convertir en hex
+    const hash = [...new Uint8Array(hashBuffer)]
       .map(byte => byte.toString(16).padStart(2, "0"))
       .join("");
 

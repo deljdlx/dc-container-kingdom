@@ -1,5 +1,20 @@
 class Container
 {
+  // Constants
+  static WATCH_INTERVAL_MS = 1000;
+  static CPU_USAGE_THRESHOLDS = [
+    {value: 1, css: 'xxs'},
+    {value: 5, css: 'xs'},
+    {value: 10, css: 's'},
+    {value: 20, css: 'm'},
+    {value: 30, css: 'xm'},
+    {value: 40, css: 'xxm'},
+    {value: 50, css: 'l'},
+    {value: 60, css: 'xl'},
+    {value: 70, css: 'xxl'},
+    {value: 80, css: 'xxxl'},
+  ];
+
   rpgEngine = {
     data: {
       element: null,
@@ -14,26 +29,13 @@ class Container
   previousStats = null;
   cpuUsage = 0;
 
-
-  cpuUsageThresholds = [
-    {value: 1, css: 'xxs'},
-    {value: 5, css: 'xs'},
-    {value: 10, css: 's'},
-    {value: 20, css: 'm'},
-    {value: 30, css: 'xm'},
-    {value: 40, css: 'xxm'},
-    {value: 50, css: 'l'},
-    {value: 60, css: 'xl'},
-    {value: 70, css: 'xxl'},
-    {value: 80, css: 'xxxl'},
-  ];
-
   /**
    * @type {DockerApiClient}
    * @private
    */
   _dockerApiClient = null;
   _actionsEnabled = false;
+  _watchTimeoutId = null;
 
 
 
@@ -65,12 +67,34 @@ class Container
   }
 
   async start() {
-    const response = this._dockerApiClient.startContainer(this.Id);
+    try {
+      const response = await this._dockerApiClient.startContainer(this.Id);
+      return response;
+    } catch (error) {
+      console.error(`Error starting container ${this.Id}:`, error);
+      throw error;
+    }
   }
 
   async destroy() {
-    // this.rpgEngine.data.element.destroy();
-    const response = this._dockerApiClient.destroyContainer(this.Id);
+    this.stopWatch();
+    try {
+      const response = await this._dockerApiClient.destroyContainer(this.Id);
+      return response;
+    } catch (error) {
+      console.error(`Error destroying container ${this.Id}:`, error);
+      throw error;
+    }
+  }
+
+  /**
+   * Stop the watch timer to prevent memory leaks
+   */
+  stopWatch() {
+    if (this._watchTimeoutId) {
+      clearTimeout(this._watchTimeoutId);
+      this._watchTimeoutId = null;
+    }
   }
 
   getHtmlInfo() {
@@ -153,15 +177,15 @@ class Container
       }
     }
 
-    setTimeout(() => {
+    this._watchTimeoutId = setTimeout(() => {
       this.watch();
-    }, 1000);
+    }, Container.WATCH_INTERVAL_MS);
   }
 
   getCpuUsageThreshold() {
-    for (let i = 0; i < this.cpuUsageThresholds.length; i++) {
-      if (this.cpuUsage < this.cpuUsageThresholds[i].value) {
-        return this.cpuUsageThresholds[i];
+    for (let i = 0; i < Container.CPU_USAGE_THRESHOLDS.length; i++) {
+      if (this.cpuUsage < Container.CPU_USAGE_THRESHOLDS[i].value) {
+        return Container.CPU_USAGE_THRESHOLDS[i];
       }
     }
 
@@ -204,10 +228,7 @@ class Container
 
 
   isRunning() {
-    if(this.State === 'running') {
-      return true;
-    }
-    return false;
+    return this.State === 'running';
   }
 
   getStatus() {
@@ -227,6 +248,9 @@ class Container
   }
 
   getMemoryUsage(human = false) {
+    if (!this.stats || !this.stats.memory_stats || typeof this.stats.memory_stats.usage === 'undefined') {
+      return human ? 'N/A' : 0;
+    }
     if(human) {
       const usageInMb = this.stats.memory_stats.usage / 1024 / 1024;
       return `${usageInMb.toFixed(2)} MB`;
@@ -234,16 +258,8 @@ class Container
     return this.stats.memory_stats.usage;
   }
 
-  // destroy() {
-  //   this.rpgEngine.data.element.destroy();
-  // }
-
   setRpgEngineData(data) {
     this.rpgEngine.data = data;
-  }
-
-  getStatus() {
-    return this.Status;
   }
 
 
@@ -271,10 +287,8 @@ class Container
   }
 
   async getChecksum() {
-
-    let descriptor = {
+    const descriptor = {
       Id: this.Id,
-      Labels: this.Labels,
       Name: this.Name,
       State: this.State,
       Created: this.Created,
@@ -289,20 +303,18 @@ class Container
       NetworkSettings: this.NetworkSettings,
       Mounts: this.Mounts,
       Config: this.Config,
-      NetworkSettings: this.NetworkSettings,
       LogPath: this.LogPath,
-      HostConfig: this.HostConfig,
       RestartCount: this.RestartCount,
       Platform: this.Platform,
     };
 
-
     const json = JSON.stringify(descriptor);
     const encoder = new TextEncoder();
-    const data = encoder.encode(json); // Encoder en Uint8Array
+    const data = encoder.encode(json);
     const hashBuffer = await crypto.subtle.digest("SHA-256", data);
 
-    const hash = [...new Uint8Array(hashBuffer)] // Convertir en hex
+    // Convert to hex
+    const hash = [...new Uint8Array(hashBuffer)]
       .map(byte => byte.toString(16).padStart(2, "0"))
       .join("");
 
