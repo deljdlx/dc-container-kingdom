@@ -21,9 +21,25 @@ console.log(
 	`
 );
 
+/**
+ * Check if mock mode is enabled via URL parameter
+ * @returns {boolean} True if mock mode is enabled
+ */
+function isMockModeEnabled() {
+  const urlParams = new URLSearchParams(window.location.search);
+  return urlParams.get('mock') === 'true';
+}
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const dockerApiClient = new DockerApiClient();
+  let dockerApiClient;
+
+  if (isMockModeEnabled()) {
+    console.log('%c🎭 Mock mode enabled - using fake Docker API data', 'color: #FFA; font-size: 16px; font-weight: bold;');
+    dockerApiClient = new MockDockerApiClient();
+  } else {
+    dockerApiClient = new DockerApiClient();
+  }
+
   const instance = new ContainerKingdom(dockerApiClient);
   instance.zoom(0.5);
 });
