@@ -50,7 +50,7 @@ const MockData = {
       "Id": "2d8a9b53c1602413cc0f2831c961d881cffd556d859982f9ecf9f604e80d8838",
       "Names": ["/clever-database"],
       "Image": "postgres:15",
-      "ImageID": "sha256:def789ghi012",
+      "ImageID": "sha256:def789abc012",
       "Command": "docker-entrypoint.sh postgres",
       "Created": Math.floor(Date.now() / 1000) - 172800, // 2 days ago
       "Ports": [
@@ -61,7 +61,7 @@ const MockData = {
       },
       "State": "running",
       "Status": "Up 2 days",
-      "HostConfig": { "NetworkMode": "backend" },
+      "HostConfig": { "NetworkMode": "default" },
       "NetworkSettings": {
         "Networks": {
           "web": {
