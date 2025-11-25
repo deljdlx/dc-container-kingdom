@@ -13,7 +13,7 @@ class ContainersList {
   load(composes) {
     this.composes = composes;
 
-    Object.keys(this.composes).map(composeName => {
+    Object.keys(this.composes).forEach(composeName => {
       if(this.composes[composeName].length() > 1 ) {
         const composeContainer = document.createElement('details');
         composeContainer.open = true;
@@ -23,12 +23,12 @@ class ContainersList {
         caption.innerHTML = composeName;
         composeContainer.append(caption);
 
-        Object.values(this.composes[composeName].getContainers()).map(container => {
+        Object.values(this.composes[composeName].getContainers()).forEach(container => {
           const entry = new ContainersListEntry(this.application, container);
           composeContainer.append(entry.getElement());
           this.element.append(composeContainer);
         });
-        return
+        return;
       }
 
       const container = this.composes[composeName].getByIndex(0);

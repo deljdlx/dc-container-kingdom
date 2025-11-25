@@ -1,10 +1,28 @@
 class ContainerKingdomRenderer
 {
+  // Constants
+  static DEFAULT_CELL_SIZE = 150;
+  static DEFAULT_GRID_SIZE = 15;
+  static LOOP_PROTECTION_MAX = 100;
+
+  static MEMORY_USAGE_THRESHOLDS = [
+    {threshold: 4 * 1024 * 1024, caption: '4mb', humanCaption: 'xxs'},
+    {threshold: 8 * 1024 * 1024, caption: '8mb', humanCaption: 'xs'},
+    {threshold: 16 * 1024 * 1024, caption: '16mb', humanCaption: 's'},
+    {threshold: 32 * 1024 * 1024, caption: '32mb', humanCaption: 'm'},
+    {threshold: 64 * 1024 * 1024, caption: '64mb', humanCaption: 'xm'},
+    {threshold: 128 * 1024 * 1024, caption: '128mb', humanCaption: 'xxm'},
+    {threshold: 256 * 1024 * 1024, caption: '256mb', humanCaption: 'l'},
+    {threshold: 512 * 1024 * 1024, caption: '512mb', humanCaption: 'xl'},
+    {threshold: 1024 * 1024 * 1024, caption: '1024mb', humanCaption: 'xxl'},
+    {threshold: 2048 * 1024 * 1024, caption: '2048mb', humanCaption: 'xxxl'},
+  ];
+
   application;
   viewport;
 
-  cellWidth = 150;
-  cellHeight = 150;
+  cellWidth = ContainerKingdomRenderer.DEFAULT_CELL_SIZE;
+  cellHeight = ContainerKingdomRenderer.DEFAULT_CELL_SIZE;
   layoutWidth = window.innerWidth;
   layoutHeight = window.innerHeight;
   layoutMatrix = [];
@@ -18,19 +36,6 @@ class ContainerKingdomRenderer
 
   matrix = {};
 
-  memoryUsageThresholds = [
-    {thresholds: 4 * 1024 *1024, caption: '4mb', humanCaption: 'xxs'},
-    {thresholds: 8 * 1024 *1024, caption: '8mb', humanCaption: 'xs'},
-    {thresholds: 16 * 1024 *1024, caption: '16mb', humanCaption: 's'},
-    {thresholds: 32 * 1024 *1024, caption: '32mb', humanCaption: 'm'},
-    {thresholds: 64 * 1024 *1024, caption: '64mb', humanCaption: 'xm'},
-    {thresholds: 128 * 1024 *1024, caption: '128mb', humanCaption: 'xxm'},
-    {thresholds: 256 * 1024 *1024, caption: '256mb', humanCaption: 'l'},
-    {thresholds: 512 * 1024 *1024, caption: '512mb', humanCaption: 'xl'},
-    {thresholds: 1024 * 1024 *1024, caption: '1024mb', humanCaption: 'xxl'},
-    {thresholds: 2048 * 1024 *1024, caption: '2048mb', humanCaption: 'xxxl'},
-  ]
-
   bounds = {
     minX: BigInt(Number.MAX_SAFE_INTEGER),
     minY: BigInt(Number.MAX_SAFE_INTEGER),
@@ -43,8 +48,8 @@ class ContainerKingdomRenderer
     this.application = application;
     this.viewport = viewport;
 
-    this.xCells = 15;
-    this.yCells = 15;
+    this.xCells = ContainerKingdomRenderer.DEFAULT_GRID_SIZE;
+    this.yCells = ContainerKingdomRenderer.DEFAULT_GRID_SIZE;
 
     const roadElement = new Ground00();
     this.roadWidth = roadElement.width();
@@ -54,7 +59,7 @@ class ContainerKingdomRenderer
   }
 
   initMatrix()  {
-    let layoutMatrix = [];
+    const layoutMatrix = [];
     for (let x = 0; x < this.xCells; x++) {
       layoutMatrix[x] = [];
       for (let y = 0; y < this.yCells; y++) {
@@ -92,21 +97,28 @@ class ContainerKingdomRenderer
 
 
   async drawContainers() {
-
     this.computeBounds(
       this.application.getContainers(true)
     );
-    Object.values(this.application.getComposes()).map(async (compose) => {
-      this.drawHouseGroup(
+
+    const composes = Object.values(this.application.getComposes());
+    for (const compose of composes) {
+      await this.drawHouseGroup(
         Object.values(compose.getContainers())
       );
-    });
+    }
   }
 
 
   async drawHouseGroup(containers) {
     const houses = [];
-    const firstContainer = Object.values(containers)[0];
+    const containerList = Object.values(containers);
+    const firstContainer = containerList[0];
+    
+    if (!firstContainer) {
+      return;
+    }
+    
     let {x, y} = this.computeContainerCoords(firstContainer);
     try {
       ({x, y} = this.getClosestFreeCoords(x, y, 2));
@@ -118,116 +130,51 @@ class ContainerKingdomRenderer
         console.error('No space available for container', firstContainer);
       }
     }
-    let house = await this.drawHouse(firstContainer, x, y);
-    houses.push(house);
+    const firstHouse = await this.drawHouse(firstContainer, x, y);
+    houses.push(firstHouse);
 
-    await Object.values(containers).map(async (container, index) => {
-      if(index === 0) {
-        return;
-      }
-
+    // Draw remaining containers
+    for (const container of containerList.slice(1)) {
       ({x, y} = this.getClosestFreeCoords(x, y, 0));
-      let house = await this.drawHouse(container, x, y);
+      const house = await this.drawHouse(container, x, y);
       houses.push(house);
-    });
+    }
 
     if(houses.length > 1) {
       this.drawFences(houses);
     }
   }
 
-  drawFences(
-    houses
-  ) {
-
+  drawFences(houses) {
     let xMin = Number.MAX_SAFE_INTEGER;
     let xMax = Number.MIN_SAFE_INTEGER;
     let yMin = Number.MAX_SAFE_INTEGER;
     let yMax = Number.MIN_SAFE_INTEGER;
 
-    houses.map((house) => {
+    houses.forEach((house) => {
       xMin = Math.min(xMin, house.x());
       xMax = Math.max(xMax, house.x() + house.width());
       yMin = Math.min(yMin, house.y());
       yMax = Math.max(yMax, house.y() + house.height());
     });
 
-    xMin -= 20;
-    xMax += 20;
-    yMin -= 20;
-    yMax += 20;
+    const padding = 20;
+    xMin -= padding;
+    xMax += padding;
+    yMin -= padding;
+    yMax += padding;
 
-    const board = this.viewport.getBoard();
-    const area = board.getAreaAt(0, 0);
-    let element = new Element(
+    const element = new Element(
       -16,
       -16,
       xMax - xMin,
       yMax - yMin,
       true,
-    )
+    );
     element.manualZ = 0;
-
     element.getDom().classList.add('compose-cluster');
 
-    houses[0].addElement(
-      -20,
-      -20,
-      element
-    )
-
-    // area.addElement(
-    //   xMin,
-    //   yMin,
-    //   element
-    // );
-
-
-
-    return;
-
-
-    // houses.map((house) => {
-    //   xMin = Math.min(xMin, house.x());
-    //   xMax = Math.max(xMax, house.x() + house.width());
-    //   yMin = Math.min(yMin, house.y());
-    //   yMax = Math.max(yMax, house.y() + house.height());
-    // });
-    // console.log({
-    //   xMin, xMax, yMin, yMax
-    // })
-
-    // xMin -= 20;
-    // xMax += 20;
-    // yMin -= 20;
-    // yMax += 20;
-
-    // const board = this.viewport.getBoard();
-    // const area = board.getAreaAt(0, 0);
-    // const horizontalFences = Math.floor((xMax - xMin) / 16);
-    // const verticalFences = Math.floor((yMax - yMin) / 16);
-
-    // for(let h = 0 ; h <= horizontalFences ; h++) {
-    //   area.addElement(
-    //     xMin + h * 16,
-    //     yMin,
-    //     new Fence00H()
-    //   );
-    // }
-
-    // for(let v = 0 ; v <= verticalFences ; v++) {
-    //   area.addElement(
-    //     xMin,
-    //     yMin + v * 16,
-    //     new Fence00V()
-    //   );
-
-    //   area.addElement(
-    //     xMax,
-    //     yMin + v * 16,
-    //     new Fence00V()
-    //   );
-    // }
+    houses[0].addElement(-padding, -padding, element);
   }
 
 
@@ -328,12 +275,11 @@ class ContainerKingdomRenderer
 
 
   drawNetworks(containers) {
-
     const networks = {};
 
-    Object.values(containers).map((container, index) => {
-      let containerNetWorks = container.NetworkSettings.Networks;
-      containerNetWorks = Object.keys(containerNetWorks).map((networkName) => {
+    Object.values(containers).forEach((container) => {
+      const containerNetworks = container.NetworkSettings.Networks;
+      Object.keys(containerNetworks).forEach((networkName) => {
         if(!networks[networkName]) {
           networks[networkName] = [];
         }
@@ -344,9 +290,9 @@ class ContainerKingdomRenderer
 
     const roadsMatrix = {};
 
-    Object.keys(networks).map((networkName) => {
+    Object.keys(networks).forEach((networkName) => {
       const connectedCells = [];
-      networks[networkName].map((container, index) => {
+      networks[networkName].forEach((container) => {
         connectedCells.push(container.rpgEngine.data.coords);
       });
 
@@ -355,26 +301,25 @@ class ContainerKingdomRenderer
       }
 
       let from = connectedCells[0];
-      let fromContainer = networks[networkName][0];
+      const fromContainer = networks[networkName][0];
       if(!fromContainer.rpgEngine.data.element) {
         return;
       }
 
-      let offsetLeft = fromContainer.rpgEngine.data.element.width() / 2;
-      let offsetTop = fromContainer.rpgEngine.data.element.height();
+      const offsetLeft = fromContainer.rpgEngine.data.element.width() / 2;
+      const offsetTop = fromContainer.rpgEngine.data.element.height();
 
       for(let i = 1 ; i < connectedCells.length ; i++) {
         if(!networks[networkName][i]) {
           continue;
         }
-        const toContainer = networks[networkName][i];
-        let to = connectedCells[i];
+        const to = connectedCells[i];
 
         let xFromInPixels = from.x * this.cellWidth;
         let yFromInPixels = from.y * this.cellHeight;
 
-        let xToInPixels = to.x * this.cellWidth;
-        let yToInPixels = to.y * this.cellHeight;
+        const xToInPixels = to.x * this.cellWidth;
+        const yToInPixels = to.y * this.cellHeight;
 
         xFromInPixels = this.drawHorizontalRoads(
           networkName,
@@ -390,7 +335,7 @@ class ContainerKingdomRenderer
           xFromInPixels,
           offsetLeft, offsetTop,
           roadsMatrix
-        )
+        );
         from = connectedCells[i];
       }
     });
@@ -398,7 +343,7 @@ class ContainerKingdomRenderer
     this.drawRoadTrees(roadsMatrix);
 
     return networks;
-  };
+  }
 
   drawRoadTrees(matrix) {
     const area = this.viewport.getBoard().getAreaAt(0, 0);
@@ -406,26 +351,16 @@ class ContainerKingdomRenderer
     const width = this.roadWidth;
     const height = this.roadHeight;
 
-    Object.keys(matrix).map((x) => {
-      Object.keys(matrix[x]).map((y) => {
-        const road = matrix[x][y];
-
+    Object.keys(matrix).forEach((x) => {
+      Object.keys(matrix[x]).forEach((y) => {
         if(Math.random() > 0.8) {
           if(
             (matrix[x + width] && matrix[x + width][y])
-            || (matrix[x -width] && matrix[x - width][y])
-
-            // || (matrix[x + width] && matrix[x + width][y - height]) ||
-            // || (matrix[x + width] && matrix[x + width][y]) ||
-            // || (matrix[x + width] && matrix[x + width][y + height]) ||
-
-            // || (matrix[x - width] && matrix[x - width][y - height]) ||
-            // || (matrix[x - width] && matrix[x - width][y]) ||
-            // || (matrix[x - width] && matrix[x - width][y + height])
+            || (matrix[x - width] && matrix[x - width][y])
           ){
             return;
           }
-          const tree = area.addElement(
+          area.addElement(
             parseInt(x),
             parseInt(y) + height * 2,
             new Tree00()
@@ -442,21 +377,21 @@ class ContainerKingdomRenderer
     offsetLeft, offsetTop,
     roadsMatrix
   ) {
-    let xDiff = xToInPixels - xFromInPixels;
-    let xDirection = xDiff > 0 ? 1 : -1;
+    const xDirection = (xToInPixels - xFromInPixels) > 0 ? 1 : -1;
 
-    let noLockX = 0
+    let loopCounter = 0;
     while (Math.abs(xFromInPixels - xToInPixels) > this.roadWidth) {
-      if(noLockX > 100) {
-        console.error('loop detected on X');
+      if(loopCounter > ContainerKingdomRenderer.LOOP_PROTECTION_MAX) {
+        console.error('Loop detected on X axis');
         break;
       }
-      noLockX++;
+      loopCounter++;
+      
       const road = this.drawRoad(
         networkName,
         xFromInPixels + offsetLeft,
         yFromInPixels + offsetTop,
-      )
+      );
 
       if(!roadsMatrix[xFromInPixels]) {
         roadsMatrix[xFromInPixels] = {};
@@ -475,23 +410,21 @@ class ContainerKingdomRenderer
     offsetLeft, offsetTop,
     roadsMatrix
   ) {
-    let yDiff = yToInPixels - yFromInPixels;
-    let yDirection = yDiff > 0 ? 1 : -1;
+    const yDirection = (yToInPixels - yFromInPixels) > 0 ? 1 : -1;
 
-
-    let noLockY = 0
+    let loopCounter = 0;
     while(Math.abs(yFromInPixels - yToInPixels) >= this.roadHeight) {
-      if(noLockY > 100) {
-        console.error('loop detected on Y');
+      if(loopCounter > ContainerKingdomRenderer.LOOP_PROTECTION_MAX) {
+        console.error('Loop detected on Y axis');
         break;
       }
-      noLockY++;
+      loopCounter++;
 
       const road = this.drawRoad(
         networkName,
         xFromInPixels + offsetLeft,
         yFromInPixels + offsetTop,
-      )
+      );
 
       if(!roadsMatrix[xFromInPixels]) {
         roadsMatrix[xFromInPixels] = {};
@@ -526,7 +459,7 @@ class ContainerKingdomRenderer
     return road;
   }
 
-  // compute methods =============================
+  // Compute methods =============================
 
   computeBounds(containers) {
     let minX = BigInt(Number.MAX_SAFE_INTEGER);
@@ -534,10 +467,10 @@ class ContainerKingdomRenderer
     let maxX = BigInt(Number.MIN_SAFE_INTEGER);
     let maxY = BigInt(Number.MIN_SAFE_INTEGER);
 
-    Object.values(containers).map((container) => {
-      let containerId = container.Id;
-      let containerLeft = BigInt('0x' + containerId.substring(0,32))
-      let containerRight = BigInt('0x' + containerId.substring(32,64));
+    Object.values(containers).forEach((container) => {
+      const containerId = container.Id;
+      const containerLeft = BigInt('0x' + containerId.substring(0, 32));
+      const containerRight = BigInt('0x' + containerId.substring(32, 64));
       minX = containerLeft < minX ? containerLeft : minX;
       minY = containerRight < minY ? containerRight : minY;
       maxX = containerLeft > maxX ? containerLeft : maxX;
@@ -554,23 +487,17 @@ class ContainerKingdomRenderer
 
 
   hasAdjacentCell(x, y) {
-    if(
-        this.matrix[x + 1] && this.matrix[x + 1][y + 1]
-        || this.matrix[x + 1] && this.matrix[x + 1][y]
-        || this.matrix[x + 1] && this.matrix[x + 1][y - 1]
-
-        || this.matrix[x] && this.matrix[x][y + 1]
-        || this.matrix[x] && this.matrix[x][y - 1]
-
-        || this.matrix[x - 1] && this.matrix[x - 1][y - 1]
-        || this.matrix[x - 1] && this.matrix[x - 1][y]
-        || this.matrix[x - 1] && this.matrix[x - 1][y + 1]
-    ) {
-      return true;
-    }
-
-    return false;
-  };
+    return (
+      (this.matrix[x + 1] && this.matrix[x + 1][y + 1])
+      || (this.matrix[x + 1] && this.matrix[x + 1][y])
+      || (this.matrix[x + 1] && this.matrix[x + 1][y - 1])
+      || (this.matrix[x] && this.matrix[x][y + 1])
+      || (this.matrix[x] && this.matrix[x][y - 1])
+      || (this.matrix[x - 1] && this.matrix[x - 1][y - 1])
+      || (this.matrix[x - 1] && this.matrix[x - 1][y])
+      || (this.matrix[x - 1] && this.matrix[x - 1][y + 1])
+    );
+  }
 
   getClosestFreeCoords(startX, startY, minDistance = 1) {
     const rows = this.matrix.length;
@@ -651,15 +578,13 @@ isPositionValid(x, y, minDistance) {
   }
 
   getMemoryThreshold(usage) {
-    let thresholdIndex = 0;
-    this.memoryUsageThresholds.map((threshold) => {
-      if(usage < threshold.thresholds) {
+    const thresholds = ContainerKingdomRenderer.MEMORY_USAGE_THRESHOLDS;
+    for (const threshold of thresholds) {
+      if (usage < threshold.threshold) {
         return threshold;
       }
-      thresholdIndex++;
-    });
-
-    return this.memoryUsageThresholds[thresholdIndex] ?? this.memoryUsageThresholds[this.memoryUsageThresholds.length - 1];
+    }
+    return thresholds[thresholds.length - 1];
   }
 }
 
