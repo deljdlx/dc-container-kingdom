@@ -1,3 +1,4 @@
+import { ContainerGrid } from './ContainerGrid.js';
 import { Element } from '../../../assets/js/map/Element.js';
 import { Ground00 } from '../../../assets/js/map/Elements/Ground00.js';
 import { House00 } from '../../../assets/js/map/Elements/House00.js';
@@ -40,50 +41,31 @@ export class ContainerKingdomRenderer
   roadWidth = 50;
   roadHeight = 50;
 
-  xCells = 0;
-  yCells = 0;
-
-  matrix = {};
-
-  bounds = {
-    minX: BigInt(Number.MAX_SAFE_INTEGER),
-    minY: BigInt(Number.MAX_SAFE_INTEGER),
-    maxX: BigInt(Number.MIN_SAFE_INTEGER),
-    maxY: BigInt(Number.MIN_SAFE_INTEGER),
-  };
+  /**
+   * @type {ContainerGrid}
+   */
+  grid;
 
 
   constructor(application, viewport) {
     this.application = application;
     this.viewport = viewport;
 
-    this.xCells = ContainerKingdomRenderer.DEFAULT_GRID_SIZE;
-    this.yCells = ContainerKingdomRenderer.DEFAULT_GRID_SIZE;
+    this.grid = new ContainerGrid(
+      ContainerKingdomRenderer.DEFAULT_GRID_SIZE,
+      ContainerKingdomRenderer.DEFAULT_GRID_SIZE,
+    );
 
     const roadElement = new Ground00();
     this.roadWidth = roadElement.width();
     this.roadHeight = roadElement.height();
-
-    this.matrix = this.initMatrix();
   }
-
-  initMatrix()  {
-    const layoutMatrix = [];
-    for (let x = 0; x < this.xCells; x++) {
-      layoutMatrix[x] = [];
-      for (let y = 0; y < this.yCells; y++) {
-        layoutMatrix[x][y] = [];
-      }
-    }
-
-    return layoutMatrix;
-  };
 
   drawContainersMatrix() {
     const area = this.viewport.getBoard().getAreaAt(0, 0);
 
-    for(let x = 0 ; x < this.xCells; x++) {
-      for(let y = 0 ; y < this.yCells; y++) {
+    for(let x = 0 ; x < this.grid.xCells; x++) {
+      for(let y = 0 ; y < this.grid.yCells; y++) {
         const cell = document.createElement('div');
         cell.style.width = this.cellWidth + 'px';
         cell.style.height = this.cellHeight + 'px';
@@ -106,7 +88,7 @@ export class ContainerKingdomRenderer
 
 
   async drawContainers() {
-    this.computeBounds(
+    this.grid.computeBounds(
       this.application.getContainers(true)
     );
 
@@ -128,12 +110,12 @@ export class ContainerKingdomRenderer
       return;
     }
     
-    let {x, y} = this.computeContainerCoords(firstContainer);
+    let {x, y} = this.grid.computeContainerCoords(firstContainer);
     try {
-      ({x, y} = this.getClosestFreeCoords(x, y, 2));
+      ({x, y} = this.grid.getClosestFreeCoords(x, y, 2));
     } catch(e) {
       try {
-        ({x, y} = this.getClosestFreeCoords(x, y, 1));
+        ({x, y} = this.grid.getClosestFreeCoords(x, y, 1));
       }
       catch(e) {
         console.error('No space available for container', firstContainer);
@@ -144,7 +126,7 @@ export class ContainerKingdomRenderer
 
     // Draw remaining containers
     for (const container of containerList.slice(1)) {
-      ({x, y} = this.getClosestFreeCoords(x, y, 0));
+      ({x, y} = this.grid.getClosestFreeCoords(x, y, 0));
       const house = await this.drawHouse(container, x, y);
       houses.push(house);
     }
@@ -201,7 +183,7 @@ export class ContainerKingdomRenderer
     );
 
     container.rendered = true;
-    this.matrix[x][y].push(house);
+    this.grid.occupy(x, y);
 
     container.setRpgEngineData({
       element: house,
@@ -469,122 +451,6 @@ export class ContainerKingdomRenderer
   }
 
   // Compute methods =============================
-
-  computeBounds(containers) {
-    let minX = BigInt(Number.MAX_SAFE_INTEGER);
-    let minY = BigInt(Number.MAX_SAFE_INTEGER);
-    let maxX = BigInt(Number.MIN_SAFE_INTEGER);
-    let maxY = BigInt(Number.MIN_SAFE_INTEGER);
-
-    Object.values(containers).forEach((container) => {
-      const containerId = container.Id;
-      const containerLeft = BigInt('0x' + containerId.substring(0, 32));
-      const containerRight = BigInt('0x' + containerId.substring(32, 64));
-      minX = containerLeft < minX ? containerLeft : minX;
-      minY = containerRight < minY ? containerRight : minY;
-      maxX = containerLeft > maxX ? containerLeft : maxX;
-      maxY = containerRight > maxY ? containerRight : maxY;
-    });
-
-    this.bounds.minX = minX;
-    this.bounds.minY = minY;
-    this.bounds.maxX = maxX;
-    this.bounds.maxY = maxY;
-
-    return this.bounds;
-  }
-
-
-  hasAdjacentCell(x, y) {
-    return (
-      (this.matrix[x + 1] && this.matrix[x + 1][y + 1])
-      || (this.matrix[x + 1] && this.matrix[x + 1][y])
-      || (this.matrix[x + 1] && this.matrix[x + 1][y - 1])
-      || (this.matrix[x] && this.matrix[x][y + 1])
-      || (this.matrix[x] && this.matrix[x][y - 1])
-      || (this.matrix[x - 1] && this.matrix[x - 1][y - 1])
-      || (this.matrix[x - 1] && this.matrix[x - 1][y])
-      || (this.matrix[x - 1] && this.matrix[x - 1][y + 1])
-    );
-  }
-
-  getClosestFreeCoords(startX, startY, minDistance = 1) {
-    const rows = this.matrix.length;
-    const cols = this.matrix[0].length;
-    let x = startX, y = startY;
-    let step = 1, dir = 0;
-
-    const directions = [
-        [1, 0],  // Droite
-        [0, 1],  // Bas
-        [-1, 0], // Gauche
-        [0, -1]  // Haut
-    ];
-
-    // Vérifier si la position de départ respecte déjà la distance minimale
-    if (this.isPositionValid(x, y, minDistance)) return { x, y };
-
-    while (step < Math.max(rows, cols)) {
-        for (let i = 0; i < 2; i++) { // 2 fois chaque step avant d'incrémenter
-            for (let j = 0; j < step; j++) {
-                x += directions[dir][0];
-                y += directions[dir][1];
-
-                if (x >= 0 && y >= 0 && x < rows && y < cols && this.isPositionValid(x, y, minDistance)) {
-                    return { x, y }; // Premier emplacement libre respectant la distance
-                }
-            }
-            dir = (dir + 1) % 4; // Tourner dans la spirale
-        }
-        step++; // Augmenter le pas après 2 itérations
-    }
-
-    return null; // Aucun espace libre trouvé
-}
-
-// ✅ Fonction auxiliaire pour vérifier la distance minimale
-isPositionValid(x, y, minDistance) {
-
-    if(x < 0 || y < 0 || x >= this.matrix.length || y >= this.matrix[0].length) {
-      return false;
-    }
-
-    if (this.matrix[x][y].length !== 0) return false; // Pas vide, on refuse
-
-    // Vérifier que toutes les cases dans un rayon de `minDistance` sont vides
-    for (let dx = -minDistance; dx <= minDistance; dx++) {
-        for (let dy = -minDistance; dy <= minDistance; dy++) {
-            let nx = x + dx, ny = y + dy;
-            if (nx >= 0 && ny >= 0 && nx < this.matrix.length && ny < this.matrix[0].length) {
-                if (this.matrix[nx][ny].length !== 0) {
-                    return false; // Une case trop proche est occupée
-                }
-            }
-        }
-    }
-    return true;
-  }
-
-
-  computeContainerCoords(container) {
-
-    const {minX, minY, maxX, maxY} = this.bounds;
-
-    let containerId = container.Id;
-    let containerLeft = BigInt('0x' + containerId.substring(0,32)) - minX;
-    let containerTop = BigInt('0x' + containerId.substring(32,64)) - minY;
-
-    const rangeX = maxX - minX;
-    const rangeY = maxY - minY;
-
-    let x = Number((containerLeft * BigInt(this.xCells)) / rangeX);
-    let y = Number((containerTop * BigInt(this.yCells)) / rangeY);
-
-    x = Math.min(x, this.xCells - 1);
-    y = Math.min(y, this.yCells - 1);
-
-    return {x, y};
-  }
 
   getMemoryThreshold(usage) {
     const thresholds = ContainerKingdomRenderer.MEMORY_USAGE_THRESHOLDS;
