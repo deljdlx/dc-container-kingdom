@@ -1,4 +1,8 @@
-class FenceGroup00 extends Element
+import { Element } from '../Element.js';
+import { Fence00H } from './Fence00H.js';
+import { Fence00V } from './Fence00V.js';
+
+export class FenceGroup00 extends Element
 {
   constructor(x = 0, y = 0) {
     super(x, y);

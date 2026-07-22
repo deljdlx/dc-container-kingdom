@@ -1,4 +1,6 @@
-class Ground00 extends Element
+import { Element } from '../Element.js';
+
+export class Ground00 extends Element
 {
   constructor() {
     super(0, 0 , 50, 50);

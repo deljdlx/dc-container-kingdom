@@ -1,4 +1,6 @@
-class Flower00 extends Element
+import { Element } from '../../Element.js';
+
+export class Flower00 extends Element
 {
   constructor() {
     super(0, 0 , 32, 32)

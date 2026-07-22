@@ -1,4 +1,6 @@
-class Log
+import { LogEntry } from './LogEntry.js';
+
+export class Log
 {
   buffer;
   lines = [];

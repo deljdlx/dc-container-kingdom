@@ -1,4 +1,8 @@
-class Board extends Element
+import { Area } from './Area.js';
+import { BoardRenderer } from './Renderer/BoardRenderer.js';
+import { Element } from './Element.js';
+
+export class Board extends Element
 {
   areas = {};
 

@@ -1,4 +1,24 @@
-class ContainerKingdomLayout
+import { Application } from '../../../assets/js/map/Application.js';
+import { ContainerKingdom } from './ContainerKingdom.js';
+import { ContainersList } from './ContainersList.js';
+import { Fence00H } from '../../../assets/js/map/Elements/Fence00H.js';
+import { Fence00V } from '../../../assets/js/map/Elements/Fence00V.js';
+import { FenceGroup00 } from '../../../assets/js/map/Elements/FenceGroup00.js';
+import { Flower00 } from '../../../assets/js/map/Elements/Flowers/Flower00.js';
+import { Fountain00 } from '../../../assets/js/map/Elements/Fountain00.js';
+import { GameConsole } from '../../../assets/js/tools/GameConsole.js';
+import { Ground00 } from '../../../assets/js/map/Elements/Ground00.js';
+import { House00 } from '../../../assets/js/map/Elements/House00.js';
+import { House01 } from '../../../assets/js/map/Elements/House01.js';
+import { Log } from './Log.js';
+import { Man00 } from '../../../assets/js/map/Elements/CharacterBases/Man00.js';
+import { Sunflower00 } from '../../../assets/js/map/Elements/Sunflower00.js';
+import { Tree00 } from '../../../assets/js/map/Elements/Tree00.js';
+import { Woman00 } from '../../../assets/js/map/Elements/CharacterBases/Woman00.js';
+import { Woman01 } from '../../../assets/js/map/Elements/CharacterBases/Woman01.js';
+import { Woman02 } from '../../../assets/js/map/Elements/CharacterBases/Woman02.js';
+
+export class ContainerKingdomLayout
 {
 
   /**

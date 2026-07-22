@@ -1,4 +1,7 @@
-class Character extends Element
+import { CharacterRenderer } from './Renderer/CharacterRenderer.js';
+import { Element } from './Element.js';
+
+export class Character extends Element
 {
 
   animationIndex = 0;

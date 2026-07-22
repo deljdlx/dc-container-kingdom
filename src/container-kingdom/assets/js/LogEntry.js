@@ -1,4 +1,4 @@
-class LogEntry
+export class LogEntry
 {
   logEntry;
   element;

@@ -1,4 +1,9 @@
-class Element
+import { Application } from './Application.js';
+import { BoundingBox } from './BoundingBox.js';
+import { Geometry } from './Geometry.js';
+import { Renderer } from './Renderer/Renderer.js';
+
+export class Element
 {
   data = {};
 
@@ -572,7 +577,7 @@ class Element
    */
   setParent(element) {
     this.parent = element
-    return parent;
+    return this.parent;
   }
 
   getChildren() {

@@ -1,4 +1,12 @@
-class Viewport
+import { Application } from './Application.js';
+import { Area } from './Area.js';
+import { Board } from './Board.js';
+import { Character } from './Character.js';
+import { Geometry } from './Geometry.js';
+import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
+import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
+
+export class Viewport
 {
 
   /**
@@ -94,10 +102,10 @@ class Viewport
     this.character = new Character();
     this.character.setRenderer(new MainCharacterRenderer(this.character));
     if(mainCharacterX === null) {
-      mainCharacterX = width / 2;
+      mainCharacterX = this.width() / 2;
     }
     if(mainCharacterY === null) {
-      mainCharacterY = height / 2;
+      mainCharacterY = this.height() / 2;
     }
     this.character.x(mainCharacterX);
     this.character.y(mainCharacterY);

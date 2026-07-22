@@ -1,4 +1,4 @@
-class ContainersListEntry
+export class ContainersListEntry
 {
   application;
   container;

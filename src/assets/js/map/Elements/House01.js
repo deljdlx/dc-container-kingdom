@@ -1,4 +1,11 @@
-class House01 extends Element
+import { Element } from '../Element.js';
+import { FenceGroup00 } from './FenceGroup00.js';
+import { Ground00 } from './Ground00.js';
+import { House00 } from './House00.js';
+import { Sunflower00 } from './Sunflower00.js';
+import { Tree00 } from './Tree00.js';
+
+export class House01 extends Element
 {
   constructor() {
     super(0, 0 , 0, 0)

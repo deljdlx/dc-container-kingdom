@@ -1,4 +1,4 @@
-class Coordinates
+export class Coordinates
 {
   _x;
   _y;

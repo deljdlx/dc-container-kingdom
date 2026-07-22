@@ -1,4 +1,6 @@
-class Container
+import { DockerApiClient } from './DockerApiClient.js';
+
+export class Container
 {
   // Constants
   static WATCH_INTERVAL_MS = 1000;

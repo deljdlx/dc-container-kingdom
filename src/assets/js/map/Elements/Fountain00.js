@@ -1,4 +1,6 @@
-class Fountain00 extends Element
+import { Element } from '../Element.js';
+
+export class Fountain00 extends Element
 {
   constructor() {
     super(0, 0 , 80, 64);

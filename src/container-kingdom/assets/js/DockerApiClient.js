@@ -1,4 +1,6 @@
-class DockerApiClient
+import { Container } from './Container.js';
+
+export class DockerApiClient
 {
   /**
    * Get all container descriptors from Docker API

@@ -1,4 +1,7 @@
-class Application
+import { Element } from './Element.js';
+import { Viewport } from './Viewport.js';
+
+export class Application
 {
 
   _elementsClasses = {};

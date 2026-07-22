@@ -1,4 +1,6 @@
-class CharacterRenderer extends Renderer
+import { Renderer } from './Renderer.js';
+
+export class CharacterRenderer extends Renderer
 {
 
   spriteWidth = 48;

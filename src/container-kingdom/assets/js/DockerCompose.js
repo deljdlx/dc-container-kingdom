@@ -1,4 +1,4 @@
-class DockerCompose {
+export class DockerCompose {
 
   _containers = {};
   _name = '';

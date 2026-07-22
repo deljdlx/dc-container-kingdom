@@ -1,4 +1,6 @@
-class Sunflower00 extends Element
+import { Element } from '../Element.js';
+
+export class Sunflower00 extends Element
 {
   constructor() {
     super(0, 0 , 16, 24)

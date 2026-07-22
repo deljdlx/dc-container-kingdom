@@ -1,4 +1,6 @@
-class ViewportRenderer
+import { Viewport } from '../Viewport.js';
+
+export class ViewportRenderer
 {
   /**
    * @type {Viewport}

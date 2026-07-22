@@ -1,4 +1,6 @@
-class Tree00 extends Element
+import { Element } from '../Element.js';
+
+export class Tree00 extends Element
 {
   constructor() {
     super(0, 0 , 64, 64)

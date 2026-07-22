@@ -1,3 +1,6 @@
+import { ContainerKingdom } from './ContainerKingdom.js';
+import { DockerApiClient } from './DockerApiClient.js';
+
 console.log(
 	`%cWanna see some of my projects ? https://github.com/deljdlx`,  `
 	color: #FFA;

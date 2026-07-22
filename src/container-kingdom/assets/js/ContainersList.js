@@ -1,4 +1,6 @@
-class ContainersList {
+import { ContainersListEntry } from './ContainersListEntry.js';
+
+export class ContainersList {
 
   application = null;
   element = null;

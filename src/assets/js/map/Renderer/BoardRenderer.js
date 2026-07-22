@@ -1,4 +1,7 @@
-class BoardRenderer extends Renderer
+import { Board } from '../Board.js';
+import { Renderer } from './Renderer.js';
+
+export class BoardRenderer extends Renderer
 {
   /**
    * @type {Board}

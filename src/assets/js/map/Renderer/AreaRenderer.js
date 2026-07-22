@@ -1,4 +1,6 @@
-class AreaRenderer extends Renderer
+import { Renderer } from './Renderer.js';
+
+export class AreaRenderer extends Renderer
 {
 
   render() {

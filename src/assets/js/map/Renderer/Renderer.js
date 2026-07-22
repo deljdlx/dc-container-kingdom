@@ -1,4 +1,6 @@
-class Renderer
+import { Element } from '../Element.js';
+
+export class Renderer
 {
 
   /**

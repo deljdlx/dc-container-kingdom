@@ -1,4 +1,6 @@
-class Fence00V extends Element
+import { Element } from '../Element.js';
+
+export class Fence00V extends Element
 {
   constructor() {
     super(0, 0 , 8, 16)

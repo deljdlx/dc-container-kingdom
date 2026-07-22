@@ -1,4 +1,4 @@
-class GameConsole
+export class GameConsole
 {
 
   application;

@@ -1,4 +1,6 @@
-class Geometry
+import { Coordinates } from './Coordinates.js';
+
+export class Geometry
 {
   /**
    * @type {Number}
