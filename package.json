@@ -1,0 +1,21 @@
+{
+  "name": "container-kingdom",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Interactive RPG-style visualization of Docker containers.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "eslint ."
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.18.0",
+    "eslint": "^9.18.0",
+    "vite": "^7.0.0",
+    "vitest": "^3.0.0"
+  }
+}

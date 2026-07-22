@@ -1,0 +1,2726 @@
+[
+    {
+        "Id": "b9da5142afad3362106609904bd081dc1614ab9557db34827097d9812b92d7d0",
+        "Names": [
+            "/the-seal"
+        ],
+        "Image": "dc-the-seal-the-seal",
+        "ImageID": "sha256:c11d07cc9cdafed67c50e1f0ebeac5f391f8bbf3671b89e1cd9a007ff0b2da5c",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1763367035,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "4cf79db0bbe6221e23dc8b489df9061bc712b8263889c46708d2454e5c291a15",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:c11d07cc9cdafed67c50e1f0ebeac5f391f8bbf3671b89e1cd9a007ff0b2da5c",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-the-seal",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-the-seal/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-the-seal",
+            "com.docker.compose.service": "the-seal",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.the-seal.entrypoints": "websecure",
+            "traefik.http.routers.the-seal.rule": "Host(\"the-seal.deljdlx.fr\")",
+            "traefik.http.routers.the-seal.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 8 days",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:18",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "13dc788d6881de2a3ad92891d905b30d6121a7bbf9b75933643bff66bd473b8c",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.24",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-the-seal/compose/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-the-seal/src",
+                "Destination": "/src",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "8dc65b662171912f5d1b01a41f1536113bbd0c8ef66505da0eada4cc2c6c67d3",
+        "Names": [
+            "/skilltree"
+        ],
+        "Image": "dc-skilltree-skilltree",
+        "ImageID": "sha256:219e345fbc803c14daebbc176f4af7812ce3999752ebe76bc88ac34665f65862",
+        "Command": "/bin/bash /entrypoint.sh",
+        "Created": 1762972846,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "6d70d3114e273ab1fab3642ae5951845cb12bd9834c59fe8a0b87f68073d2035",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:219e345fbc803c14daebbc176f4af7812ce3999752ebe76bc88ac34665f65862",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-skilltree",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-skilltree/compose.yml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-skilltree",
+            "com.docker.compose.service": "skilltree",
+            "com.docker.compose.version": "2.29.7",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.skilltree.entrypoints": "websecure",
+            "traefik.http.routers.skilltree.rule": "Host(\"dc-skilltree.deljdlx.fr\")",
+            "traefik.http.routers.skilltree.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 12 days",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:03",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "ba0f8fc2a16d094398cae438664493e7344d87194ca56ec0e4bf4bc7c6d89280",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.3",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1b",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "8f9b7e163caa452e5d6da866b359746cdfb704f333cf0eab013b76d21755d90d",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.27",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-skilltree/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "cf1a05d385766199d3c3b73a7350efe6d2cfad2809ca12873475825830610032",
+        "Names": [
+            "/rpg-engine"
+        ],
+        "Image": "dc-rpg-engine-rpg-engine",
+        "ImageID": "sha256:b9d2f9fec8c3d24ce5dccc922f5db7fa0492251b389241728a7f4dee11c040a8",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1762972694,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "8f440ec47e91481bb3dd0b414a88194f694fbf82ef82fc4fe4d6a6d9078a4de6",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:b9d2f9fec8c3d24ce5dccc922f5db7fa0492251b389241728a7f4dee11c040a8",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-rpg-engine",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-rpg-engine/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-rpg-engine",
+            "com.docker.compose.service": "rpg-engine",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.rpg-engine.entrypoints": "websecure",
+            "traefik.http.routers.rpg-engine.rule": "Host(\"rpg-engine.deljdlx.fr\")",
+            "traefik.http.routers.rpg-engine.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 12 days",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:06",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "511a18395d0d66725b56dec460f307d5c221ff9b8584d29f7bf0d2d63ea1ab65",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.6",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-rpg-engine/compose/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-rpg-engine/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "bd69d56a7c6fd8bd905d55b86bb1965bcfaa1f29fa1a3ac845f1ab45a3785384",
+        "Names": [
+            "/pharmacies"
+        ],
+        "Image": "dc-pharmacies-pharmacies",
+        "ImageID": "sha256:e9706f6add095de3c44d9c4eea893a6d35766168904dc7f22a117b5e744f2735",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1762868145,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "78694ce5a3378c2e085d5bef275c52729c6f87aeae73c23d11576dc4e949c4fc",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:e9706f6add095de3c44d9c4eea893a6d35766168904dc7f22a117b5e744f2735",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-pharmacies",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-pharmacies/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-pharmacies",
+            "com.docker.compose.service": "pharmacies",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.pharmacies.entrypoints": "websecure",
+            "traefik.http.routers.pharmacies.rule": "Host(\"pharmacies.deljdlx.fr\")",
+            "traefik.http.routers.pharmacies.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 2 weeks",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:08",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "f5b09295456d9cf0f83c24aeacd758cf7451ee184d4b778d803e5db1bca7e0af",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.8",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:21",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "2aeb91bbfa549cfe62de3ea11ae76fb4ca29cd7c0bbacd7273405900a476a7c4",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.33",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-pharmacies/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "11fa070e54ab94f16944b9708971f766d155dec2d8301e33e06f9f54ec929255",
+        "Names": [
+            "/paris-toilets"
+        ],
+        "Image": "dc-paris-toilets-paris-toilets",
+        "ImageID": "sha256:f708c1971da7a634008303e7679c5765f775053063ab71f6235c27229674cf7f",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1760705443,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "23f93d28fd585e46e6cc398494b8e756740a8e2deec91de80f0bf92fc351b996",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:f708c1971da7a634008303e7679c5765f775053063ab71f6235c27229674cf7f",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-paris-toilets",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-paris-toilets/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-paris-toilets",
+            "com.docker.compose.service": "paris-toilets",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.paris-toilets.entrypoints": "websecure",
+            "traefik.http.routers.paris-toilets.rule": "Host(\"paris-toilets.deljdlx.fr\")",
+            "traefik.http.routers.paris-toilets.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:08",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "61cd8a20d070d23c4515d381f49987f24388c19fa0b2aa92abf780b96245fdf5",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.8",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-paris-toilets/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "89d80210870bbf675b0f5332ab8f4a57000b5555d8ac1e81c42c5a5fec2f0709",
+        "Names": [
+            "/gameoflife"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1760705015,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "483a068b314d773b4e8420cdfc449720b379fa17663e6c3555fa0d82815b1f51",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-gameoflife",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-gameoflife/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-gameoflife",
+            "com.docker.compose.service": "gameofile",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.gameoflife.entrypoints": "websecure",
+            "traefik.http.routers.gameoflife.rule": "Host(\"gameoflife.deljdlx.fr\")",
+            "traefik.http.routers.gameoflife.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0f",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "8e9db9b959e75a60081f1836c203a633875b24baa9eaf88a22c28ec645dbc654",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.15",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-gameoflife/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "c85c594f46298b4afc98ff201e8d25bff0a0026ab5c9e851bc73e8fbb7729bad",
+        "Names": [
+            "/displayblock"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1760007940,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "f538f91ce2e7f830d0bbd379b4351ff77590e253798c2dc9ea1c8557aabb8e8e",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-displayblock",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-displayblock/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-displayblock",
+            "com.docker.compose.service": "displayblock",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.displayblock.entrypoints": "websecure",
+            "traefik.http.routers.displayblock.rule": "Host(\"displayblock.deljdlx.fr\")",
+            "traefik.http.routers.displayblock.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 6 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:15",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "1282b1449bd9463ee399504404287703937e3f0797d4f77350e4f564474fdd41",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.21",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-displayblock/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "b32bf13ba7de3000552d1c1e84e17d62ab3d44cb43d88ae61d29b241f974ae7c",
+        "Names": [
+            "/playmodoro"
+        ],
+        "Image": "dc-playmodoro-playmodoro",
+        "ImageID": "sha256:d84847e2e1c7e85835a2f12fa10090257183b15301342b14a30fab84a9910791",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1760001259,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "7853e9e70433073c013e197f7d3c499b682343e8725d377f1be12e879ee098c1",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d84847e2e1c7e85835a2f12fa10090257183b15301342b14a30fab84a9910791",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-playmodoro",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-playmodoro/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-playmodoro",
+            "com.docker.compose.service": "playmodoro",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.playmodoro.entrypoints": "websecure",
+            "traefik.http.routers.playmodoro.rule": "Host(\"playmodoro.deljdlx.fr\")",
+            "traefik.http.routers.playmodoro.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 6 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:17",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "28e816e1ee5d051ead78ca3d0427f5ac2ff6b5556573c1b3f53cefbb1f0c1843",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.23",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playmodoro/compose/frontend/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playmodoro/src/frontend",
+                "Destination": "/src",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "84f0a4f2e110bab1aa6f9d4786f79f4135d1862b8de9d99f50492886f9f6f2cc",
+        "Names": [
+            "/media-api"
+        ],
+        "Image": "dc-playmodoro-media-api",
+        "ImageID": "sha256:7808a06c55d8d96d5cee481501e34d8d7ef3027949cc509271d02a7ff44ad4a0",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1760001259,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "b87dfe2821b0ce5d870dbe45ef29d4e059839194edf28695bd9fd915c3860e1c",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:7808a06c55d8d96d5cee481501e34d8d7ef3027949cc509271d02a7ff44ad4a0",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-playmodoro",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-playmodoro/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-playmodoro",
+            "com.docker.compose.service": "media-api",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.media-api.entrypoints": "websecure",
+            "traefik.http.routers.media-api.rule": "Host(\"media-api.deljdlx.fr\")",
+            "traefik.http.routers.media-api.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 6 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:09",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "adeff077bbe811f36b96dfeedbdf85e67e4bbd697a2c26516ef9b2a394d9be26",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.9",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playmodoro/compose/backend/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playmodoro/compose/backend/php-fpm.conf",
+                "Destination": "/etc/php83/php-fpm.d/www.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playmodoro/src/backend",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "179d1ad678f87cc17afee141f66598186702676bfb31152be04410ae870242a6",
+        "Names": [
+            "/match3"
+        ],
+        "Image": "dc-match3-match3",
+        "ImageID": "sha256:6c9f1d6a91f3ca67b9d13ddf982800e9b7156874283692fdc2457e4824a50aa0",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1760000507,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "7d6c60e3b8812710996e8241211a81f98e9920efef7b9acbb60e8c6d13718f62",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:6c9f1d6a91f3ca67b9d13ddf982800e9b7156874283692fdc2457e4824a50aa0",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-match3",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-match3/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-match3",
+            "com.docker.compose.service": "match3",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.match3.entrypoints": "websecure",
+            "traefik.http.routers.match3.rule": "Host(\"match3.deljdlx.fr\")",
+            "traefik.http.routers.match3.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 6 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0d",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "a30fd0dd763824409ee1fb3691295e4a687a56c49f16d7f70ae59034d163d42b",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.13",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-match3/compose/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-match3/src",
+                "Destination": "/src",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-match3/src/build",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "2609f3e998fa4f240c73272b658f020e14599002f111695f7328e2255bd82f22",
+        "Names": [
+            "/drawio"
+        ],
+        "Image": "dc-mcd-editor-drawio",
+        "ImageID": "sha256:ef38c976a03dd6c0429dbc431bc046068c0f613e22fb4290570297fc9b392902",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1759825225,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "eca2c64350a2b146df7a5d0be883418b8deef257288c306a153ffa3b66b27c5f",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:ef38c976a03dd6c0429dbc431bc046068c0f613e22fb4290570297fc9b392902",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-mcd-editor",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-mcd-editor/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-mcd-editor",
+            "com.docker.compose.service": "drawio",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.drawio.entrypoints": "websecure",
+            "traefik.http.routers.drawio.rule": "Host(\"mcd-editor.deljdlx.fr\")",
+            "traefik.http.routers.drawio.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:10",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "ba6460271e91526bb33ad180c924d7107fce453159fea2055589d1251d549e8f",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.16",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-mcd-editor/compose/nginx.conf",
+                "Destination": "/etc/nginx/nginx.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-mcd-editor/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "9cbc81d98c0eeff457f459e74da8504b10af8e53e98538b79c5c73cdab78726e",
+        "Names": [
+            "/decision-tree"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1759824887,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "18756eae4d8d5cb716141b21a77055b6397058a3eca9ae915411893ce4944834",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-decision-tree",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-decision-tree/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-decision-tree",
+            "com.docker.compose.service": "decision-tree",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.decision-tree.entrypoints": "websecure",
+            "traefik.http.routers.decision-tree.rule": "Host(\"decision-tree.deljdlx.fr\")",
+            "traefik.http.routers.decision-tree.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:11",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "1bba497c7fee3656427cfbd3af85b73c14f74c2dbcc5e45cbbc147afe5c540fa",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.17",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-decision-tree/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "051f2bcb3104a18b082d089f222cc9a94c91f8f923d27fd1c2e462bed666ce40",
+        "Names": [
+            "/container-kingdom"
+        ],
+        "Image": "dc-container-kingdom-container-kingdom",
+        "ImageID": "sha256:22fd48243545cff05492c5f3cb76d185e7286d7926299ddbef1c92a706b2ef8e",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1759824726,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "ee4e6ff926ca7323483f2c5aba13ada5ad4360dabd30a91948991b7773035fa2",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:22fd48243545cff05492c5f3cb76d185e7286d7926299ddbef1c92a706b2ef8e",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-container-kingdom",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-container-kingdom/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-container-kingdom",
+            "com.docker.compose.service": "container-kingdom",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.container-kingdom.entrypoints": "websecure",
+            "traefik.http.routers.container-kingdom.rule": "Host(\"container-kingdom.deljdlx.fr\")",
+            "traefik.http.routers.container-kingdom.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "docker-api"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "docker-api": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:15:00:03",
+                    "DriverOpts": null,
+                    "NetworkID": "4d022c428697292e63db5916944d3a91636002ccdbb3f63ef93746496916a7bd",
+                    "EndpointID": "dae5acdbe07cfde827fc66dccb7c20bae5d93f29f11e3dc6712e5c3a23060035",
+                    "Gateway": "172.21.0.1",
+                    "IPAddress": "172.21.0.3",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1a",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "bcb9587fd3d18327b8198b05ff6245815518da880c87f8a371a1f93660beb421",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.26",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-container-kingdom/compose/nginx.conf",
+                "Destination": "/etc/nginx/conf.d/default.conf",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-container-kingdom/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "74004a86ec0037848bfb3b79b9f4b9b9b8f3871ed161376842d2f259580eaf9b",
+        "Names": [
+            "/docker-api"
+        ],
+        "Image": "tecnativa/docker-socket-proxy",
+        "ImageID": "sha256:1484f9fee8a7f423374977ca5e39457c762d859182511192270bf1e542670608",
+        "Command": "docker-entrypoint.sh haproxy -f /usr/local/etc/haproxy/haproxy.cfg",
+        "Created": 1759824726,
+        "Ports": [
+            {
+                "IP": "172.17.0.1",
+                "PrivatePort": 2375,
+                "PublicPort": 2375,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "9a04f4ccd096b3fd931a58e6eb5c62edfb2d605ba10083615d49f610bce64843",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:1484f9fee8a7f423374977ca5e39457c762d859182511192270bf1e542670608",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-container-kingdom",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-container-kingdom/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-container-kingdom",
+            "com.docker.compose.service": "docker-api",
+            "com.docker.compose.version": "2.29.7",
+            "org.opencontainers.image.created": "2024-09-09T14:16:46.786Z",
+            "org.opencontainers.image.description": "Proxy over your Docker socket to restrict which requests it accepts",
+            "org.opencontainers.image.licenses": "Apache-2.0",
+            "org.opencontainers.image.revision": "393a99c0695cde2649e7f50f186b29c381d81585",
+            "org.opencontainers.image.source": "https://github.com/Tecnativa/docker-socket-proxy",
+            "org.opencontainers.image.title": "docker-socket-proxy",
+            "org.opencontainers.image.url": "https://github.com/Tecnativa/docker-socket-proxy",
+            "org.opencontainers.image.version": "0.3.0"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "docker-api"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "docker-api": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:15:00:02",
+                    "DriverOpts": null,
+                    "NetworkID": "4d022c428697292e63db5916944d3a91636002ccdbb3f63ef93746496916a7bd",
+                    "EndpointID": "5c1670e0bb5f9fea250c4d621511eb59c71f471d248c0c488166c1ec7f36593f",
+                    "Gateway": "172.21.0.1",
+                    "IPAddress": "172.21.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "89fb77d4452d89292ee45e20118d4ebe390530cf54fe8c2adcfca801fc635c76",
+        "Names": [
+            "/demineur"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1759761276,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "105d2114422078348ac1bc5f877cdc2e4d97283c0fbe55aab5f4aa3c71e377fd",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-demineur",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-demineur/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-demineur",
+            "com.docker.compose.service": "demineur",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.enable": "true",
+            "traefik.http.routers.demineur.entrypoints": "websecure",
+            "traefik.http.routers.demineur.rule": "Host(\"demineur.deljdlx.fr\")",
+            "traefik.http.routers.demineur.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0c",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "0c738fc4d7d0c415ba25ef41e8c9488e9360490842cb967aef81ea7ea87e3f67",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.12",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-demineur/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "12ad86ef03839f1467ee66b8520ce7f12a19d8f3190c25fd0f00603a23a961a2",
+        "Names": [
+            "/patterns"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1759761080,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "123f4a238852acb6cacb91e9205f4ef51c5e2cf609c7ab3c82a1f35b542986fd",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-patterns",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-patterns/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-patterns",
+            "com.docker.compose.service": "patterns",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.patterns.entrypoints": "websecure",
+            "traefik.http.routers.patterns.rule": "Host(\"patterns.deljdlx.fr\")",
+            "traefik.http.routers.patterns.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:03",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "bc10cd9c8a8a5afbb24e0f0be9cf4b5c098cbaf4ae509e11299fc0b14595aa4c",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.3",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-patterns/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "0a632109ba7b38c0671534d1e136a92cc731d6d67936db3cd747ece53c2ff2b6",
+        "Names": [
+            "/nginx-middleware"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1759760232,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "a1b354700300cfb900947882a919d950e195c4b9f952131dce757fd5e495504f",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-traefik",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-traefik/compose.yml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-traefik",
+            "com.docker.compose.service": "nginx-middleware",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.enable": "true",
+            "traefik.http.routers.nginx-middleware.entrypoints": "web,websecure",
+            "traefik.http.routers.nginx-middleware.rule": "HostRegexp(`{host:.+}`)",
+            "traefik.http.routers.nginx-middleware.tls.certresolver": "myresolver",
+            "traefik.http.services.nginx-middleware.loadbalancer.server.port": "80"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "web"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:16",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "ac728dfae4db62fdfef1326205b1ce6683485112654c05bcb32a9b87a060cf02",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.22",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-traefik/nginx.conf",
+                "Destination": "/etc/nginx/nginx.conf",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "950387f09f233ad34991411f198e37ada6ed5cd8a09684d89df3629bb04a6d95",
+        "Names": [
+            "/traefik"
+        ],
+        "Image": "traefik:v2.10",
+        "ImageID": "sha256:ee69e8120b64a420b5deca1cf46db0e4188ef76c7807a45c0f26d8a5ac2ab2bd",
+        "Command": "/entrypoint.sh traefik",
+        "Created": 1759760232,
+        "Ports": [
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 8000,
+                "PublicPort": 8000,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 8000,
+                "PublicPort": 8000,
+                "Type": "tcp"
+            },
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 8443,
+                "PublicPort": 8443,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 8443,
+                "PublicPort": 8443,
+                "Type": "tcp"
+            },
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 3000,
+                "PublicPort": 3000,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 3000,
+                "PublicPort": 3000,
+                "Type": "tcp"
+            },
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 443,
+                "PublicPort": 443,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 443,
+                "PublicPort": 443,
+                "Type": "tcp"
+            },
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 80,
+                "PublicPort": 80,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 80,
+                "PublicPort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "9b0a5089abf3b33cb45a92540893a60c9e29c5b3856beaadd1edabb8dbfe995b",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:ee69e8120b64a420b5deca1cf46db0e4188ef76c7807a45c0f26d8a5ac2ab2bd",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-traefik",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-traefik/compose.yml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-traefik",
+            "com.docker.compose.service": "traefik",
+            "com.docker.compose.version": "2.29.7",
+            "org.opencontainers.image.description": "A modern reverse-proxy",
+            "org.opencontainers.image.documentation": "https://docs.traefik.io",
+            "org.opencontainers.image.source": "https://github.com/traefik/traefik",
+            "org.opencontainers.image.title": "Traefik",
+            "org.opencontainers.image.url": "https://traefik.io",
+            "org.opencontainers.image.vendor": "Traefik Labs",
+            "org.opencontainers.image.version": "v2.10.7",
+            "traefik.enable": "true",
+            "traefik.http.middlewares.nginx-middleware.addprefix.prefix": "/",
+            "traefik.http.middlewares.use-nginx-middleware.chain.middlewares": "nginx-middleware",
+            "traefik.http.routers.api.entrypoints": "websecure",
+            "traefik.http.routers.api.rule": "Host(`traefik.deljdlx.fr`)",
+            "traefik.http.routers.api.service": "api@internal",
+            "traefik.http.routers.api.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "web"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:07",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "677f3b98658c60020a2a66254e417c7a230713479abf8da00ecd703432341550",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.7",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/var/run/docker.sock",
+                "Destination": "/var/run/docker.sock",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-traefik/acme.json",
+                "Destination": "/letsencrypt/acme.json",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-traefik/traefik.toml",
+                "Destination": "/traefik.toml",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "1c9f8952c0601312bb9f1720b860c770beec445c748871e8dbf8f5f3d79c7727",
+        "Names": [
+            "/thirsty-ai"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1745667240,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "d18af3ee9b153b7b430f42a46bbdeb2a96b57c010dd5357f187550367a96716d",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-thirsty-ai",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-thirsty-ai/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-thirsty-ai",
+            "com.docker.compose.service": "thirsty-ai",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.thirsty-ai.entrypoints": "websecure",
+            "traefik.http.routers.thirsty-ai.rule": "Host(\"dc-thirsty-ai.jlb.ninja\")",
+            "traefik.http.routers.thirsty-ai.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0a",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "4035032e1c8c827a8a2cbcc448b9e4a10850c7be7d28184e55a985469be03c89",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.10",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-thirsty-ai/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "657800f9ead5168e5f841b2b237accadd5522ba1226fe97412838dfa43cee2f0",
+        "Names": [
+            "/thevault"
+        ],
+        "Image": "thevault-thevault",
+        "ImageID": "sha256:9c1f1e109f59bd9895ab26ccf5dad0bb18d30a7dadf6826cbaa2a6394d29e81e",
+        "Command": "/bin/bash /entrypoint.sh",
+        "Created": 1741072227,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "5b5f3a033cccddf25bb81b48ea7f598d5cf0b5056cb2985ccde55d612b233753",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:9c1f1e109f59bd9895ab26ccf5dad0bb18d30a7dadf6826cbaa2a6394d29e81e",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "thevault",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/thevault/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/thevault",
+            "com.docker.compose.replace": "481984c8f4bb31fb49ebe9d28bc346a2b2efa045c3541a7a3ce5079d3feb8c5f",
+            "com.docker.compose.service": "thevault",
+            "com.docker.compose.version": "2.29.7",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.thevault.entrypoints": "websecure",
+            "traefik.http.routers.thevault.rule": "Host(\"thevault.jlb.ninja\")",
+            "traefik.http.routers.thevault.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:04",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "39bac6931653573821e2a14f29cade4a166ff7c16eeb49d44d2eed0b581e4f6b",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.4",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1c",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "d2ef786ecaed6bcdce9e6ff93a2e14b43132b1d46c2a93b5dc3b38bac0fbf338",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.28",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/thevault/src/wordpress",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "263e0c61896fe9f138a5352120e95ace62ae1a0a880514b8f781cb252cc8314e",
+        "Names": [
+            "/phocker"
+        ],
+        "Image": "dc-phocker-phocker",
+        "ImageID": "sha256:f65329d58228cb2e6e69805635cece4f525fb6bedf8988345e27ce319d6e374a",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740939884,
+        "Ports": [
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 80,
+                "PublicPort": 8080,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 80,
+                "PublicPort": 8080,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "22136c70a753f016e2f348ca61229fb32a01bd129b5cfb30e412a8ec68752d96",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:f65329d58228cb2e6e69805635cece4f525fb6bedf8988345e27ce319d6e374a",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-phocker",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-phocker/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-phocker",
+            "com.docker.compose.service": "phocker",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.phocker.entrypoints": "websecure",
+            "traefik.http.routers.phocker.rule": "Host(\"phocker.jlb.ninja\")",
+            "traefik.http.routers.phocker.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:04",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "edcfcfd23d302c25bdbc40c26eb35d8df938aba0783a90d1893af60fe2cfaa4b",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.4",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-phocker/compose/php.ini",
+                "Destination": "/etc/php83/conf.d/00_php.ini",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-phocker/app",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "458095f6b7de0ddd42db97831cba07e49694dd9eec31d6d8509432fb4ffcbcdf",
+        "Names": [
+            "/playground"
+        ],
+        "Image": "dc-playground-playground",
+        "ImageID": "sha256:021b1b85138ae6de3b8ea84b37156f6d3d48c053c515618693ae8547d72d52c1",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740643630,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "97e57f61b3c32dd87d9dd648abc6725c034890ca3c95b563d516540a399ed3dc",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:021b1b85138ae6de3b8ea84b37156f6d3d48c053c515618693ae8547d72d52c1",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-playground",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-playground/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-playground",
+            "com.docker.compose.service": "playground",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.playground.entrypoints": "websecure",
+            "traefik.http.routers.playground.rule": "Host(\"playground.jlb.ninja\")",
+            "traefik.http.routers.playground.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:05",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "177fa05192ff1b0958ea5eac7f0f7efbf4591b08ca8dc38a73f1a7c88ff253d4",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.5",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1e",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "907812d40436a0d82ff9af3df7a509c49f964b5644f4d8f86f681494562913cc",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.30",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-playground/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "9c667d09c76cd911c90361fb06582e95301bdee5098330b24d72dbc876c1d3fe",
+        "Names": [
+            "/webdrop-ws"
+        ],
+        "Image": "dc-webdrop-webdrop-ws",
+        "ImageID": "sha256:9beb799383425245a37acfe3c32b7b8b6713906f2c14cd335399148627a1da9f",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740571823,
+        "Ports": [
+            {
+                "PrivatePort": 8443,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "9ca26951640116389409a8b34528fe99be1d6ac7096f9f6b77cb92c97b5e2a08",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:9beb799383425245a37acfe3c32b7b8b6713906f2c14cd335399148627a1da9f",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-webdrop",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-webdrop/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-webdrop",
+            "com.docker.compose.service": "webdrop-ws",
+            "com.docker.compose.version": "2.29.7",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.webdrop-ws.entrypoints": "wss",
+            "traefik.http.routers.webdrop-ws.rule": "Host(`wss.webdrop.jlb.ninja`)",
+            "traefik.http.routers.webdrop-ws.tls.certresolver": "myresolver",
+            "traefik.http.services.webdrop-ws.loadbalancer.server.port": "8443"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:05",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "67024c889174d74538825b2d35f41ed20605f3de8f41377866b901d9b7ba116e",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.5",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-webdrop/src",
+                "Destination": "/app",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "b2107b47032fb09d6e9b43e6cd4e88e0e145e5b431a5bab77750e0bf77d82fd0",
+        "Names": [
+            "/webdrop-front"
+        ],
+        "Image": "dc-webdrop-webdrop",
+        "ImageID": "sha256:726dafa037e352e8905705ed52a75ab8f6112047d99b2226d626cf099a3cc8e2",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740571823,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "49fc8050a611675dd52f31465c711c68b9800e4cbffb326c3900dd85cc6dc13d",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:726dafa037e352e8905705ed52a75ab8f6112047d99b2226d626cf099a3cc8e2",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-webdrop",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-webdrop/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-webdrop",
+            "com.docker.compose.service": "webdrop",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.webdrop.entrypoints": "websecure",
+            "traefik.http.routers.webdrop.rule": "Host(\"webdrop.jlb.ninja\")",
+            "traefik.http.routers.webdrop.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0b",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "3782d041faef4ab32c93df6185be5ee59399e391633df092fbe999cfb6eadab3",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.11",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-webdrop/src/uploads",
+                "Destination": "/uploads",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-webdrop/src/front",
+                "Destination": "/var/www/html/public",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "4acec653ffb0ffba7db9060c23f3e177b4e0bfc0c51f611638bbfb0578a4967d",
+        "Names": [
+            "/phpinfo"
+        ],
+        "Image": "dc-phpinfo-phpinfo",
+        "ImageID": "sha256:a118dcc02b15db04383b24817ceb2c91479b40891f9ef7d2b8041b4047216a09",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740568920,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "3edc098d6f7adb260f7cb60e6e32abca7e21478da9a3e5ee1d13412d5eca157d",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:a118dcc02b15db04383b24817ceb2c91479b40891f9ef7d2b8041b4047216a09",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-phpinfo",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-phpinfo/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-phpinfo",
+            "com.docker.compose.service": "phpinfo",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.phpinfo.entrypoints": "websecure",
+            "traefik.http.routers.phpinfo.rule": "Host(\"phpinfo.jlb.ninja\")",
+            "traefik.http.routers.phpinfo.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:0e",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "aa9658f5f118bfe5fa6a282a64c6ea2a6ffbfd17ffa40d235affaafe96cd7ae8",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.14",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-phpinfo/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "3fcd40b7a9683ae45e168eac79dab2b194863656efca74209b9f16d5ebe4460d",
+        "Names": [
+            "/generators"
+        ],
+        "Image": "dc-generators-generators",
+        "ImageID": "sha256:08a60eef6e93ed2b0b0ae707860fb585030a4c4434a7122221a078a491ef0d45",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740568747,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "0a026bca679411297917f0dc39043e766f8621889df7df2f89ddf58fa7dc7c92",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:08a60eef6e93ed2b0b0ae707860fb585030a4c4434a7122221a078a491ef0d45",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-generators",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-generators/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-generators",
+            "com.docker.compose.service": "generators",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.generators.entrypoints": "websecure",
+            "traefik.http.routers.generators.rule": "Host(\"generators.jlb.ninja\")",
+            "traefik.http.routers.generators.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:14",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "b1eb69d620d6bc78d860829b83837d4e2f42dd26b28442a9c287572971071f1a",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.20",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-generators/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "dbf1cd1c9aa2ee17504ba12863cbb6a1b9e4132f13caa648e2b7de4f4f5f81d1",
+        "Names": [
+            "/umami"
+        ],
+        "Image": "ghcr.io/mikecao/umami:postgresql-latest",
+        "ImageID": "sha256:3b012dfec911a3725296ec11898e2ec7ddf17244b1dd5c17fc3d42e1d86bde5c",
+        "Command": "docker-entrypoint.sh yarn start-docker",
+        "Created": 1740568453,
+        "Ports": [
+            {
+                "PrivatePort": 3000,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "824d359c0af537ae48f40863ae8c5d34dd7d356674b1d2694f5d86ad90858e56",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "postgres:service_started:false",
+            "com.docker.compose.image": "sha256:3b012dfec911a3725296ec11898e2ec7ddf17244b1dd5c17fc3d42e1d86bde5c",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-umami",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-umami/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-umami",
+            "com.docker.compose.service": "umami",
+            "com.docker.compose.version": "2.29.7"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "umami"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "umami": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:19:00:02",
+                    "DriverOpts": null,
+                    "NetworkID": "2616ec71d6ec6dc7b89db67d87b027c6e4dca1eda6c405eada1373667bb1d7bf",
+                    "EndpointID": "b979412a31c39b483919b324338b4ab2795974ba23a7d7cc87a8cdca85c972a8",
+                    "Gateway": "172.25.0.1",
+                    "IPAddress": "172.25.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:19",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "b19a36893be6cb60fe2f08bdaa3699adb809e3bd656796d6073762844b990b27",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.25",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": []
+    },
+    {
+        "Id": "e471590a4b0de4290575b9b02bbb23991d1f0741f79282f8255a15f23df59c5c",
+        "Names": [
+            "/umami-db"
+        ],
+        "Image": "postgres:13",
+        "ImageID": "sha256:fecffa0994f99f896796221b26d443d484356716ffc5fd5fa7fef8060dc062ed",
+        "Command": "docker-entrypoint.sh postgres",
+        "Created": 1740568451,
+        "Ports": [
+            {
+                "PrivatePort": 5432,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "5bfd8e708ccbad8f345616b03b5f879767bcb87b98d0a531af4547331cc526dd",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:fecffa0994f99f896796221b26d443d484356716ffc5fd5fa7fef8060dc062ed",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-umami",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-umami/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-umami",
+            "com.docker.compose.service": "postgres",
+            "com.docker.compose.version": "2.29.7"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "umami"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "umami": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:19:00:03",
+                    "DriverOpts": null,
+                    "NetworkID": "2616ec71d6ec6dc7b89db67d87b027c6e4dca1eda6c405eada1373667bb1d7bf",
+                    "EndpointID": "34e6e5f49af8c815179682ed106088f5e6bb77b601a8e50dcc7defaceb5218db",
+                    "Gateway": "172.25.0.1",
+                    "IPAddress": "172.25.0.3",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "volume",
+                "Name": "dc-umami_umami_db",
+                "Source": "/var/lib/docker/volumes/dc-umami_umami_db/_data",
+                "Destination": "/var/lib/postgresql/data",
+                "Driver": "local",
+                "Mode": "z",
+                "RW": true,
+                "Propagation": ""
+            }
+        ]
+    },
+    {
+        "Id": "bbc2950304f51df5e875e6977acf788a8efe89b288765fcdeb66e1fed64214da",
+        "Names": [
+            "/umami-proxy"
+        ],
+        "Image": "nginx",
+        "ImageID": "sha256:97662d24417b316f60607afbca9f226a2ba58f09d642f27b8e197a89859ddc8e",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1740568451,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "82e070e60c77027e11d86426689eef1c772dc697ad17c7f24bd634c5dfa64e84",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:97662d24417b316f60607afbca9f226a2ba58f09d642f27b8e197a89859ddc8e",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-umami",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-umami/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-umami",
+            "com.docker.compose.service": "umami-proxy",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.enable": "true",
+            "traefik.http.routers.umami-proxy.entrypoints": "websecure",
+            "traefik.http.routers.umami-proxy.rule": "Host(`metrics.jlb.ninja`)",
+            "traefik.http.routers.umami-proxy.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:20",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "cc4c30efc6e9d020b99c9f49866724bc5dc2da9970b78418931465057407be51",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.32",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-umami/nginx.conf",
+                "Destination": "/etc/nginx/nginx.conf",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "550fe401114115945d6341fa099da08132736e9c6804f62ec098daf89ebd745f",
+        "Names": [
+            "/mariadb"
+        ],
+        "Image": "mariadb:latest",
+        "ImageID": "sha256:a914eff5d2eb4c650a4e787e453d52a4ffba977632bd624cc6e63d0c9c4c2d65",
+        "Command": "docker-entrypoint.sh --bind-address=0.0.0.0",
+        "Created": 1740519099,
+        "Ports": [
+            {
+                "IP": "0.0.0.0",
+                "PrivatePort": 3306,
+                "PublicPort": 3306,
+                "Type": "tcp"
+            },
+            {
+                "IP": "::",
+                "PrivatePort": 3306,
+                "PublicPort": 3306,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "60f81bd81ceb6060d6ca28a383be864d61258a9a7940dc3c2613b2983c5e012d",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:a914eff5d2eb4c650a4e787e453d52a4ffba977632bd624cc6e63d0c9c4c2d65",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-mariadb",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-mariadb/compose.yml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-mariadb",
+            "com.docker.compose.service": "mariadb",
+            "com.docker.compose.version": "2.29.7",
+            "org.opencontainers.image.authors": "MariaDB Community",
+            "org.opencontainers.image.base.name": "docker.io/library/ubuntu:noble",
+            "org.opencontainers.image.description": "MariaDB Database for relational SQL",
+            "org.opencontainers.image.documentation": "https://hub.docker.com/_/mariadb/",
+            "org.opencontainers.image.licenses": "GPL-2.0",
+            "org.opencontainers.image.ref.name": "ubuntu",
+            "org.opencontainers.image.source": "https://github.com/MariaDB/mariadb-docker",
+            "org.opencontainers.image.title": "MariaDB Database",
+            "org.opencontainers.image.url": "https://github.com/MariaDB/mariadb-docker",
+            "org.opencontainers.image.vendor": "MariaDB Community",
+            "org.opencontainers.image.version": "11.7.2"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "mariadb"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:02",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "1ec96d7e0685a4fbcd1e3f57ea545679affa2a46a978854e25dcb00839c06453",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-mariadb/init.sql",
+                "Destination": "/docker-entrypoint-initdb.d/init.sql",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            },
+            {
+                "Type": "volume",
+                "Name": "dc-mariadb_mariadb_data",
+                "Source": "/var/lib/docker/volumes/dc-mariadb_mariadb_data/_data",
+                "Destination": "/var/lib/mysql",
+                "Driver": "local",
+                "Mode": "z",
+                "RW": true,
+                "Propagation": ""
+            }
+        ]
+    },
+    {
+        "Id": "e1db21cfa9c27d9b5ccc69a3a8d7d9b6df39d3f1115f9c5dd2f6352da5a1c7db",
+        "Names": [
+            "/wordpress"
+        ],
+        "Image": "dc-wordpress-wordpress",
+        "ImageID": "sha256:91e10ff1432284d3202624b3d27dc0339421ea221e412e1d97544997b0abcd64",
+        "Command": "/bin/sh -c '/entrypoint.sh && exec docker-entrypoint.sh apache2-foreground'",
+        "Created": 1740517259,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "9a56e8b2d9040e73d6a068cc2e7a29f8b2ef50f5a2a9cbc48d9c79542ba639cb",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:91e10ff1432284d3202624b3d27dc0339421ea221e412e1d97544997b0abcd64",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-wordpress",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-wordpress/compose.yml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-wordpress",
+            "com.docker.compose.service": "wordpress",
+            "com.docker.compose.version": "2.29.7",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.wordpress.entrypoints": "web,websecure",
+            "traefik.http.routers.wordpress.rule": "Host(\"wp.jlb.ninja\")",
+            "traefik.http.routers.wordpress.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 7 weeks",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:07",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "4af37a1e52cfbbd930ae627d085620fda94eeda21a73d46d8388ae72aff30e59",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.7",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1f",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "3d75dcfc538b4242cdcc536820429a1127c909589bfe1acefefdaf7a3c28d49d",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.31",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-wordpress/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "0337bfe0f2c55ae6f36f0737cdd241b9f1f8d323b3b979179157b3a41b473e72",
+        "Names": [
+            "/jg-seal"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1740499203,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "dfa1ffc6f0ab82feacdcf7bd01328d9afb7b3b2b6ef58b1a8e8f92edc4fe88e9",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-jg-seal",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-jg-seal/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-jg-seal",
+            "com.docker.compose.service": "jg-seal",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.jg-seal.entrypoints": "websecure",
+            "traefik.http.routers.jg-seal.rule": "Host(\"dc-jg-seal.jlb.ninja\")",
+            "traefik.http.routers.jg-seal.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:13",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "4ea363e405295497ed6813f7b1a4374e4f105880bb67496512793b2ebfaa9f17",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.19",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-jg-seal/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "606734f8d698a9f18657dd11b3084a72a6cd86e1d22655f15d8973ca21010d79",
+        "Names": [
+            "/sandbox"
+        ],
+        "Image": "dc-sandbox-sandbox",
+        "ImageID": "sha256:6a640e496b82e52860d2d9bac7a75e15477bf3617465d33bd0cbbb79c324212a",
+        "Command": "/bin/sh -c /entrypoint.sh",
+        "Created": 1740498991,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "12a01e803f8c560bc83bc28c4eba27fae10e3bc7f974ae2b89a840ed1b11383e",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:6a640e496b82e52860d2d9bac7a75e15477bf3617465d33bd0cbbb79c324212a",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-sandbox",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-sandbox/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-sandbox",
+            "com.docker.compose.service": "sandbox",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.sandbox.entrypoints": "websecure",
+            "traefik.http.routers.sandbox.rule": "Host(\"sandbox.jlb.ninja\")",
+            "traefik.http.routers.sandbox.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "mariadb": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:17:00:06",
+                    "DriverOpts": null,
+                    "NetworkID": "e792a6fb298f21e8861f4585b5278be60ac3b34bcf0953cd5d2b9365451b9e9c",
+                    "EndpointID": "9d948c4d6bd1bc41c66f64e79ddee612895f069d01efd76be295a9f3af02a4dc",
+                    "Gateway": "172.23.0.1",
+                    "IPAddress": "172.23.0.6",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                },
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:1d",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "5456b1c00b97ca331bb5d2b0d296ed64c73c216497efd58d99c56d6cf215e6b8",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.29",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-sandbox/src",
+                "Destination": "/var/www/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "5c4b19d0626ff57e9c0870dc01aebbea728365f35523957e87eaee6fd08c2c10",
+        "Names": [
+            "/time"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1740498933,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "409f31592f48ade01f99a2a160e50cbabec501d8bb040464fc00e70c8c835abc",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-time",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-time/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-time",
+            "com.docker.compose.service": "time",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.time.entrypoints": "websecure",
+            "traefik.http.routers.time.rule": "Host(\"time.jlb.ninja\")",
+            "traefik.http.routers.time.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:12",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "3f9bd4ac0a7a120d814633bf61dcce8658ab9b3f5103b34359a1ff372ab14fa2",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.18",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-time/src",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "rw",
+                "RW": true,
+                "Propagation": "rprivate"
+            }
+        ]
+    },
+    {
+        "Id": "37bb424301664283ffe9ea5c6868723c70304720a8fe38112c2e1a2484d48143",
+        "Names": [
+            "/www"
+        ],
+        "Image": "nginx:alpine",
+        "ImageID": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+        "Command": "/docker-entrypoint.sh nginx -g 'daemon off;'",
+        "Created": 1740498553,
+        "Ports": [
+            {
+                "PrivatePort": 80,
+                "Type": "tcp"
+            }
+        ],
+        "Labels": {
+            "com.docker.compose.config-hash": "7db11ecc4c621a23dd048c737ef6a0c45753a134304c2d4d40789c2b29d5fbdf",
+            "com.docker.compose.container-number": "1",
+            "com.docker.compose.depends_on": "",
+            "com.docker.compose.image": "sha256:d41a14a4ecff96bdae6253ad2f58d8f258786db438307846081e8d835b984111",
+            "com.docker.compose.oneoff": "False",
+            "com.docker.compose.project": "dc-www",
+            "com.docker.compose.project.config_files": "/home/jdlxt/stack/dc-www/compose.yaml",
+            "com.docker.compose.project.working_dir": "/home/jdlxt/stack/dc-www",
+            "com.docker.compose.service": "www",
+            "com.docker.compose.version": "2.29.7",
+            "maintainer": "NGINX Docker Maintainers <docker-maint@nginx.com>",
+            "traefik.docker.network": "web",
+            "traefik.enable": "true",
+            "traefik.http.routers.www.entrypoints": "web,websecure",
+            "traefik.http.routers.www.middlewares": "use-nginx-middleware",
+            "traefik.http.routers.www.rule": "Host(\"www.jlb.ninja\")",
+            "traefik.http.routers.www.tls.certresolver": "myresolver"
+        },
+        "State": "running",
+        "Status": "Up 5 months",
+        "HostConfig": {
+            "NetworkMode": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c"
+        },
+        "NetworkSettings": {
+            "Networks": {
+                "web": {
+                    "IPAMConfig": null,
+                    "Links": null,
+                    "Aliases": null,
+                    "MacAddress": "02:42:ac:13:00:02",
+                    "DriverOpts": null,
+                    "NetworkID": "7af447c3c39eaa269f591f8c0ac64ddcd067fa795f138ce28e1184d9df4cba8c",
+                    "EndpointID": "43cd84ff5042b545fda71977991f782ec4a03f3674fb2c61b98a37d81721eaf9",
+                    "Gateway": "172.19.0.1",
+                    "IPAddress": "172.19.0.2",
+                    "IPPrefixLen": 16,
+                    "IPv6Gateway": "",
+                    "GlobalIPv6Address": "",
+                    "GlobalIPv6PrefixLen": 0,
+                    "DNSNames": null
+                }
+            }
+        },
+        "Mounts": [
+            {
+                "Type": "bind",
+                "Source": "/home/jdlxt/stack/dc-www/html",
+                "Destination": "/usr/share/nginx/html",
+                "Mode": "ro",
+                "RW": false,
+                "Propagation": "rprivate"
+            }
+        ]
+    }
+]

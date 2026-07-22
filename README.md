@@ -10,3 +10,27 @@ Container Kingdom is an interactive visualization tool for Docker containers, us
 
 🕹️ Demo: [https://container-kingdom.jlb.ninja/](https://container-kingdom.jlb.ninja/)  
 
+---
+
+## 🛠️ Development
+
+The app can run **without a Docker daemon**: a Vite dev-server plugin mocks the
+`/api/docker/*` endpoints (the same routes nginx proxies to the Docker socket in
+production) from a captured fixture of 35 containers.
+
+```bash
+npm install
+npm run dev      # serves the app at http://localhost:5173 with the mocked Docker API
+npm test         # run the Vitest suite
+npm run test:watch
+npm run lint
+```
+
+- `mock/fixtures/containers.json` — captured `GET /containers/json` payload.
+- `mock/docker-mock.js` — framework-agnostic mock, shared by the dev server and the tests.
+- `mock/vite-docker-mock-plugin.js` — wires the mock into the Vite dev server.
+
+> `npm run build` (bundling) becomes meaningful once the source is migrated from
+> global `<script>` tags to ES modules. Today, production is served by nginx
+> directly from `src/` (see `compose.yaml`).
+
