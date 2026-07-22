@@ -3,7 +3,6 @@ import { DockerApiClient } from './DockerApiClient.js';
 export class Container
 {
   // Constants
-  static WATCH_INTERVAL_MS = 1000;
   static CPU_USAGE_THRESHOLDS = [
     {value: 1, css: 'xxs'},
     {value: 5, css: 'xs'},
@@ -36,21 +35,16 @@ export class Container
    * @private
    */
   _dockerApiClient = null;
-  _actionsEnabled = false;
-  _watchTimeoutId = null;
 
 
 
 
   constructor(
     dockerApiClient,
-    descriptor,
-    actionsEnabled = false
+    descriptor
   ) {
     this._dockerApiClient = dockerApiClient;
-    this._actionsEnabled = actionsEnabled;
     Object.assign(this, descriptor);
-    this.watch();
   }
 
   getNetworks() {
@@ -59,13 +53,6 @@ export class Container
 
   getElement() {
     return this.rpgEngine.data.element;
-  }
-
-  createEntry(caption, content) {
-    let entry = document.createElement('div');
-    entry.classList.add('container-info-entry');
-    entry.innerHTML = caption + ': ' + content
-    return entry
   }
 
   async start() {
@@ -79,7 +66,6 @@ export class Container
   }
 
   async destroy() {
-    this.stopWatch();
     try {
       const response = await this._dockerApiClient.destroyContainer(this.Id);
       return response;
@@ -87,101 +73,6 @@ export class Container
       console.error(`Error destroying container ${this.Id}:`, error);
       throw error;
     }
-  }
-
-  /**
-   * Stop the watch timer to prevent memory leaks
-   */
-  stopWatch() {
-    if (this._watchTimeoutId) {
-      clearTimeout(this._watchTimeoutId);
-      this._watchTimeoutId = null;
-    }
-  }
-
-  getHtmlInfo() {
-
-    const container = document.createElement('div');
-
-
-      if(this._actionsEnabled)  {
-        const actionContainer = document.createElement('div');
-        actionContainer.classList.add('actions-container');
-        container.appendChild(actionContainer);
-
-        if(!this.isRunning()) {
-          const startButton = document.createElement('button');
-          startButton.classList.add('container-action-button', 'start-button');
-          startButton.innerHTML = 'Start';
-          startButton.addEventListener('click', async () => {
-            await this.start();
-          });
-          actionContainer.appendChild(startButton);
-
-          const deleteButton = document.createElement('button');
-          deleteButton.classList.add('container-action-button', 'destroy-button');
-          deleteButton.innerHTML = 'Destroy';
-          deleteButton.addEventListener('click', async () => {
-            await this.destroy();
-          });
-          actionContainer.appendChild(deleteButton);
-        }
-      }
-
-
-
-
-
-
-      const containerName = this.createEntry('🗒️ Container name', this.getName());
-      container.appendChild(containerName);
-
-      const containerStatus = this.createEntry('🔥 Status', this.getStatus())
-      container.appendChild(containerStatus);
-
-      const containerCreatedUptime = this.createEntry('🗒️ Container created', this.getCreatedSince());
-      container.appendChild(containerCreatedUptime);
-
-      const containerImage = this.createEntry('📀 Image', this.getImage());
-      container.appendChild(containerImage);
-
-      const containerCompose = this.createEntry('📦 Compose', this.getComposeName());
-      container.appendChild(containerCompose);
-
-      const containerMemoryUsage = this.createEntry('🧠 Memory usage', this.getMemoryUsage(true))
-      container.appendChild(containerMemoryUsage);
-
-      const containerCpuUsage = this.createEntry('⚙️ CPU load', `${Math.round(this.getCpuUsage() * 100) / 100}%`)
-      container.appendChild(containerCpuUsage);
-
-      const demoUrl = this.getDemoUrl();
-      if(demoUrl) {
-        const containerDemo = this.createEntry('🚀 Demo', `<a class="demo-url" href="//${demoUrl}" target="_blank">${demoUrl}</a>`);
-        container.appendChild(containerDemo);
-      }
-
-      const networks = this.getNetworks();
-      const containerNetworks = this.createEntry('🔌 Networks', `<ul class="networks">${networks.map(network => `<li class="network">${network}</li>`).join('')}</ul>`)
-      container.appendChild(containerNetworks);
-
-    return container;
-  }
-
-  watch() {
-
-    if(this.rpgEngine && this.rpgEngine.data.element) {
-      const dom = this.rpgEngine.data.element.getDom()
-      dom.dataset.cpuUsage = this.getCpuUsageThreshold().css;
-
-      let memoryUsageContainer = document.querySelector(`[data-container-id="${this.Id}"] .memory-usage`);
-      if(memoryUsageContainer) {
-        memoryUsageContainer.innerHTML = this.getMemoryUsage(true);
-      }
-    }
-
-    this._watchTimeoutId = setTimeout(() => {
-      this.watch();
-    }, Container.WATCH_INTERVAL_MS);
   }
 
   getCpuUsageThreshold() {

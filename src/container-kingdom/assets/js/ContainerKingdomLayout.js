@@ -121,8 +121,8 @@ export class ContainerKingdomLayout
 
     this.containerInfoContainer.innerHTML = '';
 
-    // this.containerInfoContainer.innerHTML = container.getHtmlInfo();
-    this.containerInfoContainer.appendChild(container.getHtmlInfo());
+    const view = this.application.getContainerView(container.getId());
+    this.containerInfoContainer.appendChild(view.getHtmlInfo());
 
     this.showConsole();
     this.console.scrollToBottom();

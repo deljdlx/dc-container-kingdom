@@ -1,4 +1,5 @@
 import { Container } from './Container.js';
+import { ContainerView } from './ContainerView.js';
 import { ContainerKingdomLayout } from './ContainerKingdomLayout.js';
 import { ContainerKingdomRenderer } from './ContainerKingdomRenderer.js';
 import { ContainersList } from './ContainersList.js';
@@ -24,6 +25,11 @@ export class ContainerKingdom
    * @type {Object<string, Container>}
    */
   containers = {};
+  /**
+   * @type {Object<string, ContainerView>}
+   */
+  containerViews = {};
+  _previousContainerViews = {};
   containersStats = {};
 
   _previousContainers = {};
@@ -130,7 +136,8 @@ export class ContainerKingdom
     // Stop the loop before clearing
     this.stopLoop();
     Object.values(this.containers).forEach(container => {
-      container.stopWatch();
+      this.containerViews[container.Id]?.stopWatch();
+      delete this.containerViews[container.Id];
       delete this.containers[container.Id];
     });
   }
@@ -187,6 +194,14 @@ export class ContainerKingdom
     return this.containers;
   }
 
+  /**
+   * @param {string} containerId
+   * @returns {ContainerView|undefined}
+   */
+  getContainerView(containerId) {
+    return this.containerViews[containerId];
+  }
+
   getCompose(composeName) {
     return this.composes[composeName] || null;
   }
@@ -205,7 +220,9 @@ export class ContainerKingdom
     const containers = await this.dockerApiClient.getContainersDescriptors();
 
     this._previousContainers = this.containers;
+    this._previousContainerViews = this.containerViews;
     this.containers = {};
+    this.containerViews = {};
 
     containers.forEach(containerDescriptor => {
       if(this.containers[containerDescriptor.Id]) {
@@ -217,6 +234,7 @@ export class ContainerKingdom
         containerDescriptor,
       );
       this.containers[container.Id] = container;
+      this.containerViews[container.Id] = new ContainerView(container);
 
       const networks = container.NetworkSettings.Networks;
       Object.keys(networks).forEach(networkName => {
@@ -276,7 +294,7 @@ export class ContainerKingdom
   cleanContainers() {
     Object.values(this._previousContainers).forEach(container => {
       if(!this.containers[container.Id]) {
-        container.stopWatch();
+        this._previousContainerViews[container.Id]?.stopWatch();
         const element = container.getElement();
         if (element) {
           element.destroy();
