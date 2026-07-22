@@ -363,10 +363,6 @@ class Viewport
     this.startLoop()
   }
 
-  getBoard() {
-    return this.board;
-  }
-
   getGeometry() {
     return this.geometry;
   }
