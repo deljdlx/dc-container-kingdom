@@ -1,4 +1,4 @@
-import { ContainerGrid } from './ContainerGrid.js';
+import { ContainerPlacement } from './ContainerPlacement.js';
 import {
   Element,
   Ground00,
@@ -44,7 +44,7 @@ export class ContainerKingdomRenderer
   roadHeight = 50;
 
   /**
-   * @type {ContainerGrid}
+   * @type {ContainerPlacement}
    */
   grid;
 
@@ -53,7 +53,7 @@ export class ContainerKingdomRenderer
     this.application = application;
     this.viewport = viewport;
 
-    this.grid = new ContainerGrid(
+    this.placement = new ContainerPlacement(
       ContainerKingdomRenderer.DEFAULT_GRID_SIZE,
       ContainerKingdomRenderer.DEFAULT_GRID_SIZE,
     );
@@ -66,8 +66,8 @@ export class ContainerKingdomRenderer
   drawContainersMatrix() {
     const area = this.viewport.getBoard().getAreaAt(0, 0);
 
-    for(let x = 0 ; x < this.grid.xCells; x++) {
-      for(let y = 0 ; y < this.grid.yCells; y++) {
+    for(let x = 0 ; x < this.placement.xCells; x++) {
+      for(let y = 0 ; y < this.placement.yCells; y++) {
         const cell = document.createElement('div');
         cell.style.width = this.cellWidth + 'px';
         cell.style.height = this.cellHeight + 'px';
@@ -90,7 +90,7 @@ export class ContainerKingdomRenderer
 
 
   async drawContainers() {
-    this.grid.computeBounds(
+    this.placement.computeBounds(
       this.application.getContainers(true)
     );
 
@@ -112,12 +112,12 @@ export class ContainerKingdomRenderer
       return;
     }
     
-    let {x, y} = this.grid.computeContainerCoords(firstContainer);
+    let {x, y} = this.placement.computeContainerCoords(firstContainer);
     try {
-      ({x, y} = this.grid.getClosestFreeCoords(x, y, 2));
+      ({x, y} = this.placement.getClosestFreeCoords(x, y, 2));
     } catch(e) {
       try {
-        ({x, y} = this.grid.getClosestFreeCoords(x, y, 1));
+        ({x, y} = this.placement.getClosestFreeCoords(x, y, 1));
       }
       catch(e) {
         console.error('No space available for container', firstContainer);
@@ -128,7 +128,7 @@ export class ContainerKingdomRenderer
 
     // Draw remaining containers
     for (const container of containerList.slice(1)) {
-      ({x, y} = this.grid.getClosestFreeCoords(x, y, 0));
+      ({x, y} = this.placement.getClosestFreeCoords(x, y, 0));
       const house = await this.drawHouse(container, x, y);
       houses.push(house);
     }
@@ -185,7 +185,7 @@ export class ContainerKingdomRenderer
     );
 
     container.rendered = true;
-    this.grid.occupy(x, y);
+    this.placement.occupy(x, y);
 
     container.setRpgEngineData({
       element: house,

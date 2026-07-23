@@ -1,11 +1,11 @@
 /**
- * Pure spatial-placement grid for container houses — no DOM.
+ * Decides where each container's house sits on the map — pure, no DOM.
  *
  * Maps each container to a cell derived from its id hash, then finds a free
- * cell (spiral search) honouring a minimum spacing. Cells only track
- * occupancy, so this whole layer is deterministic and unit-testable.
+ * cell (spiral search) honouring a minimum spacing. Backed by a simple
+ * occupancy grid, so the whole placement is deterministic and unit-testable.
  */
-export class ContainerGrid {
+export class ContainerPlacement {
   xCells;
   yCells;
 
