@@ -55,34 +55,16 @@ export class ViewportRenderer
   }
 
   update() {
+    const camera = this._viewport.getCamera();
 
-    if(!this._viewport.getCharacter()) {
+    // The camera stays out of the way unless it is actually driving the view
+    // (a host that translates the board itself — e.g. drag/zoom — keeps it
+    // inactive). Depth is world-space, so nothing here touches z-order.
+    if(!camera.isActive()) {
       return;
     }
 
-    this._board = this._viewport.getBoard();
-    const left = -this._viewport.x();
-    const top = -this._viewport.y();
-
-    // -1 : zindex fine tuning
-    const zIndex =
-      (
-        this._board.height() +
-        (
-          (this._viewport.getCharacter().y()) % this._board.height() + (this._viewport.getCharacter().height() - 1)
-        )
-      ) % this._board.height()
-    ;
-
-    this._viewport.getCharacter().getRenderer().getDom().style.zIndex = zIndex;
-
-    const characterTop = -top;
-    const characterLeft = -left;
-
-    this._viewport.getCharacter().getRenderer().getDom().style.transform =
-      `translateZ(${-zIndex}px) translateX(${characterLeft}px) translateY(${characterTop}px)`;
-
-    this._board.getRenderer().getDom().style.transform = `translateX(${left}px) translateY(${top}px)`;
-
+    this._viewport.getBoard().getRenderer().getDom().style.transform =
+      `translate(${-camera.x()}px, ${-camera.y()}px)`;
   }
 }

@@ -17,6 +17,7 @@ export { setAssetsBase, getAssetsBase, assetUrl } from './assets.js';
 // --- Core ---
 export { Application } from './map/Application.js';
 export { Viewport } from './map/Viewport.js';
+export { Camera } from './map/Camera.js';
 export { Board } from './map/Board.js';
 export { Area } from './map/Area.js';
 export { Element } from './map/Element.js';

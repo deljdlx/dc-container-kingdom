@@ -75,7 +75,6 @@ export class Renderer
 
     let left = this._element.x();
     let top = this._element.y();
-    const zIndex = top;
 
     if(relativeTo) {
       const offsets = relativeTo.getRelativeToOffsets();
@@ -87,7 +86,9 @@ export class Renderer
     this.dom.style.top = top + 'px';
 
     if(this._element.manualZ === false) {
-      this.dom.style.zIndex = zIndex + this._element.height();
+      // World-space depth: sort by absolute Y so painter's ordering stays
+      // consistent across areas (the camera never affects z).
+      this.dom.style.zIndex = this._element.offsetY() + this._element.height();
     }
 
     return this.dom;
