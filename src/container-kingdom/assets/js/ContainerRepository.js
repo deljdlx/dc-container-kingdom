@@ -18,8 +18,6 @@ export class ContainerRepository {
   containers = {};
   /** @type {Object<string, ContainerView>} */
   containerViews = {};
-  _previousContainers = {};
-  _previousContainerViews = {};
 
   /** @type {Object<string, DockerCompose>} */
   composes = {};
@@ -33,61 +31,73 @@ export class ContainerRepository {
   }
 
   /**
-   * Fetch descriptors and rebuild the container/view/network/compose indexes.
-   * When the set of containers changed, prune the vanished ones.
+   * Fetch descriptors and reconcile the current state: drop vanished
+   * containers, refresh existing ones in place (keeping their stats history so
+   * CPU can be computed and their watch timer alive), create the new ones, then
+   * rebuild the derived network/compose indexes.
    */
   async loadContainers() {
-    const containers = await this.dockerApiClient.getContainersDescriptors();
+    const descriptors = await this.dockerApiClient.getContainersDescriptors();
+    const seenIds = new Set(descriptors.map(descriptor => descriptor.Id));
 
-    this._previousContainers = this.containers;
-    this._previousContainerViews = this.containerViews;
-    this.containers = {};
-    this.containerViews = {};
+    // Remove containers that disappeared.
+    Object.keys(this.containers).forEach(id => {
+      if (!seenIds.has(id)) {
+        this.containerViews[id]?.stopWatch();
+        const element = this.containers[id].getElement();
+        if (element) {
+          element.destroy();
+        }
+        delete this.containers[id];
+        delete this.containerViews[id];
+      }
+    });
 
-    containers.forEach(containerDescriptor => {
-      if (this.containers[containerDescriptor.Id]) {
+    // Update existing containers, create the new ones (one watch per container).
+    descriptors.forEach(descriptor => {
+      const existing = this.containers[descriptor.Id];
+      if (existing) {
+        existing.update(descriptor);
         return;
       }
-
-      const container = new Container(
-        this.dockerApiClient,
-        containerDescriptor,
-      );
+      const container = new Container(this.dockerApiClient, descriptor);
       this.containers[container.Id] = container;
       this.containerViews[container.Id] = new ContainerView(container);
+    });
 
-      const networks = container.NetworkSettings.Networks;
-      Object.keys(networks).forEach(networkName => {
+    this._rebuildNetworks();
+    this._rebuildComposes();
+
+    const checksumDescriptor = {
+      ids: descriptors.map(descriptor => descriptor.Id),
+      networks: descriptors.map(descriptor => descriptor.NetworkSettings.Networks),
+      labels: descriptors.map(descriptor => descriptor.Labels),
+      status: descriptors.map(descriptor => descriptor.ImageID),
+    };
+
+    const newChecksum = await sha256(checksumDescriptor);
+    const changed = this.lastContainersChecksum !== null
+      && this.lastContainersChecksum !== newChecksum;
+    this.lastContainersChecksum = newChecksum;
+    if (changed) {
+      this.handleNewContainers();
+    }
+  }
+
+  _rebuildNetworks() {
+    this.networks = {};
+    Object.values(this.containers).forEach(container => {
+      Object.keys(container.NetworkSettings.Networks).forEach(networkName => {
         if (!this.networks[networkName]) {
           this.networks[networkName] = [];
         }
         this.networks[networkName].push(container);
       });
     });
-
-    this._rebuildComposes();
-
-    const descriptor = {
-      ids: containers.map(container => container.Id),
-      networks: containers.map(container => container.NetworkSettings.Networks),
-      labels: containers.map(container => container.Labels),
-      status: containers.map(container => container.ImageID),
-    };
-
-    const newChecksum = await sha256(descriptor);
-    if (this.lastContainersChecksum === null) {
-      this.lastContainersChecksum = newChecksum;
-    }
-
-    if (this.lastContainersChecksum !== newChecksum) {
-      this.cleanContainers();
-      this.handleNewContainers();
-      return;
-    }
-    this.lastContainersChecksum = newChecksum;
   }
 
   _rebuildComposes() {
+    this.composes = {};
     const grouped = {};
     Object.values(this.containers).forEach(container => {
       const composeName = container.getComposeName();
@@ -132,19 +142,6 @@ export class ContainerRepository {
 
   handleNewContainers() {
     // Placeholder for future implementation
-  }
-
-  /** Stop watching and destroy the map elements of containers that vanished. */
-  cleanContainers() {
-    Object.values(this._previousContainers).forEach(container => {
-      if (!this.containers[container.Id]) {
-        this._previousContainerViews[container.Id]?.stopWatch();
-        const element = container.getElement();
-        if (element) {
-          element.destroy();
-        }
-      }
-    });
   }
 
   /** Stop every watch loop and drop all containers. */

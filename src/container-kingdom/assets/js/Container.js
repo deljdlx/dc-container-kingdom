@@ -48,6 +48,16 @@ export class Container
     Object.assign(this, descriptor);
   }
 
+  /**
+   * Refresh the Docker descriptor fields in place, keeping runtime state
+   * (stats history, CPU, rpg-engine binding, rendered flag) intact so the
+   * repository can reconcile instead of recreating the model.
+   * @param {object} descriptor
+   */
+  update(descriptor) {
+    Object.assign(this, descriptor);
+  }
+
   getNetworks() {
     return Object.keys(this.NetworkSettings.Networks);
   }
