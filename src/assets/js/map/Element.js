@@ -1,5 +1,5 @@
 import { Application } from './Application.js';
-import { BoundingBox } from './BoundingBox.js';
+import { CollisionSystem } from './CollisionSystem.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { Renderer } from './Renderer/Renderer.js';
@@ -11,35 +11,11 @@ export class Element
   _application;
 
   manualZ = false;
-  /**
-   * @type {BoundingBox}
-   */
-  boundingBox;
-
-  _collided = {
-    collision: false,
-    trigger: false,
-  };
-
-  collisionZones = {
-    collision: [],
-    trigger: [],
-  };
-
-  collidedWith = {
-    collision: [],
-    trigger: [],
-  };
-
-
-  triggerZones = [];
-
-
 
   /**
-   * @type {BoundingBox}
+   * @type {CollisionSystem}
    */
-   collisionBoundingBox;
+  collision;
 
 
   /**
@@ -103,16 +79,16 @@ export class Element
     this.geometry = new Geometry();
     this.setRenderer(new Renderer(this));
 
-    // emtpy collision bouding box
-    this.collisionBoundingBox = new BoundingBox(this);
-
+    // Owns the (empty) collision bounding box; the outer bounding box is built
+    // once the geometry below is set.
+    this.collision = new CollisionSystem(this);
 
     this.x(x);
     this.y(y);
     this.width(width);
     this.height(height);
 
-    this.boundingBox = new BoundingBox(this);
+    this.collision.initBoundingBox();
   }
 
   getBoard() {
@@ -364,54 +340,19 @@ export class Element
   }
 
   createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision') {
-
-    const zone = new BoundingBox(this);
-    zone.x0(x);
-    zone.y0(y);
-    zone.width(width);
-    zone.height(height);
-
-    this.collisionZones[type].push(zone);
-
-    this.collisionBoundingBox.updateWithBoundingBox(zone);
-
-    if(this.parent) {
-      this.parent.updateCollisionBoundingBox(this);
-    }
-
-    return zone;
+    return this.collision.createCollisionZone(x, y, width, height, type);
   }
-
 
   createTriggerZone(x = null, y = null, width = null, height = null) {
-    return this.createCollisionZone(x, y, width, height, 'trigger');
+    return this.collision.createTriggerZone(x, y, width, height);
   }
 
-  /**
-   * @param {Element}
-   */
   updateCollisionBoundingBox(element) {
-    this.collisionBoundingBox.updateWithRelativeElement(this, element);
-    if(this.parent) {
-      this.parent.updateCollisionBoundingBox(this);
-    }
+    this.collision.updateCollisionBoundingBox(element);
   }
 
-  /**
-   * @param {Element}
-   */
   updateBoudingBox(element) {
-    const boundingBox = new BoundingBox();
-    boundingBox.x0(element.x());
-    boundingBox.y0(element.y());
-
-    boundingBox.x1(element.x() + element.getBoundingBox().width());
-    boundingBox.y1(element.y() + element.getBoundingBox().height());
-
-    this.boundingBox.updateWithBoundingBox(boundingBox);
-    if(this.parent) {
-      this.parent.updateBoudingBox(this);
-    }
+    this.collision.updateBoudingBox(element);
   }
 
   // ===========================
@@ -429,118 +370,19 @@ export class Element
   // ===========================
 
   collided(value = null, type = 'collision') {
-    if(value !== null) {
-      if(value !== this._collided[type]) {
-        this._collided[type] = value;
-        if(value === false) {
-          this.collisionZones[type].forEach(zone => {
-            zone.collided(false, type);
-          });
-        }
-
-        if(this.parent) {
-          this.parent.collided(value, type);
-        }
-        this.needUpdate(true);
-      }
-    }
-
-    return this._collided[type];
+    return this.collision.collided(value, type);
   }
 
   getTrigger(element) {
-    return this.getCollision(element, 'trigger');
+    return this.collision.getTrigger(element);
   }
 
-
   getCollision(element, type = 'collision') {
-
-    if(element === this) {
-      return false;
-    }
-
-    const boundingBoxCollided = this.getCollisionBoundingBox().isCollided(
-      element.getCollisionBoundingBox()
-    );
-
-    if(boundingBoxCollided) {
-      const collided = element.collisionZones[type].reduce((collided, zone) => {
-
-        const isCollided = this.getCollisionBoundingBox().isCollided(zone, type);
-        if(!collided) {
-          collided = isCollided;
-        }
-        zone.collided(isCollided, type);
-
-        return collided
-      }, false);
-
-      if(collided) {
-
-        if(!element.collided(null, type)) {
-          this.collidedWith[type].push(element);
-
-          // console.log('%cElement.js :: 403 =============================', 'color: #f00; font-size: 1rem');
-          // console.log("ICI");
-
-          this.handle(this._eventPrefix + type, {
-            element: this,
-            target: element,
-          });
-
-          element.handle(this._eventPrefix + type, {
-            element: this,
-            target: element,
-          });
-        }
-
-        element.collided(true, type);
-        this.collided(true, type);
-
-        return [element];
-      }
-
-      const childCollisions = element.getChildren().map(child => {
-        const result = this.getCollision(child, type);
-        return result;
-      }).filter(Boolean).reduce((accumulator, element) => element, []);
-
-      if(childCollisions.length) {
-        return childCollisions;
-      }
-    }
-    element.clearCollision(type);
-
-    return false;
+    return this.collision.getCollision(element, type);
   }
 
   clearCollision(type = 'collision') {
-
-    this.collidedWith[type].forEach(element => {
-      this.handle('element.' + type + '.end', {
-        element: this,
-        target: element,
-      });
-    });
-
-    this.collidedWith[type].forEach(element => {
-      element.handle('element.' + type + '.end', {
-        element: element,
-        target: this,
-      });
-    });
-    this.collidedWith[type] = [];
-
-    this.collided(false, type);
-    this.getCollisionZones(type).forEach(zone => {
-      if(zone.dom) {
-        zone.collided(false, type);
-      }
-
-    });
-    this.getChildren().forEach(child => {
-      child.clearCollision(type);
-    });
+    return this.collision.clearCollision(type);
   }
 
   // ===========================
@@ -580,15 +422,15 @@ export class Element
   }
 
   getCollisionZones(type = 'collision') {
-    return this.collisionZones[type];
+    return this.collision.getCollisionZones(type);
   }
 
   getCollisionBoundingBox() {
-    return this.collisionBoundingBox;
+    return this.collision.getCollisionBoundingBox();
   }
 
   getBoundingBox() {
-    return this.boundingBox;
+    return this.collision.getBoundingBox();
   }
 
 
