@@ -92,4 +92,43 @@ describe('ContainerRepository', () => {
     expect(repo.getContainers()[removedId]).toBeUndefined();
     expect(stopWatch).toHaveBeenCalled();
   });
+
+  describe('reconciliation across reloads', () => {
+    it('reuses the same Container instance (and its view) instead of recreating', async () => {
+      repo = new ContainerRepository(makeClient());
+      await repo.loadContainers();
+      const id = containers[0].Id;
+      const container = repo.getContainers()[id];
+      const view = repo.getContainerView(id);
+
+      await repo.loadContainers();
+
+      expect(repo.getContainers()[id]).toBe(container);
+      expect(repo.getContainerView(id)).toBe(view);
+    });
+
+    it('computes CPU across a reload cycle (stats history is preserved)', async () => {
+      // Regression: recreating models every reload reset previousStats, so CPU
+      // stayed 0. Reconciliation keeps the models, so the second sample counts.
+      repo = new ContainerRepository(makeClient());
+      await repo.loadContainers();
+      await repo.loadContainersStats(); // sample 1
+      await repo.loadContainers();      // reload must not wipe the models
+      await repo.loadContainersStats(); // sample 2
+
+      expect(repo.getGlobalCpuUsage()).toBeGreaterThan(0);
+    });
+
+    it('does not accumulate the network index on identical reloads', async () => {
+      repo = new ContainerRepository(makeClient());
+      await repo.loadContainers();
+      const count = () =>
+        Object.values(repo.getNetworks()).reduce((n, arr) => n + arr.length, 0);
+      const first = count();
+
+      await repo.loadContainers();
+
+      expect(count()).toBe(first);
+    });
+  });
 });
