@@ -1,4 +1,5 @@
 import { Renderer } from './Renderer.js';
+import { assetUrl } from '../../assets.js';
 
 export class AreaRenderer extends Renderer
 {
@@ -6,7 +7,7 @@ export class AreaRenderer extends Renderer
   render() {
     // const dom = super.render();
     const dom = this.getDom();
-    dom.style.backgroundImage = 'url(engine/images/map/grass-01.png)';
+    dom.style.backgroundImage = `url(${assetUrl('map/grass-01.png')})`;
     dom.classList.add('map-area');
     dom.style.width = this.getElement().width() + 'px';
     dom.style.height = this.getElement().height() + 'px';

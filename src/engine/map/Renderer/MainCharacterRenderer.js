@@ -1,4 +1,5 @@
 import { Renderer } from './Renderer.js';
+import { assetUrl } from '../../assets.js';
 
 export class MainCharacterRenderer extends Renderer
 {
@@ -19,7 +20,7 @@ export class MainCharacterRenderer extends Renderer
     super(element);
     this.dom.classList.add('character');
     this.dom.classList.add('character--main');
-    this.domSprite.style.backgroundImage = `url('engine/images/characters/characters-00.png')`;
+    this.domSprite.style.backgroundImage = `url(${assetUrl('characters/characters-00.png')})`;
 
     const left = -this.getElement().width() - this.getElement().getSpriteSheetOffsetLeft();
 

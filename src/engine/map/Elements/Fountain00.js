@@ -1,4 +1,5 @@
 import { Element } from '../Element.js';
+import { assetUrl } from '../../assets.js';
 
 export class Fountain00 extends Element
 {
@@ -10,7 +11,7 @@ export class Fountain00 extends Element
   render() {
     const dom = super.render();
     this.getRenderer().addShadow();
-    this.getRenderer().getSprite().style.backgroundImage = 'url(engine/images/map/map-sprites-01.png)';
+    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
     this.getRenderer().getSprite().style.backgroundPosition = `-1170px -2754px`;
 
     this.getRenderer().getShadow().style.borderRadius = '100%';

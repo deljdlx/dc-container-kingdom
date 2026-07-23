@@ -11,6 +11,9 @@
  *   const app = new Application('#viewport', 900, 900);
  */
 
+// --- Configuration ---
+export { setAssetsBase, getAssetsBase, assetUrl } from './assets.js';
+
 // --- Core ---
 export { Application } from './map/Application.js';
 export { Viewport } from './map/Viewport.js';

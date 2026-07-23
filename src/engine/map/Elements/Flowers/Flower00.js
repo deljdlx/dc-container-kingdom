@@ -1,4 +1,5 @@
 import { Element } from '../../Element.js';
+import { assetUrl } from '../../../assets.js';
 
 export class Flower00 extends Element
 {
@@ -10,7 +11,7 @@ export class Flower00 extends Element
   render() {
     const dom = super.render();
     this.getRenderer().addShadow();
-    this.getRenderer().getSprite().style.backgroundImage = 'url(engine/images/map/flowers-00.png)';
+    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/flowers-00.png')})`;
     this.getRenderer().getSprite().style.backgroundPosition = `0px -96px`;
     return dom;
   }

@@ -1,4 +1,5 @@
 import { Element } from '../Element.js';
+import { assetUrl } from '../../assets.js';
 
 export class Fence00V extends Element
 {
@@ -9,7 +10,7 @@ export class Fence00V extends Element
 
   render() {
     const dom = super.render();
-    dom.style.backgroundImage = 'url(engine/images/map/map-sprites-01.png)';
+    dom.style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
     dom.style.backgroundPosition = `-1504px -1504px`;
     this.getRenderer().addShadow();
     return dom;

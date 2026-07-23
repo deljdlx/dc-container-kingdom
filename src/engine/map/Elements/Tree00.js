@@ -1,4 +1,5 @@
 import { Element } from '../Element.js';
+import { assetUrl } from '../../assets.js';
 
 export class Tree00 extends Element
 {
@@ -9,7 +10,7 @@ export class Tree00 extends Element
 
   render() {
     super.render();
-    this.getRenderer().getSprite().style.backgroundImage = 'url(engine/images/map/map-sprites-01.png)';
+    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
     this.getRenderer().getSprite().style.backgroundPosition = '-256px 0';
     this.getRenderer().addShadow();
     this.getRenderer().getShadow().style.width = '48px';

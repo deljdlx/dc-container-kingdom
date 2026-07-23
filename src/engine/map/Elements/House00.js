@@ -1,4 +1,5 @@
 import { Element } from '../Element.js';
+import { assetUrl } from '../../assets.js';
 
 export class House00 extends Element
 {
@@ -11,7 +12,7 @@ export class House00 extends Element
   render() {
     super.render();
     this.getRenderer().addShadow();
-    this.getRenderer().getSprite().style.backgroundImage = 'url(engine/images/map/map-sprites-02.png)';
+    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/map-sprites-02.png')})`;
     this.getRenderer().getSprite().style.backgroundPosition = '-1734px -2390px';
     return this.dom;
   }

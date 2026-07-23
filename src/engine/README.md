@@ -47,8 +47,18 @@ Load the engine styles once in the host page:
 - `tools/` — helpers such as `GameConsole`.
 - `css/`, `images/` — engine styles and sprite sheets.
 
-## Known limitation
+## Configuring asset paths
 
-Sprite image paths are currently hard-coded relative to the serving root
-(`engine/images/…`). To embed the engine under a different base path, that would
-need to become configurable — a good next step toward full portability.
+Sprite sheets resolve to `engine/images/…` by default. To serve them from a
+different location (a sub-path, a CDN, a bundler's asset dir), set the base once
+before creating the `Application`:
+
+```js
+import { setAssetsBase, Application } from '../engine/index.js';
+
+setAssetsBase('/static/rpg-engine/images'); // or 'https://cdn.example.com/rpg'
+const app = new Application('#viewport', 900, 900);
+```
+
+Engine **CSS** already uses paths relative to `engine/css/`, so it stays portable
+as long as `css/` and `images/` move together.
