@@ -42,6 +42,8 @@ export default [
         Response: 'readonly',
         URL: 'readonly',
         fetch: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
       },
     },
   },
