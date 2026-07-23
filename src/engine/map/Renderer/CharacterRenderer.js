@@ -1,6 +1,6 @@
 import { Renderer } from './Renderer.js';
 
-export class MainCharacterRenderer extends Renderer
+export class CharacterRenderer extends Renderer
 {
 
   spriteWidth = 48;
@@ -18,8 +18,7 @@ export class MainCharacterRenderer extends Renderer
   constructor(element) {
     super(element);
     this.dom.classList.add('character');
-    this.dom.classList.add('character--main');
-    this.domSprite.style.backgroundImage = `url('assets/images/characters/characters-00.png')`;
+    this.domSprite.style.backgroundImage = `url('engine/images/characters/characters-00.png')`;
 
     const left = -this.getElement().width() - this.getElement().getSpriteSheetOffsetLeft();
 
@@ -37,9 +36,10 @@ export class MainCharacterRenderer extends Renderer
 
   update() {
       const animationIndex = this.getElement().getAnimationIndex();
-      const left = animationIndex * -this.getElement().width() - this.getElement().getSpriteSheetOffsetLeft();
+      const left = animationIndex * - this.getElement().width() - this.getElement().getSpriteSheetOffsetLeft();
       const top = this.spriteDirectionOffsets[this.getElement().getDirection()] - this.getElement().getSpriteSheetOffsetTop();
       this.domSprite.style.backgroundPosition = `${left}px ${top}px`;
+      super.render();
   }
 
 

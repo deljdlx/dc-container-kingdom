@@ -10,7 +10,7 @@ export class Fence00H extends Element
   render() {
     const dom = super.render();
     this.getRenderer().addShadow();
-    dom.style.backgroundImage = 'url(assets/images/map/map-sprites-01.png)';
+    dom.style.backgroundImage = 'url(engine/images/map/map-sprites-01.png)';
     dom.style.backgroundPosition = `-1520px -1520px`;
     return dom;
   }

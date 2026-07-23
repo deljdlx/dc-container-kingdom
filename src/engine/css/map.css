@@ -20,7 +20,7 @@
 
 .map-area {
   position: absolute;
-  outline: dotted #f0f 4px;
+  /* outline: dotted #f0f 4px; */ /* debug: enable via map-debug.css */
 }
 /* ===================================== */
 

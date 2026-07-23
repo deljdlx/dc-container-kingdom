@@ -1,12 +1,14 @@
 import { ContainerGrid } from './ContainerGrid.js';
-import { Element } from '../../../assets/js/map/Element.js';
-import { Ground00 } from '../../../assets/js/map/Elements/Ground00.js';
-import { House00 } from '../../../assets/js/map/Elements/House00.js';
-import { Man00 } from '../../../assets/js/map/Elements/CharacterBases/Man00.js';
-import { Tree00 } from '../../../assets/js/map/Elements/Tree00.js';
-import { Woman00 } from '../../../assets/js/map/Elements/CharacterBases/Woman00.js';
-import { Woman01 } from '../../../assets/js/map/Elements/CharacterBases/Woman01.js';
-import { Woman02 } from '../../../assets/js/map/Elements/CharacterBases/Woman02.js';
+import {
+  Element,
+  Ground00,
+  House00,
+  Man00,
+  Tree00,
+  Woman00,
+  Woman01,
+  Woman02,
+} from '../../../engine/index.js';
 
 export class ContainerKingdomRenderer
 {

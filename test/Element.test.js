@@ -1,7 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { Application } from '../src/assets/js/map/Application.js';
-import { Element } from '../src/assets/js/map/Element.js';
+import { Application, Element } from '../src/engine/index.js';
 
 // Characterization tests: they lock in the CURRENT behaviour of the map-engine
 // base class so it can be refactored safely. Element reads

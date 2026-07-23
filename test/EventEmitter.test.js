@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { EventEmitter } from '../src/assets/js/map/EventEmitter.js';
+import { EventEmitter } from '../src/engine/index.js';
 
 describe('EventEmitter', () => {
   it('calls every listener registered for a name with the payload', () => {
