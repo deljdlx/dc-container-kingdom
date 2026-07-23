@@ -1,47 +1,30 @@
-import { Container } from './Container.js';
-import { ContainerView } from './ContainerView.js';
 import { ContainerKingdomLayout } from './ContainerKingdomLayout.js';
 import { ContainerKingdomRenderer } from './ContainerKingdomRenderer.js';
-import { ContainersList } from './ContainersList.js';
-import { DockerCompose } from './DockerCompose.js';
+import { ContainerRepository } from './ContainerRepository.js';
 import { KingdomHud } from './KingdomHud.js';
+import { sha256 } from './sha256.js';
 
+/**
+ * Top-level orchestrator: wires the data layer ({@link ContainerRepository}),
+ * the map renderer, the layout and the header HUD together, and runs the
+ * refresh loop. Holds no Docker state itself — it delegates reads to the
+ * repository so the renderer/layout/HUD keep calling `application.getX()`.
+ */
 export class ContainerKingdom
 {
-  // Constants
   static LOOP_INTERVAL_MS = 5000;
 
-  consoleContainer;
   /**
    * @type {ContainerKingdomLayout}
    */
   layout;
   viewer;
-  console;
-
-  containersList;
   dockerApiClient;
 
   /**
-   * @type {Object<string, Container>}
+   * @type {ContainerRepository}
    */
-  containers = {};
-  /**
-   * @type {Object<string, ContainerView>}
-   */
-  containerViews = {};
-  _previousContainerViews = {};
-  containersStats = {};
-
-  _previousContainers = {};
-  _loopTimeoutId = null;
-
-
-  /**
-   * @type {Object<string, DockerCompose>}
-   */
-  composes = {};
-  networks = {};
+  repository;
 
   header;
 
@@ -50,57 +33,37 @@ export class ContainerKingdom
    */
   hud;
 
-  lastContainersChecksum = null;
+  _loopTimeoutId = null;
 
 
   constructor(dockerApiClient) {
-
     this.dockerApiClient = dockerApiClient;
+    this.repository = new ContainerRepository(dockerApiClient);
     this.layout = new ContainerKingdomLayout(this);
-
-    // this.containersList = new ContainersList(this);
-
 
     this.header = document.querySelector('#header');
     this.hud = new KingdomHud(this, this.header);
-
 
     this.init();
   }
 
   async init() {
-    // await this.initConsole();
     this.layout.init();
 
     this.viewer = new ContainerKingdomRenderer(this, this.layout.getViewport());
 
-
-    await this.loadContainers();
+    await this.repository.loadContainers();
     this.layout.renderContainersList();
     await this.loadContainersStats();
 
-    await this.viewer.drawContainers(this.containers);
-    await this.viewer.drawNetworks(this.containers);
+    await this.viewer.drawContainers(this.getContainers());
+    await this.viewer.drawNetworks(this.getContainers());
     await this.layout.getViewport().render();
     this.hud.drawNetworksSwitches();
 
     this.layout.hideLoadingScreen();
 
     await this.loop();
-  }
-
-  getTotalMemoryUsage() {
-    return Object.values(this.containers).reduce((acc, container) => {
-      const newUsage = acc + container.getMemoryUsage();
-      return isNaN(newUsage) ? acc : newUsage;
-    }, 0);
-  }
-
-  getGlobalCpuUsage() {
-    return Object.values(this.containers).reduce((acc, container) => {
-      const newUsage =acc + container.getCpuUsage();
-      return isNaN(newUsage) ? acc : newUsage;
-    }, 0);
   }
 
   /**
@@ -110,53 +73,23 @@ export class ContainerKingdom
     return this.layout;
   }
 
-  clear() {
-    // Stop the loop before clearing
-    this.stopLoop();
-    Object.values(this.containers).forEach(container => {
-      this.containerViews[container.Id]?.stopWatch();
-      delete this.containerViews[container.Id];
-      delete this.containers[container.Id];
-    });
-  }
-
-  /**
-   * Stop the main loop to prevent memory leaks
-   */
-  stopLoop() {
-    if (this._loopTimeoutId) {
-      clearTimeout(this._loopTimeoutId);
-      this._loopTimeoutId = null;
-    }
-  }
-
   async loadContainersStats() {
-    try {
-      const stats = await this.dockerApiClient.getAllContainersStats();
-      stats.forEach((containerStats) => {
-        const containerId = containerStats.id;
-        const container = this.containers[containerId];
-        if(container) {
-          container.setStats(containerStats);
-        }
-      });
-
+    const loaded = await this.repository.loadContainersStats();
+    if (loaded) {
       this.hud.renderClusterInfo();
-    } catch (error) {
-      console.error('Error loading container stats:', error);
     }
   }
 
   async loop() {
-    const currentChecksum = await this.getChecksum();
+    const currentChecksum = await sha256();
 
-    await this.loadContainers();
+    await this.repository.loadContainers();
     await this.loadContainersStats();
 
     this.layout.renderContainersList();
 
-    const newChecksum = await this.getChecksum();
-    if(currentChecksum !== newChecksum) {
+    const newChecksum = await sha256();
+    if (currentChecksum !== newChecksum) {
       document.location.reload();
     }
 
@@ -165,128 +98,56 @@ export class ContainerKingdom
     }, ContainerKingdom.LOOP_INTERVAL_MS);
   }
 
-  getContainers(toArray = false) {
-    if(toArray) {
-      return Object.values(this.containers);
+  /**
+   * Stop the main loop to prevent memory leaks.
+   */
+  stopLoop() {
+    if (this._loopTimeoutId) {
+      clearTimeout(this._loopTimeoutId);
+      this._loopTimeoutId = null;
     }
-    return this.containers;
+  }
+
+  clear() {
+    this.stopLoop();
+    this.repository.clear();
+  }
+
+  // --- data facade (read by the renderer, layout and HUD) ---
+
+  getContainers(toArray = false) {
+    return this.repository.getContainers(toArray);
   }
 
   /**
    * @param {string} containerId
-   * @returns {ContainerView|undefined}
+   * @returns {import('./ContainerView.js').ContainerView|undefined}
    */
   getContainerView(containerId) {
-    return this.containerViews[containerId];
+    return this.repository.getContainerView(containerId);
   }
 
   getCompose(composeName) {
-    return this.composes[composeName] || null;
+    return this.repository.getCompose(composeName);
   }
 
   getComposes() {
-    return this.composes;
+    return this.repository.getComposes();
   }
 
-
-  getContainerStats(containerId) {
-    return this.containersStats[containerId];
-  }
-
-
-  async loadContainers() {
-    const containers = await this.dockerApiClient.getContainersDescriptors();
-
-    this._previousContainers = this.containers;
-    this._previousContainerViews = this.containerViews;
-    this.containers = {};
-    this.containerViews = {};
-
-    containers.forEach(containerDescriptor => {
-      if(this.containers[containerDescriptor.Id]) {
-        return;
-      }
-
-      const container = new Container(
-        this.dockerApiClient,
-        containerDescriptor,
-      );
-      this.containers[container.Id] = container;
-      this.containerViews[container.Id] = new ContainerView(container);
-
-      const networks = container.NetworkSettings.Networks;
-      Object.keys(networks).forEach(networkName => {
-        if(!this.networks[networkName]) {
-          this.networks[networkName] = [];
-        }
-        this.networks[networkName].push(container);
-      });
-    });
-
-    const composes = {};
-
-    Object.values(this.containers).forEach(container => {
-      const composeName = container.getComposeName();
-      if(!composes[composeName]) {
-        composes[composeName] = [];
-      }
-      composes[composeName].push(container);
-    });
-
-    const sortedComposes = Object.fromEntries(
-      Object.entries(composes)
-        .sort(([, containersA], [, containersB]) => containersB.length - containersA.length)
-    );
-    Object.entries(sortedComposes).forEach(([composeName, composeContainers]) => {
-      this.composes[composeName] = new DockerCompose(composeName);
-      composeContainers.forEach(container => {
-        this.composes[composeName].addContainer(container);
-      });
-    });
-
-    const descriptor = {
-      ids: containers.map(container => container.Id),
-      networks: containers.map(container => container.NetworkSettings.Networks),
-      labels: containers.map(container => container.Labels),
-      status: containers.map(container => container.ImageID),
-    };
-
-    const newChecksum = await this.getChecksum(descriptor);
-    if(this.lastContainersChecksum === null) {
-      this.lastContainersChecksum = newChecksum
-    }
-
-    if(this.lastContainersChecksum !== newChecksum) {
-      this.cleanContainers();
-      this.handleNewContainers();
-      return;
-    }
-    this.lastContainersChecksum = newChecksum;
-  }
-
-  handleNewContainers() {
-    // Placeholder for future implementation
-  }
-
-  cleanContainers() {
-    Object.values(this._previousContainers).forEach(container => {
-      if(!this.containers[container.Id]) {
-        this._previousContainerViews[container.Id]?.stopWatch();
-        const element = container.getElement();
-        if (element) {
-          element.destroy();
-        }
-      }
-    });
-  }
-
-
-  /**
-   * @returns {Object<string, Array<Container>>}
-   */
   getNetworks() {
-    return this.networks;
+    return this.repository.getNetworks();
   }
+
+  getTotalMemoryUsage() {
+    return this.repository.getTotalMemoryUsage();
+  }
+
+  getGlobalCpuUsage() {
+    return this.repository.getGlobalCpuUsage();
+  }
+
+  // --- view / navigation facade ---
 
   async gotoContainerUrl(container) {
     const demoUrl = container.getDemoUrl();
@@ -295,8 +156,6 @@ export class ContainerKingdom
       document.querySelector('#iframe-preview').src = '//' + demoUrl;
     }
   }
-
-
 
   async focusOnContainer(container) {
     this.layout.focusOnContainer(container);
@@ -310,22 +169,7 @@ export class ContainerKingdom
     return this.dockerApiClient.getContainerLogs(container.Id);
   }
 
-
   zoom(zoomLevel) {
     this.layout.zoom(zoomLevel);
-  }
-
-  async getChecksum(object) {
-    const json = JSON.stringify(object);
-
-    const encoder = new TextEncoder();
-    const data = encoder.encode(json);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    const hash = [...new Uint8Array(hashBuffer)]
-      .map(byte => byte.toString(16).padStart(2, "0"))
-      .join("");
-
-    return hash;
   }
 }

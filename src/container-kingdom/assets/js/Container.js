@@ -1,4 +1,5 @@
 import { DockerApiClient } from './DockerApiClient.js';
+import { sha256 } from './sha256.js';
 
 export class Container
 {
@@ -201,16 +202,6 @@ export class Container
       Platform: this.Platform,
     };
 
-    const json = JSON.stringify(descriptor);
-    const encoder = new TextEncoder();
-    const data = encoder.encode(json);
-    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-
-    // Convert to hex
-    const hash = [...new Uint8Array(hashBuffer)]
-      .map(byte => byte.toString(16).padStart(2, "0"))
-      .join("");
-
-    return hash;
+    return sha256(descriptor);
   }
 }

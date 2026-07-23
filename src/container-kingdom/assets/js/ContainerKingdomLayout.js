@@ -141,7 +141,7 @@ export class ContainerKingdomLayout
 
   renderContainersList() {
     this.containersList.clear();
-    this.containersList.load(this.application.composes);
+    this.containersList.load(this.application.getComposes());
   }
 
   zoom(zoom) {
