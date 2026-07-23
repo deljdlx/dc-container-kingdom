@@ -102,6 +102,9 @@ export class Renderer
   }
 
   addShadow() {
+    if(this.domShadow) {
+      return this.domShadow;
+    }
     this.domShadow = document.createElement('div');
     this.domShadow.classList.add('map-element__shadow');
     this.domShadow.style.width = this.getElement().width() + 'px';
@@ -142,9 +145,13 @@ export class Renderer
 
 
   renderBoundingBox() {
+    if(this.boundingBox) {
+      return this.boundingBox;
+    }
     this.boundingBox = document.createElement('div');
     this.boundingBox.classList.add('map-element__bounding-box');
     this.dom.append(this.boundingBox);
+    return this.boundingBox;
   }
 
   renderCollisionZones() {
