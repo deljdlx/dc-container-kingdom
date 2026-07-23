@@ -54,6 +54,9 @@ export function makeStats(id, now = Date.now()) {
   const totalUsage = (systemUsage * (targetPercent / 100) / ONLINE_CPUS) * jitter;
 
   return {
+    // Real Docker stats carry the container id; the app matches stats to
+    // containers by `stats.id`, so the mock must include it too.
+    id,
     cpu_stats: {
       cpu_usage: { total_usage: totalUsage },
       system_cpu_usage: systemUsage,
