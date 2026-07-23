@@ -3,6 +3,7 @@ import { CollisionSystem } from './CollisionSystem.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { Renderer } from './Renderer/Renderer.js';
+import { SceneGraph } from './SceneGraph.js';
 
 export class Element
 {
@@ -23,18 +24,10 @@ export class Element
    */
   geometry;
 
-
   /**
-   * @type {Element}
+   * @type {SceneGraph}
    */
-  parent;
-
-  /**
-   * @type {Element[]}
-   */
-  children = [];
-
-  childrenByName = {};
+  scene = new SceneGraph(this);
 
   /**
    * @type {Renderer}
@@ -47,8 +40,6 @@ export class Element
   _needUpdate = false;
 
   rendered = false;
-
-  _relativeTo = null;
 
   /**
    * @type {boolean}
@@ -97,30 +88,24 @@ export class Element
 
   clear() {
     this.getRenderer().clear();
-    this.children.forEach(child => {
+    this.getChildren().forEach(child => {
       child.clear();
     });
   }
 
   destroy() {
-    if(this.parent) {
-      this.parent.removeChild(this);
+    const parent = this.getParent();
+    if(parent) {
+      parent.removeChild(this);
     }
 
-    this.children = [];
-    this.childrenByName = {};
+    this.scene.reset();
 
     this.getRenderer().clear();
   }
 
   removeChild(element) {
-    this.children = this.children.filter(child => child !== element);
-    this.childrenByName = Object.keys(this.childrenByName).reduce((accumulator, name) => {
-      if(this.childrenByName[name] !== element) {
-        accumulator[name] = this.childrenByName[name];
-      }
-      return accumulator;
-    }, {});
+    this.scene.removeChild(element);
   }
 
 
@@ -219,8 +204,9 @@ export class Element
       this.x(this.x() + this.moveSpeed());
     }
 
-    if(this.parent) {
-      this.parent.updateCollisionBoundingBox(this);
+    const parent = this.getParent();
+    if(parent) {
+      parent.updateCollisionBoundingBox(this);
     }
 
     if(this.needUpdate() || this.isMoving()) {
@@ -243,33 +229,18 @@ export class Element
 
 
   getParent() {
-    return this.parent;
+    return this.scene.getParent();
   }
 
 
   // ===========================
 
   relativeTo(element = null) {
-    if(element !== null) {
-      this._relativeTo = element;
-    }
-
-    return this._relativeTo;
+    return this.scene.relativeTo(element);
   }
 
   getRelativeToOffsets() {
-    if(!this._relativeTo) {
-      return {
-        x: 0,
-        y: 0,
-      }
-    }
-
-    const offsets = this._relativeTo.getRelativeToOffsets();
-    return {
-      x: offsets.x  + this.x(),
-      y: offsets.y  + this.y(),
-    };
+    return this.scene.getRelativeToOffsets();
   }
 
 
@@ -290,49 +261,26 @@ export class Element
   }
 
   offsetX() {
-    if(this.parent) {
-      return this.x() + this.parent.offsetX();
-    }
-
-    return this.x();
+    return this.scene.offsetX();
   }
 
   offsetY() {
-    if(this.parent) {
-      return this.y() + this.parent.offsetY();
-    }
-
-    return this.y();
+    return this.scene.offsetY();
   }
 
   createElement() {
-    const element = new Element();
-    element.setApplication(this.getApplication());
-    this.children.push(element);
-    // JDLX_TODO handle childrenByName
-
-    element.setParent(this);
-    element.relativeTo(this);
-
-    return element;
+    return this.scene.createChild();
   }
 
   addElement(x = 0, y = 0, element, name) {
-    element.setApplication(this.getApplication());
-    this.children.push(element);
-    this.childrenByName[name] = element;
-
-    element.setParent(this);
-    element.relativeTo(this);
-
-    element.x(x);
-    element.y(y);
+    this.scene.addChild(x, y, element, name);
 
     this.updateCollisionBoundingBox(element);
     this.updateBoudingBox(element);
 
-    if(this.parent) {
-      this.parent.updateCollisionBoundingBox(this);
+    const parent = this.getParent();
+    if(parent) {
+      parent.updateCollisionBoundingBox(this);
     }
 
     this.needUpdate(true);
@@ -359,8 +307,9 @@ export class Element
   needUpdate(value = null) {
     if(value !== null) {
       this._needUpdate = value;
-      if(this.parent) {
-        this.parent.needUpdate(value);
+      const parent = this.getParent();
+      if(parent) {
+        parent.needUpdate(value);
       }
     }
 
@@ -392,33 +341,23 @@ export class Element
    * @returns {Element}
    */
   setParent(element) {
-    this.parent = element
-    return this.parent;
+    return this.scene.setParent(element);
   }
 
   getChildren() {
-    return this.children;
+    return this.scene.getChildren();
+  }
+
+  getChildrenByName() {
+    return this.scene.getChildrenByName();
   }
 
   getChildByName(name) {
-    if(typeof(this.childrenByName[name]) ==='undefined') {
-      throw new Error('No element with name ' + name);
-    }
-    return this.childrenByName[name];
+    return this.scene.getChildByName(name);
   }
 
   getAllChildren() {
-    const children = [];
-    this.getChildren().forEach(parent => {
-      children.push(parent);
-      // parent.relativeTo(this);
-
-      parent.getAllChildren().forEach(child => {
-        // child.relativeTo(parent);
-        children.push(child);
-      });
-    });
-    return children;
+    return this.scene.getAllChildren();
   }
 
   getCollisionZones(type = 'collision') {

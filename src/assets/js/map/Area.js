@@ -63,8 +63,9 @@ export class Area extends Element
   toJSON() {
     const data = [];
 
-    for(let name in this.childrenByName) {
-      const element = this.childrenByName[name]
+    const childrenByName = this.getChildrenByName();
+    for(let name in childrenByName) {
+      const element = childrenByName[name]
       const descriptor = {
         name: name,
         x: element.x(),
