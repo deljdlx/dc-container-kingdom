@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPG engine — demo</title>
+
+  <!-- Engine styles (relative to the engine dir → portable) -->
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/_variables.css">
+  <link rel="stylesheet" href="../css/map.css">
+  <link rel="stylesheet" href="../css/character.css">
+  <!-- Toggle to visualise the grid / bounding boxes:
+  <link rel="stylesheet" href="../css/map-debug.css"> -->
+
+  <link rel="stylesheet" href="./demo.css">
+</head>
+<body>
+  <header class="demo-header">
+    <h1>🗺️ RPG engine — demo</h1>
+    <p>A standalone showcase driven only by the engine's public API
+       (<code>engine/index.js</code>) — no Container Kingdom.
+       <strong>Arrow keys</strong> to walk; the camera follows.</p>
+  </header>
+
+  <div id="viewport" class="frame"></div>
+
+  <script type="module" src="./demo.js"></script>
+</body>
+</html>
