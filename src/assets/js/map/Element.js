@@ -1,5 +1,6 @@
 import { Application } from './Application.js';
 import { BoundingBox } from './BoundingBox.js';
+import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { Renderer } from './Renderer/Renderer.js';
 
@@ -20,10 +21,6 @@ export class Element
     trigger: false,
   };
 
-  /**
-   * @type {Element}
-   */
-  // collisionZones = [];
   collisionZones = {
     collision: [],
     trigger: [],
@@ -90,7 +87,11 @@ export class Element
 
 
   _eventPrefix = 'element.';
-  _listeners = {};
+
+  /**
+   * @type {EventEmitter}
+   */
+  _events = new EventEmitter();
 
 
   constructor(x = null, y = null, width = null, height = null,)
@@ -184,25 +185,11 @@ export class Element
   // ===========================
 
   addEventListener(name, callback) {
-    if(typeof(this._listeners[name]) === 'undefined') {
-      this._listeners[name] = [];
-    }
-    this._listeners[name].push(callback);
-
-    return this._listeners[name].length - 1;
+    return this._events.on(name, callback);
   }
 
   handle(name, data = {}) {
-    // console.log('%cElement.js :: 131 =============================', 'color: #f00; font-size: 1rem');
-    // console.log(name);
-    // console.log(this);
-    // console.log(this._listeners);
-    if(typeof(this._listeners[name]) !== 'undefined') {
-      this._listeners[name].map(callback => {
-        callback(data);
-      });
-    }
-
+    this._events.emit(name, data);
     this.getApplication().handle(name, data);
   }
 
@@ -281,19 +268,6 @@ export class Element
 
   getParent() {
     return this.parent;
-  }
-
-
-  update2() {
-    if(this.needUpdate()) {
-      this.getRenderer().update();
-
-      this.getChildren().forEach(element => {
-        element.update();
-      });
-
-    }
-    this.needUpdate(false);
   }
 
 

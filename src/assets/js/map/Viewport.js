@@ -2,6 +2,7 @@ import { Application } from './Application.js';
 import { Area } from './Area.js';
 import { Board } from './Board.js';
 import { Character } from './Character.js';
+import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
@@ -66,7 +67,10 @@ export class Viewport
    */
   character;
 
-  _listeners = {};
+  /**
+   * @type {EventEmitter}
+   */
+  _events = new EventEmitter();
 
 
   /**
@@ -120,21 +124,11 @@ export class Viewport
 
   // ===========================
   addEventListener(name, callback) {
-    if(typeof(this._listeners[name]) === 'undefined') {
-      this._listeners[name] = [];
-    }
-    this._listeners[name].push(callback);
-
-    return this._listeners[name].length - 1;
+    return this._events.on(name, callback);
   }
 
   handle(name, data = {}) {
-    if(typeof(this._listeners[name]) !== 'undefined') {
-      this._listeners[name].map(callback => {
-        callback(data);
-      });
-    }
-
+    this._events.emit(name, data);
     this.getApplication().handle(name, data);
   }
 

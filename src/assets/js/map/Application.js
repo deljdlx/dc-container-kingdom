@@ -1,4 +1,5 @@
 import { Element } from './Element.js';
+import { EventEmitter } from './EventEmitter.js';
 import { Viewport } from './Viewport.js';
 
 export class Application
@@ -14,7 +15,10 @@ export class Application
   _viewportHeight;
 
 
-  listeners = {};
+  /**
+   * @type {EventEmitter}
+   */
+  _events = new EventEmitter();
 
   apiGetAreaUrl = './backend/index.php';
 
@@ -63,20 +67,11 @@ export class Application
   }
 
   addEventListener(name, callback) {
-    if(typeof(this.listeners[name]) === 'undefined') {
-      this.listeners[name] = [];
-    }
-    this.listeners[name].push(callback);
-
-    return this.listeners[name].length - 1;
+    return this._events.on(name, callback);
   }
 
   handle(name, data = {}) {
-    if(typeof(this.listeners[name]) !== 'undefined') {
-      this.listeners[name].map(callback => {
-        callback(data);
-      });
-    }
+    this._events.emit(name, data);
   }
 
   registerElement(name, constructorName) {
