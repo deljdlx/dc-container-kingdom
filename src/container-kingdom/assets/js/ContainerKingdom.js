@@ -4,6 +4,7 @@ import { ContainerKingdomLayout } from './ContainerKingdomLayout.js';
 import { ContainerKingdomRenderer } from './ContainerKingdomRenderer.js';
 import { ContainersList } from './ContainersList.js';
 import { DockerCompose } from './DockerCompose.js';
+import { KingdomHud } from './KingdomHud.js';
 
 export class ContainerKingdom
 {
@@ -42,9 +43,12 @@ export class ContainerKingdom
   composes = {};
   networks = {};
 
-  selectedNetworks = {};
-
   header;
+
+  /**
+   * @type {KingdomHud}
+   */
+  hud;
 
   lastContainersChecksum = null;
 
@@ -58,6 +62,7 @@ export class ContainerKingdom
 
 
     this.header = document.querySelector('#header');
+    this.hud = new KingdomHud(this, this.header);
 
 
     this.init();
@@ -77,7 +82,7 @@ export class ContainerKingdom
     await this.viewer.drawContainers(this.containers);
     await this.viewer.drawNetworks(this.containers);
     await this.layout.getViewport().render();
-    this.drawNetworksSwitches();
+    this.hud.drawNetworksSwitches();
 
     this.layout.hideLoadingScreen();
 
@@ -103,33 +108,6 @@ export class ContainerKingdom
    */
   getLayout() {
     return this.layout;
-  }
-
-  renderClusterInfo() {
-    let element = document.querySelector('.cluster-info');
-    if(!element) {
-      element = document.createElement('div');
-      element.classList.add('cluster-info');
-      this.header.append(element);
-    }
-
-    let memoryUsage = this.getTotalMemoryUsage();
-    memoryUsage = Math.round(memoryUsage / 1024 / 1024 * 100) / 100 + ' MB';
-
-    element.innerHTML = '';
-
-    let memoryUsageContainer = document.createElement('div');
-    memoryUsageContainer.classList.add('memory-usage');
-    memoryUsageContainer.innerHTML = 'Memory usage: ' + memoryUsage;
-    element.append(memoryUsageContainer);
-
-    let cpuUsage = this.getGlobalCpuUsage();
-    cpuUsage = Math.round(cpuUsage * 100) / 100 + '%';
-
-    let cpuUsageContainer = document.createElement('div');
-    cpuUsageContainer.classList.add('cpu-usage');
-    cpuUsageContainer.innerHTML = 'CPU usage: ' + cpuUsage;
-    element.append(cpuUsageContainer);
   }
 
   clear() {
@@ -163,7 +141,7 @@ export class ContainerKingdom
         }
       });
 
-      this.renderClusterInfo();
+      this.hud.renderClusterInfo();
     } catch (error) {
       console.error('Error loading container stats:', error);
     }
@@ -241,7 +219,6 @@ export class ContainerKingdom
         if(!this.networks[networkName]) {
           this.networks[networkName] = [];
         }
-        this.selectedNetworks[networkName] = true;
         this.networks[networkName].push(container);
       });
     });
@@ -304,63 +281,11 @@ export class ContainerKingdom
   }
 
 
-  drawNetworksSwitches() {
-    let container = document.querySelector('.networks-switches');
-    if(!container) {
-      container = document.createElement('div');
-      container.classList.add('networks-switches');
-    }
-    container.innerHTML = '';
-    const caption = document.createElement('h2');
-    caption.innerHTML = 'Networks';
-    container.append(caption);
-
-
-    Object.keys(this.networks).forEach(networkName => {
-      const label = document.createElement('label');
-      label.classList.add('network-switch');
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.checked = true;
-      label.append(checkbox);
-      label.append(networkName);
-      container.append(label);
-
-      checkbox.addEventListener('change', (event) => {
-        this.handleNetworkSwitch(networkName, event.target.checked);
-      });
-    });
-    this.header.append(container);
-  }
-
-  handleNetworkSwitch(networkName, checked) {
-    const roads = document.querySelectorAll('.map-element.network.network--' + networkName);
-    roads.forEach(road => {
-      if(checked) {
-        road.classList.remove('hidden');
-        this.selectedNetworks[networkName] = true;
-      } else {
-        road.classList.add('hidden');
-        this.selectedNetworks[networkName] = false;
-      }
-    });
-
-    const containers = document.querySelectorAll('.map-element.container.network--' + networkName);
-    containers.forEach(containerElement => {
-      let mustBeHidden = true;
-      Object.keys(this.selectedNetworks).forEach(netName => {
-        if(this.selectedNetworks[netName] && containerElement.classList.contains('network--' + netName)) {
-          mustBeHidden = false;
-        }
-      });
-      if(mustBeHidden) {
-        containerElement.classList.add('hidden');
-      }
-      else {
-        containerElement.classList.remove('hidden');
-      }
-    });
-
+  /**
+   * @returns {Object<string, Array<Container>>}
+   */
+  getNetworks() {
+    return this.networks;
   }
 
   async gotoContainerUrl(container) {
