@@ -9,7 +9,7 @@ export default [
     files: ['src/**/*.js'],
     languageOptions: {
       ecmaVersion: 'latest',
-      sourceType: 'script',
+      sourceType: 'module',
       globals: {
         window: 'readonly',
         document: 'readonly',
@@ -18,14 +18,16 @@ export default [
         setTimeout: 'readonly',
         clearTimeout: 'readonly',
         requestAnimationFrame: 'readonly',
+        TextEncoder: 'readonly',
+        crypto: 'readonly',
+        Image: 'readonly',
+        getComputedStyle: 'readonly',
+        HTMLElement: 'readonly',
       },
     },
     rules: {
       'no-unused-vars': 'warn',
-      // Classes are shared as globals via ordered <script> tags until the
-      // ES-module migration (stage 3); cross-file references are resolved at
-      // runtime, not statically. Control chars are intentional ANSI stripping.
-      'no-undef': 'off',
+      // Control chars are intentional ANSI stripping in LogEntry.
       'no-control-regex': 'off',
     },
   },
@@ -40,6 +42,8 @@ export default [
         Response: 'readonly',
         URL: 'readonly',
         fetch: 'readonly',
+        window: 'readonly',
+        document: 'readonly',
       },
     },
   },

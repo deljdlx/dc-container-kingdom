@@ -1,0 +1,9 @@
+/**
+ * Container Kingdom overrides on top of the engine's neutral map.css.
+ * Keep engine-generic rules in engine/css/map.css; app-specific tweaks here.
+ */
+
+#viewport {
+  /* Prevent selecting the map tiles while dragging the board around. */
+  user-select: none;
+}

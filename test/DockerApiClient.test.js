@@ -1,14 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { readFileSync } from 'node:fs';
 import { handleDockerRequest } from '../mock/docker-mock.js';
-
-// DockerApiClient is a plain global-scoped class (loaded via <script> today).
-// Evaluate its source once and grab the class until the app is modularized.
-const source = readFileSync(
-  new URL('../src/container-kingdom/assets/js/DockerApiClient.js', import.meta.url),
-  'utf8',
-);
-const DockerApiClient = (0, eval)(`${source}; DockerApiClient`);
+import { DockerApiClient } from '../src/container-kingdom/js/DockerApiClient.js';
 
 /**
  * Wire global fetch to the shared Docker mock, so the client is exercised
