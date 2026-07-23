@@ -119,7 +119,7 @@ html, body {
     position: relative;
     box-sizing: border-box;
     border: 15px solid transparent;
-    border-image-source: url("../../../engine/images/ui/frame-00.png");;
+    border-image-source: url("../../engine/images/ui/frame-00.png");;
     border-image-slice: 47;
     border-image-repeat: repeat;
     border-image-width: 28px;

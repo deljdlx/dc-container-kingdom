@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { handleDockerRequest } from '../mock/docker-mock.js';
-import { DockerApiClient } from '../src/container-kingdom/assets/js/DockerApiClient.js';
+import { DockerApiClient } from '../src/container-kingdom/js/DockerApiClient.js';
 
 /**
  * Wire global fetch to the shared Docker mock, so the client is exercised

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ContainerGrid } from '../src/container-kingdom/assets/js/ContainerGrid.js';
+import { ContainerGrid } from '../src/container-kingdom/js/ContainerGrid.js';
 import containers from '../mock/fixtures/containers.json' with { type: 'json' };
 
 describe('ContainerGrid (placement)', () => {

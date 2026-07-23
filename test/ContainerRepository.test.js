@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { ContainerRepository } from '../src/container-kingdom/assets/js/ContainerRepository.js';
+import { ContainerRepository } from '../src/container-kingdom/js/ContainerRepository.js';
 import { makeStats } from '../mock/docker-mock.js';
 import containers from '../mock/fixtures/containers.json' with { type: 'json' };
 

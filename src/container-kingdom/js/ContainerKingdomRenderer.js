@@ -8,7 +8,7 @@ import {
   Woman00,
   Woman01,
   Woman02,
-} from '../../../engine/index.js';
+} from '../../engine/index.js';
 
 export class ContainerKingdomRenderer
 {
