@@ -1,18 +1,12 @@
-import { Element } from '../../Element.js';
-import { assetUrl } from '../../../assets.js';
+import { SpriteElement } from '../../SpriteElement.js';
 
-export class Flower00 extends Element
+export class Flower00 extends SpriteElement
 {
-  constructor() {
-    super(0, 0 , 32, 32)
-    this.createTriggerZone(0, 0, 32 ,32);
-  }
-
-  render() {
-    const dom = super.render();
-    this.getRenderer().addShadow();
-    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/flowers-00.png')})`;
-    this.getRenderer().getSprite().style.backgroundPosition = `0px -96px`;
-    return dom;
-  }
+  static descriptor = {
+    width: 32,
+    height: 32,
+    atlas: 'map/flowers-00.png',
+    frame: [0, -96],
+    trigger: [0, 0, 32, 32],
+  };
 }

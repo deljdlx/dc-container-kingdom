@@ -1,17 +1,13 @@
-import { Element } from '../Element.js';
-import { assetUrl } from '../../assets.js';
+import { SpriteElement } from '../SpriteElement.js';
 
-export class Ground00 extends Element
+export class Ground00 extends SpriteElement
 {
-  constructor() {
-    super(0, 0 , 50, 50);
-    this.manualZ = true;
-  }
-
-  render() {
-    const dom = super.render();
-    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
-    this.getRenderer().getSprite().style.backgroundPosition = `-1790px -800px`;
-    return dom;
-  }
+  static descriptor = {
+    width: 50,
+    height: 50,
+    atlas: 'map/map-sprites-01.png',
+    frame: [-1790, -800],
+    manualZ: true,
+    shadow: false,
+  };
 }

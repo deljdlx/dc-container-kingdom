@@ -1,17 +1,11 @@
-import { Element } from '../Element.js';
-import { assetUrl } from '../../assets.js';
+import { SpriteElement } from '../SpriteElement.js';
 
-export class Sunflower00 extends Element
+export class Sunflower00 extends SpriteElement
 {
-  constructor() {
-    super(0, 0 , 16, 24)
-  }
-
-  render() {
-    const dom = super.render();
-    this.getRenderer().addShadow();
-    this.getRenderer().getSprite().style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
-    this.getRenderer().getSprite().style.backgroundPosition = `-1760px -1256px`;
-    return dom;
-  }
+  static descriptor = {
+    width: 16,
+    height: 24,
+    atlas: 'map/map-sprites-01.png',
+    frame: [-1760, -1256],
+  };
 }

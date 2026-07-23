@@ -20,6 +20,7 @@ export { Viewport } from './map/Viewport.js';
 export { Board } from './map/Board.js';
 export { Area } from './map/Area.js';
 export { Element } from './map/Element.js';
+export { SpriteElement } from './map/SpriteElement.js';
 export { Character } from './map/Character.js';
 export { Geometry } from './map/Geometry.js';
 export { Coordinates } from './map/Coordinates.js';
@@ -32,6 +33,7 @@ export { SceneGraph } from './map/SceneGraph.js';
 
 // --- Renderers ---
 export { Renderer } from './map/Renderer/Renderer.js';
+export { SpriteRenderer } from './map/Renderer/SpriteRenderer.js';
 export { BoardRenderer } from './map/Renderer/BoardRenderer.js';
 export { AreaRenderer } from './map/Renderer/AreaRenderer.js';
 export { ViewportRenderer } from './map/Renderer/ViewportRenderer.js';
