@@ -100,3 +100,68 @@ describe('Element — collision zones', () => {
     expect(el.getCollision(el)).toBe(false);
   });
 });
+
+describe('Element — collision detection', () => {
+  /** An element whose collision box spans [x, x+size] on both axes. */
+  function collider(x, y, size = 50) {
+    const el = new Element(x, y, size, size);
+    el.createCollisionZone(0, 0, size, size);
+    return el;
+  }
+
+  it('detects overlapping colliders and returns the target', () => {
+    const a = collider(0, 0);
+    const b = collider(10, 10); // overlaps a in absolute space
+
+    expect(a.getCollision(b)).toEqual([b]);
+    expect(a.collided()).toBe(true);
+    expect(b.collided()).toBe(true);
+  });
+
+  it('reports no collision for distant colliders', () => {
+    const a = collider(0, 0);
+    const b = collider(1000, 1000);
+
+    expect(a.getCollision(b)).toBe(false);
+  });
+
+  it('fires element.collision on both parties, bubbling to the application', () => {
+    const a = collider(0, 0);
+    const b = collider(10, 10);
+    const onA = vi.fn();
+    const onB = vi.fn();
+    a.addEventListener('element.collision', onA);
+    b.addEventListener('element.collision', onB);
+
+    a.getCollision(b);
+
+    expect(onA).toHaveBeenCalled();
+    expect(onB).toHaveBeenCalled();
+    expect(Application.mainInstance.handle).toHaveBeenCalledWith(
+      'element.collision',
+      expect.anything(),
+    );
+  });
+
+  it('detects trigger overlaps separately via getTrigger', () => {
+    const a = new Element(0, 0, 50, 50);
+    a.createCollisionZone(0, 0, 50, 50);
+    const b = new Element(10, 10, 50, 50);
+    b.createTriggerZone(0, 0, 50, 50);
+
+    expect(a.getTrigger(b)).toEqual([b]);
+  });
+
+  it('clears collision state and fires the end event', () => {
+    const a = collider(0, 0);
+    const b = collider(10, 10);
+    const onEnd = vi.fn();
+    a.addEventListener('element.collision.end', onEnd);
+
+    a.getCollision(b);
+    a.clearCollision();
+
+    expect(a.collided()).toBe(false);
+    expect(onEnd).toHaveBeenCalled();
+  });
+});
