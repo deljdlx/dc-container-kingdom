@@ -115,6 +115,17 @@ spawnNpc(Man00,   850, 360, { axis: 'vertical',   distance: 130, speed: 3 });
 spawnNpc(Woman02, 280, 160);
 spawnNpc(Man00,   440, 230);
 
+// Deckard Cain — a stationary NPC who greets the player the moment they bump
+// into him. Only the player's collision detection fires events (patrols probe
+// with a pure overlap test), so the bubble pops on contact with the player.
+const cain = new Man00();
+originArea.addElement(470, 360, cain);
+cain.addEventListener('element.collision', () => {
+  if (!cain.isReacting()) {
+    cain.quickReaction('Hello my friend, stay a while and listen');
+  }
+});
+
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
