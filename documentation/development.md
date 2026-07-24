@@ -9,6 +9,7 @@ npm run build      # bundle ES modules → dist/
 npm test           # Vitest (suite complète)
 npm run test:watch
 npm run lint       # ESLint — doit rester à 0 problème
+npm run verify     # lint + build + tests (commande de fin de tâche)
 ```
 
 Front-end en **modules ES** : `index.html` charge un seul module d'entrée
@@ -92,6 +93,8 @@ C'est le **même chemin** que celui appelé par rAF, donc une vérification fid�
   explicites.
 - **Workflow** typique : créer une branche → coder → **vérifier** (lint + build +
   tests, + navigateur si pertinent) → committer → merger sur `main` (`--no-ff`).
+- **PR** : utiliser la checklist du template PR (`.github/pull_request_template.md`)
+  pour tracer les vérifications et l'impact doc.
 - **Design** : SOLID / découplage ; JSDoc sur l'API publique et la logique subtile,
   code auto-documenté ailleurs ; tests sur la logique critique.
 - **« Terminé » = vérifié.** Rapporter fidèlement (un test qui échoue se dit).

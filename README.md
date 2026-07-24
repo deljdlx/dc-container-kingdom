@@ -33,6 +33,7 @@ npm run build    # bundles the ES modules to dist/ for production
 npm test         # run the Vitest suite
 npm run test:watch
 npm run lint
+npm run verify   # run lint + build + tests (done criteria)
 ```
 
 The front-end is written as **ES modules**: `index.html` loads a single entry

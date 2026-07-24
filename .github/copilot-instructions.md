@@ -23,6 +23,7 @@ npm run dev     # app sur http://localhost:5173 (API Docker mockée, pas de daem
 npm run build   # bundle ES modules → dist/
 npm test        # Vitest
 npm run lint    # ESLint (doit rester à 0 problème)
+npm run verify  # lint + build + tests (commande de fin de tâche)
 ```
 
 Démo moteur autonome : `http://localhost:5173/engine/demo/` (l'URL doit finir par
