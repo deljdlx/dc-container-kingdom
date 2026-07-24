@@ -313,14 +313,14 @@ export class Viewport
       case 'right': { this.character.x(this.character.x() + increment); break; }
     }
 
-    const collisions = this.character.getCollision(this.board);
+    // One traversal detects both collisions and triggers; collisions are
+    // reconciled immediately, trigger hits come back raw.
+    const { collision, trigger } = this.character.detectCollisionAndTrigger(this.board);
 
-    if(collisions.length) {
+    const blocked = collision.length > 0;
+    if(blocked) {
       this.character.x(savedX);
       this.character.y(savedY);
-    }
-    else {
-      this.character.clearCollision();
     }
 
     this.handle("map.update", {
@@ -328,9 +328,14 @@ export class Viewport
       character: this.character,
     });
 
-    const triggers = this.character.getTrigger(this.board);
-    if(!triggers.length) {
-      this.character.clearCollision('trigger');
+    // Reconcile triggers at the FINAL position: when blocked, re-detect at the
+    // reverted position so a trigger on the wall doesn't phantom-fire; when the
+    // move went through, the single-pass hits are already at the final position.
+    if(blocked) {
+      this.character.getTrigger(this.board);
+    }
+    else {
+      this.character.reconcileTrigger(trigger);
     }
   }
 
