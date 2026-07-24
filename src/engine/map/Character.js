@@ -23,6 +23,9 @@ export class Character extends Element
   /** @type {CharacterBehavior} */
   _behavior = new CharacterBehavior(this);
 
+  /** @type {ReturnType<typeof setTimeout>|undefined} speech-bubble auto-close timer */
+  _reactionTimeout;
+
   constructor(
     x = null,
     y = null,
@@ -104,8 +107,10 @@ export class Character extends Element
    */
   quickReaction(content, autoClose = true, closeAfter = 10000) {
     this.getRenderer().showReaction(content);
+    this.handle(this._eventPrefix + 'reaction.show', { character: this, content });
+    clearTimeout(this._reactionTimeout);
     if (autoClose) {
-      setTimeout(() => {
+      this._reactionTimeout = setTimeout(() => {
         this.clearQuickReaction();
       }, closeAfter);
     }
@@ -113,7 +118,17 @@ export class Character extends Element
   }
 
   clearQuickReaction() {
+    clearTimeout(this._reactionTimeout);
+    const wasReacting = this.isReacting();
     this.getRenderer().clearReaction();
+    if (wasReacting) {
+      this.handle(this._eventPrefix + 'reaction.hide', { character: this });
+    }
     return this;
+  }
+
+  /** @returns {boolean} whether a speech bubble is currently displayed */
+  isReacting() {
+    return this.getRenderer().isReactionVisible();
   }
 }

@@ -17,20 +17,17 @@
 
 .map-element.character .quickReaction {
   position: absolute;
-  border: solid 1px #000;
-  border-radius: 4px;
-  padding: 4px 2px;
-  color: #000;
-  font-size: 11px;
-  background-color: #fff;
   top: -30px;
-  display: none;
-
   min-width: 150px;
   padding: 8px;
+  border: solid 1px #000;
+  border-radius: 4px;
+  background-color: #fff;
+  color: #000;
+  font-size: 11px;
+  display: none;
 }
 
 .map-element.character .quickReaction--enable {
   display: block;
-
 }

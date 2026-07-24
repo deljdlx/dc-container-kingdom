@@ -70,4 +70,9 @@ export class CharacterRenderer extends Renderer
     this._domQuickReaction.innerHTML = '';
     this._domQuickReaction.classList.remove('quickReaction--enable');
   }
+
+  /** @returns {boolean} whether the speech bubble is currently shown */
+  isReactionVisible() {
+    return this._domQuickReaction.classList.contains('quickReaction--enable');
+  }
 }

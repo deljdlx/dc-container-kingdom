@@ -125,3 +125,50 @@ describe('Character — speech bubble via the renderer', () => {
     vi.useRealTimers();
   });
 });
+
+describe('Character — speech bubble state & events', () => {
+  it('isReacting reflects whether a bubble is shown', () => {
+    const char = new Character(0, 0);
+    expect(char.isReacting()).toBe(false);
+    char.quickReaction('hi', false);
+    expect(char.isReacting()).toBe(true);
+    char.clearQuickReaction();
+    expect(char.isReacting()).toBe(false);
+  });
+
+  it('emits element.reaction.show on speak and element.reaction.hide on close', () => {
+    const char = new Character(0, 0);
+    const onShow = vi.fn();
+    const onHide = vi.fn();
+    char.addEventListener('element.reaction.show', onShow);
+    char.addEventListener('element.reaction.hide', onHide);
+
+    char.quickReaction('hi', false);
+    expect(onShow).toHaveBeenCalledWith(expect.objectContaining({ content: 'hi' }));
+    expect(onHide).not.toHaveBeenCalled();
+
+    char.clearQuickReaction();
+    expect(onHide).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not emit hide when no bubble was showing', () => {
+    const char = new Character(0, 0);
+    const onHide = vi.fn();
+    char.addEventListener('element.reaction.hide', onHide);
+
+    char.clearQuickReaction();
+    expect(onHide).not.toHaveBeenCalled();
+  });
+
+  it('emits hide when the bubble auto-closes', () => {
+    vi.useFakeTimers();
+    const char = new Character(0, 0);
+    const onHide = vi.fn();
+    char.addEventListener('element.reaction.hide', onHide);
+
+    char.quickReaction('hi', true, 5000);
+    vi.advanceTimersByTime(5000);
+    expect(onHide).toHaveBeenCalledTimes(1);
+    vi.useRealTimers();
+  });
+});
