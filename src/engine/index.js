@@ -35,6 +35,7 @@ export { SceneGraph } from './map/SceneGraph.js';
 // --- Character subsystems (composed by Character) ---
 export { CharacterAnimator } from './map/CharacterAnimator.js';
 export { CharacterBehavior } from './map/CharacterBehavior.js';
+export { PatrolBehavior } from './map/PatrolBehavior.js';
 
 // --- Renderers ---
 export { Renderer } from './map/Renderer/Renderer.js';

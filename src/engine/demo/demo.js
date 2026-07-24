@@ -5,6 +5,8 @@ import {
   Tree00,
   Fountain00,
   Sunflower00,
+  Man00,
+  PatrolBehavior,
   setAssetsBase,
 } from '../index.js';
 
@@ -73,8 +75,16 @@ populate(0, -1, [
   [520, 300, Tree00],
 ]);
 
+// A collidable NPC that walks back and forth across the origin area — bump the
+// player into it to see the collision block, and watch it turn around when it
+// hits an obstacle.
+const npc = new Man00();
+board.getAreaAt(0, 0).addElement(230, 220, npc);
+const patrol = new PatrolBehavior(npc, { axis: 'horizontal', distance: 240, speed: 3 });
+
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
 viewport.render();
 viewport.run();
+patrol.start();
