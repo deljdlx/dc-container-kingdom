@@ -227,9 +227,15 @@ export class CollisionSystem {
    * @returns {boolean} whether the element hit for this type.
    */
   _hitZones(element, type, hits) {
+    // Narrow phase: test the DETECTOR's own collision zones (its body) against
+    // the target's zone — NOT the aggregate box. The aggregate also covers the
+    // detector's trigger zones, so a character with a large trigger radius would
+    // otherwise "collide" with everything within that radius. The aggregate
+    // stays for broad-phase pruning only.
+    const body = this._element.getCollisionZones('collision');
     let hit = false;
     element.getCollisionZones(type).forEach(zone => {
-      const zoneHit = this._collisionBoundingBox.isCollided(zone, type);
+      const zoneHit = body.some(bodyZone => bodyZone.isCollided(zone));
       zone.collided(zoneHit, type);
       if (zoneHit) {
         hit = true;

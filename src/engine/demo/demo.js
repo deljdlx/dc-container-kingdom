@@ -10,6 +10,7 @@ import {
   Woman01,
   Woman02,
   PatrolBehavior,
+  FleeBehavior,
   setAssetsBase,
 } from '../index.js';
 
@@ -125,6 +126,12 @@ cain.addEventListener('element.collision', () => {
     cain.quickReaction('Hello my friend, stay a while and listen');
   }
 });
+
+// A shy NPC that flees when the player enters its trigger radius (tests
+// triggers): approach it and it backs away.
+const shy = new Woman01();
+originArea.addElement(250, 240, shy);
+new FleeBehavior(shy, { radius: 110, speed: 4 }).start();
 
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
