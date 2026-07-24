@@ -42,12 +42,15 @@ d'une area ne coûte rien. Chargement en 7×7, libération au-delà d'un anneau
 
 Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`) :
 
-```
-update(timestamp):
-  dt = clamp(timestamp - lastTimestamp, 0, 100)   # clampé : pas de téléport après une pause
-  si le joueur bouge : moveCharacter(increment) ; _streamAreas() ; character.update()
-  pour chaque behavior enregistré : behavior.update(dt)   # PNJ sur la MÊME horloge
-  camera.update() ; renderer.update()
+```mermaid
+flowchart TD
+    U["update(timestamp)"] --> DT["dt = clamp(Δt, 0, 100 ms)<br/>pas de téléport après une pause"]
+    DT --> Q{"le joueur bouge ?"}
+    Q -->|oui| MC["moveCharacter · _streamAreas · character.update"]
+    Q -->|non| B
+    MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
+    B --> C["camera.update"]
+    C --> R["renderer.update"]
 ```
 
 Points clés :
@@ -99,6 +102,14 @@ Le `CollisionSystem` fait du **broad + narrow phase** et sépare **détection** 
   n'émet que les events qui changent : `element.collision` / `.collision.end`
   (et pareil pour `trigger`). Pas de « clear » de tout l'arbre à chaque frame.
 
+```mermaid
+flowchart LR
+    B["broad phase<br/>élague les sous-arbres (bbox agrégée)"] --> N["narrow phase<br/>zones du détecteur vs zones de la cible"]
+    N --> H["hits de la frame"]
+    H --> REC["réconciliation<br/>diff vs frame précédente"]
+    REC --> EV["émet start / end<br/>seulement pour ce qui change"]
+```
+
 Deux types de zones :
 
 - **collision** — solides : bloquent le déplacement.
@@ -130,6 +141,16 @@ le temps et rejoue un pas à la cadence voulue) :
 - **`FleeBehavior`** — crée une **zone trigger** (rayon de détection) ; quand
   quelque chose y entre (event `element.trigger`), le PNJ fuit à l'opposé.
 - **`CharacterBehavior`** — errance aléatoire.
+
+Exemple, le cycle de `FleeBehavior` (entièrement piloté par le trigger) :
+
+```mermaid
+stateDiagram-v2
+    [*] --> Idle
+    Idle --> Fuite : element.trigger (intrus dans le rayon)
+    Fuite --> Fuite : s'éloigne via moveBlocked
+    Fuite --> Idle : hors rayon (trigger.end / garde-fou de distance)
+```
 
 L'animation est isolée dans **`CharacterAnimator`** (horloge de cycle de marche),
 et la **bulle de dialogue** passe par le renderer :

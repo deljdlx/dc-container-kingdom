@@ -2,17 +2,15 @@
 
 Container Kingdom est fait de **deux couches nettement séparées** :
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│  src/container-kingdom/  — l'application                     │
-│  Docker → carte RPG : maisons, routes, PNJ, HUD             │
-│                                                             │
-│        dépend de ↓  (jamais l'inverse)                      │
-├─────────────────────────────────────────────────────────────┤
-│  src/engine/  — moteur de mini-RPG réutilisable             │
-│  scene-graph, tuilage, caméra, rendu, collisions, behaviors │
-│  ne connaît RIEN de Docker / Container Kingdom              │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+flowchart TB
+    subgraph APP["src/container-kingdom/ — l'application"]
+        A["Docker → carte RPG : maisons, routes, PNJ, HUD"]
+    end
+    subgraph ENG["src/engine/ — moteur de mini-RPG réutilisable (ignore Docker)"]
+        E["scene-graph · tuilage · caméra · rendu · collisions · behaviors"]
+    end
+    A -->|"dépend de — jamais l'inverse"| E
 ```
 
 La règle d'or : **les dépendances vont app → moteur, uniquement**. Le moteur
@@ -23,23 +21,15 @@ projet sans toucher une ligne de Container Kingdom (c'est ce que fait la démo,
 
 ## Flux de données de l'app
 
-```
-DockerApiClient        GET /api/docker/*  (mocké en dev par un plugin Vite)
-      │
-      ▼
-ContainerRepository    charge conteneurs + stats, les tient en mémoire
-      │
-      ▼
-DockerCompose          regroupe les conteneurs par projet compose (les stacks dc-*)
-      │
-      ▼
-ContainerPlacement     grille d'occupation déterministe → où poser chaque maison
-      │
-      ▼
-ContainerKingdomRenderer   instancie les éléments du MOTEUR (maisons, routes, PNJ)
-      │                     et les ajoute au Board via l'API moteur
-      ▼
-Engine (Viewport/Board/Renderer)   game loop rAF, rendu DOM, collisions, caméra
+```mermaid
+flowchart TB
+    DAC["DockerApiClient<br/>GET /api/docker/* (mocké en dev)"]
+    REPO["ContainerRepository<br/>conteneurs + stats en mémoire"]
+    DC["DockerCompose<br/>regroupe par stack dc-*"]
+    PLACE["ContainerPlacement<br/>grille d'occupation déterministe"]
+    REND["ContainerKingdomRenderer<br/>instancie maisons · routes · PNJ (API moteur)"]
+    ENG["Moteur — Viewport / Board / Renderer<br/>game loop rAF · rendu DOM · collisions · caméra"]
+    DAC --> REPO --> DC --> PLACE --> REND --> ENG
 ```
 
 En parallèle : `KingdomHud` (mémoire/CPU, interrupteurs de réseaux),
@@ -59,6 +49,21 @@ sous-systèmes dédiés plutôt que de tout faire lui-même —
 | `CollisionSystem`| zones collision/trigger, broad+narrow phase, événements   |
 | `EventEmitter`   | events locaux qui remontent à l'`Application`              |
 | `Renderer`       | nœud DOM, position monde, profondeur (algo du peintre)    |
+
+```mermaid
+classDiagram
+    class Element
+    class Geometry
+    class SceneGraph
+    class CollisionSystem
+    class EventEmitter
+    class Renderer
+    Element *-- Geometry : position/taille
+    Element *-- SceneGraph : parent/enfants
+    Element *-- CollisionSystem : zones + détection
+    Element *-- EventEmitter : events
+    Element *-- Renderer : DOM + profondeur
+```
 
 Au-dessus : `Board` (grille d'`Area`s tuilées, **streamées 7×7** autour du
 joueur), `Viewport` (la game loop rAF, le registre de behaviors, le déplacement

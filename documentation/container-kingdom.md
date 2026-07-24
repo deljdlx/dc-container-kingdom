@@ -23,16 +23,21 @@ instance.zoom(0.5)
 
 `ContainerKingdom.init()` enchaîne le pipeline (async) :
 
-```
-repository.loadContainers()            # récupère les conteneurs
-layout.renderContainersList()          # barre latérale
-loadContainersStats()                  # stats (mémoire/CPU) + info cluster (HUD)
-viewer.drawContainers(containers)      # maisons sur la carte
-viewer.drawNetworks(containers)        # routes entre maisons d'un même réseau
-viewport.render()
-viewport.renderDebug()                 # boîtes de zones si ?debug=1
-hud.drawNetworksSwitches()
-loop()                                 # polling
+```mermaid
+sequenceDiagram
+    participant B as bootstrap.js
+    participant CK as ContainerKingdom
+    participant R as Repository
+    participant V as Viewer (Renderer)
+    participant E as Moteur
+    B->>CK: new + init()
+    CK->>R: loadContainers() + loadContainersStats()
+    CK->>CK: renderContainersList() (barre latérale)
+    CK->>V: drawContainers() / drawNetworks()
+    V->>E: instancie maisons · routes · PNJ + addElement
+    CK->>E: viewport.render() / renderDebug()
+    CK->>CK: drawNetworksSwitches() (HUD)
+    CK->>CK: loop() — polling + checksum sha256
 ```
 
 La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et calcule
