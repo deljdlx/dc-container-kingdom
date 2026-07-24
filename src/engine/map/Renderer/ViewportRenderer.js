@@ -21,6 +21,16 @@ export class ViewportRenderer
    */
   domCharacter;
 
+  /**
+   * @type {number|null}
+   */
+  _lastCameraX = null;
+
+  /**
+   * @type {number|null}
+   */
+  _lastCameraY = null;
+
   constructor(viewport) {
     this._viewport = viewport;
     this._container = this._viewport.getContainer();
@@ -64,7 +74,18 @@ export class ViewportRenderer
       return;
     }
 
+    // Only rewrite the board transform when the camera actually moved. Left
+    // untouched, update() runs 60×/s and would otherwise re-emit an identical
+    // transform every frame while the camera is idle.
+    const x = camera.x();
+    const y = camera.y();
+    if(x === this._lastCameraX && y === this._lastCameraY) {
+      return;
+    }
+    this._lastCameraX = x;
+    this._lastCameraY = y;
+
     this._viewport.getBoard().getRenderer().getDom().style.transform =
-      `translate(${-camera.x()}px, ${-camera.y()}px)`;
+      `translate(${-x}px, ${-y}px)`;
   }
 }

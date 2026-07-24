@@ -62,13 +62,14 @@ export class BoardRenderer extends Renderer
             element.relativeTo(area);
 
             const elementDom = element.render();
-            if(element.getAllChildren().length) {
+            const descendants = element.getAllChildren();
+            if(descendants.length) {
               elementDom.classList.add('map-element--group');
             }
             this.dom.append(elementDom);
 
 
-            element.getAllChildren().forEach(child => {
+            descendants.forEach(child => {
               this.dom.append(child.render());
               // this.dom.append(child.getDom());
             });
