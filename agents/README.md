@@ -15,6 +15,8 @@ renvoient ici pour le détail — les garder minces, mettre le détail ici :
   « terminé = vérifié », doc à jour, piège rAF.
 - **[engine-boundary.md](engine-boundary.md)** — frontière app→moteur (impérative)
   et repères d'architecture du moteur.
+- **[recipes/](recipes/)** — playbooks étape par étape des tâches récurrentes
+  (ajouter un élément, un behavior, vérifier au navigateur, feature moteur, review).
 
 ## À ne pas confondre
 
