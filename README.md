@@ -12,6 +12,14 @@ Container Kingdom is an interactive visualization tool for Docker containers, us
 
 ---
 
+## 📚 Documentation
+
+- [`documentation/`](documentation/) — architecture, moteur, app, développement.
+- [`src/engine/README.md`](src/engine/README.md) — le moteur RPG réutilisable.
+- [`CLAUDE.md`](CLAUDE.md) — brief pour agents IA.
+
+---
+
 ## 🛠️ Development
 
 The app can run **without a Docker daemon**: a Vite dev-server plugin mocks the
@@ -28,7 +36,7 @@ npm run lint
 ```
 
 The front-end is written as **ES modules**: `index.html` loads a single entry
-module (`container-kingdom/assets/js/bootstrap.js`) and every class declares its
+module (`container-kingdom/js/bootstrap.js`) and every class declares its
 own `import`s, so dependencies are explicit and the bundler can build `dist/`.
 
 - `mock/fixtures/containers.json` — captured `GET /containers/json` payload.
