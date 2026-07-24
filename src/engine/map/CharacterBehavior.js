@@ -4,43 +4,73 @@
  * it bumps into something. Extracted from Character so the node itself carries
  * no AI — a controllable player character simply never gets a behavior.
  *
- * NOTE: the loop drives movement + collision itself (mirroring the original
- * Character.loop), duplicating Viewport.moveCharacter. Unifying the two onto the
- * game loop is a separate, deliberate step; this extraction preserves the
- * original behaviour verbatim, including the self-rescheduling timer.
+ * Driven by the viewport's game loop (via {@link update}) rather than its own
+ * timer, so it shares the single rAF clock — and the frame's `dt` — with the
+ * player and every other behavior.
  */
 export class CharacterBehavior {
   /** @type {import('./Character.js').Character} */
   _character;
 
   _alive = false;
-  _lastActionTime = null;
   _actionDuration = 5000;
   _newActionThreshold = 0.5;
 
-  /** pixels moved per behavior tick */
+  /** pixels moved per tick */
   _pixelsPerTick = 6;
 
-  /** ms between behavior ticks */
+  /** ms between ticks */
   _tickDelay = 100;
+
+  /** ms accumulated toward the next tick */
+  _elapsed = 0;
+
+  /** ms accumulated since the last direction decision */
+  _sinceAction = 0;
 
   constructor(character) {
     this._character = character;
   }
 
   /**
-   * Bring the character to life: it starts wandering and re-deciding its
-   * direction every `actionDuration` ms.
+   * Bring the character to life: it wanders and re-decides its direction every
+   * `actionDuration` ms. Registers with the viewport's game loop.
    * @param {number} actionDuration
    */
   live(actionDuration) {
     this._actionDuration = actionDuration;
     this._alive = true;
-    this._lastActionTime = this._now();
-    this.loop();
+    this._sinceAction = 0;
+    const viewport = this._viewport();
+    if (viewport) {
+      viewport.addBehavior(this);
+    }
   }
 
-  loop() {
+  /** Stop wandering; the character stays where it is. */
+  stop() {
+    this._alive = false;
+    const viewport = this._viewport();
+    if (viewport) {
+      viewport.removeBehavior(this);
+    }
+  }
+
+  /**
+   * Ticked by the game loop at the behavior's cadence, catching up if several
+   * `tickDelay` windows elapsed in one (slow) frame.
+   * @param {number} dt milliseconds since the last frame
+   */
+  update(dt) {
+    this._elapsed += dt;
+    while (this._elapsed >= this._tickDelay) {
+      this._elapsed -= this._tickDelay;
+      this._sinceAction += this._tickDelay;
+      this._step();
+    }
+  }
+
+  _step() {
     const character = this._character;
 
     if (this._alive && !character.getDirection()) {
@@ -48,31 +78,38 @@ export class CharacterBehavior {
     }
 
     if (
-      this._timeSinceLastAction() >= this._actionDuration
+      this._sinceAction >= this._actionDuration
       && Math.random() > this._newActionThreshold
     ) {
-      this._lastActionTime = this._now();
+      this._sinceAction = 0;
       character.setDirection(this._randomDirection());
     }
 
-    const savedGeometry = character.geometry.clone();
-
-    switch (character.getDirection()) {
-      case 'up': character.y(character.y() - this._pixelsPerTick); break;
-      case 'down': character.y(character.y() + this._pixelsPerTick); break;
-      case 'left': character.x(character.x() - this._pixelsPerTick); break;
-      case 'right': character.x(character.x() + this._pixelsPerTick); break;
-    }
-
-    const collisions = character.getCollision(character.getBoard());
-    if (collisions.length > 0) {
+    const [dx, dy] = this._delta(character.getDirection());
+    const blocked = character.moveBlocked(
+      dx,
+      dy,
+      () => character.getCollision(character.getBoard()).length > 0,
+    );
+    if (blocked) {
       character.setDirection(this._randomDirection());
-      character.geometry = savedGeometry;
     }
 
     character.update();
+  }
 
-    setTimeout(() => this.loop(), this._tickDelay);
+  /**
+   * @param {string} direction
+   * @returns {[number, number]} the (dx, dy) step for a direction
+   */
+  _delta(direction) {
+    switch (direction) {
+      case 'up': return [0, -this._pixelsPerTick];
+      case 'down': return [0, this._pixelsPerTick];
+      case 'left': return [-this._pixelsPerTick, 0];
+      case 'right': return [this._pixelsPerTick, 0];
+      default: return [0, 0];
+    }
   }
 
   _randomDirection() {
@@ -80,11 +117,9 @@ export class CharacterBehavior {
     return directions[Math.floor(Math.random() * directions.length)];
   }
 
-  _timeSinceLastAction() {
-    return this._now() - this._lastActionTime;
-  }
-
-  _now() {
-    return new Date().getTime();
+  /** The viewport this NPC is attached to, or null if it isn't in a world yet. */
+  _viewport() {
+    const app = this._character.getApplication && this._character.getApplication();
+    return app && app.getViewport ? app.getViewport() : null;
   }
 }

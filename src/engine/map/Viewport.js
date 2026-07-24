@@ -50,6 +50,9 @@ export class Viewport
   /** @type {{x: number, y: number}|null} last area the streaming ran for */
   _lastAreaCoords = null;
 
+  /** @type {Array<{update: (dt: number) => void}>} behaviors ticked each frame */
+  _behaviors = [];
+
   loop;
 
   // pixels per second
@@ -117,6 +120,26 @@ export class Viewport
    */
   getCamera() {
     return this._camera;
+  }
+
+  /**
+   * Register a behavior to be ticked every frame by the game loop. Behaviors
+   * (NPC wander, patrol…) run on the single rAF clock with the frame's `dt`
+   * instead of their own timers.
+   * @param {{update: (dt: number) => void}} behavior
+   */
+  addBehavior(behavior) {
+    if (!this._behaviors.includes(behavior)) {
+      this._behaviors.push(behavior);
+    }
+  }
+
+  /** Stop ticking a behavior. @param {{update: (dt: number) => void}} behavior */
+  removeBehavior(behavior) {
+    const index = this._behaviors.indexOf(behavior);
+    if (index !== -1) {
+      this._behaviors.splice(index, 1);
+    }
   }
 
   enableMainCharacter(mainCharacterX, mainCharacterY) {
@@ -271,6 +294,9 @@ export class Viewport
       }
     }
 
+    // NPC behaviors run on the same clock as the player.
+    this._behaviors.forEach(behavior => behavior.update(dt));
+
     // The camera follows its target; the viewport renderer applies the offset.
     this._camera.update();
     this.renderer.update();
@@ -303,25 +329,22 @@ export class Viewport
       return;
     }
 
-    const savedX = this.character.x();
-    const savedY = this.character.y();
-
+    let dx = 0;
+    let dy = 0;
     switch(this.direction) {
-      case 'up': { this.character.y(this.character.y() - increment); break; }
-      case 'down': { this.character.y(this.character.y() + increment); break; }
-      case 'left': { this.character.x(this.character.x() - increment); break; }
-      case 'right': { this.character.x(this.character.x() + increment); break; }
+      case 'up': { dy = -increment; break; }
+      case 'down': { dy = increment; break; }
+      case 'left': { dx = -increment; break; }
+      case 'right': { dx = increment; break; }
     }
 
-    // One traversal detects both collisions and triggers; collisions are
-    // reconciled immediately, trigger hits come back raw.
-    const { collision, trigger } = this.character.detectCollisionAndTrigger(this.board);
-
-    const blocked = collision.length > 0;
-    if(blocked) {
-      this.character.x(savedX);
-      this.character.y(savedY);
-    }
+    // Move, reverting on a solid collision. The single detection pass also
+    // yields the trigger hits, reconciled below at the final position.
+    let detected;
+    const blocked = this.character.moveBlocked(dx, dy, () => {
+      detected = this.character.detectCollisionAndTrigger(this.board);
+      return detected.collision.length > 0;
+    });
 
     this.handle("map.update", {
       map: this,
@@ -335,7 +358,7 @@ export class Viewport
       this.character.getTrigger(this.board);
     }
     else {
-      this.character.reconcileTrigger(trigger);
+      this.character.reconcileTrigger(detected.trigger);
     }
   }
 

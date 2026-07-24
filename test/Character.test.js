@@ -75,6 +75,31 @@ describe('Character — direction & animation', () => {
   });
 });
 
+describe('Character — moveBlocked', () => {
+  it('applies the delta when the move is not blocked', () => {
+    const char = new Character(100, 100);
+    const blocked = char.moveBlocked(5, -3, () => false);
+    expect(blocked).toBe(false);
+    expect(char.x()).toBe(105);
+    expect(char.y()).toBe(97);
+  });
+
+  it('reverts to the starting position when blocked', () => {
+    const char = new Character(100, 100);
+    const blocked = char.moveBlocked(5, -3, () => true);
+    expect(blocked).toBe(true);
+    expect(char.x()).toBe(100);
+    expect(char.y()).toBe(100);
+  });
+
+  it('evaluates the predicate at the tentative (moved) position', () => {
+    const char = new Character(100, 100);
+    let seenX;
+    char.moveBlocked(10, 0, () => { seenX = char.x(); return false; });
+    expect(seenX).toBe(110);
+  });
+});
+
 describe('Character — speech bubble via the renderer', () => {
   it('routes quickReaction / clearQuickReaction to the renderer (no DOM poking)', () => {
     const char = new Character(0, 0);

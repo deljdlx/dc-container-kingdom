@@ -20,6 +20,14 @@ function fakeCharacter(collisionFlags = []) {
     y(v) { if (v !== undefined) { this.geometry._y = v; } return this.geometry._y; },
     getBoard() { return null; },
     overlaps() { return Boolean(collisionFlags[call++]); },
+    moveBlocked(dx, dy, isBlocked) {
+      const sx = this.x();
+      const sy = this.y();
+      this.x(sx + dx);
+      this.y(sy + dy);
+      if (isBlocked()) { this.x(sx); this.y(sy); return true; }
+      return false;
+    },
     update() {},
   };
 }
@@ -63,5 +71,19 @@ describe('PatrolBehavior', () => {
     patrol._step();
     expect(char.direction).toBe('down');
     expect(char.y()).toBe(5);
+  });
+
+  it('update(dt) runs the step at the tickDelay cadence, catching up on slow frames', () => {
+    const char = fakeCharacter();
+    const patrol = new PatrolBehavior(char, { axis: 'horizontal', distance: 1000, speed: 4, tickDelay: 60 });
+
+    patrol.update(130); // 120ms = 2 full ticks, 10ms carried over
+    expect(char.x()).toBe(8);
+
+    patrol.update(50); // 10 + 50 = 60 → exactly one tick
+    expect(char.x()).toBe(12);
+
+    patrol.update(30); // 30 < 60 → no tick yet
+    expect(char.x()).toBe(12);
   });
 });
