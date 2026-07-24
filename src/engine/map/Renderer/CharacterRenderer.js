@@ -14,6 +14,9 @@ export class CharacterRenderer extends Renderer
 
   _domQuickReaction;
 
+  _lastDirection = null;
+  _lastAnimationIndex = null;
+
   spriteDirectionOffsets = {
     up: this.spriteHeight * -3,
     down: this.spriteHeight * 0,
@@ -40,6 +43,12 @@ export class CharacterRenderer extends Renderer
    * @param {number} animationIndex
    */
   applySpriteFrame(direction, animationIndex) {
+    if(direction === this._lastDirection && animationIndex === this._lastAnimationIndex) {
+      return;
+    }
+    this._lastDirection = direction;
+    this._lastAnimationIndex = animationIndex;
+
     const left = animationIndex * -this.getElement().width() - this.getElement().getSpriteSheetOffsetLeft();
     const top = this.spriteDirectionOffsets[direction] - this.getElement().getSpriteSheetOffsetTop();
     this.domSprite.style.backgroundPosition = `${left}px ${top}px`;
