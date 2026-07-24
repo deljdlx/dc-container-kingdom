@@ -330,6 +330,14 @@ export class Element
     return this.collision.getCollision(element, type);
   }
 
+  detectCollisionAndTrigger(element) {
+    return this.collision.detectCollisionAndTrigger(element);
+  }
+
+  reconcileTrigger(hits) {
+    return this.collision.reconcileTrigger(hits);
+  }
+
   clearCollision(type = 'collision') {
     return this.collision.clearCollision(type);
   }
