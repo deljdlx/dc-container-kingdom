@@ -39,6 +39,7 @@ Copier [`TEMPLATE.md`](TEMPLATE.md) dans `000-todo/` sous le nom `NNN-slug.md`
 ## Comment ça s'articule
 
 - **Ce board** = le **QUOI** (état, priorité, avancement).
-- **`../agents/recipes/`** = le **COMMENT** (playbooks des tâches récurrentes).
+- **`../agents/recipes/`** = le **COMMENT générique** (méthode réutilisable) ;
+  **[`recipes/`](recipes/)** = le **COMMENT projet** (patterns Container Kingdom).
 - **`../agents/`** (conventions, workflow, frontière moteur) = les **RÈGLES**.
 - **`../documentation/`** = comment le **code** fonctionne.
