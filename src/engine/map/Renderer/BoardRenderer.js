@@ -1,22 +1,28 @@
-import { Board } from '../Board.js';
 import { Renderer } from './Renderer.js';
 
+/**
+ * Renders the board: positions the board root, then lazily mounts each area of
+ * the area matrix and its (not-yet-rendered) child elements.
+ */
 export class BoardRenderer extends Renderer
 {
   /**
-   * @type {Board}
+   * @type {import('../Board.js').Board}
    */
   board;
 
   /**
-   *
-   * @param {Board} board
+   * @param {import('../Board.js').Board} board
    */
   constructor(board) {
     super(board);
     this.board = board;
   }
 
+  /**
+   * Position the board root and mount any pending areas.
+   * @returns {DomElement} the board root DOM node
+   */
   render() {
     super.render();
     this.renderAreas();
@@ -24,11 +30,13 @@ export class BoardRenderer extends Renderer
     return this.dom;
   }
 
+  /** Mount any areas/elements that appeared since the last frame. */
   update() {
     super.update();
     this.renderAreas();
   }
 
+  /** Draw collision-zone and bounding-box overlays for the board and its areas. */
   renderDebug() {
     this.board.renderCollisionZones();
 
@@ -46,6 +54,10 @@ export class BoardRenderer extends Renderer
     }
   }
 
+  /**
+   * Mount every not-yet-rendered area, and each area's not-yet-rendered child
+   * elements together with their descendants, into the board root.
+   */
   renderAreas() {
     const matrix = this.board.getAreas();
     for(let x in matrix) {
@@ -71,7 +83,6 @@ export class BoardRenderer extends Renderer
 
             descendants.forEach(child => {
               this.dom.append(child.render());
-              // this.dom.append(child.getDom());
             });
           }
         });

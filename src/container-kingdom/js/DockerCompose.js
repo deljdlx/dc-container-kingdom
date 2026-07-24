@@ -9,7 +9,7 @@ export class DockerCompose {
 
   getByIndex(index) {
     let found = null;
-    Object.entries(this._containers).forEach(([key, container], i) => {
+    Object.entries(this._containers).forEach(([, container], i) => {
       if(i === index) {
         found = container;
       }

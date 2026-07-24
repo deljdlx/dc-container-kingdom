@@ -1,7 +1,12 @@
 import { SpriteElement } from '../../SpriteElement.js';
 
+/**
+ * A decorative flower sprite; non-solid but carries a trigger zone so
+ * characters stepping onto it can fire an interaction.
+ */
 export class Flower00 extends SpriteElement
 {
+  /** @type {import('../../SpriteElement.js').SpriteDescriptor} */
   static descriptor = {
     width: 32,
     height: 32,

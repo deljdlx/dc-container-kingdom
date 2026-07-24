@@ -16,6 +16,7 @@ export class CharacterAnimator {
   /** @type {number} number of frames in the walk cycle */
   _frameCount;
 
+  /** @param {number} [frameCount] number of frames in the walk cycle */
   constructor(frameCount = 3) {
     this._frameCount = frameCount;
   }
@@ -38,6 +39,7 @@ export class CharacterAnimator {
     return this._index;
   }
 
+  /** Reset the clock back to the first frame. */
   reset() {
     this._tick = 0;
     this._index = 0;

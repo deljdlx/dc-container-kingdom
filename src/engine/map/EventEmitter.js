@@ -4,9 +4,11 @@
  * owns one and adds application-level bubbling on top of it.
  */
 export class EventEmitter {
+  /** @type {Object<string, Array<(data: object) => void>>} name → callbacks */
   _listeners = {};
 
   /**
+   * Register a callback for the named event.
    * @param {string} name
    * @param {(data: object) => void} callback
    * @returns {number} the listener index within its name bucket
@@ -21,6 +23,7 @@ export class EventEmitter {
   }
 
   /**
+   * Synchronously invoke every callback registered for the named event.
    * @param {string} name
    * @param {object} [data]
    */

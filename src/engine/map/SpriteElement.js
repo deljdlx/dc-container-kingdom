@@ -2,6 +2,19 @@ import { Element } from './Element.js';
 import { SpriteRenderer } from './Renderer/SpriteRenderer.js';
 
 /**
+ * @typedef {object} SpriteDescriptor
+ * @property {number} width sprite width in px
+ * @property {number} height sprite height in px
+ * @property {string} atlas atlas image path, relative to the assets base
+ * @property {[number, number]} frame background-position [x, y] into the atlas
+ * @property {[number, number, number, number]} [collision] solid box [x, y, w, h]
+ * @property {[number, number, number, number]} [trigger] trigger box [x, y, w, h]
+ * @property {boolean|{width?: number, height?: number, top?: number, left?: number, borderRadius?: string}} [shadow]
+ *   drop shadow: true (default) | false | explicit geometry
+ * @property {boolean} [manualZ] opt out of y-based depth sorting (e.g. ground)
+ */
+
+/**
  * Base class for a static sprite element. A concrete element is a pure
  * *declaration* — no DOM, no render() — via a static `descriptor`:
  *
@@ -22,6 +35,7 @@ import { SpriteRenderer } from './Renderer/SpriteRenderer.js';
  * {@link SpriteRenderer} paints it; the model never touches the DOM.
  */
 export class SpriteElement extends Element {
+  /** Builds the element from the concrete subclass's static `descriptor`. */
   constructor() {
     const descriptor = new.target.descriptor;
     super(0, 0, descriptor.width, descriptor.height);
@@ -42,7 +56,7 @@ export class SpriteElement extends Element {
   }
 
   /**
-   * @returns {object} the element's sprite descriptor
+   * @returns {SpriteDescriptor} the element's sprite descriptor
    */
   getSpriteDescriptor() {
     return this._descriptor;

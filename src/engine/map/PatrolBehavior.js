@@ -23,12 +23,23 @@ export class PatrolBehavior {
   /** ms between ticks */
   _tickDelay;
 
+  /** pixels travelled on the current leg */
   _traveled = 0;
+
+  /** true while heading right/down, false while heading left/up */
   _forward = true;
 
   /** ms accumulated toward the next tick */
   _elapsed = 0;
 
+  /**
+   * @param {import('./Character.js').Character} character the NPC to patrol
+   * @param {object} [options]
+   * @param {'horizontal'|'vertical'} [options.axis] axis to patrol along
+   * @param {number} [options.distance] pixels to travel before turning back
+   * @param {number} [options.speed] pixels moved per tick
+   * @param {number} [options.tickDelay] ms between ticks
+   */
   constructor(character, { axis = 'horizontal', distance = 200, speed = 4, tickDelay = 60 } = {}) {
     this._character = character;
     this._axis = axis;
@@ -66,6 +77,7 @@ export class PatrolBehavior {
     }
   }
 
+  /** One patrol tick: face the current leg, move, and reverse on collision or at the leg's end. */
   _step() {
     const character = this._character;
     const horizontal = this._axis === 'horizontal';
@@ -99,6 +111,7 @@ export class PatrolBehavior {
    * Would the character's current position collide with anything solid? Checks
    * the static board AND the player, which lives outside the board tree — so an
    * NPC turns around at the player instead of walking through it.
+   * @returns {boolean}
    */
   _isBlocked() {
     const character = this._character;
@@ -109,18 +122,25 @@ export class PatrolBehavior {
     return player != null && player !== character && character.overlaps(player);
   }
 
-  /** The player character, if this NPC is attached to a running viewport. */
+  /**
+   * @returns {import('./Character.js').Character|null} the player character, if
+   * this NPC is attached to a running viewport
+   */
   _player() {
     const viewport = this._viewport();
     return viewport && viewport.getCharacter ? viewport.getCharacter() : null;
   }
 
-  /** The viewport this NPC is attached to, or null if it isn't in a world yet. */
+  /**
+   * @returns {import('./Viewport.js').Viewport|null} the viewport this NPC is
+   * attached to, or null if it isn't in a world yet
+   */
   _viewport() {
     const app = this._character.getApplication && this._character.getApplication();
     return app && app.getViewport ? app.getViewport() : null;
   }
 
+  /** Flip patrol direction and start a fresh leg. */
   _reverse() {
     this._forward = !this._forward;
     this._traveled = 0;

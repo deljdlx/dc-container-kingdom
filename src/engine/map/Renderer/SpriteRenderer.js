@@ -9,6 +9,10 @@ import { assetUrl } from '../../assets.js';
  * @see SpriteElement for the descriptor shape.
  */
 export class SpriteRenderer extends Renderer {
+  /**
+   * Position the element, paint its atlas frame, and add/override its shadow.
+   * @returns {DomElement} the element root DOM node
+   */
   render() {
     super.render();
 
@@ -27,6 +31,10 @@ export class SpriteRenderer extends Renderer {
     return this.getDom();
   }
 
+  /**
+   * Apply per-descriptor shadow style overrides, skipping unset fields.
+   * @param {{width?: number, height?: number, top?: number, left?: number, borderRadius?: string}} overrides
+   */
   _applyShadowOverrides(overrides) {
     const style = this.getShadow().style;
     if (overrides.width != null) style.width = overrides.width + 'px';

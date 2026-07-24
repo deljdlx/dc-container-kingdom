@@ -115,11 +115,11 @@ export class ContainerKingdomRenderer
     let {x, y} = this.placement.computeContainerCoords(firstContainer);
     try {
       ({x, y} = this.placement.getClosestFreeCoords(x, y, 2));
-    } catch(e) {
+    } catch {
       try {
         ({x, y} = this.placement.getClosestFreeCoords(x, y, 1));
       }
-      catch(e) {
+      catch {
         console.error('No space available for container', firstContainer);
       }
     }
@@ -247,7 +247,7 @@ export class ContainerKingdomRenderer
 
     // character.live(3000 + Math.random() * 3);
 
-    character.addEventListener('element.click', (event) => {
+    character.addEventListener('element.click', () => {
       if(container.getDemoUrl())
         character.quickReaction(`
           Hello my friend. Do you want to visit

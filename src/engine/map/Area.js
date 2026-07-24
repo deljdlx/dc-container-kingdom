@@ -1,30 +1,33 @@
 import { AreaRenderer } from './Renderer/AreaRenderer.js';
-import { Board } from './Board.js';
 import { Element } from './Element.js';
 
+/**
+ * A single tile of the world grid: a fixed-size container of game elements,
+ * placed on the {@link import('./Board.js').Board} at integer map coordinates
+ * (`mapX`, `mapY`). Forwards click events as `area.click`.
+ */
 export class Area extends Element
 {
   /**
-   * @type {Board}
+   * @type {import('./Board.js').Board}
    */
   board;
 
 
   /**
-   * @type {Number}
+   * @type {Number} area column on the board grid
    */
   mapX;
 
   /**
-   * @type {Number}
+   * @type {Number} area row on the board grid
    */
   mapY;
 
   /**
-   *
-   * @param {Board} board
-   * @param {Number} x
-   * @param {Number} y
+   * @param {import('./Board.js').Board} board
+   * @param {Number} x map column
+   * @param {Number} y map row
    */
   constructor(board, x, y) {
     super(0, 0, board.width(), board.height());
@@ -44,22 +47,28 @@ export class Area extends Element
     })
   }
 
+  /** @returns {Number} the area's column on the board grid */
   getCoordX() {
     return this.mapX;
   }
 
+  /** @returns {Number} the area's row on the board grid */
   getCoordY() {
     return this.mapY;
   }
 
   /**
-   * @returns {Board}
+   * @returns {import('./Board.js').Board}
    */
   getBoard() {
     return this.board;
   }
 
 
+  /**
+   * Serialize named children into backend area descriptors.
+   * @returns {Array<{name: string, x: number, y: number, element: string}>}
+   */
   toJSON() {
     const data = [];
 

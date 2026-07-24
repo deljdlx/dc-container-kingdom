@@ -1,5 +1,9 @@
 import { Coordinates } from './Coordinates.js';
 
+/**
+ * Size (width/height) plus position (via {@link Coordinates}) of an element.
+ * Each accessor doubles as a getter/setter and rounds to integer pixels on set.
+ */
 export class Geometry
 {
   /**
@@ -21,6 +25,7 @@ export class Geometry
   }
 
   /**
+   * Deep copy of this geometry (position and size).
    * @returns {Geometry}
    */
   clone() {
@@ -32,10 +37,18 @@ export class Geometry
     return cloned;
   }
 
+  /**
+   * @returns {Coordinates} the backing position object
+   */
   coordinates() {
     return this._coordinates;
   }
 
+  /**
+   * Get or set the width (rounded on set).
+   * @param {?number} value
+   * @returns {number}
+   */
   width(value = null) {
     if(value !== null) {
       this._width = Math.round(value);
@@ -43,6 +56,11 @@ export class Geometry
     return this._width;
   }
 
+  /**
+   * Get or set the height (rounded on set).
+   * @param {?number} value
+   * @returns {number}
+   */
   height(value = null) {
     if(value !== null) {
       this._height = Math.round(value);
@@ -50,14 +68,30 @@ export class Geometry
     return this._height;
   }
 
+  /**
+   * Get or set the x coordinate.
+   * @param {?number} value
+   * @returns {number}
+   */
   x(value = null) {
     return this._coordinates.x(value);
   }
 
+  /**
+   * Get or set the y coordinate.
+   * @param {?number} value
+   * @returns {number}
+   */
   y(value = null) {
     return this._coordinates.y(value);
   }
 
+  /**
+   * Add `value` to the given position axis.
+   * @param {'x'|'y'} axis
+   * @param {number} value
+   * @returns {number|undefined}
+   */
   add(axis, value) {
     return this._coordinates.add(axis, value);
   }

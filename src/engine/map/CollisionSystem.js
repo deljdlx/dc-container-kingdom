@@ -19,10 +19,18 @@ export class CollisionSystem {
   /** @type {BoundingBox} */
   _collisionBoundingBox;
 
+  /** @type {{collision: BoundingBox[], trigger: BoundingBox[]}} the element's own zones per type */
   _zones = { collision: [], trigger: [] };
+
+  /** @type {{collision: import('./Element.js').Element[], trigger: import('./Element.js').Element[]}} last frame's hits per type */
   _collidedWith = { collision: [], trigger: [] };
+
+  /** @type {{collision: boolean, trigger: boolean}} whether currently hitting anything per type */
   _collided = { collision: false, trigger: false };
 
+  /**
+   * @param {import('./Element.js').Element} element the owning node
+   */
   constructor(element) {
     this._element = element;
     // Created before the element's geometry is set (mirrors the original
@@ -35,18 +43,37 @@ export class CollisionSystem {
     this._boundingBox = new BoundingBox(this._element);
   }
 
+  /**
+   * @returns {BoundingBox} the outer (rendering) bounding box
+   */
   getBoundingBox() {
     return this._boundingBox;
   }
 
+  /**
+   * @returns {BoundingBox} the aggregate collision bounding box (broad phase)
+   */
   getCollisionBoundingBox() {
     return this._collisionBoundingBox;
   }
 
+  /**
+   * @param {'collision'|'trigger'} type
+   * @returns {BoundingBox[]} this element's own zones of that type
+   */
   getCollisionZones(type = 'collision') {
     return this._zones[type];
   }
 
+  /**
+   * Add a zone of `type`, grow the aggregate box, and propagate up the tree.
+   * @param {?number} x
+   * @param {?number} y
+   * @param {?number} width
+   * @param {?number} height
+   * @param {'collision'|'trigger'} type
+   * @returns {BoundingBox} the created zone
+   */
   createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision') {
     const zone = new BoundingBox(this._element);
     zone.x0(x);
@@ -65,10 +92,22 @@ export class CollisionSystem {
     return zone;
   }
 
+  /**
+   * Convenience wrapper: add a zone of type `trigger`.
+   * @param {?number} x
+   * @param {?number} y
+   * @param {?number} width
+   * @param {?number} height
+   * @returns {BoundingBox} the created zone
+   */
   createTriggerZone(x = null, y = null, width = null, height = null) {
     return this.createCollisionZone(x, y, width, height, 'trigger');
   }
 
+  /**
+   * Grow the aggregate collision box to enclose a child, then propagate up.
+   * @param {import('./Element.js').Element} element the child that changed
+   */
   updateCollisionBoundingBox(element) {
     this._collisionBoundingBox.updateWithRelativeElement(this._element, element);
     const parent = this._element.getParent();
@@ -77,6 +116,10 @@ export class CollisionSystem {
     }
   }
 
+  /**
+   * Grow the outer bounding box to enclose a child, then propagate up.
+   * @param {import('./Element.js').Element} element the child that changed
+   */
   updateBoudingBox(element) {
     const boundingBox = new BoundingBox();
     boundingBox.x0(element.x());
@@ -92,6 +135,13 @@ export class CollisionSystem {
     }
   }
 
+  /**
+   * Get or set the collided flag for `type`; on change, reset zones when
+   * clearing, propagate up the tree, and request a redraw.
+   * @param {?boolean} value
+   * @param {'collision'|'trigger'} type
+   * @returns {boolean}
+   */
   collided(value = null, type = 'collision') {
     if (value !== null) {
       if (value !== this._collided[type]) {
@@ -113,6 +163,11 @@ export class CollisionSystem {
     return this._collided[type];
   }
 
+  /**
+   * Convenience wrapper: {@link getCollision} for type `trigger`.
+   * @param {import('./Element.js').Element} element subtree root to test against
+   * @returns {Array|false}
+   */
   getTrigger(element) {
     return this.getCollision(element, 'trigger');
   }
@@ -120,6 +175,8 @@ export class CollisionSystem {
   /**
    * Detect what this element collides with in `element`'s subtree, then
    * reconcile events/state against the previous frame.
+   * @param {import('./Element.js').Element} element subtree root to test against
+   * @param {'collision'|'trigger'} type
    * @returns {Array|false} the hits, or `false` when there are none.
    */
   getCollision(element, type = 'collision') {
@@ -147,6 +204,7 @@ export class CollisionSystem {
    * This is the per-frame fast path: the common case (character not blocked)
    * needs one traversal instead of the two a separate getCollision + getTrigger
    * would cost.
+   * @param {import('./Element.js').Element} element subtree root to test against
    * @returns {{collision: Array, trigger: Array}}
    */
   detectCollisionAndTrigger(element) {
@@ -157,7 +215,11 @@ export class CollisionSystem {
     return { collision, trigger };
   }
 
-  /** Reconcile trigger hits against the previous frame. @see _reconcile */
+  /**
+   * Reconcile trigger hits against the previous frame.
+   * @param {import('./Element.js').Element[]} hits
+   * @see _reconcile
+   */
   reconcileTrigger(hits) {
     this._reconcile(hits, 'trigger');
   }
@@ -166,6 +228,8 @@ export class CollisionSystem {
    * Pure overlap test against `element`'s subtree: does this element's collision
    * (or trigger) zones intersect anything there? Fires no events and touches no
    * state — meant for AI probing a would-be move, unlike {@link getCollision}.
+   * @param {import('./Element.js').Element} element subtree root to test against
+   * @param {'collision'|'trigger'} type
    * @returns {boolean}
    */
   overlaps(element, type = 'collision') {
@@ -192,6 +256,11 @@ export class CollisionSystem {
    * that type stops descending into its children — but the other type keeps
    * going. Running both types in one traversal is therefore equivalent to two
    * separate single-type traversals, minus the duplicated prune/self checks.
+   * @param {import('./Element.js').Element} element subtree root to test against
+   * @param {boolean} seekCollision whether to collect collision hits
+   * @param {boolean} seekTrigger whether to collect trigger hits
+   * @param {import('./Element.js').Element[]} collisionHits out param, appended in place
+   * @param {import('./Element.js').Element[]} triggerHits out param, appended in place
    */
   _detect(element, seekCollision, seekTrigger, collisionHits, triggerHits) {
     if (element === this._element) {
@@ -224,6 +293,9 @@ export class CollisionSystem {
    * Narrow-phase test of one element's zones of `type`: flag each zone's hit
    * state (for debug rendering) and push the element into `hits` on any
    * overlap.
+   * @param {import('./Element.js').Element} element the element being tested
+   * @param {'collision'|'trigger'} type which of the target's zones to test
+   * @param {import('./Element.js').Element[]} hits out param, appended in place
    * @returns {boolean} whether the element hit for this type.
    */
   _hitZones(element, type, hits) {
@@ -251,6 +323,8 @@ export class CollisionSystem {
    * Diff the hits against the previous frame: fire start events for newly
    * touching elements, end events for those no longer touching, and only touch
    * the changed elements — no clearing the whole tree every frame.
+   * @param {import('./Element.js').Element[]} hits elements touching this frame
+   * @param {'collision'|'trigger'} type
    */
   _reconcile(hits, type) {
     const previous = this._collidedWith[type];
@@ -289,7 +363,10 @@ export class CollisionSystem {
     this.collided(hits.length > 0, type);
   }
 
-  /** Drop all current collisions (fires end events for each), via reconcile. */
+  /**
+   * Drop all current collisions (fires end events for each), via reconcile.
+   * @param {'collision'|'trigger'} type
+   */
   clearCollision(type = 'collision') {
     this._reconcile([], type);
   }

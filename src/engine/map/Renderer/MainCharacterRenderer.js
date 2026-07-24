@@ -7,6 +7,9 @@ import { CharacterRenderer } from './CharacterRenderer.js';
  */
 export class MainCharacterRenderer extends CharacterRenderer
 {
+  /**
+   * @param {import('../Character.js').Character} element
+   */
   constructor(element) {
     super(element);
     this.dom.classList.add('character--main');

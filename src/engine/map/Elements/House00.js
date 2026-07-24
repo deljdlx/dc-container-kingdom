@@ -1,7 +1,11 @@
 import { SpriteElement } from '../SpriteElement.js';
 
+/**
+ * A house sprite, solid across its base so characters can't walk through it.
+ */
 export class House00 extends SpriteElement
 {
+  /** @type {import('../SpriteElement.js').SpriteDescriptor} */
   static descriptor = {
     width: 130,
     height: 130,

@@ -9,14 +9,21 @@ import { assetUrl } from '../../assets.js';
  */
 export class CharacterRenderer extends Renderer
 {
+  /** Sprite-sheet cell size, in pixels. */
   spriteWidth = 48;
   spriteHeight = 48;
 
+  /**
+   * Speech-bubble node.
+   * @type {DomElement}
+   */
   _domQuickReaction;
 
+  /** Last painted frame, cached to skip redundant background-position writes. */
   _lastDirection = null;
   _lastAnimationIndex = null;
 
+  /** Vertical sprite-sheet offset (px) for each facing direction. */
   spriteDirectionOffsets = {
     up: this.spriteHeight * -3,
     down: this.spriteHeight * 0,
@@ -24,6 +31,11 @@ export class CharacterRenderer extends Renderer
     right: this.spriteHeight * -2,
   }
 
+  /**
+   * Set up the character node: sprite sheet, initial frame, reaction bubble
+   * and drop shadow.
+   * @param {import('../Character.js').Character} element
+   */
   constructor(element) {
     super(element);
     this.dom.classList.add('character');
@@ -54,12 +66,16 @@ export class CharacterRenderer extends Renderer
     this.domSprite.style.backgroundPosition = `${left}px ${top}px`;
   }
 
+  /** Refresh the sprite frame from the model and re-render the board position. */
   update() {
     this.applySpriteFrame(this.getElement().getDirection(), this.getElement().getAnimationIndex());
     super.render();
   }
 
-  /** Show a speech bubble with the given HTML content. */
+  /**
+   * Show a speech bubble with the given HTML content.
+   * @param {string} content
+   */
   showReaction(content) {
     this._domQuickReaction.innerHTML = content;
     this._domQuickReaction.classList.add('quickReaction--enable');

@@ -1,4 +1,3 @@
-import { DockerApiClient } from './DockerApiClient.js';
 import { sha256 } from './sha256.js';
 
 export class Container

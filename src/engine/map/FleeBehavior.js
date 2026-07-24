@@ -33,8 +33,16 @@ export class FleeBehavior {
   /** the element to flee from while it is in range, or null */
   _threat = null;
 
+  /** whether {@link start} has already wired the trigger zone (guards against re-arming) */
   _started = false;
 
+  /**
+   * @param {import('./Character.js').Character} character the shy NPC to drive
+   * @param {object} [options]
+   * @param {number} [options.radius] detection radius (px) around the character
+   * @param {number} [options.speed] pixels moved per tick
+   * @param {number} [options.tickDelay] ms between ticks
+   */
   constructor(character, { radius = 120, speed = 4, tickDelay = 60 } = {}) {
     this._character = character;
     this._radius = radius;
@@ -82,6 +90,8 @@ export class FleeBehavior {
   }
 
   /**
+   * Ticked by the game loop: run the flee step at the behavior's cadence,
+   * catching up if several `tickDelay` windows elapsed in one (slow) frame.
    * @param {number} dt milliseconds since the last frame
    */
   update(dt) {
@@ -92,6 +102,7 @@ export class FleeBehavior {
     }
   }
 
+  /** One flee tick: drop an out-of-range threat, else step away from it along the dominant axis. */
   _step() {
     if (!this._threat) {
       return; // nobody in range → stand still
@@ -123,7 +134,10 @@ export class FleeBehavior {
     character.update();
   }
 
-  /** Blocked by the static world, another NPC, or the threat itself. */
+  /**
+   * Blocked by the static world, another NPC, or the threat itself.
+   * @returns {boolean}
+   */
   _isBlocked() {
     const character = this._character;
     if (character.overlaps(character.getBoard())) {
@@ -132,7 +146,10 @@ export class FleeBehavior {
     return this._threat != null && character.overlaps(this._threat);
   }
 
-  /** The viewport this NPC is attached to, or null if it isn't in a world yet. */
+  /**
+   * @returns {import('./Viewport.js').Viewport|null} the viewport this NPC is
+   * attached to, or null if it isn't in a world yet
+   */
   _viewport() {
     const app = this._character.getApplication && this._character.getApplication();
     return app && app.getViewport ? app.getViewport() : null;

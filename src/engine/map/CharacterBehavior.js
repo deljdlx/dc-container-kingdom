@@ -12,8 +12,13 @@ export class CharacterBehavior {
   /** @type {import('./Character.js').Character} */
   _character;
 
+  /** whether the character is currently wandering */
   _alive = false;
+
+  /** ms between direction re-decisions */
   _actionDuration = 5000;
+
+  /** probability gate (0..1): a re-decision only happens when random() exceeds this */
   _newActionThreshold = 0.5;
 
   /** pixels moved per tick */
@@ -28,6 +33,7 @@ export class CharacterBehavior {
   /** ms accumulated since the last direction decision */
   _sinceAction = 0;
 
+  /** @param {import('./Character.js').Character} character the NPC this brain drives */
   constructor(character) {
     this._character = character;
   }
@@ -70,6 +76,7 @@ export class CharacterBehavior {
     }
   }
 
+  /** One wander tick: ensure a direction, occasionally re-decide, move, and turn away on collision. */
   _step() {
     const character = this._character;
 
@@ -112,12 +119,16 @@ export class CharacterBehavior {
     }
   }
 
+  /** @returns {string} a uniformly random cardinal direction */
   _randomDirection() {
     const directions = ['up', 'down', 'left', 'right'];
     return directions[Math.floor(Math.random() * directions.length)];
   }
 
-  /** The viewport this NPC is attached to, or null if it isn't in a world yet. */
+  /**
+   * @returns {import('./Viewport.js').Viewport|null} the viewport this NPC is
+   * attached to, or null if it isn't in a world yet
+   */
   _viewport() {
     const app = this._character.getApplication && this._character.getApplication();
     return app && app.getViewport ? app.getViewport() : null;

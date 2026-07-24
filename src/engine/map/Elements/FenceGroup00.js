@@ -2,8 +2,17 @@ import { Element } from '../Element.js';
 import { Fence00H } from './Fence00H.js';
 import { Fence00V } from './Fence00V.js';
 
+/**
+ * A rectangular fence enclosure assembled from {@link Fence00H} and
+ * {@link Fence00V} tiles: top and bottom horizontal runs, left and right
+ * vertical runs, with a gap left in the bottom run for an entrance.
+ */
 export class FenceGroup00 extends Element
 {
+  /**
+   * @param {number} [x] world x of the enclosure's top-left corner
+   * @param {number} [y] world y of the enclosure's top-left corner
+   */
   constructor(x = 0, y = 0) {
     super(x, y);
     const fenceLeft = 0;
