@@ -117,84 +117,93 @@ export class CollisionSystem {
     return this.getCollision(element, 'trigger');
   }
 
+  /**
+   * Detect what this element collides with in `element`'s subtree, then
+   * reconcile events/state against the previous frame.
+   * @returns {Array|false} the hits, or `false` when there are none.
+   */
   getCollision(element, type = 'collision') {
-    if (element === this._element) {
-      return false;
-    }
-
-    const boundingBoxCollided = this._collisionBoundingBox.isCollided(
-      element.getCollisionBoundingBox()
-    );
-
-    if (boundingBoxCollided) {
-      const collided = element.getCollisionZones(type).reduce((collided, zone) => {
-        const isCollided = this._collisionBoundingBox.isCollided(zone, type);
-        if (!collided) {
-          collided = isCollided;
-        }
-        zone.collided(isCollided, type);
-
-        return collided;
-      }, false);
-
-      if (collided) {
-        if (!element.collided(null, type)) {
-          this._collidedWith[type].push(element);
-
-          this._element.handle(this._element._eventPrefix + type, {
-            element: this._element,
-            target: element,
-          });
-
-          element.handle(this._element._eventPrefix + type, {
-            element: this._element,
-            target: element,
-          });
-        }
-
-        element.collided(true, type);
-        this.collided(true, type);
-
-        return [element];
-      }
-
-      const childCollisions = element.getChildren().map(child => {
-        return this.getCollision(child, type);
-      }).filter(Boolean).reduce((accumulator, element) => element, []);
-
-      if (childCollisions.length) {
-        return childCollisions;
-      }
-    }
-    element.clearCollision(type);
-
-    return false;
+    const hits = [];
+    this._detect(element, type, hits);
+    this._reconcile(hits, type);
+    return hits.length ? hits : false;
   }
 
-  clearCollision(type = 'collision') {
-    this._collidedWith[type].forEach(element => {
-      this._element.handle('element.' + type + '.end', {
-        element: this._element,
-        target: element,
-      });
-    });
+  /**
+   * Broad + narrow phase: prune any subtree whose aggregate box doesn't
+   * overlap, then collect elements whose collision zones actually intersect.
+   * Pure — no events, no state diffing (only the per-zone hit flag used for
+   * debug rendering).
+   */
+  _detect(element, type, hits) {
+    if (element === this._element) {
+      return;
+    }
+    if (!this._collisionBoundingBox.isCollided(element.getCollisionBoundingBox())) {
+      return; // whole subtree pruned
+    }
 
-    this._collidedWith[type].forEach(element => {
-      element.handle('element.' + type + '.end', {
-        element: element,
-        target: this._element,
-      });
-    });
-    this._collidedWith[type] = [];
-
-    this.collided(false, type);
-    this.getCollisionZones(type).forEach(zone => {
-      if (zone.dom) {
-        zone.collided(false, type);
+    let hit = false;
+    element.getCollisionZones(type).forEach(zone => {
+      const zoneHit = this._collisionBoundingBox.isCollided(zone, type);
+      zone.collided(zoneHit, type);
+      if (zoneHit) {
+        hit = true;
       }
     });
-    this._element.getChildren().forEach(child => {
-      child.clearCollision(type);
+
+    if (hit) {
+      hits.push(element);
+      return;
+    }
+
+    element.getChildren().forEach(child => this._detect(child, type, hits));
+  }
+
+  /**
+   * Diff the hits against the previous frame: fire start events for newly
+   * touching elements, end events for those no longer touching, and only touch
+   * the changed elements — no clearing the whole tree every frame.
+   */
+  _reconcile(hits, type) {
+    const previous = this._collidedWith[type];
+    const hitSet = new Set(hits);
+    const previousSet = new Set(previous);
+
+    hits.forEach(element => {
+      if (!previousSet.has(element)) {
+        this._element.handle(this._element._eventPrefix + type, {
+          element: this._element,
+          target: element,
+        });
+        element.handle(this._element._eventPrefix + type, {
+          element: this._element,
+          target: element,
+        });
+        element.collided(true, type);
+      }
     });
+
+    previous.forEach(element => {
+      if (!hitSet.has(element)) {
+        this._element.handle('element.' + type + '.end', {
+          element: this._element,
+          target: element,
+        });
+        element.handle('element.' + type + '.end', {
+          element: element,
+          target: this._element,
+        });
+        element.collided(false, type);
+      }
+    });
+
+    this._collidedWith[type] = hits;
+    this.collided(hits.length > 0, type);
+  }
+
+  /** Drop all current collisions (fires end events for each), via reconcile. */
+  clearCollision(type = 'collision') {
+    this._reconcile([], type);
   }
 }

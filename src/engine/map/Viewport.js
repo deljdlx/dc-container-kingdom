@@ -47,6 +47,9 @@ export class Viewport
    */
   _camera;
 
+  /** @type {{x: number, y: number}|null} last area the streaming ran for */
+  _lastAreaCoords = null;
+
   loop;
 
   // pixels per second
@@ -207,44 +210,36 @@ export class Viewport
     return this.board.areaExistsAt(at.x, at.y);
   }
 
-  loadAreasFromCurrentPosition() {
+  /**
+   * Ensure the (2·radius+1)² window of areas around the character is loaded.
+   * @param {number} [radius] 3 → a 7×7 window
+   */
+  loadAreasFromCurrentPosition(radius = 3) {
     const at = this.getCurrentAreaCoordinates();
-
-    this.board.loadArea(at.x - 1, at.y);
-    this.board.loadArea(at.x - 1, at.y - 1);
-    this.board.loadArea(at.x - 1, at.y + 1);
-
-    this.board.loadArea(at.x + 1, at.y);
-    this.board.loadArea(at.x + 1, at.y - 1);
-    this.board.loadArea(at.x + 1, at.y + 1);
-
-    this.board.loadArea(at.x, at.y + 1);
-    this.board.loadArea(at.x, at.y - 1);
+    for (let dx = -radius; dx <= radius; dx++) {
+      for (let dy = -radius; dy <= radius; dy++) {
+        this.board.loadArea(at.x + dx, at.y + dy);
+      }
+    }
   }
 
-  freeAreasFromCurrentPosision(radius = 2) {
+  /**
+   * Free any loaded area farther than `radius` from the character (Chebyshev
+   * distance). Keeping it one ring beyond the load window gives hysteresis, so
+   * areas aren't thrashed when walking along a boundary.
+   * @param {number} [radius] 4 → keep up to 9×9 before freeing
+   */
+  freeAreasFromCurrentPosision(radius = 4) {
     const at = this.getCurrentAreaCoordinates();
-
-    this.board.freeArea(at.x - 2, at.y - 2);
-    this.board.freeArea(at.x - 2, at.y - 1);
-    this.board.freeArea(at.x - 2, at.y);
-    this.board.freeArea(at.x - 2, at.y + 1);
-    this.board.freeArea(at.x - 2, at.y + 2);
-
-    this.board.freeArea(at.x + 2, at.y - 2);
-    this.board.freeArea(at.x + 2, at.y - 1);
-    this.board.freeArea(at.x + 2, at.y);
-    this.board.freeArea(at.x + 2, at.y + 1);
-    this.board.freeArea(at.x + 2, at.y + 2);
-
-    this.board.freeArea(at.x - 1, at.y + 2);
-    this.board.freeArea(at.x, at.y + 2);
-    this.board.freeArea(at.x + 1, at.y + 2);
-
-    this.board.freeArea(at.x - 1, at.y - 2);
-    this.board.freeArea(at.x, at.y - 2);
-    this.board.freeArea(at.x + 1, at.y - 2);
-
+    const areas = this.board.getAreas();
+    Object.keys(areas).forEach(x => {
+      Object.keys(areas[x]).forEach(y => {
+        const distance = Math.max(Math.abs(x - at.x), Math.abs(y - at.y));
+        if (distance > radius) {
+          this.board.freeArea(Number(x), Number(y));
+        }
+      });
+    });
   }
 
   // ===========================
@@ -270,10 +265,8 @@ export class Viewport
     if(this.character && this.moving) {
       const increment = Math.round(dt * this.character.moveSpeed() / 1000);
       if(increment >= 1) {
-        this.loadAreasFromCurrentPosition();
-        this.freeAreasFromCurrentPosision();
         this.moveCharacter(increment);
-        this.getBoard().update();
+        this._streamAreas();
         this.character.update();
       }
     }
@@ -281,6 +274,24 @@ export class Viewport
     // The camera follows its target; the viewport renderer applies the offset.
     this._camera.update();
     this.renderer.update();
+  }
+
+  /**
+   * Stream the area window, but only when the character actually crosses into a
+   * new area — the common case (walking within an area) does no work.
+   */
+  _streamAreas() {
+    const at = this.getCurrentAreaCoordinates();
+    if (this._lastAreaCoords
+      && at.x === this._lastAreaCoords.x
+      && at.y === this._lastAreaCoords.y) {
+      return;
+    }
+    this._lastAreaCoords = at;
+
+    this.loadAreasFromCurrentPosition();
+    this.freeAreasFromCurrentPosision();
+    this.getBoard().update(); // render the newly-loaded areas
   }
 
   /**
