@@ -1,7 +1,11 @@
-# Instructions Copilot — Container Kingdom
+# AGENTS.md — guide pour agents IA
 
-> Miroir de [`../AGENTS.md`](../AGENTS.md) et [`../CLAUDE.md`](../CLAUDE.md) —
-> garder les trois alignés si on modifie les règles.
+> Fichier agnostique lu par les agents de code (Copilot coding agent, Cursor, …).
+> Miroir de [`CLAUDE.md`](CLAUDE.md) (Claude Code) et de
+> [`.github/copilot-instructions.md`](.github/copilot-instructions.md) (Copilot) —
+> **garder les trois alignés** si on modifie les règles.
+
+## Le projet
 
 Outil de visualisation de conteneurs Docker rendu comme un **RPG** (chaque
 conteneur = une maison, les réseaux = des routes, des PNJ déambulent), bâti sur un
@@ -13,7 +17,7 @@ Deux couches :
 - **`src/container-kingdom/`** — l'app, qui *utilise* le moteur.
 
 Doc détaillée : dossier **`documentation/`** (`architecture.md`, `engine.md`,
-`container-kingdom.md`, `development.md`). Le détail au niveau code est dans les
+`container-kingdom.md`, `development.md`). Le détail au niveau code vit dans les
 **JSDoc** de chaque fichier.
 
 ## Commandes
@@ -26,33 +30,32 @@ npm run lint    # ESLint (doit rester à 0 problème)
 ```
 
 Démo moteur autonome : `http://localhost:5173/engine/demo/` (l'URL doit finir par
-`/`). Mode debug : ajouter `?debug=1` à l'URL (visualise zones de collision/trigger,
+`/`). Mode debug : `?debug=1` dans l'URL (visualise zones de collision/trigger et
 bounding boxes ; les zones s'allument en magenta au contact).
 
-## Règles pour générer du code
+## Règles pour écrire du code
 
 - **Langue** : code, identifiants, commentaires, **JSDoc** → **anglais**.
-  Messages de commit, PR, échanges → **français**.
+  Commits, PR, échanges → **français**.
 - **Épouser le style du code environnant** (nommage, densité de commentaires, idiomes).
-- **JSDoc** sur l'API publique et la logique subtile ; ailleurs, privilégier un
-  **code auto-documenté** (noms clairs) plutôt que des commentaires.
+- **JSDoc** sur l'API publique et la logique subtile ; ailleurs, code
+  auto-documenté (noms clairs) plutôt que commentaires.
 - **SOLID / découplage** : responsabilités séparées, dépendances explicites. Le
   moteur sépare déjà les préoccupations en sous-systèmes (`Element` compose
   `SceneGraph`, `CollisionSystem`, `Geometry`, `EventEmitter`, `Renderer`) — suivre
   ce patron plutôt que de gonfler une classe.
-- **Tests** (Vitest) sur la logique critique et les chemins fragiles. Les fichiers
-  DOM utilisent `// @vitest-environment jsdom` en tête ; la logique pure tourne en
-  environnement node.
+- **Tests** (Vitest) sur la logique critique. Fichiers DOM : `// @vitest-environment
+  jsdom` en tête ; logique pure : environnement node.
 - **Produit** : mobile-first, soin de la performance et de la finition visuelle.
 
 ## Frontière moteur (impérative)
 
-- Les dépendances vont **app → moteur uniquement**. Le moteur (`src/engine/`)
-  **n'importe jamais** rien de `src/container-kingdom/`.
-- Importer le moteur **uniquement** depuis le baril **`src/engine/index.js`**,
-  jamais un fichier interne. Y ajouter l'export de toute nouvelle classe publique.
-- Le moteur configure ses chemins d'assets via `setAssetsBase(...)` — pas de chemin
-  Container Kingdom en dur dedans.
+- Dépendances **app → moteur uniquement**. Le moteur (`src/engine/`) **n'importe
+  jamais** rien de `src/container-kingdom/`.
+- Importer le moteur **uniquement** depuis le baril **`src/engine/index.js`** —
+  jamais un fichier interne. Y exporter toute nouvelle classe publique.
+- Chemins d'assets du moteur configurés via `setAssetsBase(...)` — rien de
+  spécifique à Container Kingdom en dur.
 
 ## Repères d'architecture (moteur)
 
@@ -65,7 +68,7 @@ bounding boxes ; les zones s'allument en magenta au contact).
   diff. Zones **collision** (bloquent) vs **trigger** (émettent des events).
 - Personnages : `Character` animé, IA déléguée à des **behaviors** interchangeables
   (`PatrolBehavior`, `FleeBehavior`, `CharacterBehavior`) tickés par la game loop.
-  Déplacement via la primitive `Character.moveBlocked(dx, dy, isBlocked)`.
+  Déplacement via `Character.moveBlocked(dx, dy, isBlocked)`.
 - Éléments intégrés : `SpriteElement` déclaratifs (`static descriptor`).
 
 ## Vérification (« terminé » = vérifié)
@@ -76,12 +79,12 @@ Avant de considérer une modif finie : `npm run lint` (0 problème) + `npm run b
 > ⚠️ La game loop tourne sur `requestAnimationFrame` : **rAF est en pause quand
 > l'onglet est en arrière-plan**, donc rien ne bouge à l'écran. Pour vérifier de
 > façon déterministe, piloter la boucle à la main : `viewport.update(timestamp)`
-> avec des timestamps croissants (détails dans `documentation/development.md`).
+> avec des timestamps croissants (voir `documentation/development.md`).
 
 ## Git
 
-- Messages en **Conventional Commits** + description **française** (`feat:`, `fix:`,
-  `refactor:`, `docs:`, `test:`, `chore:`).
+- **Conventional Commits** + description **française** (`feat:`, `fix:`, `refactor:`,
+  `docs:`, `test:`, `chore:`).
 - **Ne jamais** ajouter de mention d'assistance IA (pas de `Co-Authored-By`, pas de
   « Generated with… »).
 - **Ne jamais** `git add -A` / `git add .` — stager des chemins explicites.

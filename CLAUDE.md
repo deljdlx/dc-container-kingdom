@@ -1,5 +1,9 @@
 # Container Kingdom — guide agent
 
+> Miroir de [`AGENTS.md`](AGENTS.md) et
+> [`.github/copilot-instructions.md`](.github/copilot-instructions.md) —
+> garder les trois alignés si on modifie les règles.
+
 Outil de visualisation de conteneurs Docker rendu comme un **RPG** : chaque
 conteneur devient une « maison » sur une carte, les réseaux deviennent des
 routes, des PNJ déambulent. Le rendu repose sur un **moteur de mini-RPG maison**
