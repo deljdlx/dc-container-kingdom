@@ -36,6 +36,7 @@ export { SceneGraph } from './map/SceneGraph.js';
 export { CharacterAnimator } from './map/CharacterAnimator.js';
 export { CharacterBehavior } from './map/CharacterBehavior.js';
 export { PatrolBehavior } from './map/PatrolBehavior.js';
+export { FleeBehavior } from './map/FleeBehavior.js';
 
 // --- Renderers ---
 export { Renderer } from './map/Renderer/Renderer.js';
