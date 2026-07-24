@@ -68,6 +68,18 @@ bounding boxes ; les zones s'allument en magenta au contact).
   Déplacement via la primitive `Character.moveBlocked(dx, dy, isBlocked)`.
 - Éléments intégrés : `SpriteElement` déclaratifs (`static descriptor`).
 
+## Tenir la documentation à jour (impératif)
+
+**Une doc obsolète est un bug.** Toute modification qui touche l'architecture, le
+comportement, l'API publique, les commandes ou les conventions **doit** mettre à
+jour la doc concernée **dans le même changement** :
+
+- `documentation/` (architecture, engine, container-kingdom, development) — y
+  compris les schémas Mermaid ;
+- les README (racine et `src/engine/`) et les **JSDoc** de l'API touchée ;
+- si les règles agent changent : les **trois** guides (`CLAUDE.md`, `AGENTS.md`,
+  `.github/copilot-instructions.md`), à garder alignés.
+
 ## Vérification (« terminé » = vérifié)
 
 Avant de considérer une modif finie : `npm run lint` (0 problème) + `npm run build`
