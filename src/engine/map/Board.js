@@ -72,11 +72,9 @@ export class Board extends Element
 
   loadArea(x, y) {
     if(!this.areaExistsAt(x, y)) {
-      const area = this.createAreaAt(x, y);
-
-      this.getRenderer().update();
-
-      return area;
+      // Rendering of newly-created areas is batched by the caller
+      // (Viewport._streamAreas) into a single board update.
+      return this.createAreaAt(x, y);
     }
 
     return this.areas[x][y];
