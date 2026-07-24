@@ -1,5 +1,15 @@
 import { Element } from '../Element.js';
 
+/**
+ * Positive base added to every world-space depth z-index. Areas paint their
+ * ground (grass) background at z-index `auto` (≈ 0); without this base an
+ * element north of the origin — where absolute Y is negative — would get a
+ * negative z-index and sink *behind* the ground. The base is large enough that
+ * no reachable position brings the depth back down to the ground layer, while
+ * the offset is uniform so relative painter ordering is untouched.
+ */
+const DEPTH_BASE = 1_000_000;
+
 export class Renderer
 {
 
@@ -108,8 +118,9 @@ export class Renderer
 
     if(this._element.manualZ === false) {
       // World-space depth: sort by absolute Y so painter's ordering stays
-      // consistent across areas (the camera never affects z).
-      const z = this._element.offsetY() + height;
+      // consistent across areas (the camera never affects z). DEPTH_BASE keeps
+      // the value above the ground layer even north of the origin.
+      const z = DEPTH_BASE + this._element.offsetY() + height;
       if(z !== this._lastZ) {
         this.dom.style.zIndex = z;
         this._lastZ = z;

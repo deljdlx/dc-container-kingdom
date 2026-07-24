@@ -1,27 +1,27 @@
+import { CharacterAnimator } from './CharacterAnimator.js';
+import { CharacterBehavior } from './CharacterBehavior.js';
 import { CharacterRenderer } from './Renderer/CharacterRenderer.js';
 import { Element } from './Element.js';
 
+/**
+ * A character in the world: a 48×48 walking sprite. Owns only its world state
+ * (geometry via {@link Element}, facing direction, sprite-sheet offset) and
+ * delegates the rest — the walk-cycle clock to {@link CharacterAnimator}, the
+ * autonomous NPC wander to {@link CharacterBehavior}, and the speech bubble to
+ * its {@link CharacterRenderer}.
+ */
 export class Character extends Element
 {
-
-  animationIndex = 0;
   direction;
 
   spriteSheetOffsetLeft = 0;
   spriteSheetOffsetTop = 0;
 
+  /** @type {CharacterAnimator} */
+  _animator = new CharacterAnimator();
 
-  tickInterval = 7;
-  tick = 0;
-
-  pixelsPerTick = 6;
-
-
-
-  alive = false;
-  lastActionTime = null;
-  actionDuration = 5000;
-  newActionThreshold = 0.5;
+  /** @type {CharacterBehavior} */
+  _behavior = new CharacterBehavior(this);
 
   constructor(
     x = null,
@@ -38,73 +38,9 @@ export class Character extends Element
     this.setRenderer(new CharacterRenderer(this));
   }
 
-  getTimeSinceLastAction() {
-    return new Date().getTime() - this.lastActionTime;
-  }
-
-  startNewAction() {
-    this.lastActionTime = new Date().getTime();
-  }
-
+  /** Bring the character to life as a wandering NPC. @see CharacterBehavior */
   live(actionDuration) {
-    this.actionDuration = actionDuration;
-    this.alive = true;
-    this.lastActionTime = new Date().getTime();
-    this.loop();
-  }
-
-  loop() {
-
-    if(this.alive && !this.getDirection()) {
-      this.setDirection(
-        this.getRandomDirection()
-      );
-    }
-
-    if(
-      this.getTimeSinceLastAction() >= this.actionDuration
-      && Math.random() > this.newActionThreshold
-    ) {
-      this.startNewAction();
-      this.setDirection(
-        this.getRandomDirection()
-      );
-    }
-
-    const savedGeometry = this.geometry.clone();
-
-    switch(this.getDirection()) {
-      case 'up':
-        this.y(this.y() - this.pixelsPerTick);
-        break;
-      case 'down':
-        this.y(this.y() + this.pixelsPerTick);
-        break;
-      case 'left':
-        this.x(this.x() - this.pixelsPerTick);
-        break;
-      case 'right':
-        this.x(this.x() + this.pixelsPerTick);
-        break;
-    }
-
-
-    const collisions = this.getCollision(this.getBoard());
-    if(collisions.length > 0) {
-      this.direction = this.getRandomDirection();
-      this.geometry = savedGeometry;
-    }
-
-    this.update();
-
-    setTimeout(() => {
-      this.loop();
-    }, 100);
-  }
-
-  getRandomDirection() {
-    const directions = ['up', 'down', 'left', 'right'];
-    return directions[Math.floor(Math.random() * directions.length)];
+    this._behavior.live(actionDuration);
   }
 
   stop() {
@@ -123,27 +59,29 @@ export class Character extends Element
     return this.direction;
   }
 
-  getAnimationIndex() {
-    return this.animationIndex;
-  }
-
-  update() {
-    const tickInterval = Math.round(this.moveSpeed() / 80);
-    this.tick = (++this.tick % tickInterval);
-    if(this.tick === 0) {
-      this.animationIndex = (++this.animationIndex % 3);
-    }
-    this.getRenderer().update();
-  }
-
   setDirection(direction) {
     this.direction = direction;
   }
 
+  getAnimationIndex() {
+    return this._animator.getIndex();
+  }
+
+  /** Advance the walk-cycle clock and re-render. Called each moved frame. */
+  update() {
+    this._animator.advance(Math.round(this.moveSpeed() / 80));
+    this.getRenderer().update();
+  }
+
+  /**
+   * Show a transient speech bubble above the character.
+   * @param {string} content
+   * @param {boolean} [autoClose]
+   * @param {number} [closeAfter] ms before auto-closing
+   */
   quickReaction(content, autoClose = true, closeAfter = 10000) {
-    this.getRenderer()._domQuickReaction.innerHTML = content;
-    this.getRenderer()._domQuickReaction.classList.add('quickReaction--enable');
-    if(autoClose) {
+    this.getRenderer().showReaction(content);
+    if (autoClose) {
       setTimeout(() => {
         this.clearQuickReaction();
       }, closeAfter);
@@ -152,10 +90,7 @@ export class Character extends Element
   }
 
   clearQuickReaction() {
-    this.getRenderer()._domQuickReaction.innerHTML = '';
-    this.getRenderer()._domQuickReaction.classList.remove('quickReaction--enable');
-    console.log('%cCharacter.js :: 62 =============================', 'color: #f00; font-size: 1rem');
-    console.log("ICI");
+    this.getRenderer().clearReaction();
     return this;
   }
 }

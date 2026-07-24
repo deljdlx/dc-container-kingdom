@@ -163,6 +163,25 @@ export class CollisionSystem {
   }
 
   /**
+   * Pure overlap test against `element`'s subtree: does this element's collision
+   * (or trigger) zones intersect anything there? Fires no events and touches no
+   * state — meant for AI probing a would-be move, unlike {@link getCollision}.
+   * @returns {boolean}
+   */
+  overlaps(element, type = 'collision') {
+    const collisionHits = [];
+    const triggerHits = [];
+    this._detect(
+      element,
+      type === 'collision',
+      type === 'trigger',
+      collisionHits,
+      triggerHits,
+    );
+    return (type === 'collision' ? collisionHits : triggerHits).length > 0;
+  }
+
+  /**
    * Broad + narrow phase over `element`'s subtree: prune any subtree whose
    * aggregate box doesn't overlap, then collect the elements whose collision
    * and/or trigger zones actually intersect (per the `seekCollision` /

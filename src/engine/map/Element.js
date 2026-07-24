@@ -338,6 +338,10 @@ export class Element
     return this.collision.reconcileTrigger(hits);
   }
 
+  overlaps(element, type = 'collision') {
+    return this.collision.overlaps(element, type);
+  }
+
   clearCollision(type = 'collision') {
     return this.collision.clearCollision(type);
   }

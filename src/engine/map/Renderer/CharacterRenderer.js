@@ -58,4 +58,16 @@ export class CharacterRenderer extends Renderer
     this.applySpriteFrame(this.getElement().getDirection(), this.getElement().getAnimationIndex());
     super.render();
   }
+
+  /** Show a speech bubble with the given HTML content. */
+  showReaction(content) {
+    this._domQuickReaction.innerHTML = content;
+    this._domQuickReaction.classList.add('quickReaction--enable');
+  }
+
+  /** Hide and empty the speech bubble. */
+  clearReaction() {
+    this._domQuickReaction.innerHTML = '';
+    this._domQuickReaction.classList.remove('quickReaction--enable');
+  }
 }
