@@ -43,6 +43,12 @@ export class Renderer
    */
   boundingBox;
 
+  _lastWidth = null;
+  _lastHeight = null;
+  _lastLeft = null;
+  _lastTop = null;
+  _lastZ = null;
+
 
    /**
    *
@@ -70,8 +76,17 @@ export class Renderer
 
     const relativeTo = this._element.relativeTo();
 
-    this.dom.style.width = this._element.width() + 'px';
-    this.dom.style.height = this._element.height() + 'px';
+    const width = this._element.width();
+    const height = this._element.height();
+
+    if(width !== this._lastWidth) {
+      this.dom.style.width = width + 'px';
+      this._lastWidth = width;
+    }
+    if(height !== this._lastHeight) {
+      this.dom.style.height = height + 'px';
+      this._lastHeight = height;
+    }
 
     let left = this._element.x();
     let top = this._element.y();
@@ -82,13 +97,23 @@ export class Renderer
       top += offsets.y;
     }
 
-    this.dom.style.left = left + 'px';
-    this.dom.style.top = top + 'px';
+    if(left !== this._lastLeft) {
+      this.dom.style.left = left + 'px';
+      this._lastLeft = left;
+    }
+    if(top !== this._lastTop) {
+      this.dom.style.top = top + 'px';
+      this._lastTop = top;
+    }
 
     if(this._element.manualZ === false) {
       // World-space depth: sort by absolute Y so painter's ordering stays
       // consistent across areas (the camera never affects z).
-      this.dom.style.zIndex = this._element.offsetY() + this._element.height();
+      const z = this._element.offsetY() + height;
+      if(z !== this._lastZ) {
+        this.dom.style.zIndex = z;
+        this._lastZ = z;
+      }
     }
 
     return this.dom;
