@@ -1,106 +1,39 @@
 # AGENTS.md — guide pour agents IA
 
-> Fichier agnostique lu par les agents de code (Copilot coding agent, Cursor, …).
-> Miroir de [`CLAUDE.md`](CLAUDE.md) (Claude Code) et de
-> [`.github/copilot-instructions.md`](.github/copilot-instructions.md) (Copilot) —
-> **garder les trois alignés** si on modifie les règles.
+> Fichier agnostique (Copilot coding agent, Cursor…). Résumé des règles ; **la
+> source de vérité est [`agents/`](agents/)**. Points d'entrée frères :
+> [`CLAUDE.md`](CLAUDE.md), [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
-## Le projet
+Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
+mini-RPG maison** (vanilla JS, ES modules). Deux couches :
 
-Outil de visualisation de conteneurs Docker rendu comme un **RPG** (chaque
-conteneur = une maison, les réseaux = des routes, des PNJ déambulent), bâti sur un
-**moteur de mini-RPG maison** en **vanilla JS (ES modules, sans framework)**.
-
-Deux couches :
-
-- **`src/engine/`** — le moteur RPG **réutilisable**. Ne connaît RIEN de Docker.
+- **`src/engine/`** — le moteur RPG **réutilisable** (ignore Docker).
 - **`src/container-kingdom/`** — l'app, qui *utilise* le moteur.
-
-Doc détaillée : dossier **`documentation/`** (`architecture.md`, `engine.md`,
-`container-kingdom.md`, `development.md`). Le détail au niveau code vit dans les
-**JSDoc** de chaque fichier.
 
 ## Commandes
 
 ```bash
-npm run dev     # app sur http://localhost:5173 (API Docker mockée, pas de daemon requis)
-npm run build   # bundle ES modules → dist/
-npm test        # Vitest
-npm run lint    # ESLint (doit rester à 0 problème)
-npm run verify  # lint + build + tests (commande de fin de tâche)
+npm run dev     # http://localhost:5173 (API Docker mockée, pas de daemon requis)
+npm run verify  # lint + build + tests — à faire passer avant de conclure
 ```
 
-Démo moteur autonome : `http://localhost:5173/engine/demo/` (l'URL doit finir par
-`/`). Mode debug : `?debug=1` dans l'URL (visualise zones de collision/trigger et
-bounding boxes ; les zones s'allument en magenta au contact).
+Démo moteur : `http://localhost:5173/engine/demo/` (l'URL doit finir par `/`).
+Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
-## Règles pour écrire du code
+## Règles essentielles
 
-- **Langue** : code, identifiants, commentaires, **JSDoc** → **anglais**.
-  Commits, PR, échanges → **français**.
-- **Épouser le style du code environnant** (nommage, densité de commentaires, idiomes).
-- **JSDoc** sur l'API publique et la logique subtile ; ailleurs, code
-  auto-documenté (noms clairs) plutôt que commentaires.
-- **SOLID / découplage** : responsabilités séparées, dépendances explicites. Le
-  moteur sépare déjà les préoccupations en sous-systèmes (`Element` compose
-  `SceneGraph`, `CollisionSystem`, `Geometry`, `EventEmitter`, `Renderer`) — suivre
-  ce patron plutôt que de gonfler une classe.
-- **Tests** (Vitest) sur la logique critique. Fichiers DOM : `// @vitest-environment
-  jsdom` en tête ; logique pure : environnement node.
-- **Produit** : mobile-first, soin de la performance et de la finition visuelle.
+- **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
+- **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
+- **Une branche par feature** ; Conventional Commits FR ; **jamais** de mention IA ;
+  **jamais** `git add -A` ; commiter/pusher **sur demande**.
+- **« Terminé » = vérifié** (`npm run verify`) ; **tenir la doc à jour**.
 
-## Frontière moteur (impérative)
+## Détail (source de vérité)
 
-- Dépendances **app → moteur uniquement**. Le moteur (`src/engine/`) **n'importe
-  jamais** rien de `src/container-kingdom/`.
-- Importer le moteur **uniquement** depuis le baril **`src/engine/index.js`** —
-  jamais un fichier interne. Y exporter toute nouvelle classe publique.
-- Chemins d'assets du moteur configurés via `setAssetsBase(...)` — rien de
-  spécifique à Container Kingdom en dur.
+Lire le dossier **[`agents/`](agents/)** pour les règles complètes :
 
-## Repères d'architecture (moteur)
+- [`agents/conventions.md`](agents/conventions.md) — langue, style/design, git.
+- [`agents/workflow.md`](agents/workflow.md) — vérification, doc à jour, piège rAF.
+- [`agents/engine-boundary.md`](agents/engine-boundary.md) — frontière + archi.
 
-- `Element` = nœud de scene-graph ; `Board`/`Area` = tuilage streamé 7×7 autour du
-  joueur ; `Viewport` = game loop `requestAnimationFrame` (registre de behaviors) ;
-  `Camera` suit une cible (découplée du perso) ; `Renderer/*` = rendu DOM, profondeur
-  par algorithme du peintre (`z = DEPTH_BASE + offsetY + height`).
-- Collisions : broad phase (bounding box agrégée) + narrow phase (**zones de
-  collision** du détecteur vs zones de la cible), détection pure + réconciliation par
-  diff. Zones **collision** (bloquent) vs **trigger** (émettent des events).
-- Personnages : `Character` animé, IA déléguée à des **behaviors** interchangeables
-  (`PatrolBehavior`, `FleeBehavior`, `CharacterBehavior`) tickés par la game loop.
-  Déplacement via `Character.moveBlocked(dx, dy, isBlocked)`.
-- Éléments intégrés : `SpriteElement` déclaratifs (`static descriptor`).
-
-## Tenir la documentation à jour (impératif)
-
-**Une doc obsolète est un bug.** Toute modification qui touche l'architecture, le
-comportement, l'API publique, les commandes ou les conventions **doit** mettre à
-jour la doc concernée **dans le même changement** :
-
-- `documentation/` (architecture, engine, container-kingdom, development) — y
-  compris les schémas Mermaid ;
-- les README (racine et `src/engine/`) et les **JSDoc** de l'API touchée ;
-- si les règles agent changent : les **trois** guides (`CLAUDE.md`, `AGENTS.md`,
-  `.github/copilot-instructions.md`), à garder alignés.
-
-## Vérification (« terminé » = vérifié)
-
-Avant de considérer une modif finie : `npm run lint` (0 problème) + `npm run build`
-+ `npm test` verts. Rapporter fidèlement (un test qui échoue se dit).
-
-> ⚠️ La game loop tourne sur `requestAnimationFrame` : **rAF est en pause quand
-> l'onglet est en arrière-plan**, donc rien ne bouge à l'écran. Pour vérifier de
-> façon déterministe, piloter la boucle à la main : `viewport.update(timestamp)`
-> avec des timestamps croissants (voir `documentation/development.md`).
-
-## Git
-
-- **Une branche par feature/fix** — jamais de travail direct sur `main`. Créer une
-  branche dédiée (`feat/…`, `fix/…`, `refactor/…`, `docs/…`, `chore/…`), coder →
-  vérifier → merger sur `main` (`--no-ff`).
-- **Conventional Commits** + description **française** (`feat:`, `fix:`, `refactor:`,
-  `docs:`, `test:`, `chore:`).
-- **Ne jamais** ajouter de mention d'assistance IA (pas de `Co-Authored-By`, pas de
-  « Generated with… »).
-- **Ne jamais** `git add -A` / `git add .` — stager des chemins explicites.
+Pour comprendre le **code** : **[`documentation/`](documentation/)**.
