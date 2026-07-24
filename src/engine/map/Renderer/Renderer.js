@@ -47,10 +47,8 @@ export class Renderer
    */
   childDom;
 
-  /**
-   * @type {DomElement}
-   */
-  collisionDom;
+  /** @type {DomElement} debug box for the aggregate collision bounding box */
+  collisionBoundingBoxDom;
 
   /**
    * @type {DomElement}
@@ -219,18 +217,18 @@ export class Renderer
 
     const element = this._element;
 
-    if(this.collisiondDom) {
-      return this.collisiondDom;
+    if(this.collisionBoundingBoxDom) {
+      return this.collisionBoundingBoxDom;
     }
-    this.collisiondDom = document.createElement('div');
-    this.collisiondDom.classList.add('map-element__collision-bounding-box');
-    this.collisiondDom.style.left = element.getCollisionBoundingBox().x0() + 'px';
-    this.collisiondDom.style.top = element.getCollisionBoundingBox().y0() + 'px';
-    this.collisiondDom.style.width = element.getCollisionBoundingBox().width() + 'px';
-    this.collisiondDom.style.height = element.getCollisionBoundingBox().height() + 'px';
+    this.collisionBoundingBoxDom = document.createElement('div');
+    this.collisionBoundingBoxDom.classList.add('map-element__collision-bounding-box');
+    this.collisionBoundingBoxDom.style.left = element.getCollisionBoundingBox().x0() + 'px';
+    this.collisionBoundingBoxDom.style.top = element.getCollisionBoundingBox().y0() + 'px';
+    this.collisionBoundingBoxDom.style.width = element.getCollisionBoundingBox().width() + 'px';
+    this.collisionBoundingBoxDom.style.height = element.getCollisionBoundingBox().height() + 'px';
 
     if(this.dom) {
-      this.dom.appendChild(this.collisiondDom);
+      this.dom.appendChild(this.collisionBoundingBoxDom);
     }
 
     /**
@@ -260,7 +258,7 @@ export class Renderer
       element.renderCollisionZones();
     });
 
-    return this.collisiondDom;
+    return this.collisionBoundingBoxDom;
   }
 
   /**
