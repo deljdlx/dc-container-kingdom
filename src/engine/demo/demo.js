@@ -6,6 +6,9 @@ import {
   Fountain00,
   Sunflower00,
   Man00,
+  Woman00,
+  Woman01,
+  Woman02,
   PatrolBehavior,
   setAssetsBase,
 } from '../index.js';
@@ -75,16 +78,46 @@ populate(0, -1, [
   [520, 300, Tree00],
 ]);
 
-// A collidable NPC that walks back and forth across the origin area — bump the
-// player into it to see the collision block, and watch it turn around when it
-// hits an obstacle.
-const npc = new Man00();
-board.getAreaAt(0, 0).addElement(230, 220, npc);
-const patrol = new PatrolBehavior(npc, { axis: 'horizontal', distance: 240, speed: 3 });
+// A small crowd of collidable NPCs to stress collisions & rendering: 8 that
+// patrol back and forth (varied axes/speeds, some paths cross so they collide
+// with each other too — overlaps(board) sees the other NPCs) and 2 that stand
+// still. Bump the player into any of them to feel the block.
+const originArea = board.getAreaAt(0, 0);
+const patrols = [];
+
+/**
+ * Drop an NPC into the origin area. With `patrolOpts` it wanders back and
+ * forth; without, it stands still (still collidable).
+ * @param {Function} Base a character-base class
+ * @param {number} x local X in the area
+ * @param {number} y local Y in the area
+ * @param {object|null} [patrolOpts] PatrolBehavior options, or null to stand
+ */
+function spawnNpc(Base, x, y, patrolOpts = null) {
+  const npc = new Base();
+  originArea.addElement(x, y, npc);
+  if (patrolOpts) {
+    patrols.push(new PatrolBehavior(npc, patrolOpts));
+  }
+}
+
+// 8 moving NPCs.
+spawnNpc(Man00,   340, 170, { axis: 'horizontal', distance: 200, speed: 3 });
+spawnNpc(Woman00, 380, 90,  { axis: 'horizontal', distance: 220, speed: 4 });
+spawnNpc(Woman01, 120, 300, { axis: 'vertical',   distance: 160, speed: 2 });
+spawnNpc(Woman02, 610, 470, { axis: 'horizontal', distance: 200, speed: 3 });
+spawnNpc(Man00,   410, 300, { axis: 'vertical',   distance: 130, speed: 3 });
+spawnNpc(Woman00, 790, 110, { axis: 'vertical',   distance: 220, speed: 2 });
+spawnNpc(Woman01, 330, 400, { axis: 'horizontal', distance: 170, speed: 4 });
+spawnNpc(Man00,   850, 360, { axis: 'vertical',   distance: 130, speed: 3 });
+
+// 2 immobile NPCs.
+spawnNpc(Woman02, 280, 160);
+spawnNpc(Man00,   440, 230);
 
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
 viewport.render();
 viewport.run();
-patrol.start();
+patrols.forEach(patrol => patrol.start());
