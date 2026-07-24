@@ -1,18 +1,12 @@
-import { Element } from '../Element.js';
-import { assetUrl } from '../../assets.js';
+import { SpriteElement } from '../SpriteElement.js';
 
-export class Fence00H extends Element
+export class Fence00H extends SpriteElement
 {
-  constructor() {
-    super(0, 0 , 16, 16)
-    this.createCollisionZone(0, 0, 16, 16);
-  }
-
-  render() {
-    const dom = super.render();
-    this.getRenderer().addShadow();
-    dom.style.backgroundImage = `url(${assetUrl('map/map-sprites-01.png')})`;
-    dom.style.backgroundPosition = `-1520px -1520px`;
-    return dom;
-  }
+  static descriptor = {
+    width: 16,
+    height: 16,
+    atlas: 'map/map-sprites-01.png',
+    frame: [-1520, -1520],
+    collision: [0, 0, 16, 16],
+  };
 }

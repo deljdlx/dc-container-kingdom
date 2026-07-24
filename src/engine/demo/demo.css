@@ -1,0 +1,41 @@
+body {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  background: #10161f;
+  color: #e6edf3;
+  font-family: system-ui, sans-serif;
+}
+
+.demo-header {
+  text-align: center;
+  max-width: 720px;
+}
+
+.demo-header h1 {
+  margin: 0 0 6px;
+  font-size: 1.4rem;
+}
+
+.demo-header p {
+  margin: 0;
+  font-size: 0.9rem;
+  color: #9fb0c0;
+}
+
+.demo-header code {
+  background: #1c2733;
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+#viewport {
+  overflow: hidden;
+  border: 3px solid #2b3948;
+  border-radius: 6px;
+  box-shadow: 0 12px 40px #0008;
+  background: #6a9b41;
+}

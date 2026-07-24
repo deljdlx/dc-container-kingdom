@@ -1,6 +1,7 @@
 import { Application } from './Application.js';
 import { Area } from './Area.js';
 import { Board } from './Board.js';
+import { Camera } from './Camera.js';
 import { Character } from './Character.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
@@ -40,6 +41,11 @@ export class Viewport
    * @type {Geometry}
    */
   geometry;
+
+  /**
+   * @type {Camera}
+   */
+  _camera;
 
   loop;
 
@@ -97,9 +103,17 @@ export class Viewport
     this.geometry.width(width);
 
     this.geometry.height(height);
+    this._camera = new Camera(width, height);
     this.renderer = new ViewportRenderer(this);
 
     this.board = new Board(this);
+  }
+
+  /**
+   * @returns {Camera}
+   */
+  getCamera() {
+    return this._camera;
   }
 
   enableMainCharacter(mainCharacterX, mainCharacterY) {
@@ -115,6 +129,9 @@ export class Viewport
     this.character.y(mainCharacterY);
     this.character.moveSpeed(300);
     this.character.setApplication(this.getApplication());
+
+    // The camera keeps the player centred.
+    this._camera.follow(this.character);
   }
 
   clear() {
@@ -246,58 +263,50 @@ export class Viewport
   // ===========================
 
   update(timestamp) {
-
-    if(!this.character) {
-      return;
-    }
-
-    const increment = Math.round((timestamp - this._timestamp) * this.character.moveSpeed() / 1000);
-
-    if(increment < 1) {
-      return;
-    }
-
+    // Clamp dt so the first frame after a pause doesn't teleport the character.
+    const dt = this._timestamp ? Math.min(timestamp - this._timestamp, 100) : 0;
     this._timestamp = timestamp;
 
-    if(this.moving === 0) {
-      return;
+    if(this.character && this.moving) {
+      const increment = Math.round(dt * this.character.moveSpeed() / 1000);
+      if(increment >= 1) {
+        this.loadAreasFromCurrentPosition();
+        this.freeAreasFromCurrentPosision();
+        this.moveCharacter(increment);
+        this.getBoard().update();
+        this.character.update();
+      }
     }
 
-    this.loadAreasFromCurrentPosition();
-    this.freeAreasFromCurrentPosision();
-
-    this.updateCharacter(increment);
-
-
-    this.getBoard().update();
+    // The camera follows its target; the viewport renderer applies the offset.
+    this._camera.update();
     this.renderer.update();
-    this.character.update();
   }
 
-  updateCharacter(increment) {
-
+  /**
+   * Move the player through the world by `increment`, reverting on collision.
+   * The camera follows separately, so the player is no longer glued to centre.
+   */
+  moveCharacter(increment) {
     if(!this.character) {
       return;
     }
 
-    const saveGeometry = this.geometry.clone();
+    const savedX = this.character.x();
+    const savedY = this.character.y();
 
     switch(this.direction) {
-      case 'up': { this.geometry.add('y', -increment); break; }
-      case 'down': { this.geometry.add('y', increment); break; }
-      case 'left': { this.geometry.add('x', -increment); break; }
-      case 'right': { this.geometry.add('x', increment); break; }
+      case 'up': { this.character.y(this.character.y() - increment); break; }
+      case 'down': { this.character.y(this.character.y() + increment); break; }
+      case 'left': { this.character.x(this.character.x() - increment); break; }
+      case 'right': { this.character.x(this.character.x() + increment); break; }
     }
 
-    this.character.x(this.x() + this.width() / 2);
-    this.character.y(this.y() + this.height() / 2);
-
-    let collisions = this.character.getCollision(this.board);
+    const collisions = this.character.getCollision(this.board);
 
     if(collisions.length) {
-      this.geometry = saveGeometry;
-      this.character.x(this.x() + this.width() / 2);
-      this.character.y(this.y() + this.height() / 2);
+      this.character.x(savedX);
+      this.character.y(savedY);
     }
     else {
       this.character.clearCollision();
@@ -308,7 +317,7 @@ export class Viewport
       character: this.character,
     });
 
-    let triggers = this.character.getTrigger(this.board);
+    const triggers = this.character.getTrigger(this.board);
     if(!triggers.length) {
       this.character.clearCollision('trigger');
     }
@@ -335,34 +344,31 @@ export class Viewport
   }
 
   run() {
+    if(this.character) {
+      document.body.addEventListener('keyup', () => {
+        this.stop();
+      });
 
-    if(!this.character) {
-      return;
+      document.body.addEventListener('keydown', (event) => {
+        if (event.key === 'ArrowLeft') {
+          this.move('left');
+        }
+        if (event.key === 'ArrowRight') {
+          this.move('right');
+        }
+        if (event.key === 'ArrowUp') {
+          this.move('up');
+        }
+        if (event.key === 'ArrowDown') {
+          this.move('down');
+        }
+      });
     }
 
-
-    document.body.addEventListener('keyup', (event) => {
-      this.stop();
-      return;
-    });
-
-    document.body.addEventListener('keydown', (event) => {
-      if (event.key === 'ArrowLeft') {
-        this.move('left');
-      }
-
-      if (event.key === 'ArrowRight') {
-        this.move('right');
-      }
-      if (event.key === 'ArrowUp') {
-        this.move('up');
-      }
-      if (event.key === 'ArrowDown') {
-        this.move('down');
-      }
-    });
-
-    this.startLoop()
+    // Nothing to drive (e.g. the host translates the board itself) → no loop.
+    if(this.character || this._camera.isActive()) {
+      this.startLoop();
+    }
   }
 
   getGeometry() {
