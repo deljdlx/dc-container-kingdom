@@ -1,5 +1,3 @@
-import { Element } from '../Element.js';
-
 /**
  * Positive base added to every world-space depth z-index. Areas paint their
  * ground (grass) background at z-index `auto` (≈ 0); without this base an
@@ -10,11 +8,17 @@ import { Element } from '../Element.js';
  */
 const DEPTH_BASE = 1_000_000;
 
+/**
+ * Base renderer for any map element: owns the element's root DOM node and the
+ * inner/sprite sub-nodes, and keeps world-space position, size and painter
+ * depth in sync with the model. Subclasses specialise the paint step (areas,
+ * characters, sprites, board) while reusing this positioning logic.
+ */
 export class Renderer
 {
 
   /**
-   * @type {Element}
+   * @type {import('../Element.js').Element}
    */
   _element;
 
@@ -53,6 +57,10 @@ export class Renderer
    */
   boundingBox;
 
+  /**
+   * Last painted geometry/depth, cached so `render()` only touches the DOM when
+   * a value actually changed (positions are recomputed every frame).
+   */
   _lastWidth = null;
   _lastHeight = null;
   _lastLeft = null;
@@ -61,8 +69,8 @@ export class Renderer
 
 
    /**
-   *
-   * @param {Element} element
+   * Build the element's root DOM node with its inner-content and sprite layers.
+   * @param {import('../Element.js').Element} element
    */
   constructor(element) {
     this._element = element;
@@ -79,8 +87,9 @@ export class Renderer
   }
 
   /**
-   * @param {Element|null} referenceElement
-   * @returns {DomElement}
+   * Sync the root node's size, world-space position and painter depth with the
+   * model, writing only the properties that changed since the last paint.
+   * @returns {DomElement} the element's root DOM node
    */
   render() {
 
@@ -130,14 +139,20 @@ export class Renderer
     return this.dom;
   }
 
+  /** @returns {DomElement} the sprite layer node */
   getSprite() {
     return this.domSprite;
   }
 
+  /** @returns {DomElement} the shadow node (undefined until `addShadow()` runs) */
   getShadow() {
     return this.domShadow;
   }
 
+  /**
+   * Create the drop-shadow node (idempotent), sized from the element's height.
+   * @returns {DomElement} the shadow node
+   */
   addShadow() {
     if(this.domShadow) {
       return this.domShadow;
@@ -153,34 +168,38 @@ export class Renderer
     return this.domShadow;
   }
 
+  /** Per-frame update hook; overridden by subclasses, a no-op on the base. */
   update() {
-    /*
-    if(this._element.collided()) {
-      this.dom.classList.add('collided');
-    }
-    else {
-      this.dom.classList.remove('collided');
-    }
-    */
   }
 
+  /** @returns {DomElement} the element's root DOM node */
   getDom() {
     return this.dom;
   }
 
+  /** Detach the root node from the DOM. */
   clear() {
     this.dom.remove();
   }
 
+  /** @returns {import('../Element.js').Element} the rendered model element */
   getElement() {
     return this._element;
   }
 
+  /**
+   * Add a CSS class to the root node.
+   * @param {string} className
+   */
   addClass(className) {
     this.dom.classList.add(className);
   }
 
 
+  /**
+   * Create the debug bounding-box overlay node (idempotent).
+   * @returns {DomElement} the bounding-box node
+   */
   renderBoundingBox() {
     if(this.boundingBox) {
       return this.boundingBox;
@@ -191,6 +210,11 @@ export class Renderer
     return this.boundingBox;
   }
 
+  /**
+   * Build the debug overlays for this element's collision bounding box plus its
+   * collision and trigger zones, then recurse into children (idempotent).
+   * @returns {DomElement} the collision bounding-box node
+   */
   renderCollisionZones() {
 
     const element = this._element;
@@ -209,6 +233,11 @@ export class Renderer
       this.dom.appendChild(this.collisiondDom);
     }
 
+    /**
+     * Paint one collision/trigger zone overlay and cache its node on the box.
+     * @param {import('../BoundingBox.js').BoundingBox} boundingBox
+     * @param {string} className
+     */
     const renderZone = (boundingBox, className) => {
       const zoneDom = document.createElement('div');
       zoneDom.classList.add(className);
@@ -234,6 +263,10 @@ export class Renderer
     return this.collisiondDom;
   }
 
+  /**
+   * Replace the inner-content HTML and widen the node to the element's width.
+   * @param {string} html
+   */
   setInnerHTML(html) {
     this.innerContent.innerHTML = html;
     this.innerContent.style.minWidth = this._element.width() + 'px';

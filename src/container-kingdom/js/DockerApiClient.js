@@ -1,4 +1,3 @@
-import { Container } from './Container.js';
 
 export class DockerApiClient
 {

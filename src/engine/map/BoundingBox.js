@@ -1,10 +1,15 @@
-import { Element } from './Element.js';
-
+/**
+ * Axis-aligned rectangle in an element's local space, expressed as two corners
+ * (`x0,y0` top-left → `x1,y1` bottom-right). Backs both a single element's box
+ * and the aggregate box that grows to enclose its children/zones. Coordinates
+ * stay local; the `offset*` accessors project them into world space through the
+ * owning element. A box is "undefined" until all four corners are set.
+ */
 export class BoundingBox
 {
 
   /**
-   * @type {Element}
+   * @type {import('./Element.js').Element}
    */
   _element;
 
@@ -34,7 +39,8 @@ export class BoundingBox
   _collided = false;
 
   /**
-   * @param {Element|null} element
+   * When an element is given, seed the box from its position and size.
+   * @param {import('./Element.js').Element|null} element
    */
   constructor(element = null) {
     if(element) {
@@ -47,7 +53,8 @@ export class BoundingBox
   }
 
   /**
-   * @param {boolean} value
+   * Get or set the collided flag.
+   * @param {?boolean} value
    * @returns {boolean}
    */
   collided(value = null) {
@@ -59,8 +66,9 @@ export class BoundingBox
   }
 
   /**
-   * @param {BoundingBox} element
-   * @returns {BoundingBox}
+   * Grow this box (in place) to also enclose `boundingBox`.
+   * @param {BoundingBox} boundingBox
+   * @returns {BoundingBox} this
    */
   updateWithBoundingBox(boundingBox) {
 
@@ -84,8 +92,10 @@ export class BoundingBox
   }
 
   /**
-   * @param {Element} parentElement
-   * @param {Element} childElement
+   * Grow `parentElement`'s collision box to enclose `childElement`'s, translated
+   * by the child's local position (null corners are treated as "not yet set").
+   * @param {import('./Element.js').Element} parentElement
+   * @param {import('./Element.js').Element} childElement
    */
   updateWithRelativeElement(parentElement, childElement) {
     if(
@@ -135,7 +145,9 @@ export class BoundingBox
 
   // ===========================
   /**
-   * @param {BoudingBox} boudingBox
+   * AABB overlap test in world space; false if either box is undefined.
+   * @param {BoundingBox} boundingBox
+   * @returns {boolean}
    */
   isCollided(boundingBox) {
     if(this.isUndefined() || boundingBox.isUndefined()) {
@@ -151,6 +163,7 @@ export class BoundingBox
   }
 
   /**
+   * True while any of the four corners is still unset.
    * @returns {boolean}
    */
   isUndefined() {
@@ -160,6 +173,7 @@ export class BoundingBox
   // ===========================
 
   /**
+   * The four world-space corners as a plain object.
    * @returns {{x0: number, x1: number, y0: number, y1: number}}
    */
   offsets() {
@@ -171,23 +185,40 @@ export class BoundingBox
     }
   }
 
+  /**
+   * @returns {number} left edge in world space
+   */
   offsetX0() {
     return this.x0() + this._element.offsetX();
   }
 
+  /**
+   * @returns {number} right edge in world space
+   */
   offsetX1() {
     return this.x1() + this._element.offsetX();
   }
 
+  /**
+   * @returns {number} top edge in world space
+   */
   offsetY0() {
     return this.y0() + this._element.offsetY();
   }
 
+  /**
+   * @returns {number} bottom edge in world space
+   */
   offsetY1() {
     return this.y1() + this._element.offsetY();
   }
 
 
+  /**
+   * Get or set the local left edge.
+   * @param {?number} value
+   * @returns {number}
+   */
   x0(value = null) {
     if(value !== null) {
       this._x0 = value;
@@ -195,6 +226,11 @@ export class BoundingBox
     return this._x0;
   }
 
+  /**
+   * Get or set the local right edge.
+   * @param {?number} value
+   * @returns {number}
+   */
   x1(value = null) {
     if(value !== null) {
       this._x1 = value;
@@ -202,6 +238,11 @@ export class BoundingBox
     return this._x1;
   }
 
+  /**
+   * Get or set the local top edge.
+   * @param {?number} value
+   * @returns {number}
+   */
   y0(value = null) {
     if(value !== null) {
       this._y0 = value;
@@ -209,6 +250,11 @@ export class BoundingBox
     return this._y0;
   }
 
+  /**
+   * Get or set the local bottom edge.
+   * @param {?number} value
+   * @returns {number}
+   */
   y1(value = null) {
     if(value !== null) {
       this._y1 = value;
@@ -216,6 +262,11 @@ export class BoundingBox
     return this._y1;
   }
 
+  /**
+   * Get the width, or set it by moving the right edge relative to `x0`.
+   * @param {?number} value
+   * @returns {number}
+   */
   width(value = null) {
     if(value !== null) {
       this._x1 = this.x0() + value;
@@ -223,6 +274,11 @@ export class BoundingBox
     return this._x1 - this._x0;
   }
 
+  /**
+   * Get the height, or set it by moving the bottom edge relative to `y0`.
+   * @param {?number} value
+   * @returns {number}
+   */
   height(value = null) {
     if(value) {
       this._y1 = this.y0() + value;

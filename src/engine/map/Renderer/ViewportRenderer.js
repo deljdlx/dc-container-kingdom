@@ -1,10 +1,13 @@
-import { Viewport } from '../Viewport.js';
 import { isDebugEnabled } from '../../debug.js';
 
+/**
+ * Renders a viewport: sizes its container, mounts the board (and the player
+ * character on top of it), and applies the camera translation each frame.
+ */
 export class ViewportRenderer
 {
   /**
-   * @type {Viewport}
+   * @type {import('../Viewport.js').Viewport}
    */
   _viewport;
 
@@ -14,15 +17,13 @@ export class ViewportRenderer
   _container;
 
   /**
-   * @param {Viewport} viewport
-   */
-
-  /**
    * @type {DomElement}
    */
   domCharacter;
 
   /**
+   * Last camera position painted, so the board transform is only rewritten when
+   * the camera actually moved.
    * @type {number|null}
    */
   _lastCameraX = null;
@@ -32,19 +33,21 @@ export class ViewportRenderer
    */
   _lastCameraY = null;
 
+  /**
+   * @param {import('../Viewport.js').Viewport} viewport
+   */
   constructor(viewport) {
     this._viewport = viewport;
     this._container = this._viewport.getContainer();
     this._board = this._viewport.getBoard();
   }
 
+  /** Empty the viewport container. */
   clear() {
     this._container.innerHTML = '';
   }
 
-  /**
-   * @param {DomElement} container
-   */
+  /** Size the container, mount the board, then mount the character over it. */
   render() {
     this._container.style.width = this._viewport.getGeometry().width() + 'px';
     this._container.style.height = this._viewport.getGeometry().height() + 'px';
@@ -58,6 +61,7 @@ export class ViewportRenderer
 
   }
 
+  /** Draw board/character debug overlays; no-op unless debug mode is on. */
   renderDebug() {
     // No-op unless debug mode is on (?debug=1 → body.debug), so callers can
     // invoke it unconditionally.
@@ -72,6 +76,7 @@ export class ViewportRenderer
     }
   }
 
+  /** Translate the board to follow the camera, only when it moved this frame. */
   update() {
     const camera = this._viewport.getCamera();
 

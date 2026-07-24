@@ -12,9 +12,12 @@ import { Element } from './Element.js';
  */
 export class Character extends Element
 {
+  /** @type {string|null} the direction currently faced/walked ('up'|'down'|'left'|'right'), or null when idle */
   direction;
 
+  /** @type {number} column offset (px) of this character's sprite in the shared sheet */
   spriteSheetOffsetLeft = 0;
+  /** @type {number} row offset (px) of this character's sprite in the shared sheet */
   spriteSheetOffsetTop = 0;
 
   /** @type {CharacterAnimator} */
@@ -26,6 +29,12 @@ export class Character extends Element
   /** @type {ReturnType<typeof setTimeout>|undefined} speech-bubble auto-close timer */
   _reactionTimeout;
 
+  /**
+   * @param {number|null} [x] world x, or null to leave unpositioned
+   * @param {number|null} [y] world y, or null to leave unpositioned
+   * @param {number} [spriteSheetOffsetLeft] column offset (px) into the sprite sheet
+   * @param {number} [spriteSheetOffsetTop] row offset (px) into the sprite sheet
+   */
   constructor(
     x = null,
     y = null,
@@ -41,31 +50,40 @@ export class Character extends Element
     this.setRenderer(new CharacterRenderer(this));
   }
 
-  /** Bring the character to life as a wandering NPC. @see CharacterBehavior */
+  /**
+   * Bring the character to life as a wandering NPC. @see CharacterBehavior
+   * @param {number} actionDuration ms between random direction changes
+   */
   live(actionDuration) {
     this._behavior.live(actionDuration);
   }
 
+  /** Halt movement by clearing the current facing direction. */
   stop() {
     this.direction = null;
   }
 
+  /** @returns {number} the sprite-sheet column offset (px) */
   getSpriteSheetOffsetLeft() {
     return this.spriteSheetOffsetLeft;
   }
 
+  /** @returns {number} the sprite-sheet row offset (px) */
   getSpriteSheetOffsetTop() {
     return this.spriteSheetOffsetTop;
   }
 
+  /** @returns {string|null} the direction currently faced, or null when idle */
   getDirection() {
     return this.direction;
   }
 
+  /** @param {string|null} direction the new facing direction, or null for idle */
   setDirection(direction) {
     this.direction = direction;
   }
 
+  /** @returns {number} the current walk-cycle frame index */
   getAnimationIndex() {
     return this._animator.getIndex();
   }
@@ -104,6 +122,7 @@ export class Character extends Element
    * @param {string} content
    * @param {boolean} [autoClose]
    * @param {number} [closeAfter] ms before auto-closing
+   * @returns {this}
    */
   quickReaction(content, autoClose = true, closeAfter = 10000) {
     this.getRenderer().showReaction(content);
@@ -117,6 +136,7 @@ export class Character extends Element
     return this;
   }
 
+  /** Hide the speech bubble immediately and fire the hide event if one was shown. @returns {this} */
   clearQuickReaction() {
     clearTimeout(this._reactionTimeout);
     const wasReacting = this.isReacting();

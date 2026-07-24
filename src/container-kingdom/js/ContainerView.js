@@ -1,4 +1,3 @@
-import { Container } from './Container.js';
 
 /**
  * DOM/view layer for a {@link Container}. Owns everything that touches the

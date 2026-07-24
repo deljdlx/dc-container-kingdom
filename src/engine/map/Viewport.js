@@ -1,5 +1,3 @@
-import { Application } from './Application.js';
-import { Area } from './Area.js';
 import { Board } from './Board.js';
 import { Camera } from './Camera.js';
 import { Character } from './Character.js';
@@ -8,11 +6,16 @@ import { Geometry } from './Geometry.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
 
+/**
+ * The rendered window onto the world: owns the {@link Board}, the {@link Camera}
+ * and (optionally) the player {@link Character}, and drives the single rAF game
+ * loop that moves the player, streams areas, ticks NPC behaviors and renders.
+ */
 export class Viewport
 {
 
   /**
-   * @type {Application}
+   * @type {import('./Application.js').Application}
    */
   _application;
 
@@ -86,19 +89,16 @@ export class Viewport
 
 
   /**
-   * @param {Application} application
-   * @param {DomElement} container
-   * @param {number} width
-   * @param {number} height
+   * @param {import('./Application.js').Application} application
+   * @param {DomElement} container host DOM node the viewport renders into
+   * @param {number} [width]
+   * @param {number} [height]
    */
   constructor(
     application,
     container,
     width = 500,
     height = 500,
-    mainCharacterX = null,
-    mainCharacterY = null
-
   ) {
     this._application = application;
 
@@ -142,6 +142,12 @@ export class Viewport
     }
   }
 
+  /**
+   * Create the player character, wire its renderer/app, place it (defaults to the
+   * viewport centre) and have the camera follow it.
+   * @param {number|null} mainCharacterX defaults to half the viewport width
+   * @param {number|null} mainCharacterY defaults to half the viewport height
+   */
   enableMainCharacter(mainCharacterX, mainCharacterY) {
     this.character = new Character();
     this.character.setRenderer(new MainCharacterRenderer(this.character));
@@ -160,16 +166,28 @@ export class Viewport
     this._camera.follow(this.character);
   }
 
+  /** Clear the viewport renderer and the board. */
   clear() {
     this.renderer.clear();
     this.board.clear();
   }
 
   // ===========================
+  /**
+   * Subscribe to a viewport-level event.
+   * @param {string} name
+   * @param {Function} callback
+   * @returns {*} the subscription handle returned by the emitter
+   */
   addEventListener(name, callback) {
     return this._events.on(name, callback);
   }
 
+  /**
+   * Emit an event on the viewport bus and bubble it to the application bus.
+   * @param {string} name
+   * @param {Object} [data]
+   */
   handle(name, data = {}) {
     this._events.emit(name, data);
     this.getApplication().handle(name, data);
@@ -178,7 +196,7 @@ export class Viewport
   // ===========================
 
   /**
-   * @returns {Application}
+   * @returns {import('./Application.js').Application}
    */
   getApplication() {
     return this._application;
@@ -218,7 +236,7 @@ export class Viewport
   }
 
   /**
-   * @returns {Area}
+   * @returns {import('./Area.js').Area}
    */
   getCurrentArea() {
     const at = this.getCurrentAreaCoordinates();
@@ -267,10 +285,12 @@ export class Viewport
 
   // ===========================
 
+  /** Start the requestAnimationFrame game loop. */
   startLoop() {
     this.tick();
   }
 
+  /** Schedule the next frame: run one update, then re-arm. */
   tick() {
     requestAnimationFrame((timestamp) => {
       this.update(timestamp);
@@ -280,6 +300,11 @@ export class Viewport
 
   // ===========================
 
+  /**
+   * Advance the world by one frame: move the player, stream areas, tick NPC
+   * behaviors and let the camera and renderer catch up.
+   * @param {number} timestamp rAF high-resolution timestamp (ms)
+   */
   update(timestamp) {
     // Clamp dt so the first frame after a pause doesn't teleport the character.
     const dt = this._timestamp ? Math.min(timestamp - this._timestamp, 100) : 0;
@@ -323,6 +348,7 @@ export class Viewport
   /**
    * Move the player through the world by `increment`, reverting on collision.
    * The camera follows separately, so the player is no longer glued to centre.
+   * @param {number} increment pixels to move along the current direction
    */
   moveCharacter(increment) {
     if(!this.character) {
@@ -362,26 +388,37 @@ export class Viewport
     }
   }
 
+  /** Render the viewport. @returns {*} the renderer's render result */
   render() {
     return this.renderer.render();
   }
 
+  /** Render debug overlays (zone boxes). @returns {*} the renderer's result */
   renderDebug() {
     return this.renderer.renderDebug();
   }
 
   // ===========================
 
+  /** Stop the player's movement. */
   stop() {
     this.moving = 0;
   }
 
+  /**
+   * Start moving the player in a direction and orient its sprite accordingly.
+   * @param {string} direction one of 'up' | 'down' | 'left' | 'right'
+   */
   move(direction) {
     this.direction = direction;
     this.moving = 1;
     this.character.setDirection(this.direction);
   }
 
+  /**
+   * Wire keyboard controls (when a player exists) and start the loop if there is
+   * anything to drive (a player, or an active camera).
+   */
   run() {
     if(this.character) {
       document.body.addEventListener('keyup', () => {
@@ -410,22 +447,27 @@ export class Viewport
     }
   }
 
+  /** @returns {Geometry} the viewport geometry */
   getGeometry() {
     return this.geometry;
   }
 
+  /** Get or set the viewport x. @param {number|null} [value] @returns {number} */
   x(value = null) {
     return this.geometry.x(value);
   }
 
+  /** Get or set the viewport y. @param {number|null} [value] @returns {number} */
   y(value = null) {
     return this.geometry.y(value);
   }
 
+  /** Get or set the viewport width. @param {number|null} [value] @returns {number} */
   width(value = null) {
     return this.geometry.width(value);
   }
 
+  /** Get or set the viewport height. @param {number|null} [value] @returns {number} */
   height(value = null) {
     return this.geometry.height(value);
   }

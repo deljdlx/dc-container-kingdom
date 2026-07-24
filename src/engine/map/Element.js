@@ -5,12 +5,22 @@ import { Geometry } from './Geometry.js';
 import { Renderer } from './Renderer/Renderer.js';
 import { SceneGraph } from './SceneGraph.js';
 
+/**
+ * Base node of the map/scene tree. An Element owns its geometry, rendering,
+ * scene-graph position and collision state, and delegates each concern to a
+ * dedicated subsystem ({@link Geometry}, {@link Renderer}, {@link SceneGraph},
+ * {@link CollisionSystem}, {@link EventEmitter}). Most public methods are thin
+ * facades over those subsystems so call sites depend only on Element.
+ */
 export class Element
 {
+  /** @type {object} arbitrary caller-attached data bag */
   data = {};
 
+  /** @type {Application} */
   _application;
 
+  /** @type {boolean} when true, z-depth is not auto-derived from y */
   manualZ = false;
 
   /**
@@ -39,20 +49,34 @@ export class Element
    */
   _needUpdate = false;
 
+  /** @type {boolean} whether the DOM has been rendered at least once */
   rendered = false;
 
   /**
    * @type {boolean}
    */
   _staticPosition = false;
+
+  /** @type {number} current move target, in local coordinates */
   _targetX;
+
+  /** @type {number} current move target, in local coordinates */
   _targetY;
+
+  /** @type {number} arrival tolerance in px around the move target */
   _targetHitZone = 2;
+
+  /** @type {(element: Element) => void} invoked once when a move reaches its target */
   _onMoveEnd = () => null;
+
+  /** @type {boolean} whether the element is currently moving toward its target */
   _moving = false;
+
+  /** @type {number} move step per update, in px */
   _moveSpeed = 100;
 
 
+  /** @type {string} prefix prepended to collision/trigger event names */
   _eventPrefix = 'element.';
 
   /**
@@ -61,6 +85,13 @@ export class Element
   _events = new EventEmitter();
 
 
+  /**
+   * Wire up the subsystems and seed geometry, then build the collision box.
+   * @param {?number} x
+   * @param {?number} y
+   * @param {?number} width
+   * @param {?number} height
+   */
   constructor(x = null, y = null, width = null, height = null,)
   {
 
@@ -82,10 +113,14 @@ export class Element
     this.collision.initBoundingBox();
   }
 
+  /**
+   * @returns {*} the board of the application's viewport
+   */
   getBoard() {
     return this._application.getViewport().getBoard();
   }
 
+  /** Clear this element's rendering and that of its whole subtree. */
   clear() {
     this.getRenderer().clear();
     this.getChildren().forEach(child => {
@@ -93,6 +128,7 @@ export class Element
     });
   }
 
+  /** Detach from the parent, reset the scene tree and clear the rendering. */
   destroy() {
     const parent = this.getParent();
     if(parent) {
@@ -104,12 +140,21 @@ export class Element
     this.getRenderer().clear();
   }
 
+  /**
+   * Remove a direct child from the scene tree.
+   * @param {Element} element
+   */
   removeChild(element) {
     this.scene.removeChild(element);
   }
 
 
 
+  /**
+   * Swap the renderer, cache its DOM node and (re)register DOM events.
+   * @param {Renderer} renderer
+   * @returns {Element} this
+   */
   setRenderer(renderer) {
     this.renderer = renderer;
     this.dom = this.renderer.getDom();
@@ -118,19 +163,31 @@ export class Element
     return this;
   }
 
+  /**
+   * @returns {HTMLElement} the element's DOM node
+   */
   getDom() {
     return this.dom;
   }
 
+  /**
+   * Set the DOM node's inner HTML.
+   * @param {string} html
+   */
   setInnerHTML(html) {
     this.renderer.setInnerHTML(html);
   }
 
+  /**
+   * Add a CSS class to the DOM node.
+   * @param {string} className
+   */
   addClass(className) {
     this.renderer.addClass(className);
   }
 
 
+  /** Bind DOM listeners that re-dispatch as engine events (e.g. click). */
   registerEvents() {
     this.dom.addEventListener('click', (event) => {
       this.handle('element.click', {
@@ -145,20 +202,38 @@ export class Element
 
   // ===========================
 
+  /**
+   * Subscribe to a local event.
+   * @param {string} name
+   * @param {(data: object) => void} callback
+   * @returns {number} the listener index within its name bucket
+   */
   addEventListener(name, callback) {
     return this._events.on(name, callback);
   }
 
+  /**
+   * Emit locally, then bubble the event up to the application.
+   * @param {string} name
+   * @param {object} [data]
+   */
   handle(name, data = {}) {
     this._events.emit(name, data);
     this.getApplication().handle(name, data);
   }
 
   // ===========================
+  /**
+   * @returns {Application}
+   */
   getApplication() {
     return this._application;
   }
 
+  /**
+   * @param {Application} application
+   * @returns {Application} the same application
+   */
   setApplication(application) {
     this._application = application;
     return application;
@@ -166,7 +241,7 @@ export class Element
   // ===========================
 
   /**
-   *
+   * Get or set whether the element keeps a fixed position (ignores scrolling).
    * @param {?boolean} value
    * @returns {boolean}
    */
@@ -177,6 +252,11 @@ export class Element
     return this._staticPosition;
   }
 
+  /**
+   * Get or set the move speed (px per update).
+   * @param {?number} value
+   * @returns {number}
+   */
   moveSpeed(value = null) {
     if(value !== null) {
       this._moveSpeed = value;
@@ -185,6 +265,11 @@ export class Element
     return this._moveSpeed;
   }
 
+  /**
+   * Get or set the moving flag.
+   * @param {?boolean} value
+   * @returns {boolean}
+   */
   isMoving(value = null) {
     if(value !== null) {
       this._moving = value;
@@ -194,6 +279,11 @@ export class Element
   }
 
 
+  /**
+   * Advance one frame: step toward the move target, keep the parent's collision
+   * box in sync, fire the move-end callback on arrival, then update the renderer
+   * and recurse into children when a redraw is pending.
+   */
   update() {
     if(this.isMoving() && this.y() < this._targetY) {
       this.direction = 'down';
@@ -228,6 +318,9 @@ export class Element
   }
 
 
+  /**
+   * @returns {Element|null} the parent node
+   */
   getParent() {
     return this.scene.getParent();
   }
@@ -235,43 +328,89 @@ export class Element
 
   // ===========================
 
+  /**
+   * Get or set the element this node is positioned relative to.
+   * @param {Element|null} element
+   * @returns {Element|null}
+   */
   relativeTo(element = null) {
     return this.scene.relativeTo(element);
   }
 
+  /**
+   * @returns {{x: number, y: number}} accumulated offset from the relativeTo chain
+   */
   getRelativeToOffsets() {
     return this.scene.getRelativeToOffsets();
   }
 
 
+  /**
+   * Get or set the width.
+   * @param {?number} value
+   * @returns {number}
+   */
   width(value = null) {
     return this.geometry.width(value);
   }
 
+  /**
+   * Get or set the height.
+   * @param {?number} value
+   * @returns {number}
+   */
   height(value = null) {
     return this.geometry.height(value);
   }
 
+  /**
+   * Get or set the local x coordinate.
+   * @param {?number} value
+   * @returns {number}
+   */
   x(value = null) {
     return this.geometry.x(value);
   }
 
+  /**
+   * Get or set the local y coordinate.
+   * @param {?number} value
+   * @returns {number}
+   */
   y(value = null) {
     return this.geometry.y(value);
   }
 
+  /**
+   * @returns {number} world-space x (own x plus every ancestor's)
+   */
   offsetX() {
     return this.scene.offsetX();
   }
 
+  /**
+   * @returns {number} world-space y (own y plus every ancestor's)
+   */
   offsetY() {
     return this.scene.offsetY();
   }
 
+  /**
+   * Create, attach and return a fresh empty child element.
+   * @returns {Element}
+   */
   createElement() {
     return this.scene.createChild();
   }
 
+  /**
+   * Attach an existing element at (x, y), refresh bounding boxes and flag a redraw.
+   * @param {number} x
+   * @param {number} y
+   * @param {Element} element
+   * @param {string} name index key for name lookups
+   * @returns {Element} the attached element
+   */
   addElement(x = 0, y = 0, element, name) {
     this.scene.addChild(x, y, element, name);
 
@@ -287,23 +426,53 @@ export class Element
     return element;
   }
 
+  /**
+   * Add a collision zone of the given type.
+   * @param {?number} x
+   * @param {?number} y
+   * @param {?number} width
+   * @param {?number} height
+   * @param {'collision'|'trigger'} type
+   * @returns {import('./BoundingBox.js').BoundingBox} the created zone
+   */
   createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision') {
     return this.collision.createCollisionZone(x, y, width, height, type);
   }
 
+  /**
+   * Add a trigger zone.
+   * @param {?number} x
+   * @param {?number} y
+   * @param {?number} width
+   * @param {?number} height
+   * @returns {import('./BoundingBox.js').BoundingBox} the created zone
+   */
   createTriggerZone(x = null, y = null, width = null, height = null) {
     return this.collision.createTriggerZone(x, y, width, height);
   }
 
+  /**
+   * Grow the aggregate collision box to enclose a changed child.
+   * @param {Element} element
+   */
   updateCollisionBoundingBox(element) {
     this.collision.updateCollisionBoundingBox(element);
   }
 
+  /**
+   * Grow the outer bounding box to enclose a changed child.
+   * @param {Element} element
+   */
   updateBoudingBox(element) {
     this.collision.updateBoudingBox(element);
   }
 
   // ===========================
+  /**
+   * Get, or set-and-propagate, the redraw-pending flag (also flags the parent).
+   * @param {?boolean} value
+   * @returns {boolean}
+   */
   needUpdate(value = null) {
     if(value !== null) {
       this._needUpdate = value;
@@ -318,30 +487,66 @@ export class Element
 
   // ===========================
 
+  /**
+   * Get or set the collided flag for `type`.
+   * @param {?boolean} value
+   * @param {'collision'|'trigger'} type
+   * @returns {boolean}
+   */
   collided(value = null, type = 'collision') {
     return this.collision.collided(value, type);
   }
 
+  /**
+   * Detect trigger hits in `element`'s subtree and reconcile them.
+   * @param {Element} element
+   * @returns {Array|false}
+   */
   getTrigger(element) {
     return this.collision.getTrigger(element);
   }
 
+  /**
+   * Detect hits of `type` in `element`'s subtree and reconcile them.
+   * @param {Element} element
+   * @param {'collision'|'trigger'} type
+   * @returns {Array|false}
+   */
   getCollision(element, type = 'collision') {
     return this.collision.getCollision(element, type);
   }
 
+  /**
+   * Detect collision and trigger hits in a single traversal (collision reconciled).
+   * @param {Element} element
+   * @returns {{collision: Array, trigger: Array}}
+   */
   detectCollisionAndTrigger(element) {
     return this.collision.detectCollisionAndTrigger(element);
   }
 
+  /**
+   * Reconcile trigger hits against the previous frame.
+   * @param {Element[]} hits
+   */
   reconcileTrigger(hits) {
     return this.collision.reconcileTrigger(hits);
   }
 
+  /**
+   * Pure overlap test against `element`'s subtree (no events, no state).
+   * @param {Element} element
+   * @param {'collision'|'trigger'} type
+   * @returns {boolean}
+   */
   overlaps(element, type = 'collision') {
     return this.collision.overlaps(element, type);
   }
 
+  /**
+   * Drop all current collisions of `type` (fires end events).
+   * @param {'collision'|'trigger'} type
+   */
   clearCollision(type = 'collision') {
     return this.collision.clearCollision(type);
   }
@@ -356,30 +561,54 @@ export class Element
     return this.scene.setParent(element);
   }
 
+  /**
+   * @returns {Element[]} direct children
+   */
   getChildren() {
     return this.scene.getChildren();
   }
 
+  /**
+   * @returns {Object<string, Element>} named children index
+   */
   getChildrenByName() {
     return this.scene.getChildrenByName();
   }
 
+  /**
+   * Look up a direct child by name.
+   * @param {string} name
+   * @returns {Element}
+   */
   getChildByName(name) {
     return this.scene.getChildByName(name);
   }
 
+  /**
+   * @returns {Element[]} the whole subtree, flattened
+   */
   getAllChildren() {
     return this.scene.getAllChildren();
   }
 
+  /**
+   * @param {'collision'|'trigger'} type
+   * @returns {import('./BoundingBox.js').BoundingBox[]} own zones of that type
+   */
   getCollisionZones(type = 'collision') {
     return this.collision.getCollisionZones(type);
   }
 
+  /**
+   * @returns {import('./BoundingBox.js').BoundingBox} the aggregate collision box
+   */
   getCollisionBoundingBox() {
     return this.collision.getCollisionBoundingBox();
   }
 
+  /**
+   * @returns {import('./BoundingBox.js').BoundingBox} the outer bounding box
+   */
   getBoundingBox() {
     return this.collision.getBoundingBox();
   }
@@ -401,12 +630,16 @@ export class Element
     return this.rendered;
   }
 
+  /**
+   * Render the element's DOM.
+   * @returns {*} the renderer's render result
+   */
   render() {
     this.rendered = true;
-    // this.renderBoundingBox();
     return this.renderer.render();
   }
 
+  /** Render this element's debug bounding box, then recurse into children. */
   renderBoundingBox() {
     this.renderer.renderBoundingBox();
 
@@ -415,9 +648,11 @@ export class Element
     });
   }
 
+  /**
+   * Render the debug overlay for this element's collision zones.
+   * @returns {*} the renderer's result
+   */
   renderCollisionZones() {
     return this.renderer.renderCollisionZones();
   }
 }
-
-

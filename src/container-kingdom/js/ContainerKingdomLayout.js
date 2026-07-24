@@ -16,7 +16,6 @@ import {
   Woman01,
   Woman02,
 } from '../../engine/index.js';
-import { ContainerKingdom } from './ContainerKingdom.js';
 import { ContainersList } from './ContainersList.js';
 import { Log } from './Log.js';
 
@@ -137,7 +136,7 @@ export class ContainerKingdomLayout
       const y = Math.random() * window.innerHeight * 3;
 
       const area = board.getAreaAt(0, 0);
-      let flower = area.addElement(x, y, new Sunflower00());
+      area.addElement(x, y, new Sunflower00());
     }
   }
 
@@ -206,7 +205,7 @@ export class ContainerKingdomLayout
     this.rpgEngine.registerElement('Sunflower00', Sunflower00);
     this.rpgEngine.registerElement('Ground00', Ground00);
 
-    this.rpgEngine.addEventListener('map.update', (event) => {
+    this.rpgEngine.addEventListener('map.update', () => {
 
     });
 
