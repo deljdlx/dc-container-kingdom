@@ -23,6 +23,7 @@ export default [
         Image: 'readonly',
         getComputedStyle: 'readonly',
         HTMLElement: 'readonly',
+        URLSearchParams: 'readonly',
       },
     },
     rules: {

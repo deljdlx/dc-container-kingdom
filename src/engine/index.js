@@ -13,6 +13,7 @@
 
 // --- Configuration ---
 export { setAssetsBase, getAssetsBase, assetUrl } from './assets.js';
+export { applyDebugFlag, isDebugEnabled } from './debug.js';
 
 // --- Core ---
 export { Application } from './map/Application.js';

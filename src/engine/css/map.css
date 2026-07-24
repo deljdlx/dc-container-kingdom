@@ -87,6 +87,12 @@
   background-color: #f0f;
 }
 
+.map-element__trigger-zone {
+  position: absolute;
+  outline: dotted #0ff 1px;
+  background-color: #0ff3;
+}
+
 .map-element__collision-zone.debug {
   position: absolute;
   outline: solid #ff0 10px;

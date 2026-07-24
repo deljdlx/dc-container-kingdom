@@ -1,4 +1,5 @@
 import { Viewport } from '../Viewport.js';
+import { isDebugEnabled } from '../../debug.js';
 
 export class ViewportRenderer
 {
@@ -58,7 +59,14 @@ export class ViewportRenderer
   }
 
   renderDebug() {
-    this._board.getRenderer().renderDebug();
+    // No-op unless debug mode is on (?debug=1 → body.debug), so callers can
+    // invoke it unconditionally.
+    if(!isDebugEnabled()) {
+      return;
+    }
+    // getBoard() rather than this._board: the renderer is constructed before the
+    // board exists, so the cached field is stale (undefined).
+    this._viewport.getBoard().getRenderer().renderDebug();
     if(this._viewport.getCharacter()) {
       this._viewport.getCharacter().getRenderer().renderCollisionZones();
     }
