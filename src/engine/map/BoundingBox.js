@@ -38,6 +38,9 @@ export class BoundingBox
    */
   _collided = false;
 
+  /** @type {DomElement} debug overlay node for this zone, set only in debug mode */
+  dom;
+
   /**
    * When an element is given, seed the box from its position and size.
    * @param {import('./Element.js').Element|null} element
@@ -53,13 +56,18 @@ export class BoundingBox
   }
 
   /**
-   * Get or set the collided flag.
+   * Get or set the collided flag. When set, the debug overlay box (if any) is
+   * tinted via the `collided` CSS class — so zones light up on contact under
+   * `?debug=1`, at no cost otherwise (no overlay node exists outside debug).
    * @param {?boolean} value
    * @returns {boolean}
    */
   collided(value = null) {
     if(value !== null) {
       this._collided = value;
+      if(this.dom) {
+        this.dom.classList.toggle('collided', value);
+      }
     }
 
     return this._collided;
