@@ -123,26 +123,91 @@ export class CollisionSystem {
    * @returns {Array|false} the hits, or `false` when there are none.
    */
   getCollision(element, type = 'collision') {
-    const hits = [];
-    this._detect(element, type, hits);
+    const collisionHits = [];
+    const triggerHits = [];
+    this._detect(
+      element,
+      type === 'collision',
+      type === 'trigger',
+      collisionHits,
+      triggerHits,
+    );
+    const hits = type === 'collision' ? collisionHits : triggerHits;
     this._reconcile(hits, type);
     return hits.length ? hits : false;
   }
 
   /**
-   * Broad + narrow phase: prune any subtree whose aggregate box doesn't
-   * overlap, then collect elements whose collision zones actually intersect.
-   * Pure — no events, no state diffing (only the per-zone hit flag used for
-   * debug rendering).
+   * Detect collision AND trigger hits in a SINGLE traversal, then reconcile
+   * collision only. Trigger hits are returned raw so the caller can reconcile
+   * them at the *final* position (after any collision revert) — preserving the
+   * guarantee that a trigger sitting on a wall doesn't fire when the character
+   * merely bumps into (but is blocked by) that wall.
+   *
+   * This is the per-frame fast path: the common case (character not blocked)
+   * needs one traversal instead of the two a separate getCollision + getTrigger
+   * would cost.
+   * @returns {{collision: Array, trigger: Array}}
    */
-  _detect(element, type, hits) {
+  detectCollisionAndTrigger(element) {
+    const collision = [];
+    const trigger = [];
+    this._detect(element, true, true, collision, trigger);
+    this._reconcile(collision, 'collision');
+    return { collision, trigger };
+  }
+
+  /** Reconcile trigger hits against the previous frame. @see _reconcile */
+  reconcileTrigger(hits) {
+    this._reconcile(hits, 'trigger');
+  }
+
+  /**
+   * Broad + narrow phase over `element`'s subtree: prune any subtree whose
+   * aggregate box doesn't overlap, then collect the elements whose collision
+   * and/or trigger zones actually intersect (per the `seekCollision` /
+   * `seekTrigger` flags). Pure — no events, no state diffing (only the per-zone
+   * hit flag used for debug rendering).
+   *
+   * The early-return is *per type*: once an element's own zones of a type hit,
+   * that type stops descending into its children — but the other type keeps
+   * going. Running both types in one traversal is therefore equivalent to two
+   * separate single-type traversals, minus the duplicated prune/self checks.
+   */
+  _detect(element, seekCollision, seekTrigger, collisionHits, triggerHits) {
     if (element === this._element) {
+      return;
+    }
+    if (!seekCollision && !seekTrigger) {
       return;
     }
     if (!this._collisionBoundingBox.isCollided(element.getCollisionBoundingBox())) {
       return; // whole subtree pruned
     }
 
+    const collisionHit = seekCollision && this._hitZones(element, 'collision', collisionHits);
+    const triggerHit = seekTrigger && this._hitZones(element, 'trigger', triggerHits);
+
+    const childSeekCollision = seekCollision && !collisionHit;
+    const childSeekTrigger = seekTrigger && !triggerHit;
+    if (childSeekCollision || childSeekTrigger) {
+      element.getChildren().forEach(child => this._detect(
+        child,
+        childSeekCollision,
+        childSeekTrigger,
+        collisionHits,
+        triggerHits,
+      ));
+    }
+  }
+
+  /**
+   * Narrow-phase test of one element's zones of `type`: flag each zone's hit
+   * state (for debug rendering) and push the element into `hits` on any
+   * overlap.
+   * @returns {boolean} whether the element hit for this type.
+   */
+  _hitZones(element, type, hits) {
     let hit = false;
     element.getCollisionZones(type).forEach(zone => {
       const zoneHit = this._collisionBoundingBox.isCollided(zone, type);
@@ -151,13 +216,10 @@ export class CollisionSystem {
         hit = true;
       }
     });
-
     if (hit) {
       hits.push(element);
-      return;
     }
-
-    element.getChildren().forEach(child => this._detect(child, type, hits));
+    return hit;
   }
 
   /**
