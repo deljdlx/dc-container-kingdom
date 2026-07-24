@@ -25,7 +25,9 @@ export class PatrolBehavior {
 
   _traveled = 0;
   _forward = true;
-  _running = false;
+
+  /** ms accumulated toward the next tick */
+  _elapsed = 0;
 
   constructor(character, { axis = 'horizontal', distance = 200, speed = 4, tickDelay = 60 } = {}) {
     this._character = character;
@@ -35,26 +37,33 @@ export class PatrolBehavior {
     this._tickDelay = tickDelay;
   }
 
-  /** Start (or resume) patrolling. */
+  /** Start (or resume) patrolling: register with the viewport's game loop. */
   start() {
-    if (this._running) {
-      return;
+    const viewport = this._viewport();
+    if (viewport) {
+      viewport.addBehavior(this);
     }
-    this._running = true;
-    this._loop();
   }
 
   /** Stop patrolling; the character stays where it is. */
   stop() {
-    this._running = false;
+    const viewport = this._viewport();
+    if (viewport) {
+      viewport.removeBehavior(this);
+    }
   }
 
-  _loop() {
-    if (!this._running) {
-      return;
+  /**
+   * Ticked by the game loop: run the patrol step at the behavior's cadence,
+   * catching up if several `tickDelay` windows elapsed in one (slow) frame.
+   * @param {number} dt milliseconds since the last frame
+   */
+  update(dt) {
+    this._elapsed += dt;
+    while (this._elapsed >= this._tickDelay) {
+      this._elapsed -= this._tickDelay;
+      this._step();
     }
-    this._step();
-    setTimeout(() => this._loop(), this._tickDelay);
   }
 
   _step() {
@@ -67,16 +76,14 @@ export class PatrolBehavior {
         : (horizontal ? 'left' : 'up')
     );
 
-    const saved = character.geometry.clone();
     const delta = this._forward ? this._speed : -this._speed;
-    if (horizontal) {
-      character.x(character.x() + delta);
-    } else {
-      character.y(character.y() + delta);
-    }
+    const blocked = character.moveBlocked(
+      horizontal ? delta : 0,
+      horizontal ? 0 : delta,
+      () => this._isBlocked(),
+    );
 
-    if (this._isBlocked()) {
-      character.geometry = saved; // blocked → undo the step and turn around
+    if (blocked) {
       this._reverse();
     } else {
       this._traveled += this._speed;
@@ -104,10 +111,14 @@ export class PatrolBehavior {
 
   /** The player character, if this NPC is attached to a running viewport. */
   _player() {
-    const application = character => character.getApplication && character.getApplication();
-    const app = application(this._character);
-    const viewport = app && app.getViewport && app.getViewport();
+    const viewport = this._viewport();
     return viewport && viewport.getCharacter ? viewport.getCharacter() : null;
+  }
+
+  /** The viewport this NPC is attached to, or null if it isn't in a world yet. */
+  _viewport() {
+    const app = this._character.getApplication && this._character.getApplication();
+    return app && app.getViewport ? app.getViewport() : null;
   }
 
   _reverse() {

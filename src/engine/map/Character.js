@@ -74,6 +74,29 @@ export class Character extends Element
   }
 
   /**
+   * Move by (dx, dy) then revert to the starting position if `isBlocked()`
+   * reports a collision. The predicate decides what "blocked" means (which
+   * roots to test, whether triggers matter), so the player and NPC behaviors
+   * share this move+revert dance without sharing their collision policy.
+   * @param {number} dx
+   * @param {number} dy
+   * @param {() => boolean} isBlocked evaluated at the tentative position
+   * @returns {boolean} whether the move was blocked (and thus reverted)
+   */
+  moveBlocked(dx, dy, isBlocked) {
+    const savedX = this.x();
+    const savedY = this.y();
+    this.x(savedX + dx);
+    this.y(savedY + dy);
+    if (isBlocked()) {
+      this.x(savedX);
+      this.y(savedY);
+      return true;
+    }
+    return false;
+  }
+
+  /**
    * Show a transient speech bubble above the character.
    * @param {string} content
    * @param {boolean} [autoClose]
