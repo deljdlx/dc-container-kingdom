@@ -59,6 +59,9 @@ development).
 
 - **Langue** : code, identifiants, commentaires, JSDoc → **anglais**. Commits, PR,
   échanges → **français**.
+- **Branches** : **une branche par feature/fix** — jamais de travail direct sur
+  `main`. Créer une branche dédiée (`feat/…`, `fix/…`, `refactor/…`, `docs/…`,
+  `chore/…`), coder → vérifier → merger sur `main` (`--no-ff`).
 - **Commits** : Conventional Commits + description FR (`feat:`, `fix:`, `refactor:`,
   `docs:`, `test:`, `chore:`). **Jamais** de mention d'assistance IA
   (pas de `Co-Authored-By`, pas de « Generated with… »). **Commiter/pusher

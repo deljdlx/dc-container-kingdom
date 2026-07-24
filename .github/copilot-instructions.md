@@ -92,6 +92,9 @@ Avant de considérer une modif finie : `npm run lint` (0 problème) + `npm run b
 
 ## Git
 
+- **Une branche par feature/fix** — jamais de travail direct sur `main`. Créer une
+  branche dédiée (`feat/…`, `fix/…`, `refactor/…`, `docs/…`, `chore/…`), coder →
+  vérifier → merger sur `main` (`--no-ff`).
 - Messages en **Conventional Commits** + description **française** (`feat:`, `fix:`,
   `refactor:`, `docs:`, `test:`, `chore:`).
 - **Ne jamais** ajouter de mention d'assistance IA (pas de `Co-Authored-By`, pas de
