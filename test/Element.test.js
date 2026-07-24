@@ -163,4 +163,24 @@ describe('Element — collision detection', () => {
     expect(a.collided()).toBe(false);
     expect(onEnd).toHaveBeenCalled();
   });
+
+  it('reconciles by diff: start fires once while overlapping, end once when it stops', () => {
+    const a = collider(0, 0);
+    const b = collider(10, 10);
+    const onStart = vi.fn();
+    const onEnd = vi.fn();
+    a.addEventListener('element.collision', onStart);
+    a.addEventListener('element.collision.end', onEnd);
+
+    a.getCollision(b); // frame 1 → start
+    a.getCollision(b); // frame 2 → still overlapping, no new start
+    a.getCollision(b); // frame 3 → still overlapping
+    expect(onStart).toHaveBeenCalledTimes(1);
+    expect(onEnd).not.toHaveBeenCalled();
+
+    b.x(1000);
+    b.y(1000);
+    a.getCollision(b); // no longer overlapping → end once
+    expect(onEnd).toHaveBeenCalledTimes(1);
+  });
 });
