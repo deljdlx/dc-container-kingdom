@@ -209,20 +209,23 @@ export class Renderer
       this.dom.appendChild(this.collisiondDom);
     }
 
-    element.getCollisionZones().forEach(boundingBox => {
-      const collisionDom = document.createElement('div');
-      collisionDom.classList.add('map-element__collision-zone');
-      collisionDom.style.width = boundingBox.width() + 'px';
-      collisionDom.style.height = boundingBox.height() + 'px';
-      collisionDom.style.left = boundingBox.x0() + 'px';
-      collisionDom.style.top = boundingBox.y0() + 'px';
+    const renderZone = (boundingBox, className) => {
+      const zoneDom = document.createElement('div');
+      zoneDom.classList.add(className);
+      zoneDom.style.width = boundingBox.width() + 'px';
+      zoneDom.style.height = boundingBox.height() + 'px';
+      zoneDom.style.left = boundingBox.x0() + 'px';
+      zoneDom.style.top = boundingBox.y0() + 'px';
 
-      boundingBox.dom = collisionDom;
+      boundingBox.dom = zoneDom;
 
       if(this.dom) {
-        this.dom.appendChild(collisionDom);
+        this.dom.appendChild(zoneDom);
       }
-    });
+    };
+
+    element.getCollisionZones('collision').forEach(zone => renderZone(zone, 'map-element__collision-zone'));
+    element.getCollisionZones('trigger').forEach(zone => renderZone(zone, 'map-element__trigger-zone'));
 
     element.getChildren().forEach(element => {
       element.renderCollisionZones();

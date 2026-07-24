@@ -12,7 +12,12 @@ import {
   PatrolBehavior,
   FleeBehavior,
   setAssetsBase,
+  applyDebugFlag,
 } from '../index.js';
+
+// Debug visualisation (outlines + collision/trigger zones) when the URL has
+// ?debug=1. Applied before rendering so the debug pass sees the flag.
+applyDebugFlag();
 
 // The demo page lives under /engine/demo/, so point sprite URLs at an absolute
 // engine path rather than the default (which is relative to the host page).
@@ -138,4 +143,5 @@ viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
 viewport.render();
 viewport.run();
+viewport.renderDebug(); // draws zone boxes only when ?debug=1
 patrols.forEach(patrol => patrol.start());

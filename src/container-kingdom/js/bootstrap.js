@@ -1,5 +1,6 @@
 import { ContainerKingdom } from './ContainerKingdom.js';
 import { DockerApiClient } from './DockerApiClient.js';
+import { applyDebugFlag } from '../../engine/index.js';
 
 console.log(
 	`%cWanna see some of my projects ? https://github.com/deljdlx`,  `
@@ -26,6 +27,7 @@ console.log(
 
 
 document.addEventListener('DOMContentLoaded', async () => {
+  applyDebugFlag(); // ?debug=1 → visualise outlines + collision/trigger zones
   const dockerApiClient = new DockerApiClient();
   const instance = new ContainerKingdom(dockerApiClient);
   instance.zoom(0.5);

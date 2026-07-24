@@ -59,6 +59,7 @@ export class ContainerKingdom
     await this.viewer.drawContainers(this.getContainers());
     await this.viewer.drawNetworks(this.getContainers());
     await this.layout.getViewport().render();
+    this.layout.getViewport().renderDebug(); // draws zone boxes only when ?debug=1
     this.hud.drawNetworksSwitches();
 
     this.layout.hideLoadingScreen();
