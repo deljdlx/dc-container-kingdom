@@ -31,7 +31,7 @@ Documents vérifiés/mis à jour si nécessaire :
 - [ ] `README.md`
 - [ ] `src/engine/README.md`
 - [ ] JSDoc de l'API touchée
-- [ ] Trio de consignes agents aligné (`AGENTS.md`, `CLAUDE.md`, `.github/copilot-instructions.md`)
+- [ ] Règles agent à jour : source `agents/` + les 3 points d'entrée (`CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`)
 
 ## Vérifications exécutées
 
