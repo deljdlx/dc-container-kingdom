@@ -198,7 +198,7 @@ export class ContainerKingdomLayout
 
     this.rpgEngine.registerElement('Woman00', Woman00);
     this.rpgEngine.registerElement('Woman01', Woman01);
-    this.rpgEngine.registerElement('Woman01', Woman02);
+    this.rpgEngine.registerElement('Woman02', Woman02);
     this.rpgEngine.registerElement('Man00', Man00);
 
     this.rpgEngine.registerElement('Flower00', Flower00);
