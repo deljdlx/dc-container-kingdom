@@ -1,5 +1,14 @@
 # Workflow & vérification
 
+## Source des tâches : le board `project/`
+
+Le travail se pilote depuis le **kanban en fichiers** `project/` (colonnes
+`000-todo` → `010-doing` → `020-verify` → `030-done`). Prendre la tâche
+prioritaire, la faire avancer de colonne en colonne, et suivre le cycle décrit
+par la recipe **[`recipes/work-a-task.md`](recipes/work-a-task.md)** (branche
+dédiée, `npm run verify`, merge, journal de tâche). Voir
+[`../project/README.md`](../project/README.md).
+
 ## « Terminé » = vérifié
 
 Avant d'annoncer qu'une tâche est finie, **`npm run verify`** (= `lint` + `build`

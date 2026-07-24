@@ -22,7 +22,7 @@ Ce qu'on veut obtenir, et **pourquoi**.
 ## Vérification
 
 - [ ] `npm run verify` vert (lint + build + tests)
-- [ ] validation navigateur si rendu / gameplay (voir recipe `verify-in-browser`)
+- [ ] validation navigateur si rendu / gameplay (voir [recipes/verify-in-browser.md](recipes/verify-in-browser.md))
 - [ ] documentation à jour si impact archi / API / commandes / conventions
 
 ## Journal
