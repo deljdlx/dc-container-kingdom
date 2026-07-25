@@ -7,6 +7,8 @@ created: 2026-07-24 21:53
 ready: 2026-07-25 13:40
 doing: 2026-07-25 13:42
 verify: 2026-07-25 13:57
+done: 2026-07-25 14:00
+merge: 388e247
 ---
 
 ## Objectif
@@ -76,3 +78,12 @@ jamais. Petite optimisation d'hygiène, comportement inchangé.
   l'auto-close (10 s) le nœud est conservé et réemployé, classe retirée. Aucune
   erreur console. Sur l'app (`/`, API Docker mockée) : 35 personnages, 0 nœud
   bulle au chargement — le gain visé.
+
+### Validation
+
+- [2026-07-25 14:00] Revue du diff : frontière moteur respectée (rien de
+  Container Kingdom dans `src/engine/`), style du fichier épousé,
+  `_ensureQuickReaction()` calqué sur `Renderer.addShadow()` (même contrat
+  idempotent). API publique et rendu inchangés → aucune doc à reprendre
+  (`documentation/engine.md` ne décrit que `quickReaction()` côté `Character`).
+  DoD cochée. Merge `--no-ff` sur `main` : `388e247`.
