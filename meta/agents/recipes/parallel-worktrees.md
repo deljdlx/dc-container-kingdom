@@ -18,26 +18,31 @@ reste sur `main` et **personne n'en change la branche active**.
 
 ## Worktree de l'agent (fixe, réutilisé)
 
-**Un worktree fixe par agent**, en dossier frère hors repo (non scanné par
-vite / vitest / eslint), **pas un nouveau par ticket** :
+**Un worktree fixe par agent, sous `/tmp`** — chemin **absolu** (aucune ambiguïté
+`../` / symlink ; hors repo → jamais scanné par vite / vitest / eslint), **pas un
+nouveau par ticket** :
 
 ```
-<repo>/                       # principal, sur `main` (ne pas toucher sa branche)
-<repo>.worktrees/<agent>/     # le worktree de l'agent : claude, copilot, …
+<repo>/                  # principal, sur `main` (ne pas toucher sa branche)
+/tmp/<repo>-<agent>/     # le worktree de l'agent : claude, copilot, …
 ```
 
-Le créer une fois (`<repo>` = `dc-container-kingdom`) :
+Le créer une fois (`<repo>` = `dc-container-kingdom`, ex. `/tmp/dc-container-kingdom-copilot`) :
 
 ```bash
-git worktree add ../<repo>.worktrees/<agent> main
+git worktree add /tmp/<repo>-<agent> main
 ```
+
+> `/tmp` est **volatil** (vidé au reboot) : voulu — le worktree se recrée à la demande.
+> **Ne jamais** le placer *dans* le repo : `../` résout mal via le symlink et le
+> worktree finit scanné par l'outillage.
 
 ## Démarrer une tâche (dans le worktree)
 
 Depuis **son** worktree, repartir **propre** d'un `main` à jour :
 
 ```bash
-cd ../<repo>.worktrees/<agent>
+cd /tmp/<repo>-<agent>
 git status                          # doit être propre ; sinon stash ou demander
 git clean -fd                       # supprime les untracked d'une tâche précédente *
 git checkout main && git merge --ff-only @{u} 2>/dev/null || true
