@@ -5,6 +5,11 @@ board, positioned elements, animated characters, collisions and events — into 
 DOM container. It has **no knowledge of the app that embeds it** (no Docker /
 Container Kingdom concepts); Container Kingdom is just one host application.
 
+Two standalone local pages ship with the engine:
+
+- demo: `http://localhost:5173/engine/demo/`
+- sprites catalog: `http://localhost:5173/engine/catalog/`
+
 ## Boundary
 
 - Dependencies flow **app → engine only**. The engine imports nothing from
