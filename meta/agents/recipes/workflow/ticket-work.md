@@ -2,7 +2,9 @@
 
 1. Créer la **branche dédiée** depuis `main` (la noter dans `branch:`) ; puis, **sur
    la branche**, `git mv` le ticket vers `meta/workflow/040-doing/` et renseigner
-   `doing:`. La branche portera *work* + *verify*.
+   `doing:`. La branche portera *work* + *verify*. En **parallèle** avec d'autres
+   agents, créer la branche dans un **worktree** dédié — voir
+   [parallel-worktrees](../parallel-worktrees.md).
 2. Implémenter — s'appuyer sur la recipe de méthode adaptée :
    [implement-a-feature](../implement-a-feature.md), [refactor-safely](../refactor-safely.md),
    ou [debug-empirically](../debug-empirically.md).
