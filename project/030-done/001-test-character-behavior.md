@@ -33,3 +33,4 @@ le seul behavior sans test (`PatrolBehavior` et `FleeBehavior` en ont). Tâche
 - Test ajouté (`test/CharacterBehavior.test.js`, 3 cas : cadence de `update(dt)`,
   direction initiale quand vivant, nouvelle direction sur collision) avec
   `Math.random` stubé pour le déterminisme. `npm run verify` vert (116 tests).
+- Mergé sur `main` (65c7e2c) via `test/character-behavior`. **Done.**
