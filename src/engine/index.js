@@ -62,6 +62,9 @@ export { FenceGroup00 } from './map/Elements/FenceGroup00.js';
 // --- Built-in map elements: curated autonomous sprites from `map-sprites-01` ---
 export * from './map/Elements/MapSprites01/index.js';
 
+// --- Built-in map elements: curated autonomous vegetation from `map-sprites-02` ---
+export * from './map/Elements/MapSprites02/index.js';
+
 // --- Built-in map elements: the `flowers-00` sprite sheet ---
 // 219 elements (flowers, mushrooms, foliage, water plants, fields, props),
 // named `<Family><NN>` — see map/Elements/Flowers/index.js.

@@ -50,6 +50,8 @@ Load the engine styles once in the host page:
 - `map/Elements/` — built-in sprites (houses, trees, fences, fountain),
   `MapSprites01/` (curated autonomous trees from `map-sprites-01`: conifers,
   leafy trees, dead trees, saplings),
+  `MapSprites02/` (first vegetation lot from `map-sprites-02`: upper-left tree
+  silhouettes, stumps and small shrubs),
   `Flowers/` (the whole `flowers-00` sheet: 219 plants, mushrooms, fields and
   props, named `<Family><NN>`) and `CharacterBases/` (eight ready-to-use bases
   from the shared `characters-00.png` sprite sheet).

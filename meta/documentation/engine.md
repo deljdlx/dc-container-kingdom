@@ -229,6 +229,20 @@ Le reste de la planche (matériaux d'assemblage + objets ambigus) est documenté
 et volontairement exclu de ce lot pour préserver la lisibilité du catalogue et
 l'API publique.
 
+### Planche `map-sprites-02` (premier lot de végétation)
+
+`images/map/map-sprites-02.png` est une atlas beaucoup plus riche, mêlant objets
+autonomes et fragments d'assemblage. Ce ticket expose seulement un premier lot
+de végétation autonome du coin supérieur gauche : `Tree01..Tree30`.
+
+Conventions de ce lot :
+
+- helper pixel `sprite(x, y, width, height, extra?)` (pas de grille fiable)
+- arbres / jeunes arbres / souches posables, tous `shadow: false`
+- `collision` sur ces sprites bloquants, calculée au plus simple sur le tronc
+- le reste de la planche reste hors périmètre de ce ticket et sera loti
+  séparément
+
 ## 9. Events
 
 Tout remonte à l'`Application` via `handle()`. Principaux events (préfixe
