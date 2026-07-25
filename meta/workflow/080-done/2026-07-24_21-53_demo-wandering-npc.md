@@ -7,6 +7,8 @@ created: 2026-07-24 21:53
 ready: 2026-07-25 17:08
 doing: 2026-07-25 17:12
 verify: 2026-07-25 17:13
+done: 2026-07-25 17:16
+merge: 0efa077
 ---
 
 ## Objectif
@@ -85,3 +87,9 @@ erre dans la démo, en plus des patrouilleurs et du fuyard. Petit ajout démo.
   par s'éloigner de l'area d'origine (~1 area par minute). C'est le comportement
   du behavior tel quel ; borner l'errance demanderait une option moteur — hors
   périmètre de ce ticket.
+
+### Validation
+
+- [2026-07-25 17:16] DoD cochée, diff conforme aux règles (démo seule, moteur
+  intact, import via `src/engine/index.js`, aucun résidu de debug). Merge `--no-ff`
+  sur `main` : `0efa077`. Branche `claude/demo-wandering-npc` supprimée.
