@@ -22,6 +22,8 @@ d'un dépôt à l'autre.
   par la mesure → corriger → non-régression.
 - **[review-changes.md](review-changes.md)** — reviewer un changement (règles + qualité).
 - **[verify-a-change.md](verify-a-change.md)** — « terminé = vérifié » (auto + runtime).
+- **[audit-workflow-consistency.md](audit-workflow-consistency.md)** — après une
+  évolution du workflow, vérifier que les specs restent cohérentes et à jour.
 
 ## Écrire une recipe
 

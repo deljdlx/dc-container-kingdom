@@ -2,10 +2,10 @@
 id: 2026-07-25_13-27
 title: Recipe — auditer la cohérence des specs de workflow
 type: docs
-branch:
+branch: docs/audit-workflow-recipe
 created: 2026-07-25 13:27
 ready: 2026-07-25 13:30
-doing:
+doing: 2026-07-25 13:31
 verify:
 done:
 ---
@@ -75,7 +75,13 @@ Les contrôles mécaniques (1–3) pourront migrer plus tard vers un script
 
 ### Travail
 
--
+- [2026-07-25 13:31] Recipe `audit-workflow-consistency.md` créée dans
+  `meta/agents/recipes/` (méthode), indexée dans le `README.md` des recipes.
+  5 contrôles : liens (script), références périmées **avec triage prose/historique**,
+  `@imports`, cohérence inter-fichiers (colonnes/topologie/entrées), TEMPLATE ↔
+  recipes. Contrôles 1–3 en commandes copiables. Point de conception : distinguer
+  référence *stale* (à corriger) de *narration historique* (légitime) — d'où le
+  triage plutôt qu'un « attendu zéro » global.
 
 ### Vérification
 
