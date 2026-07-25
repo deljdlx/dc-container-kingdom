@@ -6,7 +6,7 @@ branch: docs/root-readme-structure
 created: 2026-07-27 11:17
 ready: 2026-07-25 13:18
 doing: 2026-07-25 13:19
-verify:
+verify: 2026-07-25 13:20
 done:
 ---
 
@@ -50,7 +50,10 @@ Rester concis (2 puces racine + sous-puces). Liens relatifs valides.
 
 ### Vérification
 
--
+- [2026-07-25 13:20] Link-check des 7 liens de la nouvelle section : tous
+  résolvent (`src/`, `src/engine/README.md`, `meta/README.md`, `meta/agents/`,
+  `meta/documentation/`, `meta/recipes/`, `meta/workflow/`). `npm run verify`
+  vert (lint + build + 116 tests). Aucun résidu de debug (doc pure).
 
 ### Validation
 
