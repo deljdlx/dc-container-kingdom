@@ -7,7 +7,7 @@ created: 2026-07-27 11:15
 ready: 2026-07-25 17:04
 doing: 2026-07-25 17:04
 verify: 2026-07-25 17:04
-done:
+done: 2026-07-25 17:04
 ---
 
 ## Objectif
@@ -40,4 +40,5 @@ _Trivial — pas de spec nécessaire._
 
 ### Validation
 
--
+- [2026-07-25 17:04] Relecture effectuée: DoD satisfaite et périmètre docs-only respecté (aucun impact runtime).
+- [2026-07-25 17:04] Merge sur `main` réalisé via `git merge --no-ff copilot/demo-link-in-engine-readme` (commit de merge `af0f704`).
