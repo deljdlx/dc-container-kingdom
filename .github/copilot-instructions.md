@@ -3,6 +3,29 @@
 > Résumé des règles ; **la source de vérité est [`../meta/agents/`](../meta/agents/)**.
 > Points d'entrée frères : [`../CLAUDE.md`](../CLAUDE.md), [`../AGENTS.md`](../AGENTS.md).
 
+## ⛔ AVANT DE TOUCHER AU MOINDRE FICHIER — worktree obligatoire
+
+**Tu ne travailles JAMAIS dans ce dossier** (le working tree principal de
+l'utilisateur, sur `main`). Aucune édition, aucun `git checkout` de branche ici.
+Toute la tâche se fait dans **ton propre worktree** :
+
+1. Entre dans ton worktree `../dc-container-kingdom.worktrees/copilot` (le créer s'il
+   manque) :
+   ```bash
+   git worktree add ../dc-container-kingdom.worktrees/copilot main   # une seule fois
+   cd ../dc-container-kingdom.worktrees/copilot
+   ```
+2. Repars propre, sur **ta** branche :
+   ```bash
+   git clean -fd && git checkout main && git checkout -b copilot/<slug>
+   ```
+3. **Tu ne peux pas** (worktree indisponible, HEAD du principal ≠ `main`, doute
+   quelconque) → **ARRÊTE-TOI et demande**. N'écris rien dans le dossier principal.
+
+Détail : [`../meta/agents/recipes/parallel-worktrees.md`](../meta/agents/recipes/parallel-worktrees.md).
+
+## Le projet
+
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
 mini-RPG maison** (vanilla JS, ES modules). Deux couches :
 
