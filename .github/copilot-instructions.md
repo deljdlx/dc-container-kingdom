@@ -9,11 +9,11 @@
 l'utilisateur, sur `main`). Aucune édition, aucun `git checkout` de branche ici.
 Toute la tâche se fait dans **ton propre worktree** :
 
-1. Entre dans ton worktree `../dc-container-kingdom.worktrees/copilot` (le créer s'il
-   manque) :
+1. Entre dans ton worktree **`/tmp/dc-container-kingdom-copilot`** (chemin absolu,
+   hors repo — le créer s'il manque) :
    ```bash
-   git worktree add ../dc-container-kingdom.worktrees/copilot main   # une seule fois
-   cd ../dc-container-kingdom.worktrees/copilot
+   git worktree add /tmp/dc-container-kingdom-copilot main   # une seule fois
+   cd /tmp/dc-container-kingdom-copilot
    ```
 2. Repars propre, sur **ta** branche :
    ```bash

@@ -2,3 +2,8 @@
 .env
 node_modules
 dist
+
+# Worktrees d'agents : normalement sous /tmp (hors repo). Filet de sécurité si l'un
+# est créé par erreur dans le repo (voir meta/agents/recipes/parallel-worktrees.md).
+dc-container-kingdom.worktrees/
+*.worktrees/
