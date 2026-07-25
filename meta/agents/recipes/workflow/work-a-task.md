@@ -20,3 +20,17 @@ Chaque transition = un `git mv` vers la colonne suivante.
 - **Une** tâche en `040-doing` à la fois, idéalement.
 - Une **branche par ticket** ; commiter / merger **sur demande** (voir
   [../conventions.md](../../conventions.md)).
+
+## Topologie git
+
+- Le **board** (`meta/workflow/`) vit sur `main` : les transitions *create*,
+  *specify* et *done* sont du **bookkeeping** commité sur `main` (elles ne touchent
+  que le board, jamais le code).
+- Le **code** vit sur une **branche dédiée**, créée à l'étape *work* et qui porte
+  *work* + *verify* (implémentation, `verify`, journal).
+- *validate* **merge** la branche sur `main` (`--no-ff`), **puis** clôt le ticket
+  sur `main` : la transition `done` est **post-merge**, ce qui permet d'y citer le
+  **hash du merge**.
+
+Ainsi le fichier-ticket n'est édité que sur **une seule ligne d'historique à la
+fois** (branche *ou* `main`) — pas de divergence, pas de conflit.

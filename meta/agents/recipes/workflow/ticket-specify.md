@@ -9,3 +9,6 @@ Cadrer une tâche avant de la prendre — pour qu'elle soit **prête à démarre
 
 Une tâche déjà claire peut n'avoir aucune spec à écrire : elle passe quand même en
 `020-ready` (avec `ready:` daté), simplement sans remplir « Spécifications ».
+
+> *specify* est du **bookkeeping de board** : pas encore de branche, la transition
+> se commite sur `main`. La branche dédiée naît à l'étape [work](ticket-work.md).

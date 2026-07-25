@@ -1,7 +1,8 @@
 # Recipe — travailler un ticket (`020-ready` → `040-doing`)
 
-1. `git mv` le ticket vers `meta/workflow/040-doing/` ; renseigner `doing:` et créer la
-   **branche dédiée** (la noter dans `branch:`).
+1. Créer la **branche dédiée** depuis `main` (la noter dans `branch:`) ; puis, **sur
+   la branche**, `git mv` le ticket vers `meta/workflow/040-doing/` et renseigner
+   `doing:`. La branche portera *work* + *verify*.
 2. Implémenter — s'appuyer sur la recipe de méthode adaptée :
    [implement-a-feature](../implement-a-feature.md), [refactor-safely](../refactor-safely.md),
    ou [debug-empirically](../debug-empirically.md).
