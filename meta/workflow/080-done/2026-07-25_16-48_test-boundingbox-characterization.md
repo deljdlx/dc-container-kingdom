@@ -7,7 +7,7 @@ created: 2026-07-25 16:48
 ready: 2026-07-25 16:54
 doing: 2026-07-25 16:54
 verify: 2026-07-25 16:54
-done:
+done: 2026-07-25 16:56
 ---
 
 ## Objectif
@@ -50,4 +50,5 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-25 16:56] Relecture de conformité (DoD cochée, périmètre respecté: ajout test-only, `BoundingBox.js` inchangé).
+- [2026-07-25 16:56] Merge sur `main` effectué via `git merge --no-ff copilot/test-boundingbox-characterization` (commit de merge `62c38d8`).
