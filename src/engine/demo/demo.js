@@ -142,6 +142,14 @@ const shy = new Woman01();
 originArea.addElement(250, 240, shy);
 new FleeBehavior(shy, { radius: 110, speed: 4 }).start();
 
+// A free-roaming NPC — no fixed route: its CharacterBehavior picks a random
+// direction every few seconds and turns away whenever it bumps into scenery or
+// another character. Added to the area first, since `live()` reaches the game
+// loop through the application the area wires up.
+const wanderer = new Woman00();
+originArea.addElement(180, 60, wanderer);
+wanderer.live(3000);
+
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 

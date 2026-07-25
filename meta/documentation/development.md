@@ -32,7 +32,8 @@ routes `/api/docker/*` (celles que nginx proxifie vers la socket Docker en prod)
 Container Kingdom (pilotée uniquement par `src/engine/index.js`). C'est le
 **meilleur terrain pour développer/tester une feature moteur** : flèches pour
 marcher, une foule de PNJ (patrouilleurs + immobiles), un PNJ « Cain » qui parle
-au contact, et un PNJ timide qui fuit quand on l'approche.
+au contact, un PNJ timide qui fuit quand on l'approche, et un PNJ en errance
+libre (`CharacterBehavior`).
 
 > ⚠️ L'URL de la démo **doit finir par `/`** (`/engine/demo/`) — sinon le fallback
 > SPA sert l'app à la place.
