@@ -22,7 +22,7 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Règles essentielles
 
-- **Tâches** : prises dans le board `project/000-todo/` ; suivre le cycle
+- **Tâches** : prises dans le board `project/000-backlog/` ; suivre le cycle
   (`agents/recipes/work-a-task.md` : branche → `verify` → merge → done).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.

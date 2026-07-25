@@ -2,7 +2,7 @@
 id: NNN
 title: Titre court de la tâche
 type: feat            # feat | fix | refactor | docs | test | chore
-branch:               # rempli au passage en 010-doing (ex. feat/mon-truc)
+branch:               # rempli au passage en 040-doing (ex. feat/mon-truc)
 created: YYYY-MM-DD
 ---
 
