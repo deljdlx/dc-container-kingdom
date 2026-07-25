@@ -45,6 +45,6 @@ Chaque transition = un `git mv` vers la colonne suivante.
 Ainsi le fichier-ticket n'est édité que sur **une seule ligne d'historique à la
 fois** (branche *ou* `main`) — pas de divergence, pas de conflit.
 
-En **parallèle** (plusieurs agents à la fois), isoler le travail de branche dans un
-**worktree** dédié pour éviter les collisions de working tree / index — voir
-[parallel-worktrees](../parallel-worktrees.md).
+En **parallèle** (plusieurs agents à la fois), isoler ce travail de branche dans un
+**worktree** dédié (isolation, `/tmp`, clôture propre) — la mécanique détaillée vit
+dans [parallel-worktrees](../parallel-worktrees.md).

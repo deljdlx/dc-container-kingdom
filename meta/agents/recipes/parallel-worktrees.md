@@ -5,6 +5,11 @@ Plusieurs agents (Claude, Copilot, Codex…) sur le même repo = collisions si l
 dans son propre worktree isolé** ; le working tree **principal** de l'utilisateur
 reste sur `main` et **personne n'en change la branche active**.
 
+> **Topologie du cycle** (board sur `main`, branche pour *work*/*verify*, merge
+> `--no-ff` + clôture sur `main`, bookkeeping) : source de vérité dans
+> [work-a-task](workflow/work-a-task.md). Ici : la **couche worktree** qui isole ce
+> travail entre agents.
+
 ## Règles dures
 
 1. **Ne jamais changer la branche active du working tree principal.** Interdit d'y
@@ -13,8 +18,8 @@ reste sur `main` et **personne n'en change la branche active**.
    principal — même solo (le principal peut être lu par un autre agent à tout moment).
 3. **Branches nommées par agent** : `<agent>/<slug>` (`claude/…`, `copilot/…`,
    `codex/…`). Un agent ne touche, n'édite ni ne merge **que ses propres** branches.
-4. **Commits / merges sur `main` : sur demande** — le *bookkeeping de board*
-   (création de ticket, transitions de colonnes) reste l'exception au fil de l'eau.
+4. **Bookkeeping de board vs « sur demande »** (merges sur `main`, push) : voir les
+   Règles transverses de [work-a-task](workflow/work-a-task.md).
 
 ## Worktree de l'agent (fixe, réutilisé)
 
