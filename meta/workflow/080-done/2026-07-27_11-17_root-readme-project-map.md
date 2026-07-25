@@ -7,7 +7,7 @@ created: 2026-07-27 11:17
 ready: 2026-07-25 13:18
 doing: 2026-07-25 13:19
 verify: 2026-07-25 13:20
-done:
+done: 2026-07-25 13:21
 ---
 
 ## Objectif
@@ -35,9 +35,9 @@ Rester concis (2 puces racine + sous-puces). Liens relatifs valides.
 
 ## Definition of Done
 
-- [ ] Section « Structure » au README racine, distinguant `src/` (code) et `meta/` (ressources).
-- [ ] Liens relatifs valides (link-check).
-- [ ] `npm run verify` vert.
+- [x] Section « Structure » au README racine, distinguant `src/` (code) et `meta/` (ressources).
+- [x] Liens relatifs valides (link-check).
+- [x] `npm run verify` vert.
 
 ## Journal
 
@@ -57,4 +57,6 @@ Rester concis (2 puces racine + sous-puces). Liens relatifs valides.
 
 ### Validation
 
--
+- [2026-07-25 13:21] Review d'acceptation OK : conforme aux conventions (README
+  en anglais, commits FR, liens valides), DoD couverte. Mergé sur `main` en
+  `--no-ff` (merge `0b78bcf`) ; ticket clos en `080-done`.
