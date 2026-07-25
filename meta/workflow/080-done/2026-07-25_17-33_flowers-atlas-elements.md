@@ -7,7 +7,7 @@ created: 2026-07-25 17:33
 ready: 2026-07-25 17:51
 doing: 2026-07-25 17:53
 verify: 2026-07-25 18:15
-done:
+done: 2026-07-25 18:19
 ---
 
 ## Objectif
@@ -200,4 +200,7 @@ ordre de lecture (ligne puis colonne) :
 
 ### Validation
 
--
+- [2026-07-25 18:19] Branche `claude/flowers-atlas-elements` mergée sur `main`
+  (`--no-ff`, merge `01453ec`, 8 commits). DoD complète : 219 éléments publics,
+  zones et `manualZ` conformes, `Flower00` intact, catalogue groupé/filtrable à
+  236 cartes, `npm run verify` vert et validation navigateur (catalogue + démo).
