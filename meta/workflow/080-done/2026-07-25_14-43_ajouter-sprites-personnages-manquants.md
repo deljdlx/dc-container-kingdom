@@ -7,7 +7,7 @@ created: 2026-07-25 14:43
 ready: 2026-07-25 14:46
 doing: 2026-07-25 14:46
 verify: 2026-07-25 14:53
-done:
+done: 2026-07-25 14:56
 ---
 
 ## Objectif
@@ -76,3 +76,6 @@ sont exposees: `Man00`, `Woman00`, `Woman01`, `Woman02`.
 - [2026-07-25 14:53] Acceptation fonctionnelle OK au regard de l'objectif et de
   la DoD. Le ticket reste en `060-verify` tant que la branche n'est pas committe
   puis mergee sur `main`, conformement au workflow.
+- [2026-07-25 14:56] Branche `feat/missing-character-bases` mergee sur `main`
+  via `0cf79ce` (`merge: integre les sprites de personnages manquants`). Ticket
+  deplace en `080-done`.
