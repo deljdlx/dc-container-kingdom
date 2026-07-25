@@ -2,11 +2,11 @@
 id: 2026-07-27_11-15
 title: Lien vers la démo dans le README du moteur
 type: docs
-branch:
+branch: copilot/demo-link-in-engine-readme
 created: 2026-07-27 11:15
-ready:
-doing:
-verify:
+ready: 2026-07-25 17:04
+doing: 2026-07-25 17:04
+verify: 2026-07-25 17:04
 done:
 ---
 
@@ -26,17 +26,17 @@ _Trivial — pas de spec nécessaire._
 
 ## Definition of Done
 
-- [ ] `src/engine/README.md` mentionne et lie la démo autonome.
+- [x] `src/engine/README.md` mentionne et lie la démo autonome.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-07-25 17:04] Ajout d'un lien Markdown explicite vers la démo autonome dans `src/engine/README.md`, avec URL locale et pointeur vers le dossier source `src/engine/demo/`.
 
 ### Vérification
 
--
+- [2026-07-25 17:04] `npm run verify` vert (lint + build + tests).
 
 ### Validation
 
