@@ -1,7 +1,7 @@
 # Recipe — cycle d'un ticket (overview)
 
 Le parcours d'un ticket sur le board `project/` (voir
-[`../../project/README.md`](../../project/README.md)). **Une étape = une recipe** :
+[`../../../README.md`](../../../README.md)). **Une étape = une recipe** :
 
 | Étape | Colonne | Recipe |
 |---|---|---|
@@ -19,4 +19,4 @@ Chaque transition = un `git mv` vers la colonne suivante.
   et **documente ses itérations** (section `## Journal` du ticket, entrées datées).
 - **Une** tâche en `040-doing` à la fois, idéalement.
 - Une **branche par ticket** ; commiter / merger **sur demande** (voir
-  [../conventions.md](../conventions.md)).
+  [../conventions.md](../../conventions.md)).

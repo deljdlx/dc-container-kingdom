@@ -1,6 +1,6 @@
 # Container Kingdom — guide agent (Claude Code)
 
-> Résumé des règles ; **la source de vérité est [`agents/`](agents/)**. Points
+> Résumé des règles ; **la source de vérité est [`project/agents/`](project/agents/)**. Points
 > d'entrée frères : [`AGENTS.md`](AGENTS.md),
 > [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
@@ -22,8 +22,8 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Règles essentielles
 
-- **Tâches** : prises dans le board `project/000-backlog/` ; suivre le cycle
-  (`agents/recipes/work-a-task.md` : branche → `verify` → merge → done).
+- **Tâches** : prises dans le board `project/workflow/000-backlog/` ; suivre le cycle
+  (`project/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
 - **Une branche par feature** ; Conventional Commits FR ; **jamais** de mention IA ;
@@ -32,9 +32,9 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Détail
 
-- Règles complètes : **[`agents/`](agents/)** — conventions, workflow, frontière moteur.
-- Comprendre le code : **[`documentation/`](documentation/)**.
+- Règles complètes : **[`project/agents/`](project/agents/)** — conventions, workflow, frontière moteur.
+- Comprendre le code : **[`project/documentation/`](project/documentation/)**.
 
-@agents/conventions.md
-@agents/workflow.md
-@agents/engine-boundary.md
+@project/agents/conventions.md
+@project/agents/workflow.md
+@project/agents/engine-boundary.md

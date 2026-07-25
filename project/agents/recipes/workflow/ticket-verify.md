@@ -3,7 +3,7 @@
 Quand l'implémentation est terminée — **vérification technique** par celui qui a
 fait le travail.
 
-1. Vérifier — voir [verify-a-change](verify-a-change.md) : `npm run verify` vert,
+1. Vérifier — voir [verify-a-change](../verify-a-change.md) : `npm run verify` vert,
    validation runtime si pertinent, nettoyage des résidus de debug.
 2. `git mv` le ticket vers `project/060-verify/` ; renseigner `verify:`.
 3. **Documenter chaque itération de vérification** dans `## Journal > Vérification`,

@@ -2,15 +2,15 @@
 
 Des **modes d'emploi étape par étape**, **agnostiques au projet** : ils décrivent
 *comment travailler*, pas *comment ajouter tel truc* (ça, ce sont les recipes
-projet dans [`../../project/recipes/`](../../project/recipes/)). Réutilisables
+projet dans [`../../recipes/`](../../recipes/)). Réutilisables
 d'un dépôt à l'autre.
 
 ## Cycle d'un ticket (board)
 
-- **[work-a-task.md](work-a-task.md)** — l'**overview** du cycle. **Le point de départ.**
-- Une recipe par étape : [ticket-create](ticket-create.md) · [ticket-specify](ticket-specify.md)
-  · [ticket-work](ticket-work.md) · [ticket-verify](ticket-verify.md) ·
-  [ticket-validate](ticket-validate.md).
+- **[work-a-task.md](workflow/work-a-task.md)** — l'**overview** du cycle. **Le point de départ.**
+- Une recipe par étape : [ticket-create](workflow/ticket-create.md) · [ticket-specify](workflow/ticket-specify.md)
+  · [ticket-work](workflow/ticket-work.md) · [ticket-verify](workflow/ticket-verify.md) ·
+  [ticket-validate](workflow/ticket-validate.md).
 
 ## Méthode (mobilisées pendant work / verify / validate)
 

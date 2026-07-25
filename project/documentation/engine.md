@@ -5,7 +5,7 @@ dans un conteneur DOM : board scrollable, éléments positionnés, personnages
 animés, collisions, events. Il ne connaît **rien** de l'app qui l'embarque.
 
 > Usage rapide, frontière et configuration des chemins d'assets :
-> voir **[`src/engine/README.md`](../src/engine/README.md)**. Ce document-ci
+> voir **[`src/engine/README.md`](../../src/engine/README.md)**. Ce document-ci
 > décrit les **concepts internes**. Le détail au niveau code est dans les
 > **JSDoc** (exhaustifs) de chaque fichier.
 

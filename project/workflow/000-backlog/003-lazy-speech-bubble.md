@@ -23,7 +23,7 @@ jamais. Petite optimisation d'hygiène, comportement inchangé.
 - [ ] `_domQuickReaction` créé à la demande (au 1er `showReaction`) ;
       `clearReaction` / `isReactionVisible` gèrent le cas « pas encore créé ».
 - [ ] Comportement inchangé : les tests bulle passent **sans modifier** d'assertion
-      (voir recipe `agents/recipes/refactor-safely.md`).
+      (voir recipe `project/agents/recipes/refactor-safely.md`).
 
 ## Vérification
 

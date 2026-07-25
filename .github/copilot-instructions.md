@@ -1,6 +1,6 @@
 # Instructions Copilot — Container Kingdom
 
-> Résumé des règles ; **la source de vérité est [`../agents/`](../agents/)**.
+> Résumé des règles ; **la source de vérité est [`../project/agents/`](../project/agents/)**.
 > Points d'entrée frères : [`../CLAUDE.md`](../CLAUDE.md), [`../AGENTS.md`](../AGENTS.md).
 
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
@@ -21,8 +21,8 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Règles essentielles
 
-- **Tâches** : prises dans le board `project/000-backlog/` ; suivre le cycle
-  (`agents/recipes/work-a-task.md` : branche → `verify` → merge → done).
+- **Tâches** : prises dans le board `project/workflow/000-backlog/` ; suivre le cycle
+  (`project/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
 - **Une branche par feature** ; Conventional Commits FR ; **jamais** de mention IA ;
@@ -31,10 +31,10 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Détail (source de vérité)
 
-Lire le dossier **[`../agents/`](../agents/)** pour les règles complètes :
+Lire le dossier **[`../project/agents/`](../project/agents/)** pour les règles complètes :
 
-- [`../agents/conventions.md`](../agents/conventions.md) — langue, style/design, git.
-- [`../agents/workflow.md`](../agents/workflow.md) — vérification, doc à jour, piège rAF.
-- [`../agents/engine-boundary.md`](../agents/engine-boundary.md) — frontière + archi.
+- [`../project/agents/conventions.md`](../project/agents/conventions.md) — langue, style/design, git.
+- [`../project/agents/workflow.md`](../project/agents/workflow.md) — vérification, doc à jour, piège rAF.
+- [`../project/agents/engine-boundary.md`](../project/agents/engine-boundary.md) — frontière + archi.
 
-Pour comprendre le **code** : **[`../documentation/`](../documentation/)**.
+Pour comprendre le **code** : **[`../project/documentation/`](../project/documentation/)**.

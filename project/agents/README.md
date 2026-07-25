@@ -4,9 +4,9 @@
 Copilot, Cursor…). Les points d'entrée à la racine en donnent l'essentiel et
 renvoient ici pour le détail — les garder minces, mettre le détail ici :
 
-- [`CLAUDE.md`](../CLAUDE.md) (Claude Code)
-- [`AGENTS.md`](../AGENTS.md) (agnostique)
-- [`.github/copilot-instructions.md`](../.github/copilot-instructions.md) (Copilot)
+- [`CLAUDE.md`](../../CLAUDE.md) (Claude Code)
+- [`AGENTS.md`](../../AGENTS.md) (agnostique)
+- [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md) (Copilot)
 
 ## Contenu
 
