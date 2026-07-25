@@ -2,10 +2,10 @@
 id: 2026-07-27_11-17
 title: README racine — courte carte des dossiers structurants
 type: docs
-branch:
+branch: docs/root-readme-structure
 created: 2026-07-27 11:17
 ready: 2026-07-25 13:18
-doing:
+doing: 2026-07-25 13:19
 verify:
 done:
 ---
@@ -43,7 +43,10 @@ Rester concis (2 puces racine + sous-puces). Liens relatifs valides.
 
 ### Travail
 
--
+- [2026-07-25 13:19] Section « 📁 Structure » ajoutée au README racine (après
+  « Documentation »), rédigée en anglais comme le reste du fichier. Deux entrées :
+  `src/` (code : engine + container-kingdom) et `meta/` (agents, documentation,
+  recipes, workflow), avec liens relatifs vers les sous-dossiers / README.
 
 ### Vérification
 

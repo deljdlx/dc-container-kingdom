@@ -20,6 +20,19 @@ Container Kingdom is an interactive visualization tool for Docker containers, us
 
 ---
 
+## 📁 Structure
+
+Two levels at the root:
+
+- **[`src/`](src/)** — the code: [`engine/`](src/engine/README.md) (reusable RPG
+  engine) and `container-kingdom/` (the Docker app).
+- **[`meta/`](meta/README.md)** — the working resources:
+  [`agents/`](meta/agents/) (rules + recipes), [`documentation/`](meta/documentation/)
+  (how the code works), [`recipes/`](meta/recipes/) (project recipes) and
+  [`workflow/`](meta/workflow/) (file-based kanban board).
+
+---
+
 ## 🛠️ Development
 
 The app can run **without a Docker daemon**: a Vite dev-server plugin mocks the
