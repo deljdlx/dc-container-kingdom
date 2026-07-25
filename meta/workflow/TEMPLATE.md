@@ -16,8 +16,8 @@ Ce qu'on veut obtenir, et **pourquoi**.
 
 ## Spécifications
 
-_À remplir à l'étape « specify » (avant `020-ready`) si la tâche le nécessite :
-quoi / comment, contraintes, pistes._
+_Rempli en « specify » (voir la recipe). Selon la tâche : fonctionnel (quoi) ·
+technique (comment) · schéma mermaid · risques. Doser — la DoD reste le contrat._
 
 ## Contexte / liens
 
