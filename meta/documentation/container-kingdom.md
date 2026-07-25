@@ -3,7 +3,7 @@
 L'app transforme l'état d'un daemon Docker en une carte RPG : chaque **conteneur**
 devient une **maison**, chaque **réseau** devient un tracé de **routes**, et des
 **PNJ** peuplent la scène. Elle *utilise* le moteur (`src/engine/`) mais ne le
-modifie jamais — elle instancie ses éléments et les ajoute au board via l'API
+modifie jamais : elle instancie ses éléments et les ajoute au board via l'API
 publique.
 
 Tout est sous `src/container-kingdom/js/`.
@@ -13,7 +13,7 @@ Tout est sous `src/container-kingdom/js/`.
 `index.html` charge `bootstrap.js` (module ES) qui, au `DOMContentLoaded` :
 
 ```
-applyDebugFlag()                 # ?debug=1 → body.debug
+applyDebugFlag()                 // ?debug=1 -> body.debug
 new DockerApiClient()
 new ContainerKingdom(dockerApiClient)
 instance.zoom(0.5)
@@ -27,7 +27,7 @@ instance.zoom(0.5)
 sequenceDiagram
     participant B as bootstrap.js
     participant CK as ContainerKingdom
-    participant R as Repository
+    participant R as ContainerRepository
     participant V as Viewer (Renderer)
     participant E as Moteur
     B->>CK: new + init()
@@ -37,12 +37,12 @@ sequenceDiagram
     V->>E: instancie maisons · routes · PNJ + addElement
     CK->>E: viewport.render() / renderDebug()
     CK->>CK: drawNetworksSwitches() (HUD)
-    CK->>CK: loop() — polling + checksum sha256
+    CK->>CK: loop() — polling + checksum SHA-256
 ```
 
 La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et calcule
-un checksum `sha256` ; elle ne redessine que si l'état a **changé** — même idée
-« ne travailler que sur changement » que le streaming du moteur.
+un checksum `SHA-256` ; elle ne redessine que si l'état a **changé**, selon la
+même logique de mise à jour « seulement sur changement » que le streaming du moteur.
 
 ## Données : de Docker à l'écran
 
@@ -50,7 +50,7 @@ un checksum `sha256` ; elle ne redessine que si l'état a **changé** — même 
   routes vers la socket Docker ; en dev, un **plugin Vite les mocke** (voir
   [development.md](development.md)).
 - **`ContainerRepository`** — charge conteneurs et stats, les tient en mémoire ;
-  le renderer/layout/HUD interrogent l'app (`getContainers()`, …).
+  le renderer, le layout et le HUD interrogent l'app (`getContainers()`, …).
 - **`DockerCompose`** — regroupe les conteneurs par **projet compose** (les stacks
   `dc-*` de la barre latérale).
 - **`Container`** — le modèle d'un conteneur (métier / vue séparés).
@@ -59,12 +59,13 @@ un checksum `sha256` ; elle ne redessine que si l'état a **changé** — même 
 
 Où poser chaque maison ? Une **grille d'occupation déterministe** : `ContainerPlacement`
 maintient une grille de cellules et expose `getClosestFreeCoords(x, y, minDistance)`
-qui renvoie la cellule libre la plus proche d'un point de départ. Déterministe et
-**testé unitairement** (`test/ContainerPlacement.test.js`) — indépendant du rendu.
+qui renvoie la cellule libre la plus proche d'un point de départ. Ce placement est
+**déterministe** et **testé unitairement** (`test/ContainerPlacement.test.js`),
+indépendamment du rendu.
 
 ## Rendu : `ContainerKingdomRenderer`
 
-Le « viewer » dessine sur une **grille de cellules** (`cellWidth`) :
+Le renderer dessine sur une **grille de cellules** (`cellWidth`) :
 
 - **`drawContainers()`** — pour chaque conteneur, trouve une cellule libre via
   `ContainerPlacement`, y instancie une **maison** (élément moteur) étiquetée
@@ -81,7 +82,7 @@ vers l'URL de démo du conteneur, le cas échéant.
 
 - **`ContainerKingdomLayout`** — crée l'`Application` du moteur, **enregistre les
   classes d'éléments par nom** (`registerElement('House00', House00)`, …) pour
-  l'instanciation par nom, câble `map.update`, et gère la structure de page.
+  l'instanciation par nom, branche `map.update`, et gère la structure de page.
 - **`KingdomHud`** — l'overlay : usage mémoire/CPU agrégé et **interrupteurs de
   réseaux** (afficher/masquer un réseau).
 - **`ContainersList` / `ContainersListEntry`** — la barre latérale listant les
@@ -92,7 +93,7 @@ vers l'URL de démo du conteneur, le cas échéant.
 
 L'app **consomme** le moteur, jamais l'inverse. Concrètement : elle importe depuis
 `../../engine/index.js`, instancie des éléments moteur (`new House00()`,
-`new Man00()`, `new Man04()`), les ajoute aux `Area`s, écoute les events moteur
+`new Man00()`, `new Man04()`), les ajoute aux `Area`s, écoute les événements moteur
 (`element.click`, `element.trigger`…). Ajouter un nouveau *type* d'élément visuel
 se fait **côté moteur** (voir [engine.md](engine.md)), puis l'app l'enregistre et
 l'instancie.
