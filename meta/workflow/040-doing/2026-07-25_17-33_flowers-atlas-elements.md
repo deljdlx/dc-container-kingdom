@@ -2,10 +2,10 @@
 id: 2026-07-25_17-33
 title: Exposer les sprites de flowers-00.png en éléments de carte
 type: feat
-branch:
+branch: claude/flowers-atlas-elements
 created: 2026-07-25 17:33
 ready: 2026-07-25 17:51
-doing:
+doing: 2026-07-25 17:53
 verify:
 done:
 ---
