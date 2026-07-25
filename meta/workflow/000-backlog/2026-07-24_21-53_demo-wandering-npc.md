@@ -1,9 +1,9 @@
 ---
-id: 004
+id: 2026-07-24_21-53
 title: Démo — un PNJ en errance (CharacterBehavior)
 type: chore
 branch:
-created: 2026-07-24
+created: 2026-07-24 21:53
 ---
 
 ## Objectif

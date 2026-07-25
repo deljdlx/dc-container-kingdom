@@ -1,9 +1,9 @@
 ---
-id: 002
+id: 2026-07-24_21-53
 title: development.md — renvoyer vers agents/ pour les conventions
 type: docs
 branch:
-created: 2026-07-24
+created: 2026-07-24 21:53
 ---
 
 ## Objectif
