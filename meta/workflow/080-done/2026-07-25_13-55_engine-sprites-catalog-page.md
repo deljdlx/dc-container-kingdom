@@ -7,7 +7,7 @@ created: 2026-07-25 13:55
 ready: 2026-07-25 14:00
 doing: 2026-07-25 14:03
 verify: 2026-07-25 14:30
-done:
+done: 2026-07-25 14:40
 ---
 
 ## Objectif
@@ -39,13 +39,13 @@ et le travail de level/design.
 
 ## Definition of Done
 
-- [ ] Une page de catalogue des sprites est accessible et rend les éléments
+- [x] Une page de catalogue des sprites est accessible et rend les éléments
       disponibles.
-- [ ] Les sprites sont affichés depuis l'API publique (`src/engine/index.js`) sans
+- [x] Les sprites sont affichés depuis l'API publique (`src/engine/index.js`) sans
       casser la frontière moteur/app.
-- [ ] La page est lisible sur petit écran et desktop.
-- [ ] `npm run verify` passe sans régression.
-- [ ] Doc/README mis à jour si nécessaire pour indiquer où trouver cette page.
+- [x] La page est lisible sur petit écran et desktop.
+- [x] `npm run verify` passe sans régression.
+- [x] Doc/README mis à jour si nécessaire pour indiquer où trouver cette page.
 
 ## Journal
 
@@ -67,4 +67,5 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …`, par étape.
 
 ### Validation
 
--
+- [2026-07-25 14:40] Revue finale sans ecart bloquant : frontiere moteur/app respectee, doc mise a jour, verification automatisee et runtime valides.
+- [2026-07-25 14:40] Merge effectue sur `main` via `ddd2bdb` (`Merge branch 'feat/engine-sprites-catalog-page'`), ticket pret a etre classe en `080-done`.
