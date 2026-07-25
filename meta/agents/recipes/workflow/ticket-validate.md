@@ -5,7 +5,9 @@ répond-il à son objectif ?
 
 1. Valider — voir [review-changes](../review-changes.md) : conformité aux règles +
    qualité + **Definition of Done** cochée.
-2. Merger la branche sur `main` (`--no-ff`) — **sur demande**.
+2. Merger la branche sur `main` (`--no-ff`) — **sur demande**. Si le travail était
+   en **worktree**, le retirer après le merge (`git worktree remove …`, voir
+   [parallel-worktrees](../parallel-worktrees.md)).
 3. **Sur `main`, une fois le merge fait** : `git mv` le ticket vers
    `meta/workflow/080-done/`, renseigner `done:` et **noter le hash du merge**
    (possible seulement post-merge).

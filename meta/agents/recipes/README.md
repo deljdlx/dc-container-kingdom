@@ -24,6 +24,8 @@ d'un dépôt à l'autre.
 - **[verify-a-change.md](verify-a-change.md)** — « terminé = vérifié » (auto + runtime).
 - **[audit-workflow-consistency.md](audit-workflow-consistency.md)** — après une
   évolution du workflow, vérifier que les specs restent cohérentes et à jour.
+- **[parallel-worktrees.md](parallel-worktrees.md)** — plusieurs agents en parallèle :
+  isoler chaque ticket dans un worktree git dédié.
 
 ## Écrire une recipe
 
