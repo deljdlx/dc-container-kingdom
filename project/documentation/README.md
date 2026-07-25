@@ -14,10 +14,10 @@ un **RPG**, bâtie sur un **moteur de mini-RPG maison** et découplée de lui.
 
 ## Autres points d'entrée
 
-- **[`../CLAUDE.md`](../CLAUDE.md)** — brief court pour un agent IA (résumé,
+- **[`../../CLAUDE.md`](../../CLAUDE.md)** — brief court pour un agent IA (résumé,
   commandes, carte de l'archi, conventions, workflow de vérif).
-- **[`../README.md`](../README.md)** — présentation et démarrage rapide.
-- **[`../src/engine/README.md`](../src/engine/README.md)** — usage, frontière et
+- **[`../../README.md`](../../README.md)** — présentation et démarrage rapide.
+- **[`../../src/engine/README.md`](../../src/engine/README.md)** — usage, frontière et
   configuration des chemins d'assets du moteur (côté hôte).
 - **JSDoc** — la doc de référence au niveau code vit dans les fichiers eux-mêmes
   (JSDoc exhaustifs) ; ces documents décrivent l'architecture et y renvoient.

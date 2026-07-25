@@ -31,4 +31,4 @@ boucle à la main** :
    `vp.update(t)` est **le même chemin** que celui appelé par rAF → vérification
    fidèle.
 
-Voir aussi `../../documentation/development.md` et [`agents/workflow.md`](../../agents/workflow.md).
+Voir aussi `../documentation/development.md` et [`agents/workflow.md`](../agents/workflow.md).

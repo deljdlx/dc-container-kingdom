@@ -24,26 +24,26 @@ laissent de la place pour en insérer (`010-…`, `030-…`, `050-…`, `070-…
 
 ## Cycle de vie d'une tâche
 
-Chaque étape a sa recipe (détail dans [`work-a-task`](../agents/recipes/work-a-task.md)).
+Chaque étape a sa recipe (détail dans [`work-a-task`](agents/recipes/workflow/work-a-task.md)).
 Chaque transition **date** son passage (frontmatter) et **documente ses itérations**
 (section `## Journal` du ticket) :
 
-1. **Créer** → `000-backlog/` — [ticket-create](../agents/recipes/ticket-create.md).
-2. **Spécifier** → `020-ready/` — specs + `ready:` — [ticket-specify](../agents/recipes/ticket-specify.md).
-3. **Travailler** → `040-doing/` — branche + `doing:` — [ticket-work](../agents/recipes/ticket-work.md).
-4. **Vérifier** → `060-verify/` — `npm run verify` + `verify:` — [ticket-verify](../agents/recipes/ticket-verify.md).
-5. **Valider & clore** → `080-done/` — review + merge + `done:` — [ticket-validate](../agents/recipes/ticket-validate.md).
+1. **Créer** → `000-backlog/` — [ticket-create](agents/recipes/workflow/ticket-create.md).
+2. **Spécifier** → `020-ready/` — specs + `ready:` — [ticket-specify](agents/recipes/workflow/ticket-specify.md).
+3. **Travailler** → `040-doing/` — branche + `doing:` — [ticket-work](agents/recipes/workflow/ticket-work.md).
+4. **Vérifier** → `060-verify/` — `npm run verify` + `verify:` — [ticket-verify](agents/recipes/workflow/ticket-verify.md).
+5. **Valider & clore** → `080-done/` — review + merge + `done:` — [ticket-validate](agents/recipes/workflow/ticket-validate.md).
 
 ## Créer une tâche
 
-Copier [`TEMPLATE.md`](TEMPLATE.md) dans `000-backlog/` sous le nom
+Copier [`TEMPLATE.md`](workflow/TEMPLATE.md) dans `000-backlog/` sous le nom
 `YYYY-MM-DD_HH-MM_titre.md` (heure de création ; `titre` court en kebab-case).
-Voir [ticket-create](../agents/recipes/ticket-create.md).
+Voir [ticket-create](agents/recipes/workflow/ticket-create.md).
 
 ## Comment ça s'articule
 
 - **Ce board** = le **QUOI** (état, priorité, avancement).
-- **`../agents/recipes/`** = le **COMMENT générique** (méthode réutilisable) ;
+- **`agents/recipes/`** = le **COMMENT générique** (méthode réutilisable) ;
   **[`recipes/`](recipes/)** = le **COMMENT projet** (patterns Container Kingdom).
-- **`../agents/`** (conventions, workflow, frontière moteur) = les **RÈGLES**.
-- **`../documentation/`** = comment le **code** fonctionne.
+- **`agents/`** (conventions, workflow, frontière moteur) = les **RÈGLES**.
+- **`documentation/`** = comment le **code** fonctionne.

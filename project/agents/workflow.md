@@ -5,9 +5,9 @@
 Le travail se pilote depuis le **kanban en fichiers** `project/` (colonnes
 `000-backlog` → `040-doing` → `060-verify` → `080-done`). Prendre la tâche
 prioritaire, la faire avancer de colonne en colonne, et suivre le cycle décrit
-par la recipe **[`recipes/work-a-task.md`](recipes/work-a-task.md)** (branche
+par la recipe **[`recipes/workflow/work-a-task.md`](recipes/workflow/work-a-task.md)** (branche
 dédiée, `npm run verify`, merge, journal de tâche). Voir
-[`../project/README.md`](../project/README.md).
+[`../README.md`](../README.md).
 
 ## « Terminé » = vérifié
 

@@ -3,7 +3,7 @@
 **Acceptation / review** (distincte de la vérification technique) : le ticket
 répond-il à son objectif ?
 
-1. Valider — voir [review-changes](review-changes.md) : conformité aux règles +
+1. Valider — voir [review-changes](../review-changes.md) : conformité aux règles +
    qualité + **Definition of Done** cochée.
 2. Merger la branche sur `main` (`--no-ff`) — **sur demande**.
 3. `git mv` le ticket vers `project/080-done/` ; renseigner `done:` et noter le

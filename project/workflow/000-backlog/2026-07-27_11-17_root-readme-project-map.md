@@ -12,13 +12,13 @@ done:
 
 ## Objectif
 
-Le README racine ne mentionne pas les dossiers structurants (`agents/`,
-`project/`, `documentation/`). Ajouter une courte section « Structure » qui les
+Le README racine ne mentionne pas les dossiers structurants (`project/agents/`,
+`project/`, `project/documentation/`). Ajouter une courte section « Structure » qui les
 pointe, pour qu'un nouvel arrivant (humain ou agent) s'oriente. Zéro impact.
 
 ## Spécifications
 
-Section concise (3–4 puces) liant : `documentation/`, `agents/`, `project/`,
+Section concise (3–4 puces) liant : `project/documentation/`, `project/agents/`, `project/`,
 `src/engine/README.md`. Rester bref.
 
 ## Contexte / liens

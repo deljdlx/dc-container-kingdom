@@ -2,7 +2,7 @@
 
 Playbooks **spécifiques à ce projet** (API du moteur, patterns maison). Pour les
 recipes de **méthode** génériques (implémenter, refactorer, déboguer, reviewer,
-vérifier), voir [`../../agents/recipes/`](../../agents/recipes/).
+vérifier), voir [`../agents/recipes/`](../agents/recipes/).
 
 ## Disponibles
 
