@@ -1,69 +1,76 @@
-# Recipe — travailler en parallèle avec des worktrees git
+# Recipe — travail multi-agents en worktrees git
 
-**Quand** : plusieurs agents (ou toi + un autre) travaillent en même temps sur le
-repo. **Pourquoi** : un seul working tree partagé = index / HEAD / fichiers communs
-→ collisions (commits contaminés, `checkout` bloqué, fichiers écrasés). Un
-**worktree git** donne à chaque agent son **répertoire, son index et son HEAD**
-propres, sur la même base d'objets et de refs.
+Plusieurs agents (Claude, Copilot, Codex…) sur le même repo = collisions si le
+**working tree, l'index et le HEAD sont partagés**. Modèle : **chaque agent travaille
+dans son propre worktree isolé** ; le working tree **principal** de l'utilisateur
+reste sur `main` et **personne n'en change la branche active**.
 
-> Solo, sans autre agent actif, un worktree est superflu : une branche dans le
-> répertoire principal suffit. Les worktrees servent le **parallèle**.
+## Règles dures
 
-## Emplacement
+1. **Ne jamais changer la branche active du working tree principal.** Interdit d'y
+   faire `git checkout <autre-branche>` pour travailler. Il reste sur `main`.
+2. **Tout travail de branche se fait dans le worktree de l'agent**, jamais dans le
+   principal — même solo (le principal peut être lu par un autre agent à tout moment).
+3. **Branches nommées par agent** : `<agent>/<slug>` (`claude/…`, `copilot/…`,
+   `codex/…`). Un agent ne touche, n'édite ni ne merge **que ses propres** branches.
+4. **Commits / merges sur `main` : sur demande** — le *bookkeeping de board*
+   (création de ticket, transitions de colonnes) reste l'exception au fil de l'eau.
 
-Les worktrees vivent dans un **dossier frère**, hors du repo, pour que
-vite / vitest / eslint ne les scannent jamais (aucune config à ajouter) :
+## Worktree de l'agent (fixe, réutilisé)
+
+**Un worktree fixe par agent**, en dossier frère hors repo (non scanné par
+vite / vitest / eslint), **pas un nouveau par ticket** :
 
 ```
-<repo>/                       # primaire, sur `main`
-<repo>.worktrees/<slug>/      # un par ticket en cours
+<repo>/                       # principal, sur `main` (ne pas toucher sa branche)
+<repo>.worktrees/<agent>/     # le worktree de l'agent : claude, copilot, …
 ```
 
-`<slug>` = la branche avec les `/` remplacés par `-` (ex. `feat/missing-bases` →
-`feat-missing-bases`). Ici `<repo>` = `dc-container-kingdom`.
-
-## Cycle de vie (greffé sur le cycle d'un ticket)
-
-1. **Démarrer** (étape [work](workflow/ticket-work.md)) — créer branche + worktree
-   depuis un `main` à jour, puis travailler **dans ce répertoire** :
-
-   ```bash
-   git worktree add ../<repo>.worktrees/<slug> -b feat/<slug>
-   cd ../<repo>.worktrees/<slug>
-   ```
-
-   Les transitions `040-doing` → `060-verify` et le journal s'y font, sur la branche.
-
-2. **Vérifier** (étape [verify](workflow/ticket-verify.md)) — `npm run verify` **dans
-   le worktree**, isolé (pas de collision avec les autres agents).
-
-3. **Clore** (étape [validate](workflow/ticket-validate.md)) — depuis le primaire
-   (`main`), merger puis **retirer** le worktree :
-
-   ```bash
-   git merge --no-ff feat/<slug>
-   git worktree remove ../<repo>.worktrees/<slug>
-   git branch -d feat/<slug>
-   ```
-
-   Puis clôturer le ticket sur `main` (transition `080-done`, hash du merge).
-
-## Coordination (léger)
-
-- **Un agent par ticket / par worktree.** Avant de démarrer, vérifier qu'il n'est
-  pas déjà pris : `git worktree list` et `git branch --list 'feat/*'`.
-- Le **board sur `main`** reste le point de rendez-vous : garder les commits de
-  bookkeeping **courts et atomiques** (`git commit -- <chemin>`) pour limiter la
-  contention sur `main`.
-- Jamais `git add -A` / `git add .` — stager des chemins explicites (voir
-  [../conventions.md](../conventions.md)).
-
-## Nettoyage
+Le créer une fois (`<repo>` = `dc-container-kingdom`) :
 
 ```bash
-git worktree list              # worktrees actifs
-git worktree remove <chemin>   # après merge
-git worktree prune             # purger les références mortes
+git worktree add ../<repo>.worktrees/<agent> main
 ```
 
-> Un worktree oublié = une branche qui traîne. Le retirer fait partie de *validate*.
+## Démarrer une tâche (dans le worktree)
+
+Depuis **son** worktree, repartir **propre** d'un `main` à jour :
+
+```bash
+cd ../<repo>.worktrees/<agent>
+git status                          # doit être propre ; sinon stash ou demander
+git clean -fd                       # supprime les untracked d'une tâche précédente *
+git checkout main && git merge --ff-only @{u} 2>/dev/null || true
+git checkout -b <agent>/<slug>      # branche dédiée, nommée par agent
+```
+
+> \* `git clean -fd` est **indispensable** : un fichier untracked laissé par une
+> tâche précédente (ex. un ticket déplacé de colonne) survit aux bascules de branche
+> et **pollue le board** (doublons). C'est la cause de fichiers présents en double.
+
+Puis dérouler le cycle **dans ce worktree** : transitions `040-doing` → `060-verify`,
+implémentation, `npm run verify`, journal — tout sur la branche `<agent>/<slug>`.
+
+## Clore (merge local, sans push)
+
+1. Branche prête, `verify` **vert** dans le worktree.
+2. **Merge `--no-ff` dans `main`.** `main` n'est monté que dans le principal : le
+   merge s'y fait, et `main` **reste** `main` (on n'y change pas de branche) —
+   c'est le **point de coordination** entre agents (premier arrivé, premier servi,
+   court). Si `main` a avancé, rebaser `<agent>/<slug>` dessus avant de re-merger.
+3. Clôturer le ticket sur `main` (transition `080-done` + hash) — bookkeeping.
+4. **Ne pas supprimer le worktree** (il est fixe, réutilisé) : supprimer seulement la
+   branche (`git branch -d <agent>/<slug>`). Le worktree est renettoyé au démarrage
+   suivant (`git clean -fd`).
+
+## Coordination
+
+- **Un agent par ticket.** Avant de démarrer : `git worktree list` et
+  `git branch --list '<agent>/*'`.
+- Un agent **ne touche jamais** la branche/le worktree d'un autre agent ; s'il repère
+  un souci dans leur travail, il le **signale** à l'utilisateur.
+- **Jamais** `git add -A` / `git add .` — chemins explicites (voir
+  [../conventions.md](../conventions.md)).
+
+> Modèle inspiré de règles git multi-agents éprouvées, adapté à notre flux **local**
+> (board en fichiers, merge `--no-ff` local, pas de push/PR).
