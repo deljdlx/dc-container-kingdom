@@ -22,9 +22,10 @@
 
 - **Une branche par feature/fix** — jamais de travail direct sur `main`. Créer une
   branche dédiée (`feat/…`, `fix/…`, `refactor/…`, `docs/…`, `chore/…`), coder →
-  vérifier → merger sur `main` (`--no-ff`). En **parallèle** avec un autre agent,
-  isoler la branche dans un **worktree** dédié (voir
-  [recipes/parallel-worktrees.md](recipes/parallel-worktrees.md)).
+  vérifier → merger sur `main` (`--no-ff`). En **multi-agents**, chaque agent
+  travaille dans **son propre worktree** (branche préfixée par l'agent, `claude/…` /
+  `copilot/…`) et ne change **jamais** la branche du working tree principal — voir
+  [recipes/parallel-worktrees.md](recipes/parallel-worktrees.md).
 - **Conventional Commits** + description **française** (`feat:`, `fix:`, `refactor:`,
   `docs:`, `test:`, `chore:`).
 - **Jamais** de mention d'assistance IA (pas de `Co-Authored-By`, pas de
