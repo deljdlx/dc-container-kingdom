@@ -13,6 +13,31 @@ import {
   Woman00,
   Woman01,
   Woman02,
+  Blossom05,
+  Bouquet03,
+  FlowerField01,
+  FlowerField05,
+  FlowerGrass00,
+  FlowerGrass01,
+  FlowerGrass02,
+  FlowerGrass03,
+  FlowerGrass04,
+  FlowerGrass05,
+  FlowerPatch00,
+  FlowerPatch01,
+  FlowerPatch02,
+  GiantMushroom00,
+  HollowLog01,
+  Hosta02,
+  LilyPad04,
+  Lupin07,
+  Plant05,
+  Rock00,
+  StoneSlab00,
+  Stump00,
+  Toadstool01,
+  WaterLily00,
+  Well00,
   PatrolBehavior,
   FleeBehavior,
   setAssetsBase,
@@ -78,6 +103,34 @@ populate(0, 1, [
 populate(1, 1, [
   [300, 200, House01],
   [560, 420, Tree00],
+]);
+
+// A garden cut entirely out of the `flowers-00` sheet: ground cover laid flat
+// under everything (manualZ), solid props to bump into, and decor to walk
+// behind. Reach it by walking one area east and two areas south.
+populate(1, 2, [
+  // A flowering lawn: ground tiles, walked over rather than around.
+  [96, 96, FlowerGrass00], [128, 96, FlowerGrass01], [160, 96, FlowerGrass02],
+  [96, 128, FlowerGrass03], [128, 128, FlowerGrass04], [160, 128, FlowerGrass05],
+  [96, 160, FlowerPatch00], [128, 160, FlowerPatch01], [160, 160, FlowerPatch02],
+  [230, 120, StoneSlab00],
+  // Solid props — the only blocking elements of the sheet.
+  [250, 210, Well00],
+  [330, 130, Stump00],
+  [400, 200, HollowLog01],
+  [310, 270, Rock00],
+  // Flower masses (64x64) and scattered decor.
+  [480, 110, FlowerField01],
+  [610, 170, FlowerField05],
+  [700, 300, Bouquet03],
+  [180, 300, Lupin07],
+  [250, 340, Hosta02],
+  [380, 340, GiantMushroom00],
+  [440, 390, Toadstool01],
+  [520, 330, WaterLily00],
+  [570, 370, LilyPad04],
+  [650, 430, Blossom05],
+  [90, 410, Plant05],
 ]);
 populate(-1, 0, [
   [700, 200, House00],
