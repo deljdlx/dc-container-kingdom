@@ -2,11 +2,11 @@
 id: 2026-07-25_16-48
 title: Tests de caractérisation pour BoundingBox
 type: test
-branch:
+branch: copilot/test-boundingbox-characterization
 created: 2026-07-25 16:48
-ready:
-doing:
-verify:
+ready: 2026-07-25 16:54
+doing: 2026-07-25 16:54
+verify: 2026-07-25 16:54
 done:
 ---
 
@@ -30,8 +30,8 @@ son comportement actuel avant tout refactor.
 
 ## Definition of Done
 
-- [ ] `test/BoundingBox.test.js` ajouté, `BoundingBox.js` inchangé.
-- [ ] `npm run verify` vert (nouveaux tests inclus).
+- [x] `test/BoundingBox.test.js` ajouté, `BoundingBox.js` inchangé.
+- [x] `npm run verify` vert (nouveaux tests inclus).
 
 ## Journal
 
@@ -40,11 +40,13 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-25 16:54] Ajout de `test/BoundingBox.test.js` avec 13 tests de caractérisation couvrant l'API publique de `BoundingBox` (construction, accesseurs, `collided`, offsets, extension de boîte, overlap), sans modifier `src/engine/map/BoundingBox.js`.
+- [2026-07-25 16:54] Ajustement des assertions de bords pour coller au comportement actuel observé (gestion des `null` via setters et `height(0)` qui n'écrase pas `y1`).
 
 ### Vérification
 
--
+- [2026-07-25 16:54] `npm test -- test/BoundingBox.test.js` vert (13/13).
+- [2026-07-25 16:54] `npm run verify` vert (lint + build + 168 tests).
 
 ### Validation
 
