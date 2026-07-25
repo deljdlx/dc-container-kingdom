@@ -24,6 +24,7 @@ export default [
         getComputedStyle: 'readonly',
         HTMLElement: 'readonly',
         URLSearchParams: 'readonly',
+        KeyboardEvent: 'readonly',
       },
     },
     rules: {

@@ -1,41 +1,251 @@
+/* ── Layout ────────────────────────────────────────────────────────────────── */
+
 body {
-  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 16px;
-  padding: 20px;
-  background: #10161f;
+  gap: 0;
+  padding: 0;
+  background: #0d1117;
   color: #e6edf3;
   font-family: system-ui, sans-serif;
 }
 
+/* ── Header ─────────────────────────────────────────────────────────────────── */
+
 .demo-header {
-  text-align: center;
-  max-width: 720px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 24px 16px;
+  border-bottom: 1px solid #1c2733;
+  background: #10161f;
+}
+
+.demo-header__logo {
+  font-size: 2rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.demo-header__text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
 }
 
 .demo-header h1 {
-  margin: 0 0 6px;
-  font-size: 1.4rem;
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
 }
 
-.demo-header p {
+.demo-header__tag {
+  display: inline-block;
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #58a6ff;
+  background: #122236;
+  border: 1px solid #1f4068;
+  border-radius: 4px;
+  padding: 1px 6px;
+  vertical-align: middle;
+  margin-left: 6px;
+  position: relative;
+  top: -2px;
+}
+
+.demo-header__sub {
   margin: 0;
-  font-size: 0.9rem;
-  color: #9fb0c0;
+  font-size: 0.8rem;
+  color: #6e8095;
+  line-height: 1.4;
 }
 
 .demo-header code {
   background: #1c2733;
   padding: 1px 5px;
   border-radius: 4px;
+  font-size: 0.78rem;
+  color: #8ab4f8;
+}
+
+/* ── Viewport wrapper ───────────────────────────────────────────────────────── */
+
+.demo-viewport-wrap {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 16px;
+  overflow-x: auto;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 #viewport {
   overflow: hidden;
-  border: 3px solid #2b3948;
-  border-radius: 6px;
-  box-shadow: 0 12px 40px #0008;
+  border: 2px solid #1c2733;
+  border-radius: 8px;
+  box-shadow: 0 8px 32px #000a, 0 0 0 1px #0d1117;
   background: #6a9b41;
+  flex-shrink: 0;
 }
+
+/* ── Footer — controls hint ─────────────────────────────────────────────────── */
+
+.demo-footer {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  padding: 12px 24px;
+  border-top: 1px solid #1c2733;
+  background: #10161f;
+  flex-wrap: wrap;
+}
+
+.demo-hint {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.8rem;
+  color: #6e8095;
+}
+
+.demo-hint__label {
+  font-weight: 500;
+  color: #9fb0c0;
+}
+
+.demo-hint__keys {
+  display: flex;
+  gap: 3px;
+}
+
+kbd {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 22px;
+  padding: 0 5px;
+  background: #1a2332;
+  border: 1px solid #2b3948;
+  border-bottom-width: 2px;
+  border-radius: 4px;
+  font-family: system-ui, sans-serif;
+  font-size: 0.75rem;
+  color: #c9d1d9;
+  line-height: 1;
+}
+
+.demo-hint__link {
+  color: #58a6ff;
+  text-decoration: none;
+}
+
+.demo-hint__link:hover {
+  text-decoration: underline;
+}
+
+.demo-hint__link code {
+  background: #122236;
+  border: 1px solid #1f4068;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 0.78rem;
+  color: #8ab4f8;
+}
+
+/* ── Touch D-pad ────────────────────────────────────────────────────────────── */
+
+.touch-pad {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  display: grid;
+  grid-template-areas:
+    ".    up   ."
+    "left .    right"
+    ".    down .";
+  grid-template-columns: 56px 56px 56px;
+  grid-template-rows: 56px 56px 56px;
+  gap: 5px;
+  z-index: 100;
+  /* visible by default; hidden on pointer devices below */
+}
+
+.dpad-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(22, 35, 53, 0.85);
+  border: 1.5px solid #2b3948;
+  border-radius: 10px;
+  color: #c9d1d9;
+  font-size: 1.1rem;
+  cursor: pointer;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  backdrop-filter: blur(6px);
+  transition: background 0.1s, transform 0.08s;
+}
+
+.dpad-btn:active,
+.dpad-btn.pressed {
+  background: rgba(88, 166, 255, 0.25);
+  border-color: #58a6ff;
+  transform: scale(0.92);
+}
+
+.dpad-up    { grid-area: up; }
+.dpad-left  { grid-area: left; }
+.dpad-down  { grid-area: down; }
+.dpad-right { grid-area: right; }
+
+/* Hide D-pad on devices that support hover (mouse/trackpad) */
+@media (hover: hover) and (pointer: fine) {
+  .touch-pad { display: none; }
+}
+
+/* ── Small screen adjustments ───────────────────────────────────────────────── */
+
+@media (max-width: 600px) {
+  .demo-header {
+    padding: 14px 16px 12px;
+    gap: 10px;
+  }
+
+  .demo-header__logo {
+    font-size: 1.6rem;
+  }
+
+  .demo-header h1 {
+    font-size: 1rem;
+  }
+
+  .demo-viewport-wrap {
+    padding: 12px 8px;
+    align-items: flex-start;
+  }
+
+  .demo-footer {
+    gap: 16px;
+    padding: 10px 16px;
+  }
+
+  /* On small touch screens, hide keyboard hint and only show debug link */
+  .demo-hint--keys {
+    display: none;
+  }
+}
+
