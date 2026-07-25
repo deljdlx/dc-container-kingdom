@@ -17,13 +17,37 @@
 </head>
 <body>
   <header class="demo-header">
-    <h1>🗺️ RPG engine — demo</h1>
-    <p>A standalone showcase driven only by the engine's public API
-       (<code>engine/index.js</code>) — no Container Kingdom.
-       <strong>Arrow keys</strong> to walk; the camera follows.</p>
+    <div class="demo-header__logo">🗺️</div>
+    <div class="demo-header__text">
+      <h1>RPG Engine <span class="demo-header__tag">demo</span></h1>
+      <p class="demo-header__sub">Standalone showcase — public API only (<code>engine/index.js</code>)</p>
+    </div>
   </header>
 
-  <div id="viewport" class="frame"></div>
+  <div class="demo-viewport-wrap">
+    <div id="viewport" class="frame"></div>
+  </div>
+
+  <footer class="demo-footer">
+    <div class="demo-hint demo-hint--keys">
+      <span class="demo-hint__label">Walk</span>
+      <span class="demo-hint__keys">
+        <kbd>←</kbd><kbd>↑</kbd><kbd>↓</kbd><kbd>→</kbd>
+      </span>
+    </div>
+    <div class="demo-hint demo-hint--debug">
+      <span class="demo-hint__label">Debug mode</span>
+      <a class="demo-hint__link" href="?debug=1"><code>?debug=1</code></a>
+    </div>
+  </footer>
+
+  <!-- Touch D-pad — hidden on pointer (mouse) devices, visible on touch screens -->
+  <nav class="touch-pad" aria-label="Movement controls">
+    <button class="dpad-btn dpad-up"    data-key="ArrowUp"    aria-label="Move up">▲</button>
+    <button class="dpad-btn dpad-left"  data-key="ArrowLeft"  aria-label="Move left">◀</button>
+    <button class="dpad-btn dpad-down"  data-key="ArrowDown"  aria-label="Move down">▼</button>
+    <button class="dpad-btn dpad-right" data-key="ArrowRight" aria-label="Move right">▶</button>
+  </nav>
 
   <script type="module" src="./demo.js"></script>
 </body>

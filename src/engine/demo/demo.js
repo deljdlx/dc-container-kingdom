@@ -145,3 +145,26 @@ viewport.render();
 viewport.run();
 viewport.renderDebug(); // draws zone boxes only when ?debug=1
 patrols.forEach(patrol => patrol.start());
+
+// ── Touch D-pad ──────────────────────────────────────────────────────────────
+// Dispatch synthetic keyboard events so the viewport's existing keydown/keyup
+// handlers pick them up without touching the engine internals.
+document.querySelectorAll('.dpad-btn').forEach(btn => {
+  const key = btn.dataset.key;
+
+  const press = (e) => {
+    e.preventDefault();
+    btn.classList.add('pressed');
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key, bubbles: true }));
+  };
+
+  const release = () => {
+    btn.classList.remove('pressed');
+    document.body.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+  };
+
+  btn.addEventListener('pointerdown', press);
+  btn.addEventListener('pointerup', release);
+  btn.addEventListener('pointercancel', release);
+  btn.addEventListener('pointerleave', release);
+});
