@@ -7,6 +7,9 @@
  */
 
 export * from './Blossoms.js';
+export * from './Clusters.js';
+export * from './Fields.js';
 export * from './Foliage.js';
 export * from './Mushrooms.js';
+export * from './Props.js';
 export * from './Water.js';
