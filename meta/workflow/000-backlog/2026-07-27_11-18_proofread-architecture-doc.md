@@ -12,7 +12,7 @@ done:
 
 ## Objectif
 
-Passe de relecture de `project/documentation/architecture.md` : corriger d'éventuelles
+Passe de relecture de `meta/documentation/architecture.md` : corriger d'éventuelles
 coquilles et clarifier les tournures lourdes. **Sans changer le fond** — zéro
 impact.
 
@@ -23,7 +23,7 @@ schémas Mermaid ni le sens._
 
 ## Contexte / liens
 
-- `project/documentation/architecture.md`
+- `meta/documentation/architecture.md`
 
 ## Definition of Done
 

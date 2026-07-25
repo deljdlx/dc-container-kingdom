@@ -1,7 +1,7 @@
 # AGENTS.md — guide pour agents IA
 
 > Fichier agnostique (Copilot coding agent, Cursor…). Résumé des règles ; **la
-> source de vérité est [`project/agents/`](project/agents/)**. Points d'entrée frères :
+> source de vérité est [`meta/agents/`](meta/agents/)**. Points d'entrée frères :
 > [`CLAUDE.md`](CLAUDE.md), [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
@@ -22,8 +22,8 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Règles essentielles
 
-- **Tâches** : prises dans le board `project/workflow/000-backlog/` ; suivre le cycle
-  (`project/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
+- **Tâches** : prises dans le board `meta/workflow/000-backlog/` ; suivre le cycle
+  (`meta/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
 - **Une branche par feature** ; Conventional Commits FR ; **jamais** de mention IA ;
@@ -32,10 +32,10 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Détail (source de vérité)
 
-Lire le dossier **[`project/agents/`](project/agents/)** pour les règles complètes :
+Lire le dossier **[`meta/agents/`](meta/agents/)** pour les règles complètes :
 
-- [`project/agents/conventions.md`](project/agents/conventions.md) — langue, style/design, git.
-- [`project/agents/workflow.md`](project/agents/workflow.md) — vérification, doc à jour, piège rAF.
-- [`project/agents/engine-boundary.md`](project/agents/engine-boundary.md) — frontière + archi.
+- [`meta/agents/conventions.md`](meta/agents/conventions.md) — langue, style/design, git.
+- [`meta/agents/workflow.md`](meta/agents/workflow.md) — vérification, doc à jour, piège rAF.
+- [`meta/agents/engine-boundary.md`](meta/agents/engine-boundary.md) — frontière + archi.
 
-Pour comprendre le **code** : **[`project/documentation/`](project/documentation/)**.
+Pour comprendre le **code** : **[`meta/documentation/`](meta/documentation/)**.

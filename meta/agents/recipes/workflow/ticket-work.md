@@ -1,6 +1,6 @@
 # Recipe — travailler un ticket (`020-ready` → `040-doing`)
 
-1. `git mv` le ticket vers `project/040-doing/` ; renseigner `doing:` et créer la
+1. `git mv` le ticket vers `meta/workflow/040-doing/` ; renseigner `doing:` et créer la
    **branche dédiée** (la noter dans `branch:`).
 2. Implémenter — s'appuyer sur la recipe de méthode adaptée :
    [implement-a-feature](../implement-a-feature.md), [refactor-safely](../refactor-safely.md),
