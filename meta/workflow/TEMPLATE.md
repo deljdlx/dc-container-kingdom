@@ -30,7 +30,8 @@ technique (comment) · schéma mermaid · risques. Doser — la DoD reste le con
 
 ## Journal
 
-Entrées datées `- [YYYY-MM-DD HH:MM] …`, par étape.
+Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%m-%d
+%H:%M'`), par étape ; timeline **monotone** — rien ne postdate `done`.
 
 ### Travail
 

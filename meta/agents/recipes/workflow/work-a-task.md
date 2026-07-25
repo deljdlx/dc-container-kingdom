@@ -17,6 +17,8 @@ Chaque transition = un `git mv` vers la colonne suivante.
 
 - Chaque étape **date** son passage (frontmatter `ready`/`doing`/`verify`/`done`)
   et **documente ses itérations** (section `## Journal` du ticket, entrées datées).
+  Horodatages issus de l'**heure réelle** (ex. `date '+%Y-%m-%d %H:%M'`) ; timeline
+  **monotone** — une entrée ne peut pas postdater `done`.
 - **Colonnes actives vs repos** : une colonne **active** (`040-doing`, `060-verify`)
   s'entre **au début** de son activité — on `git mv` le ticket *avant* de travailler
   / vérifier, pour que le board reflète l'état réel. Une colonne **de repos**
