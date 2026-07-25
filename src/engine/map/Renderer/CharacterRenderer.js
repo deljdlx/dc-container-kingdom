@@ -14,8 +14,9 @@ export class CharacterRenderer extends Renderer
   spriteHeight = 48;
 
   /**
-   * Speech-bubble node.
-   * @type {DomElement}
+   * Speech-bubble node, created on the first {@link showReaction} — characters
+   * that never speak never pay for it.
+   * @type {DomElement|undefined}
    */
   _domQuickReaction;
 
@@ -32,8 +33,7 @@ export class CharacterRenderer extends Renderer
   }
 
   /**
-   * Set up the character node: sprite sheet, initial frame, reaction bubble
-   * and drop shadow.
+   * Set up the character node: sprite sheet, initial frame and drop shadow.
    * @param {import('../Character.js').Character} element
    */
   constructor(element) {
@@ -41,10 +41,6 @@ export class CharacterRenderer extends Renderer
     this.dom.classList.add('character');
     this.domSprite.style.backgroundImage = `url(${assetUrl('characters/characters-00.png')})`;
     this.applySpriteFrame('down', 1);
-
-    this._domQuickReaction = document.createElement('div');
-    this._domQuickReaction.classList.add('quickReaction');
-    this.dom.append(this._domQuickReaction);
 
     this.addShadow();
   }
@@ -73,22 +69,40 @@ export class CharacterRenderer extends Renderer
   }
 
   /**
+   * Create the speech-bubble node on first use (idempotent).
+   * @returns {DomElement} the bubble node
+   */
+  _ensureQuickReaction() {
+    if(this._domQuickReaction) {
+      return this._domQuickReaction;
+    }
+    this._domQuickReaction = document.createElement('div');
+    this._domQuickReaction.classList.add('quickReaction');
+    this.dom.append(this._domQuickReaction);
+    return this._domQuickReaction;
+  }
+
+  /**
    * Show a speech bubble with the given HTML content.
    * @param {string} content
    */
   showReaction(content) {
-    this._domQuickReaction.innerHTML = content;
-    this._domQuickReaction.classList.add('quickReaction--enable');
+    const bubble = this._ensureQuickReaction();
+    bubble.innerHTML = content;
+    bubble.classList.add('quickReaction--enable');
   }
 
-  /** Hide and empty the speech bubble. */
+  /** Hide and empty the speech bubble. No-op while it has never been shown. */
   clearReaction() {
+    if(!this._domQuickReaction) {
+      return;
+    }
     this._domQuickReaction.innerHTML = '';
     this._domQuickReaction.classList.remove('quickReaction--enable');
   }
 
   /** @returns {boolean} whether the speech bubble is currently shown */
   isReactionVisible() {
-    return this._domQuickReaction.classList.contains('quickReaction--enable');
+    return this._domQuickReaction?.classList.contains('quickReaction--enable') ?? false;
   }
 }

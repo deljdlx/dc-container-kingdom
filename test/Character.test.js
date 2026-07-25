@@ -126,6 +126,37 @@ describe('Character — speech bubble via the renderer', () => {
   });
 });
 
+describe('Character — speech bubble DOM is lazy', () => {
+  it('creates no bubble node until the character first speaks', () => {
+    const char = new Character(0, 0);
+    expect(char.getDom().querySelectorAll('.quickReaction').length).toBe(0);
+    expect(char.isReacting()).toBe(false);
+
+    char.quickReaction('hi', false);
+    expect(char.getDom().querySelectorAll('.quickReaction').length).toBe(1);
+    expect(char.isReacting()).toBe(true);
+  });
+
+  it('reuses the same node across reactions and stays silent-safe', () => {
+    const char = new Character(0, 0);
+    expect(() => char.clearQuickReaction()).not.toThrow();
+    expect(char.getDom().querySelectorAll('.quickReaction').length).toBe(0);
+
+    char.quickReaction('hi', false);
+    char.clearQuickReaction();
+    char.quickReaction('again', false);
+    expect(char.getDom().querySelectorAll('.quickReaction').length).toBe(1);
+  });
+
+  it('appends the bubble last, after the shadow and the sprite', () => {
+    const char = new Character(0, 0);
+    char.quickReaction('hi', false);
+    const children = [...char.getDom().children];
+    expect(children.at(-1).classList.contains('quickReaction')).toBe(true);
+    expect(children[0].classList.contains('map-element__shadow')).toBe(true);
+  });
+});
+
 describe('Character — speech bubble state & events', () => {
   it('isReacting reflects whether a bubble is shown', () => {
     const char = new Character(0, 0);
