@@ -35,7 +35,20 @@
       </div>
     </section>
 
-    <section class="catalog-grid" data-catalog-gallery aria-label="Engine sprites catalog"></section>
+    <div class="catalog-toolbar">
+      <label class="catalog-search">
+        <span class="catalog-search__label">Filter</span>
+        <input
+          class="catalog-search__input"
+          type="search"
+          data-catalog-filter
+          placeholder="Class or family name — mushroom, LilyPad, Man…"
+          autocomplete="off"
+        >
+      </label>
+    </div>
+
+    <div data-catalog-gallery aria-label="Engine sprites catalog"></div>
   </main>
 
   <script type="module" src="./catalog.js"></script>

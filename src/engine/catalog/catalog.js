@@ -9,15 +9,105 @@ import { getCatalogEntries } from './catalog-registry.js';
 applyDebugFlag();
 setAssetsBase('/engine/images');
 
+/** Preview side, in px, a magnified sprite aims to fill. */
+const PREVIEW_TARGET = 128;
+const MAX_PREVIEW_ZOOM = 4;
+
 const catalogEntries = getCatalogEntries(engine);
 const summaryNode = document.querySelector('[data-catalog-summary]');
 const galleryNode = document.querySelector('[data-catalog-gallery]');
+const filterNode = document.querySelector('[data-catalog-filter]');
 
-summaryNode.textContent = `${catalogEntries.length} public visual elements available from engine/index.js.`;
+const cards = buildFamilySections(catalogEntries, galleryNode);
+applyFilter('');
 
-catalogEntries.forEach((entry) => {
-  galleryNode.append(buildCard(entry));
-});
+filterNode.addEventListener('input', () => applyFilter(filterNode.value));
+
+/**
+ * Render one section per family, and return the cards with what they filter on.
+ * @param {ReturnType<typeof getCatalogEntries>} entries
+ * @param {HTMLElement} container
+ * @returns {Array<{haystack: string, node: HTMLElement, section: HTMLElement}>}
+ */
+function buildFamilySections(entries, container) {
+  const built = [];
+  let section = null;
+  let grid = null;
+  let family = null;
+
+  entries.forEach((entry) => {
+    if (entry.family !== family) {
+      family = entry.family;
+      const familyEntries = entries.filter((candidate) => candidate.family === family);
+      ({ section, grid } = buildFamilySection(family, familyEntries));
+      container.append(section);
+    }
+
+    const node = buildCard(entry);
+    grid.append(node);
+    built.push({
+      haystack: `${entry.name} ${entry.family} ${entry.kindLabel}`.toLowerCase(),
+      node,
+      section,
+    });
+  });
+
+  return built;
+}
+
+/**
+ * @param {string} family
+ * @param {ReturnType<typeof getCatalogEntries>} familyEntries
+ * @returns {{section: HTMLElement, grid: HTMLElement}}
+ */
+function buildFamilySection(family, familyEntries) {
+  const section = document.createElement('section');
+  section.className = 'catalog-family';
+
+  const heading = document.createElement('h2');
+  heading.className = 'catalog-family__title';
+  heading.textContent = family;
+
+  const count = document.createElement('span');
+  count.className = 'catalog-family__count';
+  count.textContent = `${familyEntries.length}`;
+  heading.append(count);
+
+  const grid = document.createElement('div');
+  grid.className = 'catalog-grid';
+  grid.setAttribute('aria-label', `${family} elements`);
+
+  section.append(heading, grid);
+  return { section, grid };
+}
+
+/**
+ * Show the cards matching `query`, hide the rest, and keep the summary honest.
+ * @param {string} query
+ */
+function applyFilter(query) {
+  const needle = query.trim().toLowerCase();
+  const visibleSections = new Set();
+  let visible = 0;
+
+  cards.forEach((card) => {
+    const matches = needle === '' || card.haystack.includes(needle);
+    card.node.hidden = !matches;
+    if (matches) {
+      visible += 1;
+      visibleSections.add(card.section);
+    }
+  });
+
+  galleryNode.querySelectorAll('.catalog-family').forEach((section) => {
+    section.hidden = !visibleSections.has(section);
+  });
+
+  const total = cards.length;
+  summaryNode.textContent = needle === ''
+    ? `${total} public visual elements available from engine/index.js.`
+    : `${visible} of ${total} public visual elements match "${query.trim()}".`;
+}
 
 /**
  * @param {{name: string, kind: string, kindLabel: string, ElementClass: Function}} entry
@@ -46,9 +136,12 @@ function buildCard(entry) {
 
   titleWrap.append(title, kind);
 
+  const zoom = previewZoom(stageMetrics);
   const meta = document.createElement('p');
   meta.className = 'catalog-card__meta';
-  meta.textContent = `${formatSize(element.width(), element.height())} footprint`;
+  meta.textContent = zoom === 1
+    ? `${formatSize(element.width(), element.height())} footprint`
+    : `${formatSize(element.width(), element.height())} footprint, shown at ${zoom}x`;
 
   header.append(titleWrap, meta);
 
@@ -66,6 +159,9 @@ function buildCard(entry) {
   const renderedTree = renderElementTree(element);
   renderedTree.style.left = `${stageMetrics.offsetX}px`;
   renderedTree.style.top = `${stageMetrics.offsetY}px`;
+  if (zoom !== 1) {
+    renderedTree.style.transform = `scale(${zoom})`;
+  }
   canvas.append(renderedTree);
 
   if (isDebugEnabled()) {
@@ -133,6 +229,17 @@ function getStageMetrics(element) {
     offsetX: ((paddedWidth - contentWidth) / 2) - left,
     offsetY: ((paddedHeight - contentHeight) / 2) - top,
   };
+}
+
+/**
+ * Integer magnification that fills the preview with a small sprite — most of
+ * the built-in elements are 32 px pixel-art, unreadable at 1:1 on a screen.
+ * @param {{contentWidth: number, contentHeight: number}} stageMetrics
+ * @returns {number}
+ */
+function previewZoom({ contentWidth, contentHeight }) {
+  const fit = Math.floor(PREVIEW_TARGET / Math.max(contentWidth, contentHeight));
+  return Math.min(MAX_PREVIEW_ZOOM, Math.max(1, fit));
 }
 
 /**
