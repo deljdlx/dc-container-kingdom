@@ -264,7 +264,7 @@ body {
   width: var(--preview-width);
   height: var(--preview-height);
   flex-shrink: 0;
-  /* Small sprites are magnified for art QA: keep the pixel-art crisp. */
+  /* Keep source pixels crisp while preserving real-size rendering. */
   image-rendering: pixelated;
 }
 

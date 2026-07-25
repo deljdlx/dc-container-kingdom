@@ -5,13 +5,10 @@ import {
 } from '../index.js';
 import * as engine from '../index.js';
 import { getCatalogEntries } from './catalog-registry.js';
+import { getStageMetrics } from './preview-layout.js';
 
 applyDebugFlag();
 setAssetsBase('/engine/images');
-
-/** Preview side, in px, a magnified sprite aims to fill. */
-const PREVIEW_TARGET = 128;
-const MAX_PREVIEW_ZOOM = 4;
 
 const catalogEntries = getCatalogEntries(engine);
 const summaryNode = document.querySelector('[data-catalog-summary]');
@@ -136,12 +133,9 @@ function buildCard(entry) {
 
   titleWrap.append(title, kind);
 
-  const zoom = previewZoom(stageMetrics);
   const meta = document.createElement('p');
   meta.className = 'catalog-card__meta';
-  meta.textContent = zoom === 1
-    ? `${formatSize(element.width(), element.height())} footprint`
-    : `${formatSize(element.width(), element.height())} footprint, shown at ${zoom}x`;
+  meta.textContent = `${formatSize(element.width(), element.height())} footprint`;
 
   header.append(titleWrap, meta);
 
@@ -159,9 +153,6 @@ function buildCard(entry) {
   const renderedTree = renderElementTree(element);
   renderedTree.style.left = `${stageMetrics.offsetX}px`;
   renderedTree.style.top = `${stageMetrics.offsetY}px`;
-  if (zoom !== 1) {
-    renderedTree.style.transform = `scale(${zoom})`;
-  }
   canvas.append(renderedTree);
 
   if (isDebugEnabled()) {
@@ -202,44 +193,6 @@ function renderElementTree(element) {
   });
 
   return dom;
-}
-
-/**
- * @param {import('../index.js').Element} element
- * @returns {{width: number, height: number, contentWidth: number, contentHeight: number, offsetX: number, offsetY: number}}
- */
-function getStageMetrics(element) {
-  const bounds = element.getBoundingBox();
-  const collisionBounds = element.getCollisionBoundingBox();
-  const left = minDefined(0, bounds.x0(), collisionBounds.x0());
-  const top = minDefined(0, bounds.y0(), collisionBounds.y0());
-  const right = maxDefined(element.width(), bounds.x1(), collisionBounds.x1());
-  const bottom = maxDefined(element.height(), bounds.y1(), collisionBounds.y1());
-
-  const contentWidth = Math.max(1, right - left);
-  const contentHeight = Math.max(1, bottom - top);
-  const paddedWidth = Math.max(160, contentWidth + 32);
-  const paddedHeight = Math.max(160, contentHeight + 32);
-
-  return {
-    width: paddedWidth,
-    height: paddedHeight,
-    contentWidth,
-    contentHeight,
-    offsetX: ((paddedWidth - contentWidth) / 2) - left,
-    offsetY: ((paddedHeight - contentHeight) / 2) - top,
-  };
-}
-
-/**
- * Integer magnification that fills the preview with a small sprite — most of
- * the built-in elements are 32 px pixel-art, unreadable at 1:1 on a screen.
- * @param {{contentWidth: number, contentHeight: number}} stageMetrics
- * @returns {number}
- */
-function previewZoom({ contentWidth, contentHeight }) {
-  const fit = Math.floor(PREVIEW_TARGET / Math.max(contentWidth, contentHeight));
-  return Math.min(MAX_PREVIEW_ZOOM, Math.max(1, fit));
 }
 
 /**
@@ -289,20 +242,4 @@ function describeZones(zones) {
  */
 function formatBox(box) {
   return `${box.x0()},${box.y0()} ${box.width()}x${box.height()}`;
-}
-
-/**
- * @param {...(number|null)} values
- * @returns {number}
- */
-function minDefined(...values) {
-  return Math.min(...values.filter((value) => value !== null));
-}
-
-/**
- * @param {...(number|null)} values
- * @returns {number}
- */
-function maxDefined(...values) {
-  return Math.max(...values.filter((value) => value !== null));
 }
