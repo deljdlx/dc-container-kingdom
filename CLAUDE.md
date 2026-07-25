@@ -26,8 +26,10 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
   (`meta/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
-- **Une branche par feature** ; Conventional Commits FR ; **jamais** de mention IA ;
-  **jamais** `git add -A` ; commiter/pusher **sur demande**.
+- **Jamais de travail direct sur `main`** — **branche dédiée par ticket** ; en
+  **parallèle** (autre agent actif), **worktree** dédié (voir
+  `meta/agents/recipes/parallel-worktrees.md`). Conventional Commits FR ; **jamais**
+  de mention IA ; **jamais** `git add -A` ; commiter/pusher **sur demande**.
 - **« Terminé » = vérifié** (`npm run verify`) ; **tenir la doc à jour**.
 
 ## Détail
