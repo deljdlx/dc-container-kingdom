@@ -7,7 +7,7 @@ created: 2026-07-25 18:27
 ready: 2026-07-25 18:36
 doing: 2026-07-25 18:36
 verify: 2026-07-25 18:59
-done:
+done: 2026-07-25 19:00
 ---
 
 ## Objectif
@@ -147,4 +147,5 @@ mixtes qui demandent un tri visuel plus fin.
 
 ### Validation
 
--
+- [2026-07-25 19:00] Relecture de conformité: lot arbres autonome livré, exports/tests/docs alignés, 6 éléments historiques inchangés.
+- [2026-07-25 19:00] Merge sur `main` via `git merge --no-ff copilot/map-sprites-01-elements` (commit `c57a87b`).
