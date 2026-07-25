@@ -198,6 +198,37 @@ Conventions de la planche :
 - `test/flowers-00.test.js` verrouille la découpe (alignement 32 px, bornes
   512×512, aucune cellule découpée deux fois) et ces conventions.
 
+### Planche `map-sprites-01` (lot arbres autonomes)
+
+`images/map/map-sprites-01.png` mélange objets posables et fragments
+d'assemblage (autotiles, coins, bandes de façade, morceaux de routes/arches).
+Le moteur n'ayant pas de tuilage automatique, le lot public retient seulement
+les sprites autonomes, nommables et posables tels quels.
+
+Premier lot exposé sous `map/Elements/MapSprites01/` :
+
+- `Conifer00..35`
+- `LeafTree00..26`
+- `CanopyTree00..23`
+- `TallTree00..29`
+- `DeadTree00..24`
+- `SaplingTree00..05`
+
+Soit **148 éléments** issus de la planche, tous exportés via `index.js`.
+
+Conventions de ce lot :
+
+- helper `sprite(x, y, width, height, extra?)` (pixels, pas de grille régulière)
+- ombre moteur coupée (`shadow: false`) : l'art porte déjà sa propre ombre
+- `collision` sur tous ces sprites (objets bloquants), via empreintes de tronc
+  (`treeCollision` / `deadTreeCollision`)
+- les 6 éléments historiques (`Tree00`, `Ground00`, `Fountain00`, `Sunflower00`,
+  `Fence00H`, `Fence00V`) restent inchangés
+
+Le reste de la planche (matériaux d'assemblage + objets ambigus) est documenté
+et volontairement exclu de ce lot pour préserver la lisibilité du catalogue et
+l'API publique.
+
 ## 9. Events
 
 Tout remonte à l'`Application` via `handle()`. Principaux events (préfixe

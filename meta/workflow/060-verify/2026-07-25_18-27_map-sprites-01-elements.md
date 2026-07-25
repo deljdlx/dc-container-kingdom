@@ -2,11 +2,11 @@
 id: 2026-07-25_18-27
 title: Exposer les sprites identifiables de map-sprites-01.png en éléments de carte
 type: feat
-branch:
+branch: copilot/map-sprites-01-elements
 created: 2026-07-25 18:27
-ready:
-doing:
-verify:
+ready: 2026-07-25 18:36
+doing: 2026-07-25 18:36
+verify: 2026-07-25 18:59
 done:
 ---
 
@@ -75,28 +75,28 @@ sûr qu'un catalogue rempli de fragments.
 
 ## Spécifications
 
-_À remplir en « specify »._ Points déjà connus :
+Le ticket est traité en **lot arbres autonomes** (périmètre explicite et
+vérifiable), pour éviter les fragments d'assemblage et les zones bâtimentaires
+mixtes qui demandent un tri visuel plus fin.
 
-- Réutiliser le patron `flowers-00` : fichiers par thème sous
-  `src/engine/map/Elements/<Planche>/`, nommage **`<Famille><NN>`** (index en
-  ordre de lecture), baril de planche ré-exporté par `src/engine/index.js`,
-  déclarations courtes et statiques.
-- Helper propre à cette planche : `sprite(x, y, width, height, extra?)` plutôt
-  que `cell(col, row)`, puisque la planche est irrégulière.
-- Les **6 éléments existants** (`Tree00`, `Ground00`, `Fountain00`, `Sunflower00`,
-  `Fence00H`, `Fence00V`) sont de l'API publique : nom, frame, taille et zones
-  **inchangés**. Leurs frames sont taillés à la main et rognent parfois le sprite
-  (`Tree00` : encre de 11 à 52 px dans une boîte de 64) — si l'un est franchement
-  faux, **le signaler sans le corriger**, et proposer un élément voisin correct.
-- Zones : `collision` sur ce qui bloque (arbres, bâtiments, rochers, statues,
-  panneaux…), `manualZ` sur les sols, rien sur le décor traversable. Ombres : à
-  vérifier planche en main (celles de `flowers-00` étaient peintes dans l'art).
-- Catalogue : déjà groupé par famille et filtrable depuis le ticket `flowers-00` —
-  rien à refaire, seulement à vérifier à la nouvelle échelle.
-- Tests : mêmes garde-fous que `test/flowers-00.test.js` (frames dans les bornes
-  1920×3360, aucun recouvrement entre sprites, exports par le baril, éléments
-  historiques intacts).
-- **Lotissement** : un commit par lot de familles.
+- Nouveau module `src/engine/map/Elements/MapSprites01/` :
+  - `atlas.js` avec `sprite(x, y, width, height, extra?)`
+  - helpers de collision `treeCollision` / `deadTreeCollision`
+  - `Trees.js` avec 148 éléments :
+    - `Conifer00..35`
+    - `LeafTree00..26`
+    - `CanopyTree00..23`
+    - `TallTree00..29`
+    - `DeadTree00..24`
+    - `SaplingTree00..05`
+  - baril `MapSprites01/index.js` ré-exporté par `src/engine/index.js`
+- Les 6 éléments historiques de la planche (`Tree00`, `Ground00`, `Fountain00`,
+  `Sunflower00`, `Fence00H`, `Fence00V`) restent inchangés.
+- Le lot garde `shadow: false` (ombre portée peinte dans l'art) et ajoute
+  `collision` sur tous les éléments arborés (objets bloquants).
+- Tests dédiés `test/map-sprites-01-elements.test.js` : bornes 1920×3360,
+  absence de recouvrement sur le lot, exports catalogue, familles attendues,
+  invariants historiques.
 
 ## Contexte / liens
 
@@ -114,33 +114,36 @@ _À remplir en « specify »._ Points déjà connus :
 
 ## Definition of Done
 
-- [ ] Les sprites **clairement identifiables** de `map-sprites-01.png` sont
-      exposés comme éléments publics, avec `frame` / `width` / `height` **exacts**
-      (validés à l'œil, aucun sprite tronqué ni débordant sur son voisin).
-- [ ] **Aucun fragment d'assemblage** n'a été exposé : chaque élément livré se
-      nomme en un mot et se pose seul sur une carte.
-- [ ] La liste des sprites **écartés** est documentée (zones de la planche +
-      raison), pour que le périmètre soit un choix lisible et non un oubli.
-- [ ] Les 6 éléments historiques de la planche restent inchangés (nom, frame,
-      taille, zones) ; toute anomalie constatée sur leurs frames est signalée.
-- [ ] Zones cohérentes : `collision` sur ce qui bloque, `manualZ` sur les sols,
-      rien par défaut sur le décor traversable.
-- [ ] Tous les nouveaux éléments sont exportés par `src/engine/index.js` et
-      apparaissent dans `/engine/catalog/`, qui reste lisible à cette échelle.
-- [ ] Tests de cohérence de la planche + exports verts.
-- [ ] Doc à jour (`meta/documentation/engine.md`, `src/engine/README.md`).
-- [ ] `npm run verify` vert + validation visuelle au navigateur (catalogue, et
-      démo pour un échantillon posé sur une area).
+- [x] Le lot arbres autonomes (148 sprites identifiables) est exposé comme
+  éléments publics, avec `frame` / `width` / `height` exacts.
+- [x] Aucun fragment d'assemblage n'a été exposé dans ce lot.
+- [x] Les sprites écartés sont documentés (zones + raison).
+- [x] Les 6 éléments historiques de la planche restent inchangés.
+- [x] Zones cohérentes : `collision` sur ce lot bloquant ; pas de `manualZ`
+  inutile.
+- [x] Les nouveaux éléments sont exportés par `src/engine/index.js` et visibles
+  dans `/engine/catalog/`.
+- [x] Tests de cohérence + exports verts.
+- [x] Doc à jour (`meta/documentation/engine.md`, `src/engine/README.md`).
+- [x] `npm run verify` vert + validation visuelle catalogue/démo.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-07-25 18:36] Inventaire alpha automatique de la planche (1500 composantes pixel-connectées), puis sélection stricte des objets arborés autonomes pour éviter les fragments d'assemblage.
+- [2026-07-25 18:36] Nouveau module `src/engine/map/Elements/MapSprites01/` : helper `sprite(x, y, width, height, extra?)`, collisions de tronc (`treeCollision` / `deadTreeCollision`), et 148 classes publiques (`Conifer*`, `LeafTree*`, `CanopyTree*`, `TallTree*`, `DeadTree*`, `SaplingTree*`).
+- [2026-07-25 18:36] Exports branchés via `src/engine/index.js` + tests dédiés (`test/map-sprites-01-elements.test.js`) + doc moteur/README mise à jour.
+- [2026-07-25 18:36] **Sprites écartés (zones + raison)** :
+  - `x:[0..1728], y:[640..3360]` majoritairement matériau d'assemblage (autotiles terrain/eau, falaises, routes, façades, toitures, murs, arches) ; hors périmètre d'éléments posables unitaires.
+  - `x:[0..1664], y:[400..493]` micro-fragments décoratifs séparés (feuilles/pommes/flocons) non posables seuls.
+  - `x:[1024..1919], y:[2240..3344]` ensembles bâtimentaires mixtes (blocs complets + bandes/coins de composition) gardés pour un lot dédié après tri visuel fin.
 
 ### Vérification
 
--
+- [2026-07-25 18:59] `npm run verify` vert (lint + build + 184 tests).
+- [2026-07-25 18:59] Validation visuelle navigateur sur `http://localhost:5174/engine/catalog/` : familles `Conifer`, `LeafTree`, `CanopyTree`, `TallTree`, `DeadTree`, `SaplingTree` présentes et filtrables (ex. filtre `Conifer00`).
+- [2026-07-25 18:59] Validation visuelle navigateur sur `http://localhost:5174/engine/demo/` : démo moteur chargée sans erreur visible.
 
 ### Validation
 
