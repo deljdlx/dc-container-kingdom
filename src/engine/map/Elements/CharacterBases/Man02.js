@@ -1,0 +1,12 @@
+import { Character } from '../../Character.js';
+
+/**
+ * A ready-to-use character skinned from column 0, row 4 of the shared 48px
+ * sprite sheet. Spawns unpositioned at the origin.
+ */
+export class Man02 extends Character
+{
+  constructor() {
+    super(0, 0, 48 * 0, 48 * 4);
+  }
+}
