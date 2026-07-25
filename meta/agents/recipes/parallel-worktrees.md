@@ -58,15 +58,27 @@ implémentation, `npm run verify`, journal — tout sur la branche `<agent>/<slu
 
 ## Clore (merge local, sans push)
 
+Le **merge dans `main`** est la **seule** écriture autorisée sur le primaire, et il
+doit le laisser **propre**. `main` n'est monté que là : le merge s'y fait sans jamais
+changer sa branche (`main` reste `main`). **Ne jamais** y faire de `checkout` / `add`
+/ `mv` à la main hors des étapes ci-dessous — c'est ce qui laisse un index sale.
+
 1. Branche prête, `verify` **vert** dans le worktree.
-2. **Merge `--no-ff` dans `main`.** `main` n'est monté que dans le principal : le
-   merge s'y fait, et `main` **reste** `main` (on n'y change pas de branche) —
-   c'est le **point de coordination** entre agents (premier arrivé, premier servi,
-   court). Si `main` a avancé, rebaser `<agent>/<slug>` dessus avant de re-merger.
-3. Clôturer le ticket sur `main` (transition `080-done` + hash) — bookkeeping.
-4. **Ne pas supprimer le worktree** (il est fixe, réutilisé) : supprimer seulement la
-   branche (`git branch -d <agent>/<slug>`). Le worktree est renettoyé au démarrage
-   suivant (`git clean -fd`).
+2. **Depuis le primaire** (sur `main`), merger — un **seul** `git merge`, rien à la
+   main :
+   ```bash
+   cd <repo>                         # le primaire, sur main
+   git merge --no-ff <agent>/<slug>  # avance main, ne change pas de branche
+   ```
+   Si `main` a avancé, rebaser `<agent>/<slug>` sur `main` **dans le worktree**, puis
+   re-merger. **Point de coordination** entre agents (FIFO, court).
+3. Clôturer le ticket **sur `main`, dans le primaire** : `git mv` vers `080-done`,
+   `done:` + hash, puis **commit** (bookkeeping).
+4. **Laisser le primaire PROPRE** : `git status` doit être vide (sur `main`, aucun
+   résidu stagé) avant de rendre la main. Un index sale committé sur `main`
+   corromprait le board.
+5. **Ne pas supprimer le worktree** (fixe, réutilisé) : supprimer seulement la branche
+   (`git branch -d <agent>/<slug>`). Le worktree est renettoyé au démarrage suivant.
 
 ## Coordination
 
