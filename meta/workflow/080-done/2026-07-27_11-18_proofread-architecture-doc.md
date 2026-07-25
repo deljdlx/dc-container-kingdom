@@ -7,7 +7,8 @@ created: 2026-07-27 11:18
 ready:
 doing: 2026-07-25 16:37
 verify: 2026-07-25 16:37
-done:
+done: 2026-07-25 16:39
+merge: eaccd96
 ---
 
 ## Objectif
@@ -43,5 +44,6 @@ schémas Mermaid ni le sens._
 
 ### Validation
 
+- [2026-07-25 16:39] Merge `--no-ff` vers `main` effectué (`eaccd96`) et ticket déplacé en `080-done`.
 - [2026-07-25 16:37] DoD validée : document relu, formulations allégées, sens inchangé, schémas
   Mermaid inchangés.
