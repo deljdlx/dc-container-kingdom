@@ -7,7 +7,7 @@ created: 2026-07-25 13:27
 ready: 2026-07-25 13:30
 doing: 2026-07-25 13:31
 verify: 2026-07-25 13:35
-done:
+done: 2026-07-25 13:35
 ---
 
 ## Objectif
@@ -63,13 +63,13 @@ Les contrôles mécaniques (1–3) pourront migrer plus tard vers un script
 
 ## Definition of Done
 
-- [ ] Recipe `audit-workflow-consistency.md` créée dans `meta/agents/recipes/` et
+- [x] Recipe `audit-workflow-consistency.md` créée dans `meta/agents/recipes/` et
       indexée dans son `README.md`.
-- [ ] Couvre les 5 contrôles : liens, références stale (prose incluse), @imports,
+- [x] Couvre les 5 contrôles : liens, références stale (prose incluse), @imports,
       cohérence inter-fichiers, TEMPLATE ↔ recipes.
-- [ ] Contrôles mécaniques (liens/stale/@imports) fournis en commandes copiables.
-- [ ] Dogfood : la recipe passée sur le repo actuel → rapport propre (ou écarts
-      corrigés / ticketés).
+- [x] Contrôles mécaniques (liens/stale/@imports) fournis en commandes copiables.
+- [x] Dogfood : la recipe passée sur le repo actuel → écart trouvé (faux positif de
+      link-check) corrigé, hit `project/` historique trié ; rapport propre.
 
 ## Journal
 
@@ -101,4 +101,7 @@ Les contrôles mécaniques (1–3) pourront migrer plus tard vers un script
 
 ### Validation
 
--
+- [2026-07-25 13:35] Review d'acceptation OK : DoD couverte (recipe + index,
+  5 contrôles, commandes copiables, dogfood concluant avec écart corrigé),
+  conforme aux conventions. Mergé sur `main` en `--no-ff` (merge `0e01f95`) ;
+  ticket clos en `080-done`.
