@@ -1,14 +1,23 @@
 ---
-id: NNN
+id: YYYY-MM-DD_HH-MM
 title: Titre court de la tâche
 type: feat            # feat | fix | refactor | docs | test | chore
-branch:               # rempli au passage en 040-doing (ex. feat/mon-truc)
-created: YYYY-MM-DD
+branch:               # rempli à l'étape « work » (passage en 040-doing)
+created: YYYY-MM-DD HH:MM
+ready:                # daté au passage en 020-ready
+doing:                # daté au passage en 040-doing
+verify:               # daté au passage en 060-verify
+done:                 # daté au passage en 080-done
 ---
 
 ## Objectif
 
 Ce qu'on veut obtenir, et **pourquoi**.
+
+## Spécifications
+
+_À remplir à l'étape « specify » (avant `020-ready`) si la tâche le nécessite :
+quoi / comment, contraintes, pistes._
 
 ## Contexte / liens
 
@@ -19,12 +28,18 @@ Ce qu'on veut obtenir, et **pourquoi**.
 - [ ] critère concret et vérifiable 1
 - [ ] critère concret et vérifiable 2
 
-## Vérification
-
-- [ ] `npm run verify` vert (lint + build + tests)
-- [ ] validation navigateur si rendu / gameplay (voir [recipes/verify-in-browser.md](recipes/verify-in-browser.md))
-- [ ] documentation à jour si impact archi / API / commandes / conventions
-
 ## Journal
 
-- notes au fil de l'eau : décisions, obstacles, mesures, résultat.
+Entrées datées `- [YYYY-MM-DD HH:MM] …`, par étape.
+
+### Travail
+
+-
+
+### Vérification
+
+-
+
+### Validation
+
+-

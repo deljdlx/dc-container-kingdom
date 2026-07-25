@@ -5,10 +5,15 @@ Des **modes d'emploi étape par étape**, **agnostiques au projet** : ils décri
 projet dans [`../../project/recipes/`](../../project/recipes/)). Réutilisables
 d'un dépôt à l'autre.
 
-## Disponibles
+## Cycle d'un ticket (board)
 
-- **[work-a-task.md](work-a-task.md)** — le cycle d'une tâche via le board
-  `project/` (todo → doing → verify → done). **Le point de départ.**
+- **[work-a-task.md](work-a-task.md)** — l'**overview** du cycle. **Le point de départ.**
+- Une recipe par étape : [ticket-create](ticket-create.md) · [ticket-specify](ticket-specify.md)
+  · [ticket-work](ticket-work.md) · [ticket-verify](ticket-verify.md) ·
+  [ticket-validate](ticket-validate.md).
+
+## Méthode (mobilisées pendant work / verify / validate)
+
 - **[implement-a-feature.md](implement-a-feature.md)** — comprendre → concevoir →
   tester → vérifier → documenter.
 - **[refactor-safely.md](refactor-safely.md)** — tests de caractérisation, puis
