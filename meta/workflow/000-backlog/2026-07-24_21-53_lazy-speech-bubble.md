@@ -1,9 +1,9 @@
 ---
-id: 003
+id: 2026-07-24_21-53
 title: Bulle de dialogue — DOM paresseux
 type: refactor
 branch:
-created: 2026-07-24
+created: 2026-07-24 21:53
 ---
 
 ## Objectif
