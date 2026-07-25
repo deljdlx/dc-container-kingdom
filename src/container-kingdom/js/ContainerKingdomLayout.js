@@ -10,6 +10,10 @@ import {
   House00,
   House01,
   Man00,
+  Man01,
+  Man02,
+  Man03,
+  Man04,
   Sunflower00,
   Tree00,
   Woman00,
@@ -199,6 +203,10 @@ export class ContainerKingdomLayout
     this.rpgEngine.registerElement('Woman01', Woman01);
     this.rpgEngine.registerElement('Woman02', Woman02);
     this.rpgEngine.registerElement('Man00', Man00);
+    this.rpgEngine.registerElement('Man01', Man01);
+    this.rpgEngine.registerElement('Man02', Man02);
+    this.rpgEngine.registerElement('Man03', Man03);
+    this.rpgEngine.registerElement('Man04', Man04);
 
     this.rpgEngine.registerElement('Flower00', Flower00);
     this.rpgEngine.registerElement('Tree00', Tree00);

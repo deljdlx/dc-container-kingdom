@@ -6,6 +6,10 @@ import {
   Fountain00,
   Sunflower00,
   Man00,
+  Man01,
+  Man02,
+  Man03,
+  Man04,
   Woman00,
   Woman01,
   Woman02,
@@ -107,19 +111,19 @@ function spawnNpc(Base, x, y, patrolOpts = null) {
   }
 }
 
-// 8 moving NPCs.
+// 8 moving NPCs — one per built-in base from the shared character sheet.
 spawnNpc(Man00,   340, 170, { axis: 'horizontal', distance: 200, speed: 3 });
-spawnNpc(Woman00, 380, 90,  { axis: 'horizontal', distance: 220, speed: 4 });
-spawnNpc(Woman01, 120, 300, { axis: 'vertical',   distance: 160, speed: 2 });
-spawnNpc(Woman02, 610, 470, { axis: 'horizontal', distance: 200, speed: 3 });
-spawnNpc(Man00,   410, 300, { axis: 'vertical',   distance: 130, speed: 3 });
-spawnNpc(Woman00, 790, 110, { axis: 'vertical',   distance: 220, speed: 2 });
-spawnNpc(Woman01, 330, 400, { axis: 'horizontal', distance: 170, speed: 4 });
-spawnNpc(Man00,   850, 360, { axis: 'vertical',   distance: 130, speed: 3 });
+spawnNpc(Man01,   380, 90,  { axis: 'horizontal', distance: 220, speed: 4 });
+spawnNpc(Man02,   120, 300, { axis: 'vertical',   distance: 160, speed: 2 });
+spawnNpc(Man03,   610, 470, { axis: 'horizontal', distance: 200, speed: 3 });
+spawnNpc(Man04,   850, 360, { axis: 'vertical',   distance: 130, speed: 3 });
+spawnNpc(Woman00, 410, 300, { axis: 'vertical',   distance: 130, speed: 3 });
+spawnNpc(Woman01, 790, 110, { axis: 'vertical',   distance: 220, speed: 2 });
+spawnNpc(Woman02, 330, 400, { axis: 'horizontal', distance: 170, speed: 4 });
 
 // 2 immobile NPCs.
 spawnNpc(Woman02, 280, 160);
-spawnNpc(Man00,   440, 230);
+spawnNpc(Man02,   440, 230);
 
 // Deckard Cain — a stationary NPC who greets the player the moment they bump
 // into him. Only the player's collision detection fires events (patrols probe

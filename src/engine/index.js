@@ -62,6 +62,10 @@ export { Flower00 } from './map/Elements/Flowers/Flower00.js';
 
 // --- Built-in character bases ---
 export { Man00 } from './map/Elements/CharacterBases/Man00.js';
+export { Man01 } from './map/Elements/CharacterBases/Man01.js';
+export { Man02 } from './map/Elements/CharacterBases/Man02.js';
+export { Man03 } from './map/Elements/CharacterBases/Man03.js';
+export { Man04 } from './map/Elements/CharacterBases/Man04.js';
 export { Woman00 } from './map/Elements/CharacterBases/Woman00.js';
 export { Woman01 } from './map/Elements/CharacterBases/Woman01.js';
 export { Woman02 } from './map/Elements/CharacterBases/Woman02.js';

@@ -68,8 +68,9 @@ Le « viewer » dessine sur une **grille de cellules** (`cellWidth`) :
 
 - **`drawContainers()`** — pour chaque conteneur, trouve une cellule libre via
   `ContainerPlacement`, y instancie une **maison** (élément moteur) étiquetée
-  (nom, mémoire) et lui associe un **PNJ** (une base `Woman00/01/02` / `Man00`
-  choisie par index) ; les auras colorées reflètent le statut/CPU.
+  (nom, mémoire) et lui associe un **PNJ** (une base de personnage choisie dans
+  le pool public du moteur, aujourd'hui les 8 variantes de `characters-00.png`) ;
+  les auras colorées reflètent le statut/CPU.
 - **`drawNetworks()`** — relie par des tuiles de **route** les maisons partageant
   un même réseau Docker.
 
@@ -91,7 +92,7 @@ vers l'URL de démo du conteneur, le cas échéant.
 
 L'app **consomme** le moteur, jamais l'inverse. Concrètement : elle importe depuis
 `../../engine/index.js`, instancie des éléments moteur (`new House00()`,
-`new Man00()`), les ajoute aux `Area`s, écoute les events moteur
+`new Man00()`, `new Man04()`), les ajoute aux `Area`s, écoute les events moteur
 (`element.click`, `element.trigger`…). Ajouter un nouveau *type* d'élément visuel
 se fait **côté moteur** (voir [engine.md](engine.md)), puis l'app l'enregistre et
 l'instancie.

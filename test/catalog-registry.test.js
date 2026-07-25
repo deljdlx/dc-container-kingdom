@@ -11,6 +11,7 @@ describe('catalog-registry', () => {
     expect(isCatalogElementClass(engine.House00, 'House00')).toBe(true);
     expect(isCatalogElementClass(engine.FenceGroup00, 'FenceGroup00')).toBe(true);
     expect(isCatalogElementClass(engine.Woman01, 'Woman01')).toBe(true);
+    expect(isCatalogElementClass(engine.Man03, 'Man03')).toBe(true);
 
     expect(isCatalogElementClass(engine.Element, 'Element')).toBe(false);
     expect(isCatalogElementClass(engine.SpriteElement, 'SpriteElement')).toBe(false);
@@ -31,13 +32,17 @@ describe('catalog-registry', () => {
 
     expect(names).toContain('Ground00');
     expect(names).toContain('House01');
+    expect(names).toContain('Man03');
+    expect(names).toContain('Man04');
     expect(names).toContain('Woman02');
     expect(names).not.toContain('Element');
     expect(names).not.toContain('Board');
 
     const firstCharacter = entries.findIndex((entry) => entry.kind === 'character');
     const firstComposite = entries.findIndex((entry) => entry.kind === 'composite');
+    const characterEntries = entries.filter((entry) => entry.kind === 'character');
     expect(firstCharacter).toBeGreaterThan(0);
     expect(firstComposite).toBeGreaterThan(firstCharacter);
+    expect(characterEntries).toHaveLength(8);
   });
 });

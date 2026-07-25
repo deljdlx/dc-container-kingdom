@@ -4,11 +4,26 @@ import {
   Ground00,
   House00,
   Man00,
+  Man01,
+  Man02,
+  Man03,
+  Man04,
   Tree00,
   Woman00,
   Woman01,
   Woman02,
 } from '../../engine/index.js';
+
+const CHARACTER_BASES = [
+  Man00,
+  Man01,
+  Man02,
+  Man03,
+  Man04,
+  Woman00,
+  Woman01,
+  Woman02,
+];
 
 export class ContainerKingdomRenderer
 {
@@ -223,27 +238,8 @@ export class ContainerKingdomRenderer
     `);
     house.data.container = container;
 
-    const characterIndex = Math.floor(Math.random() * 4);
-    let character = null
-
-    switch(characterIndex) {
-      case 0: {
-        character = new Woman00();
-        break;
-      }
-      case 1: {
-        character = new Woman01();
-        break;
-      }
-      case 2: {
-        character = new Woman02();
-        break;
-      }
-      case 3: {
-        character = new Man00();
-        break;
-      }
-    }
+    const CharacterBase = CHARACTER_BASES[Math.floor(Math.random() * CHARACTER_BASES.length)];
+    const character = new CharacterBase();
 
     // character.live(3000 + Math.random() * 3);
 

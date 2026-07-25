@@ -162,7 +162,8 @@ events `element.reaction.show` / `element.reaction.hide`.
 Les éléments intégrés (maisons, arbres, clôtures, fleurs, PNJ) sont des
 **`SpriteElement`** décrits par un `static descriptor` (atlas, frame, zones de
 collision/trigger, `manualZ`) — pas de code de rendu à écrire. Les PNJ
-(`CharacterBases/`) sont des `Character` avec un offset de sprite-sheet.
+(`CharacterBases/`) sont des `Character` avec un offset de sprite-sheet. Le
+moteur expose aujourd'hui les 8 bases présentes sur `images/characters/characters-00.png`.
 
 ## 9. Events
 
