@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>RPG engine - sprites catalog</title>
+
+  <link rel="stylesheet" href="../css/reset.css">
+  <link rel="stylesheet" href="../css/_variables.css">
+  <link rel="stylesheet" href="../css/map.css">
+  <link rel="stylesheet" href="../css/character.css">
+  <link rel="stylesheet" href="../css/map-debug.css">
+  <link rel="stylesheet" href="./catalog.css">
+</head>
+<body>
+  <main class="catalog-shell">
+    <section class="catalog-hero">
+      <p class="catalog-eyebrow">Engine showcase</p>
+      <h1 class="catalog-title">Sprites catalog</h1>
+      <p class="catalog-lead">
+        Standalone visual inventory of the engine's public built-in elements,
+        rendered from <code>engine/index.js</code> only. Use it for art QA,
+        level-design references and quick boundary checks.
+      </p>
+      <p class="catalog-summary" data-catalog-summary></p>
+      <div class="catalog-note">
+        <p class="catalog-note__item">
+          Each card shows the exported class name, a live preview and the public
+          geometry metadata available on the instance.
+        </p>
+        <p class="catalog-note__item">
+          Add <a href="?debug=1"><code>?debug=1</code></a> to inspect collision
+          and trigger zones directly in the previews.
+        </p>
+      </div>
+    </section>
+
+    <section class="catalog-grid" data-catalog-gallery aria-label="Engine sprites catalog"></section>
+  </main>
+
+  <script type="module" src="./catalog.js"></script>
+</body>
+</html>
