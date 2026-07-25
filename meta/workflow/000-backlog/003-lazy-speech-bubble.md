@@ -23,12 +23,12 @@ jamais. Petite optimisation d'hygiène, comportement inchangé.
 - [ ] `_domQuickReaction` créé à la demande (au 1er `showReaction`) ;
       `clearReaction` / `isReactionVisible` gèrent le cas « pas encore créé ».
 - [ ] Comportement inchangé : les tests bulle passent **sans modifier** d'assertion
-      (voir recipe `project/agents/recipes/refactor-safely.md`).
+      (voir recipe `meta/agents/recipes/refactor-safely.md`).
 
 ## Vérification
 
 - [ ] `npm run verify` vert
-- [ ] bulle OK au navigateur (Cain dans la démo — `project/recipes/verify-in-browser.md`)
+- [ ] bulle OK au navigateur (Cain dans la démo — `meta/recipes/verify-in-browser.md`)
 
 ## Journal
 

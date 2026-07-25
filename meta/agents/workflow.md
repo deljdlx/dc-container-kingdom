@@ -1,8 +1,8 @@
 # Workflow & vérification
 
-## Source des tâches : le board `project/`
+## Source des tâches : le board `meta/`
 
-Le travail se pilote depuis le **kanban en fichiers** `project/` (colonnes
+Le travail se pilote depuis le **kanban en fichiers** `meta/` (colonnes
 `000-backlog` → `040-doing` → `060-verify` → `080-done`). Prendre la tâche
 prioritaire, la faire avancer de colonne en colonne, et suivre le cycle décrit
 par la recipe **[`recipes/workflow/work-a-task.md`](recipes/workflow/work-a-task.md)** (branche

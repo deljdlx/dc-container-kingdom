@@ -15,7 +15,7 @@ erre dans la démo, en plus des patrouilleurs et du fuyard. Petit ajout démo.
 
 - `src/engine/demo/demo.js`
 - `src/engine/map/CharacterBehavior.js` (`.live(...)`), exporté par `src/engine/index.js`
-- Recipe projet : `project/recipes/add-npc-behavior.md`
+- Recipe projet : `meta/recipes/add-npc-behavior.md`
 
 ## Definition of Done
 
@@ -26,7 +26,7 @@ erre dans la démo, en plus des patrouilleurs et du fuyard. Petit ajout démo.
 
 - [ ] `npm run verify` vert
 - [ ] errance visible au navigateur (pilotage manuel rAF si l'onglet est en fond —
-      `project/recipes/verify-in-browser.md`)
+      `meta/recipes/verify-in-browser.md`)
 
 ## Journal
 

@@ -14,7 +14,7 @@ Container Kingdom is an interactive visualization tool for Docker containers, us
 
 ## 📚 Documentation
 
-- [`project/documentation/`](project/documentation/) — architecture, moteur, app, développement.
+- [`meta/documentation/`](meta/documentation/) — architecture, moteur, app, développement.
 - [`src/engine/README.md`](src/engine/README.md) — le moteur RPG réutilisable.
 - [`CLAUDE.md`](CLAUDE.md) — brief pour agents IA.
 

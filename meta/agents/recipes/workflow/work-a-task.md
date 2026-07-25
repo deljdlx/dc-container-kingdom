@@ -1,6 +1,6 @@
 # Recipe — cycle d'un ticket (overview)
 
-Le parcours d'un ticket sur le board `project/` (voir
+Le parcours d'un ticket sur le board `meta/` (voir
 [`../../../README.md`](../../../README.md)). **Une étape = une recipe** :
 
 | Étape | Colonne | Recipe |

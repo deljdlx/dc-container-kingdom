@@ -1,4 +1,4 @@
-# `project/` — board agentique (kanban en fichiers)
+# `meta/` — board agentique (kanban en fichiers)
 
 Un **kanban embarqué**, versionné dans le repo et pilotable par un agent :
 l'avancement vit dans des **fichiers** (pas dans un outil externe), donc
