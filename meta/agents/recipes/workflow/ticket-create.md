@@ -10,5 +10,7 @@
    claire, mais ce n'est pas requis : *specify* reste la porte qui les **confirme /
    affine** et pose `ready:` ([ticket-specify](ticket-specify.md)). Laisse vides les
    champs de transition (`ready`/`doing`/`verify`/`done`) et le `Journal`.
-4. **Commiter** la création — bookkeeping de board sur `main` (voir la « Topologie
-   git » de [work-a-task](work-a-task.md)).
+4. **Commiter immédiatement** le ticket sur `main`. Un ticket non committé n'est pas
+   « sur le board » : invisible aux autres, perdable. C'est du **bookkeeping de
+   board**, pas une modif de code → **hors du « commit sur demande »** (voir les
+   Règles transverses de [work-a-task](work-a-task.md)).

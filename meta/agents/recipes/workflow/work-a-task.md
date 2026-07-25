@@ -23,8 +23,11 @@ Chaque transition = un `git mv` vers la colonne suivante.
   (`020-ready`, `080-done`) s'entre à la **fin** de l'étape. La date de transition =
   l'entrée dans la colonne.
 - **Une** tâche en `040-doing` à la fois, idéalement.
-- Une **branche par ticket** ; commiter / merger **sur demande** (voir
-  [../conventions.md](../../conventions.md)).
+- Une **branche par ticket**.
+- **Bookkeeping vs code** : le **bookkeeping de board** (créer un ticket, transitions
+  de colonnes sur `main`) se commite **au fil de l'eau** — c'est la mécanique du
+  board. Le **« sur demande »** protège les **merges sur `main`** et les **push**,
+  pas ces commits d'administration (voir [../conventions.md](../../conventions.md)).
 
 ## Topologie git
 
