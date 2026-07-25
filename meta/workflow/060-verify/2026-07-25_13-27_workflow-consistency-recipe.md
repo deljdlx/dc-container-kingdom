@@ -6,7 +6,7 @@ branch: docs/audit-workflow-recipe
 created: 2026-07-25 13:27
 ready: 2026-07-25 13:30
 doing: 2026-07-25 13:31
-verify:
+verify: 2026-07-25 13:35
 done:
 ---
 
@@ -85,7 +85,19 @@ Les contrôles mécaniques (1–3) pourront migrer plus tard vers un script
 
 ### Vérification
 
--
+- [2026-07-25 13:35] Dogfood de la recipe sur le repo (ses 5 contrôles) +
+  `npm run verify`.
+  - Contrôle 1 (liens) : a **attrapé un vrai défaut** — la recipe contenait un
+    `] (…)` littéral en prose, pris pour un lien par la regex. Corrigé (glyphe
+    retiré + note « faux positif → trier » ajoutée au contrôle 1) ; re-run **propre**.
+  - Contrôle 2a (`project/`) : 1 hit = l'Objectif de ce ticket → narration
+    historique, **trié OK** (le mécanisme de triage joue son rôle).
+  - Contrôle 2b (colonnes sans `workflow/`) : **vide** ✓.
+  - Contrôle 3 (`@imports`) : 3/3 existants ✓.
+  - Contrôles 4–7 (lecture) : colonnes identiques partout, topologie git sans
+    contradiction, entrées CLAUDE/AGENTS/copilot alignées, TEMPLATE ↔ recipes
+    cohérents ✓.
+  - `npm run verify` : vert (lint + build + 116 tests).
 
 ### Validation
 

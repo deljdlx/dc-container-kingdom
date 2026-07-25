@@ -40,10 +40,16 @@ print('links OK' if bad == 0 else f'{bad} broken')
 PY
 ```
 
+> Faux positif : un lien markdown écrit **littéralement en prose** (à titre
+> d'exemple) est pris pour un vrai lien par la regex. Si la « cible » signalée n'est
+> pas un chemin réel → trier ; mieux, éviter d'écrire un lien littéral hors d'un
+> vrai lien.
+
 ### 2. Références périmées — y compris en prose / code-spans
 
-Le link-check ci-dessus **ne voit que les liens `](…)`** : une référence en
-back-ticks lui échappe. Après un renommage de dossier ou de colonne, grep l'ancien
+Le link-check ci-dessus **ne détecte que les liens markdown** ; une référence
+écrite en texte ou en back-ticks lui échappe. Après un renommage de dossier ou de
+colonne, grep l'ancien
 nom et **trie** les résultats — un hit dans un lien ou une **consigne active** est à
 corriger ; un hit dans le **journal d'un ticket clos** (narration historique) est
 légitime.
