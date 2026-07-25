@@ -58,7 +58,11 @@ export { Fountain00 } from './map/Elements/Fountain00.js';
 export { Fence00H } from './map/Elements/Fence00H.js';
 export { Fence00V } from './map/Elements/Fence00V.js';
 export { FenceGroup00 } from './map/Elements/FenceGroup00.js';
-export { Flower00 } from './map/Elements/Flowers/Flower00.js';
+
+// --- Built-in map elements: the `flowers-00` sprite sheet ---
+// 219 elements (flowers, mushrooms, foliage, water plants, fields, props),
+// named `<Family><NN>` — see map/Elements/Flowers/index.js.
+export * from './map/Elements/Flowers/index.js';
 
 // --- Built-in character bases ---
 export { Man00 } from './map/Elements/CharacterBases/Man00.js';
