@@ -96,6 +96,73 @@ body {
   font-size: 0.86rem;
 }
 
+.catalog-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  margin-bottom: 22px;
+  padding: 12px 0;
+  background: linear-gradient(180deg, #f3e3c1 72%, rgba(243, 227, 193, 0));
+}
+
+.catalog-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border: 1px solid rgba(94, 62, 31, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 251, 244, 0.94);
+  box-shadow: 0 10px 24px rgba(92, 63, 28, 0.12);
+}
+
+.catalog-search__label {
+  color: #785b3b;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.catalog-search__input {
+  flex: 1;
+  min-width: 0;
+  padding: 6px 0;
+  border: 0;
+  background: none;
+  color: #3f3527;
+  font: inherit;
+  font-size: 0.95rem;
+}
+
+.catalog-search__input:focus {
+  outline: none;
+}
+
+.catalog-family {
+  margin-bottom: 34px;
+}
+
+.catalog-family__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 0 14px;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 1.5rem;
+  letter-spacing: -0.01em;
+}
+
+.catalog-family__count {
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(74, 106, 52, 0.12);
+  color: #4b6a34;
+  font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
 .catalog-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(270px, 1fr));
@@ -103,6 +170,9 @@ body {
 }
 
 .catalog-card {
+  /* ~230 live previews on the page: skip the offscreen ones. */
+  content-visibility: auto;
+  contain-intrinsic-size: auto 420px;
   display: grid;
   gap: 16px;
   padding: 18px;
@@ -110,6 +180,12 @@ body {
   border-radius: 24px;
   background: rgba(255, 251, 244, 0.86);
   box-shadow: 0 14px 34px rgba(92, 63, 28, 0.1);
+}
+
+/* `display: grid` above would otherwise beat the UA rule for [hidden]. */
+.catalog-card[hidden],
+.catalog-family[hidden] {
+  display: none;
 }
 
 .catalog-card__header {
@@ -188,6 +264,8 @@ body {
   width: var(--preview-width);
   height: var(--preview-height);
   flex-shrink: 0;
+  /* Small sprites are magnified for art QA: keep the pixel-art crisp. */
+  image-rendering: pixelated;
 }
 
 .catalog-preview__canvas .map-element {

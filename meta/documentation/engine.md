@@ -165,6 +165,39 @@ collision/trigger, `manualZ`) — pas de code de rendu à écrire. Les PNJ
 (`CharacterBases/`) sont des `Character` avec un offset de sprite-sheet. Le
 moteur expose aujourd'hui les 8 bases présentes sur `images/characters/characters-00.png`.
 
+### Planche `flowers-00` (219 éléments)
+
+`images/map/flowers-00.png` est une grille régulière de **16×16 cellules de
+32 px**. Ses 219 sprites (fleurs, champignons, feuillages, nénuphars, champs,
+puits, souche, troncs, dalles, rochers) vivent sous
+`map/Elements/Flowers/`, découpés par thème (`Blossoms`, `Clusters`, `Fields`,
+`Foliage`, `Mushrooms`, `Props`, `Water`) et ré-exportés en bloc par
+`Flowers/index.js` puis par le baril du moteur.
+
+Comme la planche est régulière, chaque élément tient en **une ligne** : le helper
+`cell(col, row, extra?)` de `Flowers/atlas.js` dérive tout le descripteur de la
+position de la cellule.
+
+```js
+export class LilyPad00 extends SpriteElement { static descriptor = cell(8, 0); }
+export class Well00 extends SpriteElement { static descriptor = cell(2, 8, { collision: [3, 14, 26, 16] }); }
+export class FlowerField00 extends SpriteElement { static descriptor = cell(14, 9, SPAN_2X2); }
+```
+
+Conventions de la planche :
+
+- **Nommage** `<Famille><NN>`, l'index suivant l'ordre de lecture de l'atlas
+  (29 familles : `Blossom`, `Mushroom`, `LilyPad`, `FlowerField`…). Les teintes ne
+  sont pas dans les noms — le [catalogue](http://localhost:5173/engine/catalog/)
+  les montre.
+- **Ombres** : l'art porte sa propre ombre peinte → `shadow: false` partout, sauf
+  `Flower00` (antérieur à cette passe, descripteur figé).
+- **Zones** : rien par défaut ; `collision` uniquement sur ce qui bloque
+  (`Well00`, `Stump00/01`, `HollowLog00..02`, `Rock00..03`), `manualZ` sur les
+  sols (`FlowerGrass*`, `FlowerPatch*`, `StoneSlab00`).
+- `test/flowers-00.test.js` verrouille la découpe (alignement 32 px, bornes
+  512×512, aucune cellule découpée deux fois) et ces conventions.
+
 ## 9. Events
 
 Tout remonte à l'`Application` via `handle()`. Principaux events (préfixe

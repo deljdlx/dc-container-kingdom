@@ -2,11 +2,11 @@
 id: 2026-07-25_17-33
 title: Exposer les sprites de flowers-00.png en éléments de carte
 type: feat
-branch:
+branch: claude/flowers-atlas-elements
 created: 2026-07-25 17:33
 ready: 2026-07-25 17:51
-doing:
-verify:
+doing: 2026-07-25 17:53
+verify: 2026-07-25 18:15
 done:
 ---
 
@@ -90,7 +90,7 @@ ordre de lecture (ligne puis colonne) :
   rochers bloquent.
 - Tapis (`FlowerGrass`, `FlowerPatch`) et dalles (`StoneSlab`) sont des **sols** :
   `manualZ`, donc jamais triés en profondeur par leur `y`.
-- Le **catalogue** `/engine/catalog/` reste utilisable à ~232 cartes : sections par
+- Le **catalogue** `/engine/catalog/` reste utilisable à 236 cartes : sections par
   famille, filtre de recherche, compteur juste.
 
 ### Technique
@@ -128,7 +128,7 @@ ordre de lecture (ligne puis colonne) :
 ## Contexte / liens
 
 - `src/engine/images/map/flowers-00.png` (l'atlas)
-- `src/engine/map/Elements/Flowers/Flower00.js` (seul élément actuel de la planche)
+- `src/engine/map/Elements/Flowers/` (les éléments de la planche)
 - `src/engine/map/SpriteElement.js` (format du `descriptor`)
 - `src/engine/index.js` (baril — frontière moteur)
 - `src/engine/catalog/` + `src/engine/catalog/catalog-registry.js`, `test/catalog-registry.test.js`
@@ -137,30 +137,66 @@ ordre de lecture (ligne puis colonne) :
 
 ## Definition of Done
 
-- [ ] Les 219 sprites de `flowers-00.png` sont exposés comme éléments publics du
+- [x] Les 219 sprites de `flowers-00.png` sont exposés comme éléments publics du
       moteur, avec `frame` / `width` / `height` **exacts** (vérifiés visuellement,
       aucun sprite tronqué ni débordant sur son voisin).
-- [ ] Zones cohérentes : `collision` sur ce qui bloque, `manualZ` sur les tapis,
+- [x] Zones cohérentes : `collision` sur ce qui bloque, `manualZ` sur les tapis,
       rien par défaut sur le décor traversable.
-- [ ] `Flower00` reste inchangé (nom, offset, zone, ombre).
-- [ ] Tous les nouveaux éléments sont exportés par `src/engine/index.js` et
+- [x] `Flower00` reste inchangé (nom, offset, zone, ombre).
+- [x] Tous les nouveaux éléments sont exportés par `src/engine/index.js` et
       apparaissent dans `/engine/catalog/`, qui reste **lisible et fluide** à cette
       échelle (regroupement / filtre, compteur juste).
-- [ ] Tests de cohérence de la planche + exports verts.
-- [ ] Doc à jour (`meta/documentation/engine.md`, `src/engine/README.md`, et
+- [x] Tests de cohérence de la planche + exports verts.
+- [x] Doc à jour (`meta/documentation/engine.md`, `src/engine/README.md`, et
       `meta/recipes/add-map-element.md` si la façon d'ajouter un élément change).
-- [ ] `npm run verify` vert + validation visuelle au navigateur (catalogue, et
+- [x] `npm run verify` vert + validation visuelle au navigateur (catalogue, et
       démo pour un échantillon posé sur une area).
 
 ## Journal
 
 ### Travail
 
--
+- [2026-07-25 17:50] **Relevé refait puis validé à l'œil.** Script temporaire
+  (masque alpha + encre par cellule + fusion par couture) → carte d'occupation
+  des 256 cellules, puis relecture de la planche en vues agrandies (×4 à ×8, avec
+  grille et indices). Verdict : **les fusions par couture sont presque toutes
+  fausses** (nénuphars, bandes d'herbe, feuillages voisins se touchent sans former
+  une unité). Seules unités multi-cellules réelles : les **7 champs 64×64**,
+  identifiables à leur signature d'encre par quadrant (680/790/778/775).
+  Résultat : **219 unités / 240 cellules occupées**, vérifié sans trou ni
+  recouvrement contre le masque alpha (les 16 cellules restantes sont vides ou
+  portent 1 à 8 px parasites).
+- [2026-07-25 17:55] **Découpage en 29 familles** (nommage `<Famille><NN>`, index
+  en ordre de lecture). `Flower00` tombe naturellement en tête de sa famille
+  (cellule (0,3) = `frame [0, -96]`), donc son nom et son offset ne bougent pas.
+- [2026-07-25 18:00] **Un élément = une ligne.** Plutôt qu'une fabrique dynamique
+  (classes non greppables, `export *` impossible) ou 219 fichiers, les classes
+  restent statiques et un helper `cell(col, row, extra?)` dérive le descripteur
+  de la grille. Écueil rencontré : `-0 * 32` vaut `-0` — normalisé dans le helper.
+- [2026-07-25 18:05] **Catalogue.** Le regroupement par famille était nécessaire
+  mais pas suffisant : à 1:1 un sprite de 32 px est illisible dans une carte de
+  270 px. Ajout d'un agrandissement entier (jusqu'à ×4, `image-rendering:
+  pixelated`) affiché dans la carte, d'un filtre, et de `content-visibility: auto`
+  pour ne pas peindre les 236 aperçus d'un coup.
+- [2026-07-25 18:10] **Démo** : jardin posé sur l'area (1,2) — tapis au sol,
+  objets bloquants, décor traversable.
 
 ### Vérification
 
--
+- [2026-07-25 18:15] `npm run verify` **vert** : lint clean, build OK,
+  **178 tests** (22 fichiers), dont les 9 nouveaux de `test/flowers-00.test.js`.
+- [2026-07-25 18:15] **Tree-shaking vérifié** : le bundle de l'app ne contient
+  aucune des 219 classes (0 occurrence de `LilyPad`/`GiantMushroom` dans
+  `dist/assets/*.js` hors chunk catalogue) — le `export *` du baril ne coûte rien
+  aux hôtes qui n'en utilisent pas.
+- [2026-07-25 18:15] **Catalogue au navigateur** (`/engine/catalog/`) : 236
+  cartes, sections par famille avec compteur, filtre OK (« FlowerField » → 7/236,
+  « log » → 3/236), aucun sprite tronqué ni débordant sur son voisin sur les
+  familles à risque (champs 64×64, nénuphars, troncs). Avec `?debug=1`, les zones
+  de collision se posent bien sur la base des objets solides.
+- [2026-07-25 18:15] **Démo au navigateur** : les 25 éléments du jardin
+  s'affichent correctement sur l'area, tapis au sol sous le décor.
+- Résidus de debug : aucun (les scripts de relevé sont restés hors du dépôt).
 
 ### Validation
 

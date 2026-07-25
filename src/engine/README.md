@@ -47,9 +47,10 @@ Load the engine styles once in the host page:
 - `map/` — core: `Element` (scene node) and its composed subsystems
   (`SceneGraph`, `CollisionSystem`, `EventEmitter`, `Geometry`), plus `Board`,
   `Area`, `Viewport`, `Character`, `Application` and the `Renderer/` classes.
-- `map/Elements/` — built-in sprites (houses, trees, fences, fountain, flowers)
-  and `CharacterBases/` (eight ready-to-use bases from the shared
-  `characters-00.png` sprite sheet).
+- `map/Elements/` — built-in sprites (houses, trees, fences, fountain),
+  `Flowers/` (the whole `flowers-00` sheet: 219 plants, mushrooms, fields and
+  props, named `<Family><NN>`) and `CharacterBases/` (eight ready-to-use bases
+  from the shared `characters-00.png` sprite sheet).
 - `tools/` — helpers such as `GameConsole`.
 - `css/`, `images/` — engine styles and sprite sheets.
 

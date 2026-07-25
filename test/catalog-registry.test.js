@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import * as engine from '../src/engine/index.js';
 import {
   getCatalogEntries,
+  getCatalogFamily,
   getCatalogKind,
   isCatalogElementClass,
 } from '../src/engine/catalog/catalog-registry.js';
@@ -24,6 +25,14 @@ describe('catalog-registry', () => {
     expect(getCatalogKind(engine.House00)).toBe('sprite');
     expect(getCatalogKind(engine.Man00)).toBe('character');
     expect(getCatalogKind(engine.House01)).toBe('composite');
+  });
+
+  it('groups variants of the same element into a family', () => {
+    expect(getCatalogFamily('House00')).toBe('House');
+    expect(getCatalogFamily('GiantMushroom07')).toBe('GiantMushroom');
+    expect(getCatalogFamily('Fence00H')).toBe('Fence');
+    expect(getCatalogFamily('Fence00V')).toBe('Fence');
+    expect(getCatalogFamily('FenceGroup00')).toBe('FenceGroup');
   });
 
   it('returns a stable, grouped list of public catalog entries', () => {

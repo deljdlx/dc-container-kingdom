@@ -26,6 +26,24 @@ pas de code de rendu, juste un `static descriptor`.
    (`/engine/demo/` — l'ajouter à un `area.addElement(x, y, new MonElement())`) ;
    `?debug=1` pour voir ses zones de collision/trigger.
 
+## Élément tiré d'une planche régulière (`flowers-00`)
+
+Sur une planche découpée en cellules de taille fixe, on ne réécrit pas le
+descripteur : `src/engine/map/Elements/Flowers/atlas.js` fournit `cell(col, row,
+extra?)`, qui le dérive de la position dans la grille 32 px. Un élément tient
+alors en **une ligne**, dans le fichier de thème correspondant
+(`Blossoms.js`, `Mushrooms.js`, `Props.js`…) :
+
+```js
+export class Well00 extends SpriteElement { static descriptor = cell(2, 8, { collision: [3, 14, 26, 16] }); }
+```
+
+Le baril `Flowers/index.js` ré-exporte les fichiers de thème, et
+`src/engine/index.js` ré-exporte le baril — rien à ajouter à la main. Voir
+`meta/documentation/engine.md` (§ planche `flowers-00`) pour les conventions
+(nommage `<Famille><NN>`, ombres, zones) et `test/flowers-00.test.js` qui les
+verrouille.
+
 ## Élément composite
 
 Pour un assemblage (plusieurs sprites), voir `House01.js` / `FenceGroup00.js` :
