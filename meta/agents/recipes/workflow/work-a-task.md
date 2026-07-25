@@ -17,6 +17,11 @@ Chaque transition = un `git mv` vers la colonne suivante.
 
 - Chaque étape **date** son passage (frontmatter `ready`/`doing`/`verify`/`done`)
   et **documente ses itérations** (section `## Journal` du ticket, entrées datées).
+- **Colonnes actives vs repos** : une colonne **active** (`040-doing`, `060-verify`)
+  s'entre **au début** de son activité — on `git mv` le ticket *avant* de travailler
+  / vérifier, pour que le board reflète l'état réel. Une colonne **de repos**
+  (`020-ready`, `080-done`) s'entre à la **fin** de l'étape. La date de transition =
+  l'entrée dans la colonne.
 - **Une** tâche en `040-doing` à la fois, idéalement.
 - Une **branche par ticket** ; commiter / merger **sur demande** (voir
   [../conventions.md](../../conventions.md)).
