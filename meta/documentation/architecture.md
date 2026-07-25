@@ -86,6 +86,7 @@ src/
     index.js                 baril d'exports — unique surface publique du moteur
     map/                     Element + sous-systèmes, Board/Area, Viewport/Camera…
       Elements/              éléments intégrés (maisons, arbres, clôtures, PNJ…)
+        Flowers/             la planche flowers-00 : 219 éléments de décor
       Renderer/              renderers spécialisés
     Renderer? (non) ; css/, images/   styles et sprite-sheets du moteur
     demo/                    vitrine autonome du moteur (`/engine/demo/`)
