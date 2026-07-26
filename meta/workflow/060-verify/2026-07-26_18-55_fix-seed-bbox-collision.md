@@ -6,7 +6,7 @@ branch: claude/fix-seed-bbox-collision
 created: 2026-07-26 18:55
 ready: 2026-07-26 18:56
 doing: 2026-07-26 18:56
-verify:
+verify: 2026-07-26 19:10
 done:
 ---
 
@@ -90,29 +90,36 @@ défaut de cohérence et de performance, pas un faux positif de collision.
 
 ## Definition of Done
 
-- [ ] Un test **prouve la convergence** : pour un même état, la bbox de collision
+- [x] Un test **prouve la convergence** : pour un même état, la bbox de collision
       est identique avec et sans passage par `recomputeAggregates` (il échoue avant
       le correctif — contre-épreuve à documenter).
-- [ ] `recomputeAggregates` reproduit la sémantique incrémentale (zones + enfants,
+- [x] `recomputeAggregates` reproduit la sémantique incrémentale (zones + enfants,
       pas le rectangle de l'élément) ; `_boundingBox` inchangée.
-- [ ] Le cas limite « ni zone ni enfant » est couvert : pas d'exception, pas de
+- [x] Le cas limite « ni zone ni enfant » est couvert : pas d'exception, pas de
       collision fantôme.
-- [ ] L'attendu de `test/Board.streaming-areas.test.js` est **renforcé** (l'enveloppe
+- [x] L'attendu de `test/Board.streaming-areas.test.js` est **renforcé** (l'enveloppe
       se réduit à ce qui reste), pas affaibli ni supprimé.
-- [ ] Vérification runtime sur `/engine/demo/?debug=1` : les boîtes de debug
+- [x] Vérification runtime sur `/engine/demo/?debug=1` : les boîtes de debug
       correspondent aux zones, avant comme après une libération d'aire.
-- [ ] `meta/documentation/engine.md` dit ce que borne la bbox de collision.
-- [ ] `npm run verify` vert.
+- [x] `meta/documentation/engine.md` dit ce que borne la bbox de collision.
+- [x] `npm run verify` vert.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, voir la recipe
-[ticket-follow-up](../agents/recipes/workflow/ticket-follow-up.md)) : ce que le ticket
-**ouvre**, ce qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
-`100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
-différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
-
--
+- **Ouvre** : `BoundingBox.updateWithRelativeElement(parent, child)` grossit la
+  boîte qu'elle atteint **via `parent`**, pas la boîte réceptrice — un piège qui a
+  déjà produit un bug silencieux ici (les enfants n'étaient jamais repliés dans
+  l'enveloppe recalculée). Contourné par un ordre d'appel + un commentaire, pas
+  réparé. → candidat déposé, `2026-07-26_19-11_api-update-with-relative-element.md`.
+- **Laisse de côté** : l'overlay `?debug=1` dessine une boîte pour les éléments
+  **sans zone** (coins `null` → `left: nullpx`, largeur héritée du parent) : ~15
+  boîtes fantômes sur la démo. Cosmétique, antérieur à ce ticket, non traité —
+  l'enveloppe elle-même est correcte, c'est le rendu de debug qui ne gère pas le
+  cas « boîte indéfinie ».
+- **Gain non mesuré** : le broad phase élague désormais davantage (une aire vide
+  n'inflige plus une enveloppe fantôme à son board — `x1 = 1216` mesuré avant
+  correctif sur le cas réel). Aucun chiffre de perf n'a été relevé ; si le sujet
+  revient, c'est là qu'il faut mesurer.
 
 ## Journal
 
@@ -132,7 +139,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Vérification
 
--
+- [2026-07-26 19:06] Contre-épreuve : correctif remisé (`git stash`) → **4 échecs** (3 nouveaux tests + le test board requalifié) ; correctif restauré → **8/8**. Aucun test vacant.
+- [2026-07-26 19:07] Navigateur, `/engine/demo/?debug=1` : sur les **195 éléments porteurs de zones**, la boîte agrégée dessinée colle **exactement** à l'union de leurs zones — **0 écart**. 0 erreur console.
+- [2026-07-26 19:08] Le premier essai de déplacement au navigateur n'a rien bougé : mesure faite → `visibilityState: hidden`, **0 frame rAF en 600 ms**. C'est le piège documenté (`meta/recipes/verify-in-browser.md`), pas une régression — essai non concluant, pas un échec.
+- [2026-07-26 19:09] Reprise par la méthode prescrite (hook temporaire `window.__vp`, boucle pilotée à la main) : le perso avance de 35 px puis **bute net** sur un obstacle solide (x figé à 485 sur 80 frames de poussée), descend librement de 300 px, et 5 zones de collision s'affichent en contact. Les collisions fonctionnent après correctif.
+- [2026-07-26 19:09] Hook temporaire **retiré** ; `git diff src/engine/demo/demo.js` vide, serveur de dev arrêté.
+- [2026-07-26 19:10] `npm run verify` vert : lint + build + **208 tests** (29 fichiers).
 
 ### Validation
 
