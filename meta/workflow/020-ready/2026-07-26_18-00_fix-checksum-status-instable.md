@@ -4,7 +4,7 @@ title: Le champ Status rend le checksum instable et provoque un rechargement en 
 type: fix
 branch:
 created: 2026-07-26 18:00
-ready:
+ready: 2026-07-26 18:01
 doing:
 verify:
 done:
