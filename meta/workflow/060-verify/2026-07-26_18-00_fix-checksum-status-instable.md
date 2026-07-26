@@ -6,7 +6,7 @@ branch: claude/fix-checksum-status-instable
 created: 2026-07-26 18:00
 ready: 2026-07-26 18:01
 doing: 2026-07-26 18:02
-verify:
+verify: 2026-07-26 18:05
 done:
 ---
 
@@ -93,7 +93,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Vérification
 
--
+- [2026-07-26 18:05] `npm run verify` vert dans le worktree : lint + build + 204 tests (28 fichiers).
+- [2026-07-26 18:07] Validation navigateur (`npm run dev` sur un port frais, 5188) : app chargée, 35 maisons rendues, écran de chargement masqué, **0 erreur console**.
+- [2026-07-26 18:07] Sonde anti-rechargement : marqueur posé sur `window`, toujours présent après **26,5 s** (≈ 5 ticks de polling) et `performance.navigation.type` resté `navigate` — la page ne se recharge pas d'elle-même.
+- [2026-07-26 18:07] Limite assumée : les fixtures du mock ont un `Status` figé (`"Up 8 days"`), donc le vieillissement du libellé **ne peut pas** être reproduit au navigateur ; c'est le test unitaire (contre-épreuve par `git stash`) qui couvre le cas.
+- [2026-07-26 18:07] Serveur de dev arrêté, aucun résidu de debug dans le code.
 
 ### Validation
 
