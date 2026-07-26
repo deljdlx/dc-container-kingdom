@@ -8,15 +8,31 @@ renvoient ici pour le détail — les garder minces, mettre le détail ici :
 - [`AGENTS.md`](../../AGENTS.md) (agnostique)
 - [`.github/copilot-instructions.md`](../../.github/copilot-instructions.md) (Copilot)
 
-## Contenu
+## Par où commencer (agent neuf)
+
+1. **Les règles** ci-dessous (conventions, workflow, frontière moteur).
+2. **Le cycle de travail** : [`recipes/workflow/work-a-task.md`](recipes/workflow/work-a-task.md)
+   — comment un ticket avance sur le **board** en fichiers (`../workflow/`, voir
+   [`../README.md`](../README.md)).
+3. **En multi-agents** : [`recipes/parallel-worktrees.md`](recipes/parallel-worktrees.md)
+   — chacun dans son worktree isolé, le tree principal (`main`) jamais touché.
+
+## Les règles
 
 - **[conventions.md](conventions.md)** — langue, style/design, git, commits, branches.
-- **[workflow.md](workflow.md)** — branche → vérifier → merger, `npm run verify`,
-  « terminé = vérifié », doc à jour, piège rAF.
+- **[workflow.md](workflow.md)** — « terminé = vérifié » (`npm run verify`), doc à
+  jour, piège rAF.
 - **[engine-boundary.md](engine-boundary.md)** — frontière app→moteur (impérative)
   et repères d'architecture du moteur.
-- **[recipes/](recipes/)** — playbooks étape par étape des tâches récurrentes
-  (ajouter un élément, un behavior, vérifier au navigateur, feature moteur, review).
+
+## Les recipes (playbooks — index : [recipes/README.md](recipes/README.md))
+
+- **[recipes/](recipes/)** — méthode **agnostique** : le **cycle de ticket**
+  (work-a-task + ticket-*) et les méthodes (implémenter, refactorer, débugger,
+  reviewer, vérifier, **worktrees**, auditer la cohérence, évaluer un ticket).
+- **[../recipes/](../recipes/)** — recipes **projet** (spécifiques : ajouter un
+  élément de carte, un behavior PNJ, vérifier au navigateur). **À ne pas confondre**
+  avec les recipes agent ci-dessus.
 
 ## À ne pas confondre
 
