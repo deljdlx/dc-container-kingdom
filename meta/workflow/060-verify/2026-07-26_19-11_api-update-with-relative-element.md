@@ -6,7 +6,7 @@ branch: claude/fix-update-with-relative-element
 created: 2026-07-26 19:11
 ready: 2026-07-26 19:25
 doing: 2026-07-26 19:26
-verify:
+verify: 2026-07-26 19:30
 done:
 ---
 
@@ -80,27 +80,31 @@ lecteur.
 
 ## Definition of Done
 
-- [ ] `updateWithRelativeElement` grossit **le receveur**, et rien d'autre : un test
+- [x] `updateWithRelativeElement` grossit **le receveur**, et rien d'autre : un test
       le prouve (une boîte détachée grossit, la boîte courante de l'élément **ne
       bouge pas**) et échoue avant le correctif.
-- [ ] Le contournement de `recomputeAggregates` (installation anticipée de la boîte)
+- [x] Le contournement de `recomputeAggregates` (installation anticipée de la boîte)
       et son commentaire sont **retirés** — plus rien à contourner.
-- [ ] Les deux appels et la JSDoc sont à jour ; aucun paramètre mort ne subsiste.
-- [ ] Aucune régression : les tests de collision existants passent **sans être
+- [x] Les deux appels et la JSDoc sont à jour ; aucun paramètre mort ne subsiste.
+- [x] Aucune régression : les tests de collision existants passent **sans être
       affaiblis**.
-- [ ] Vérification runtime sur `/engine/demo/?debug=1` : les boîtes agrégées
+- [x] Vérification runtime sur `/engine/demo/?debug=1` : les boîtes agrégées
       collent toujours exactement aux zones (même contrôle que `2026-07-26_18-55`).
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, voir la recipe
-[ticket-follow-up](../agents/recipes/workflow/ticket-follow-up.md)) : ce que le ticket
-**ouvre**, ce qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
-`100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
-différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
-
--
+- **Aucun candidat déposé.** La chaîne ouverte par `2026-07-26_18-55` est refermée :
+  le piège d'API est réparé, le contournement retiré, plus rien ne tient par un
+  commentaire.
+- **Laisse de côté** : la boîte fantôme de l'overlay `?debug=1` pour les éléments
+  sans zone (déjà notée par `2026-07-26_18-55`, toujours cosmétique, toujours non
+  traitée). Elle n'a pas été re-déposée en candidat — la noter deux fois n'ajoute
+  rien, et le tri l'aurait rejetée comme doublon.
+- **Ouvre, sans urgence** : `updateWithBoundingBox` reste tolérante aux coins
+  `null` par un effet de bord du setter (qui ignore `null`) plutôt que par un
+  garde explicite. Ça tient, ce n'est pas beau ; à traiter le jour où quelqu'un
+  touche à cette méthode, pas avant.
 
 ## Journal
 
@@ -117,7 +121,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Vérification
 
--
+- [2026-07-26 19:29] Contre-épreuve : correctif remisé (`git stash`) → les 2 nouveaux tests échouent ; restauré → 2/2. Non vacants.
+- [2026-07-26 19:29] `grep` sur `updateWithRelativeElement(` : plus **aucun** appel à l'ancienne signature (2 dans le moteur, 4 dans les tests, tous à un seul argument).
+- [2026-07-26 19:30] Navigateur, `/engine/demo/?debug=1` : sur les **195 éléments porteurs de zones**, la boîte agrégée colle exactement à l'union de leurs zones — **0 écart**, même contrôle que `2026-07-26_18-55`. 0 erreur console. Serveur arrêté ensuite.
+- [2026-07-26 19:31] `npm run verify` vert : lint + build + **210 tests** (30 fichiers). Aucun test existant affaibli — les deux assertions de `BoundingBox.test.js` sont inchangées, seul leur appel s'est simplifié.
 
 ### Validation
 
