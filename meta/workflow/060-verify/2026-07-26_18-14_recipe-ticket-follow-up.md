@@ -6,7 +6,7 @@ branch: claude/recipe-ticket-follow-up
 created: 2026-07-26 18:14
 ready: 2026-07-26 18:29
 doing: 2026-07-26 18:31
-verify:
+verify: 2026-07-26 18:40
 done:
 ---
 
@@ -125,9 +125,8 @@ tickets qui s'engendrent. Règles à écrire noir sur blanc dans la recipe :
   clore un ticket à moitié fait. Ce qui relève de la DoD reste dans le ticket.
 - **Tri forcé** : on ne prend pas une nouvelle tâche en laissant `100-follow-up`
   s'accumuler. Une boîte que personne ne vide devient une décharge — pire qu'un
-  backlog dilué, parce qu'on apprend à ne plus l'ouvrir. Le seuil exact
-  (à chaque prise de tâche ? au-delà de N candidats ?) est à trancher en
-  *specify* ; il doit être **mécanique**, pas une bonne intention.
+  backlog dilué, parce qu'on apprend à ne plus l'ouvrir. Déclencheur retenu : **au
+  démarrage de chaque tâche** (voir ci-dessus) — mécanique, pas une bonne intention.
 
 ### Technique
 
@@ -206,30 +205,43 @@ flowchart LR
 
 ## Definition of Done
 
-- [ ] `meta/agents/recipes/workflow/ticket-follow-up.md` créé : court, orienté
+- [x] `meta/agents/recipes/workflow/ticket-follow-up.md` créé : court, orienté
       étapes, agnostique au projet, avec des exemples réels plutôt qu'un gabarit.
-- [ ] `meta/agents/recipes/workflow/follow-up-triage.md` créé : tri **groupé** du
+- [x] `meta/agents/recipes/workflow/follow-up-triage.md` créé : tri **groupé** du
       dossier, trois issues, critères de **valeur** falsifiables, délégation de la
       **forme** à `evaluate-a-ticket` (et pas de duplication de ses critères).
-- [ ] `TEMPLATE.md` porte la rubrique de suite : ligne d'explication, cas
+- [x] `TEMPLATE.md` porte la rubrique de suite : ligne d'explication, cas
       `aucune`, distinction explicite d'avec le `Journal`.
-- [ ] `meta/workflow/100-follow-up/` créé (`.gitkeep`), documenté comme **hors
+- [x] `meta/workflow/100-follow-up/` créé (`.gitkeep`), documenté comme **hors
       pipeline** dans `meta/README.md` : reçoit des **candidats**, jamais des
       tickets ; réalimente `000-backlog`.
-- [ ] Les trois issues d'un candidat (promu / fusionné / rejeté) sont décrites.
-- [ ] Les garde-fous anti-boucle sont écrits : texte par défaut, barre de valeur
+- [x] Les trois issues d'un candidat (promu / fusionné / rejeté) sont décrites.
+- [x] Les garde-fous anti-boucle sont écrits : texte par défaut, barre de valeur
       via `evaluate-a-ticket`, interdiction du follow-up « méta », interdiction de
       sortir du travail non terminé, règle de tri **mécanique**.
-- [ ] Les règles « référencer par `id` » et « créer sur `main`, depuis le tree
+- [x] Les règles « référencer par `id` » et « créer sur `main`, depuis le tree
       principal » sont écrites.
-- [ ] `work-a-task`, `ticket-validate`, `ticket-work` et les index
+- [x] `work-a-task`, `ticket-validate`, `ticket-work` et les index
       (`meta/agents/recipes/README.md`, `meta/README.md`) renvoient vers les deux
       recipes ; le déclencheur du tri est **mécanique** et écrit.
-- [ ] Les trois points d'entrée sont vérifiés (mis à jour seulement si nécessaire).
-- [ ] Démonstration sur un cas réel : la suite du ticket `2026-07-26_18-00`
+- [x] Les trois points d'entrée sont vérifiés (mis à jour seulement si nécessaire).
+- [x] Démonstration sur un cas réel : la suite du ticket `2026-07-26_18-00`
       (fixtures du mock au `Status` figé) est remontée du journal vers la rubrique
       et déposée en candidat.
-- [ ] Passe `audit-workflow-consistency` faite ; `npm run verify` vert.
+- [x] Passe `audit-workflow-consistency` faite ; `npm run verify` vert.
+
+## Suite
+
+- **Ouvre** : le mécanisme n'a encore jamais tourné « à froid ». Sa première vraie
+  épreuve sera le **prochain démarrage de tâche** : si le tri de `100-follow-up`
+  est sauté à ce moment-là, c'est le déclencheur qui est mauvais, pas les agents —
+  il faudra alors le rendre plus contraignant plutôt que le répéter.
+- **Laisse de côté** : les tickets déjà clos n'ont **pas** de rubrique `Suite`
+  (rétro-remplissage limité au seul cas démonstratif `2026-07-26_18-00`) ; et le
+  tri reste **manuel** — les contrôles mécaniques de l'audit pourront migrer vers
+  `meta/agents/tools/`, mais rien de tel n'est prévu pour le tri.
+- **Candidat en attente** : `2026-07-26_18-35_mock-status-realiste.md`, déposé par
+  la démonstration (origine `2026-07-26_18-00`). Ce ticket-ci n'en dépose aucun.
 
 ## Journal
 
@@ -249,7 +261,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Vérification
 
--
+- [2026-07-26 18:39] `audit-workflow-consistency`, contrôles mécaniques 1–3 : liens markdown relatifs → `links OK` ; colonnes toujours citées `meta/workflow/<colonne>/` → vide ; `@imports` de `CLAUDE.md` → 3/3 présents.
+- [2026-07-26 18:40] Contrôles de lecture croisée 4–7 : aucune séquence d'étapes n'inclut `100-follow-up` (il n'apparaît que comme boîte de candidats) ; les trois points d'entrée énoncent une règle **strictement identique** (`sort -u` → une seule ligne) ; sections du `TEMPLATE` cohérentes avec les recipes (`Suite` entre la DoD et le `Journal`).
+- [2026-07-26 18:40] `npm run verify` vert : lint + build + 204 tests (28 fichiers).
+- [2026-07-26 18:41] Relecture du dépôt de candidat : la note n'a **pas** de frontmatter (distinction ticket / candidat tenue) et son nom suit celui des tickets, donc une promotion est bien un simple `git mv`.
 
 ### Validation
 
