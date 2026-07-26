@@ -69,13 +69,13 @@ atteignable — avant `14-19`, la détection était morte et masquait le problè
 
 ## Definition of Done
 
-- [ ] `Status` ne fait plus partie de l'empreinte ; l'exclusion est justifiée par
+- [x] `Status` ne fait plus partie de l'empreinte ; l'exclusion est justifiée par
       un commentaire dans le code.
-- [ ] Test de non-régression : seul `Status` vieillit → **aucun** appel à
+- [x] Test de non-régression : seul `Status` vieillit → **aucun** appel à
       `onContainersChanged`, checksum inchangé.
-- [ ] Les détections légitimes restent couvertes (`State`, ajout / suppression).
-- [ ] `meta/documentation/container-kingdom.md` corrigé.
-- [ ] `npm run verify` vert.
+- [x] Les détections légitimes restent couvertes (`State`, ajout / suppression).
+- [x] `meta/documentation/container-kingdom.md` corrigé.
+- [x] `npm run verify` vert.
 
 ## Journal
 
