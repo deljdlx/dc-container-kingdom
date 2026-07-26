@@ -38,6 +38,12 @@ event-driven** : il ne fait un travail que lorsque le joueur **change d'area**
 d'une area ne coûte rien. Chargement en 7×7, libération au-delà d'un anneau
 (hystérésis, pour ne pas thrash sur une frontière).
 
+Quand une area est libérée, elle est désormais **détruite** (`destroy`) : elle
+est retirée du scene-graph du board, son rendu est détaché du DOM, puis la
+matrice `board.areas` est nettoyée. Le board recalcule aussi ses bounding boxes
+agrégées après retrait d'enfants : elles ne grossissent donc plus indéfiniment
+au fil du streaming (coût collision et update bornés par la fenêtre active).
+
 ## 3. Viewport : la game loop
 
 Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`) :

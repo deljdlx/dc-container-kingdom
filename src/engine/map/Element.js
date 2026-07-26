@@ -146,6 +146,8 @@ export class Element
    */
   removeChild(element) {
     this.scene.removeChild(element);
+    this.recomputeAggregates();
+    this.needUpdate(true);
   }
 
 
@@ -465,6 +467,18 @@ export class Element
    */
   updateBoudingBox(element) {
     this.collision.updateBoudingBox(element);
+  }
+
+  /**
+   * Recompute aggregate bounding boxes from current children and propagate up.
+   */
+  recomputeAggregates() {
+    this.collision.recomputeAggregates();
+
+    const parent = this.getParent();
+    if (parent) {
+      parent.recomputeAggregates();
+    }
   }
 
   // ===========================

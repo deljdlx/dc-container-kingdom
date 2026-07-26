@@ -136,6 +136,35 @@ export class CollisionSystem {
   }
 
   /**
+   * Rebuild both aggregate boxes from the element's current zones and children.
+   * Used when a child is detached, because incremental updates only ever grow.
+   */
+  recomputeAggregates() {
+    const collisionBoundingBox = new BoundingBox(this._element);
+    this._zones.collision.forEach((zone) => {
+      collisionBoundingBox.updateWithBoundingBox(zone);
+    });
+    this._zones.trigger.forEach((zone) => {
+      collisionBoundingBox.updateWithBoundingBox(zone);
+    });
+    this._element.getChildren().forEach((child) => {
+      collisionBoundingBox.updateWithRelativeElement(this._element, child);
+    });
+    this._collisionBoundingBox = collisionBoundingBox;
+
+    const boundingBox = new BoundingBox(this._element);
+    this._element.getChildren().forEach((child) => {
+      const childBoundingBox = new BoundingBox();
+      childBoundingBox.x0(child.x());
+      childBoundingBox.y0(child.y());
+      childBoundingBox.x1(child.x() + child.getBoundingBox().width());
+      childBoundingBox.y1(child.y() + child.getBoundingBox().height());
+      boundingBox.updateWithBoundingBox(childBoundingBox);
+    });
+    this._boundingBox = boundingBox;
+  }
+
+  /**
    * Get or set the collided flag for `type`; on change, reset zones when
    * clearing, propagate up the tree, and request a redraw.
    * @param {?boolean} value

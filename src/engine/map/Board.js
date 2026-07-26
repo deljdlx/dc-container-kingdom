@@ -34,13 +34,12 @@ export class Board extends Element
 
   /** Clear the board renderer and every loaded area, then re-render. */
   clear() {
-    super.clear();
-    this.renderer.clear();
-    Object.keys(this.areas).map(x => {
-      Object.keys(this.areas[x]).map(y => {
-        this.areas[x][y].clear();
-      });
+    this.getChildren().slice().forEach((area) => {
+      area.destroy();
     });
+    this.areas = {};
+    this.recomputeAggregates();
+    this.renderer.clear();
     this.render();
   }
 
@@ -134,8 +133,11 @@ export class Board extends Element
       return false;
     }
     const area = this.areas[x][y];
-    area.getRenderer().clear();
+    area.destroy();
     delete this.areas[x][y];
+    if (Object.keys(this.areas[x]).length === 0) {
+      delete this.areas[x];
+    }
 
     return area;
   }
