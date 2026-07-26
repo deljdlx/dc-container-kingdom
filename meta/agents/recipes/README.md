@@ -11,6 +11,10 @@ d'un dépôt à l'autre.
 - Une recipe par étape : [ticket-create](workflow/ticket-create.md) · [ticket-specify](workflow/ticket-specify.md)
   · [ticket-work](workflow/ticket-work.md) · [ticket-verify](workflow/ticket-verify.md) ·
   [ticket-validate](workflow/ticket-validate.md).
+- **Après la clôture** : [ticket-follow-up](workflow/ticket-follow-up.md) — répondre à
+  « et ensuite ? » (rubrique `## Suite`, candidats en `100-follow-up/`) ·
+  [follow-up-triage](workflow/follow-up-triage.md) — trier ces candidats vers le
+  backlog, au démarrage de la tâche suivante.
 
 ## Méthode (mobilisées pendant work / verify / validate)
 

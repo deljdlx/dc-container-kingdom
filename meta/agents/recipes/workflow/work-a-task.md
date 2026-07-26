@@ -10,8 +10,14 @@ Le parcours d'un ticket sur le board `meta/` (voir
 | Travailler | `020-ready` → `040-doing` | [ticket-work](ticket-work.md) |
 | Vérifier | `040-doing` → `060-verify` | [ticket-verify](ticket-verify.md) |
 | Valider & clore | `060-verify` → `080-done` | [ticket-validate](ticket-validate.md) |
+| Suite | rubrique `## Suite` (+ `100-follow-up`) | [ticket-follow-up](ticket-follow-up.md) |
 
 Chaque transition = un `git mv` vers la colonne suivante.
+
+**Avant de prendre une tâche** : si `meta/workflow/100-follow-up/` n'est pas vide,
+le **trier** d'abord — [follow-up-triage](follow-up-triage.md). C'est le seul moment
+qui revient forcément, donc le seul déclencheur fiable ; il garde la boîte quasi
+vide, et le tri coûte une minute.
 
 ## Règles transverses
 

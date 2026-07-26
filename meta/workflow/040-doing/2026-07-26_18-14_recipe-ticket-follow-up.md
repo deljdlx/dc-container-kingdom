@@ -2,10 +2,10 @@
 id: 2026-07-26_18-14
 title: Recipe follow-up — clore chaque ticket par une vision de la suite
 type: docs
-branch:
+branch: claude/recipe-ticket-follow-up
 created: 2026-07-26 18:14
 ready: 2026-07-26 18:29
-doing:
+doing: 2026-07-26 18:31
 verify:
 done:
 ---
@@ -238,7 +238,14 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-26 18:31] Ticket pris sur `claude/recipe-ticket-follow-up` (worktree `/tmp/dc-container-kingdom-claude`).
+- [2026-07-26 18:33] Recipe **productrice** `ticket-follow-up.md` : rubrique `## Suite` (ouvre / laisse de côté / candidats), `aucune` valable, format d'un candidat (sans frontmatter — c'est ce qui le distingue d'un ticket), les trois interdits, règles d'écriture (`id` jamais chemin, création sur `main`).
+- [2026-07-26 18:34] Recipe **consommatrice** `follow-up-triage.md` : tri froid / groupé / comparatif, deux portes (valeur ici, forme déléguée à `evaluate-a-ticket`), tableau de critères falsifiables, trois issues, péremption « un sursis, pas deux ».
+- [2026-07-26 18:35] Colonne `100-follow-up/` (`.gitkeep`) + `TEMPLATE.md` (rubrique `## Suite` après la DoD, avec la distinction explicite d'avec le `Journal`).
+- [2026-07-26 18:36] Propagation : `meta/README.md` (table des colonnes + « hors pipeline » + étape 6 du cycle), `meta/agents/workflow.md`, `work-a-task` (ligne de tableau + tri avant prise de tâche), `ticket-validate` (étape 5), `ticket-work` (dépôt vs dérive, + « ce qui relève de la DoD reste dans le ticket »), index `recipes/README.md`.
+- [2026-07-26 18:37] Points d'entrée : le cycle résumé devient `branche → verify → merge → done → suite` dans `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md` (la règle agent change, donc mise à jour justifiée).
+- [2026-07-26 18:38] Démonstration sur cas réel : la suite du ticket `2026-07-26_18-00` est **déplacée** (pas dupliquée) du journal de validation vers sa rubrique `## Suite`, et le candidat `2026-07-26_18-35_mock-status-realiste.md` est déposé.
+- [2026-07-26 18:39] L'audit a trouvé une incohérence dans **sa propre recipe** : `audit-workflow-consistency.md` énumérait les 5 colonnes (contrôle dur + contrôle 4) et ignorait `100-follow-up` ; corrigé, avec la mention « hors pipeline » et l'ajout de la rubrique `Suite` au contrôle TEMPLATE ↔ recipes.
 
 ### Vérification
 
