@@ -2,10 +2,10 @@
 id: 2026-07-26_19-11
 title: updateWithRelativeElement grossit la mauvaise boîte
 type: refactor
-branch:
+branch: claude/fix-update-with-relative-element
 created: 2026-07-26 19:11
 ready: 2026-07-26 19:25
-doing:
+doing: 2026-07-26 19:26
 verify:
 done:
 ---
@@ -109,7 +109,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-26 19:26] Ticket pris sur `claude/fix-update-with-relative-element` (worktree `/tmp/dc-container-kingdom-claude`).
+- [2026-07-26 19:27] Test d'abord (`test/BoundingBoxReceiver.test.js`) : une boîte **détachée** grossit, la boîte de l'élément **ne bouge pas** ; un enfant à l'agrégat indéfini ne contribue rien. Les deux échouent avant correctif.
+- [2026-07-26 19:28] `updateWithRelativeElement(childElement)` grossit désormais le receveur : garde `isUndefined()` (le helper existait déjà), projection par la position locale de l'enfant, puis délégation à `updateWithBoundingBox` — il ne reste **qu'un seul chemin de croissance**, et 48 lignes de comparaisons répétées disparaissent.
+- [2026-07-26 19:28] Contournement retiré de `recomputeAggregates` : la boîte se replie puis s'installe, dans l'ordre naturel. Le commentaire qui documentait le piège n'a plus d'objet.
+- [2026-07-26 19:29] Les deux tests existants s'appellent simplement — **assertions inchangées**. Leurs stubs `parentElement` sont devenus morts (ils montaient justement le cas où receveur et boîte du parent étaient le même objet, ce qui masquait le défaut) : retirés.
 
 ### Vérification
 

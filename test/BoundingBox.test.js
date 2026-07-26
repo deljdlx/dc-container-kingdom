@@ -148,17 +148,13 @@ describe('BoundingBox - box growth helpers', () => {
     childBox.y0(2);
     childBox.y1(15);
 
-    const parentElement = {
-      getCollisionBoundingBox: () => parentBox,
-    };
-
     const childElement = {
       x: () => 5,
       y: () => -3,
       getCollisionBoundingBox: () => childBox,
     };
 
-    parentBox.updateWithRelativeElement(parentElement, childElement);
+    parentBox.updateWithRelativeElement(childElement);
 
     expect(parentBox.x0()).toBe(0);
     expect(parentBox.x1()).toBe(13);
@@ -175,17 +171,13 @@ describe('BoundingBox - box growth helpers', () => {
 
     const childBox = new BoundingBox();
 
-    const parentElement = {
-      getCollisionBoundingBox: () => parentBox,
-    };
-
     const childElement = {
       x: () => 10,
       y: () => 10,
       getCollisionBoundingBox: () => childBox,
     };
 
-    parentBox.updateWithRelativeElement(parentElement, childElement);
+    parentBox.updateWithRelativeElement(childElement);
 
     expect(parentBox.x0()).toBe(1);
     expect(parentBox.x1()).toBe(2);
