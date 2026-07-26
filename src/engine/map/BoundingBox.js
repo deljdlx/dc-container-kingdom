@@ -42,12 +42,22 @@ export class BoundingBox
   dom;
 
   /**
-   * When an element is given, seed the box from its position and size.
+   * When an element is given, the box belongs to it — which is what lets the
+   * `offset*` accessors project into world space — and is seeded from its
+   * position and size.
+   *
+   * Pass `seedFromElement = false` to attach the box to its element while
+   * leaving it **undefined** (all four corners `null`): that is what an
+   * aggregate box needs, since it must grow from the zones and children it
+   * encloses rather than from the element's own rectangle.
    * @param {import('./Element.js').Element|null} element
+   * @param {boolean} [seedFromElement] whether to seed the corners from `element`
    */
-  constructor(element = null) {
+  constructor(element = null, seedFromElement = true) {
     if(element) {
       this._element = element
+    }
+    if(element && seedFromElement) {
       this._x0 = element.x();
       this._y0 = element.y();
       this._x1 = element.x() + element.width();

@@ -2,10 +2,10 @@
 id: 2026-07-26_18-55
 title: Bbox de collision — le recalcul diverge du chemin incrémental
 type: fix
-branch:
+branch: claude/fix-seed-bbox-collision
 created: 2026-07-26 18:55
 ready: 2026-07-26 18:56
-doing:
+doing: 2026-07-26 18:56
 verify:
 done:
 ---
@@ -121,7 +121,14 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-26 18:56] Ticket pris sur `claude/fix-seed-bbox-collision` (worktree `/tmp/dc-container-kingdom-claude`).
+- [2026-07-26 18:58] Test d'abord (`test/CollisionAggregates.test.js`) : convergence des deux chemins, bornage sur les zones, cas « ni zone ni enfant ». **2 échecs sur 3** avant correctif, aux valeurs exactes annoncées dans l'objectif.
+- [2026-07-26 19:00] Correctif 1 — `recomputeAggregates` part d'une boîte vide au lieu du rectangle de l'élément.
+- [2026-07-26 19:01] La suite complète a attrapé un défaut **latent** du correctif : une `BoundingBox` sans élément ne sait plus se projeter en coordonnées monde (`offsetX` sur `undefined`, 10 tests rouges). D'où le paramètre `seedFromElement` : la boîte reste **attachée** à son élément mais **non amorcée**.
+- [2026-07-26 19:02] La mesure a contredit l'hypothèse de départ et révélé la **vraie** cause : le constructeur de `CollisionSystem` créait la boîte **avant** que la géométrie soit posée, d'où une boîte **à moitié définie** (`x0` à `null`, `x1` à la largeur par défaut `16`). Une aire vide gonflait ainsi l'enveloppe de son board de `x1 = 1216` — enveloppe fantôme mesurée sur le cas réel. Corrigé à la source : les **deux** chemins partent désormais d'une boîte vide.
+- [2026-07-26 19:03] Second défaut trouvé en chemin (hors périmètre initial, corrigé car bloquant pour la DoD) : `updateWithRelativeElement` grossit la boîte qu'elle atteint **via l'élément**, pas la boîte réceptrice — la boucle sur les enfants de `recomputeAggregates` mutait donc l'ancienne boîte, aussitôt remplacée. Les enfants n'étaient jamais repliés dans l'enveloppe recalculée. L'ancien seed (rectangle de l'élément) masquait le symptôme. Corrigé en installant la nouvelle boîte **avant** de replier les enfants, avec le commentaire qui explique le piège.
+- [2026-07-26 19:04] `test/Board.streaming-areas.test.js` : l'attendu affirmait le comportement fautif (`bbox == rectangle du board`). **Renforcé** — une aire voisine conservée porte un mur, on vérifie que l'enveloppe se pose sur le mur ; plus un test explicite du cas « plus rien de collisionnable → enveloppe indéfinie ».
+- [2026-07-26 19:05] Doc moteur : `engine.md` dit désormais ce que borne l'agrégat (zones propres et des enfants, jamais le rectangle) et que la sémantique vaut **par les deux chemins**.
 
 ### Vérification
 

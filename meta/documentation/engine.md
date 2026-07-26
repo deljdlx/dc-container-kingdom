@@ -97,7 +97,12 @@ Le `CollisionSystem` fait du **broad + narrow phase** et sépare **détection** 
 **réconciliation** :
 
 - **Broad phase** — élague tout sous-arbre dont la bounding box agrégée ne
-  recoupe pas (pruning).
+  recoupe pas (pruning). Cet agrégat borne **les zones de collision et de trigger**
+  — les siennes et celles de ses enfants — et **jamais le rectangle de l'élément** :
+  un élément sans zone ne contribue rien, et son agrégat reste *indéfini* (coins
+  `null`), donc inoffensif. Cette sémantique vaut par les **deux** chemins qui
+  construisent la boîte : la croissance incrémentale (ajout de zone / d'enfant) et
+  le recalcul après détachement d'un enfant.
 - **Narrow phase** — teste les **vraies zones de collision du détecteur** (son
   « corps ») contre les zones de la cible. ⚠️ *À ne pas confondre avec l'agrégat* :
   l'agrégat inclut aussi les zones trigger, donc l'utiliser en narrow phase ferait

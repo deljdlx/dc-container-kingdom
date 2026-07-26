@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Board, Viewport } from '../src/engine/index.js';
+import { Board, Element, Viewport } from '../src/engine/index.js';
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>';
@@ -44,20 +44,37 @@ describe('Board area lifecycle', () => {
     expect(area.getDom().isConnected).toBe(false);
   });
 
-  it('shrinks aggregate bounding boxes after freeing a distant area', () => {
+  it('shrinks aggregate bounding boxes back to what is still loaded', () => {
     const { board } = createBoard();
 
-    board.createAreaAt(12, 0);
+    // A neighbour stays loaded and carries something solid, so the shrunk boxes
+    // have real content to bound — proving they follow the remaining children
+    // rather than falling back to the board's own rectangle.
+    const kept = board.createAreaAt(1, 0);
+    const wall = new Element(0, 0, 20, 20);
+    wall.createCollisionZone(0, 0, 20, 20);
+    kept.addElement(10, 10, wall, 'wall');
 
-    expect(board.getCollisionBoundingBox().x1()).toBeGreaterThan(board.width());
-    expect(board.getBoundingBox().x1()).toBeGreaterThan(board.width());
+    board.createAreaAt(12, 0);
+    expect(board.getBoundingBox().x1()).toBeGreaterThan(2 * board.width());
 
     board.freeArea(12, 0);
 
-    expect(board.getCollisionBoundingBox().x0()).toBe(0);
-    expect(board.getCollisionBoundingBox().x1()).toBe(board.width());
-    expect(board.getBoundingBox().x0()).toBe(0);
-    expect(board.getBoundingBox().x1()).toBe(board.width());
+    // The kept area spans [width, 2·width] on x — nothing may reach beyond it,
+    // and the collision envelope must sit on the wall, not on the board rect.
+    expect(board.getBoundingBox().x1()).toBe(2 * board.width());
+    expect(board.getCollisionBoundingBox().x0()).toBeGreaterThanOrEqual(board.width());
+    expect(board.getCollisionBoundingBox().x1()).toBeLessThanOrEqual(2 * board.width());
+  });
+
+  it('leaves an empty collision envelope when nothing collidable remains', () => {
+    const { board } = createBoard();
+    board.createAreaAt(3, 0); // an empty area carries no collision zone
+    board.freeArea(3, 0);
+
+    // Empty, not "the whole board": an element with no zone collides with nothing.
+    expect(board.getCollisionBoundingBox().x0()).toBeNull();
+    expect(board.getCollisionBoundingBox().x1()).toBeNull();
   });
 
   it('clear resets areas matrix and detaches all area children', () => {
