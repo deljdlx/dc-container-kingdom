@@ -5,6 +5,10 @@
  * @returns {Promise<string>} 64-char hex digest
  */
 export async function sha256(object) {
+  if (typeof object === 'undefined') {
+    throw new TypeError('sha256() expects a defined value');
+  }
+
   const json = JSON.stringify(object);
   const data = new TextEncoder().encode(json);
   const hashBuffer = await crypto.subtle.digest('SHA-256', data);

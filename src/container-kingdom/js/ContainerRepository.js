@@ -26,6 +26,9 @@ export class ContainerRepository {
 
   lastContainersChecksum = null;
 
+  /** @type {() => void} explicit hook called when descriptors checksum changes */
+  onContainersChanged = () => {};
+
   constructor(dockerApiClient) {
     this.dockerApiClient = dockerApiClient;
   }
@@ -68,12 +71,17 @@ export class ContainerRepository {
     this._rebuildNetworks();
     this._rebuildComposes();
 
-    const checksumDescriptor = {
-      ids: descriptors.map(descriptor => descriptor.Id),
-      networks: descriptors.map(descriptor => descriptor.NetworkSettings.Networks),
-      labels: descriptors.map(descriptor => descriptor.Labels),
-      status: descriptors.map(descriptor => descriptor.ImageID),
-    };
+    const checksumDescriptor = descriptors
+      .map(descriptor => ({
+        id: descriptor.Id,
+        imageId: descriptor.ImageID,
+        state: descriptor.State,
+        status: descriptor.Status,
+        networks: Object.keys(descriptor.NetworkSettings?.Networks ?? {}).sort(),
+        labels: Object.entries(descriptor.Labels ?? {})
+          .sort(([left], [right]) => left.localeCompare(right)),
+      }))
+      .sort((left, right) => left.id.localeCompare(right.id));
 
     const newChecksum = await sha256(checksumDescriptor);
     const changed = this.lastContainersChecksum !== null
@@ -141,7 +149,7 @@ export class ContainerRepository {
   }
 
   handleNewContainers() {
-    // Placeholder for future implementation
+    this.onContainersChanged();
   }
 
   /** Stop every watch loop and drop all containers. */

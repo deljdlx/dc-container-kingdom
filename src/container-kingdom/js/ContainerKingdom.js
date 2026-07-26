@@ -2,7 +2,6 @@ import { ContainerKingdomLayout } from './ContainerKingdomLayout.js';
 import { ContainerKingdomRenderer } from './ContainerKingdomRenderer.js';
 import { ContainerRepository } from './ContainerRepository.js';
 import { KingdomHud } from './KingdomHud.js';
-import { sha256 } from './sha256.js';
 
 /**
  * Top-level orchestrator: wires the data layer ({@link ContainerRepository}),
@@ -34,11 +33,15 @@ export class ContainerKingdom
   hud;
 
   _loopTimeoutId = null;
+  _loopEnabled = true;
 
 
   constructor(dockerApiClient) {
     this.dockerApiClient = dockerApiClient;
     this.repository = new ContainerRepository(dockerApiClient);
+    this.repository.onContainersChanged = () => {
+      document.location.reload();
+    };
     this.layout = new ContainerKingdomLayout(this);
 
     this.header = document.querySelector('#header');
@@ -82,27 +85,30 @@ export class ContainerKingdom
   }
 
   async loop() {
-    const currentChecksum = await sha256();
-
-    await this.repository.loadContainers();
-    await this.loadContainersStats();
-
-    this.layout.renderContainersList();
-
-    const newChecksum = await sha256();
-    if (currentChecksum !== newChecksum) {
-      document.location.reload();
+    if (!this._loopEnabled) {
+      return;
     }
 
-    this._loopTimeoutId = setTimeout(() => {
-      this.loop();
-    }, ContainerKingdom.LOOP_INTERVAL_MS);
+    try {
+      await this.repository.loadContainers();
+      await this.loadContainersStats();
+      this.layout.renderContainersList();
+    } catch (error) {
+      console.error('Container refresh loop failed:', error);
+    } finally {
+      if (this._loopEnabled) {
+        this._loopTimeoutId = setTimeout(() => {
+          this.loop();
+        }, ContainerKingdom.LOOP_INTERVAL_MS);
+      }
+    }
   }
 
   /**
    * Stop the main loop to prevent memory leaks.
    */
   stopLoop() {
+    this._loopEnabled = false;
     if (this._loopTimeoutId) {
       clearTimeout(this._loopTimeoutId);
       this._loopTimeoutId = null;

@@ -40,9 +40,14 @@ sequenceDiagram
     CK->>CK: loop() — polling + checksum SHA-256
 ```
 
-La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et calcule
-un checksum `SHA-256` ; elle ne redessine que si l'état a **changé**, selon la
-même logique de mise à jour « seulement sur changement » que le streaming du moteur.
+La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et stats,
+avec un `try/catch/finally` qui garantit le réarmement du tick même en cas
+d'erreur transitoire côté daemon Docker.
+
+La détection de changement ne vit qu'à un seul endroit :
+`ContainerRepository.loadContainers()` calcule un checksum `SHA-256` normalisé
+(ID, image, état, status, réseaux, labels) et déclenche le callback explicite
+`onContainersChanged` quand l'empreinte varie.
 
 ## Données : de Docker à l'écran
 

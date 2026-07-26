@@ -78,6 +78,37 @@ describe('ContainerRepository', () => {
     expect(repo.lastContainersChecksum).toBe(checksum);
   });
 
+  it('does not trigger change callback on first load but does on descriptor changes', async () => {
+    const client = makeClient();
+    repo = new ContainerRepository(client);
+    const onChanged = vi.fn();
+    repo.onContainersChanged = onChanged;
+
+    await repo.loadContainers();
+    expect(onChanged).not.toHaveBeenCalled();
+
+    const changed = JSON.parse(JSON.stringify(containers));
+    changed[0].State = 'exited';
+    changed[0].Status = 'Exited (0) 1 second ago';
+    client.getContainersDescriptors.mockResolvedValue(changed);
+
+    await repo.loadContainers();
+    expect(onChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps checksum stable when descriptor order changes only', async () => {
+    const client = makeClient(containers);
+    repo = new ContainerRepository(client);
+    await repo.loadContainers();
+    const baseline = repo.lastContainersChecksum;
+
+    const reordered = [...containers].reverse();
+    client.getContainersDescriptors.mockResolvedValue(reordered);
+    await repo.loadContainers();
+
+    expect(repo.lastContainersChecksum).toBe(baseline);
+  });
+
   it('prunes containers that vanished and stops their watch', async () => {
     const client = makeClient();
     repo = new ContainerRepository(client);
