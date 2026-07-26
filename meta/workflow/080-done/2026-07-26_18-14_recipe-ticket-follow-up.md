@@ -7,7 +7,7 @@ created: 2026-07-26 18:14
 ready: 2026-07-26 18:29
 doing: 2026-07-26 18:31
 verify: 2026-07-26 18:40
-done:
+done: 2026-07-26 18:43
 ---
 
 ## Objectif
@@ -268,4 +268,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-26 18:42] Review : DoD cochée, recipes agnostiques au projet (aucune API ni chemin `src/` cité), aucun `git add -A`, Conventional Commits en français.
+- [2026-07-26 18:42] Le ticket applique sa propre règle : sa rubrique `## Suite` est renseignée — c'est le premier ticket clos par le mécanisme qu'il installe.
+- [2026-07-26 18:43] Merge `--no-ff` de `claude/recipe-ticket-follow-up` sur `main` : **84976a9**. Branche supprimée, worktree conservé.
