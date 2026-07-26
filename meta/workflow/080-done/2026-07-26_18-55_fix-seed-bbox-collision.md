@@ -7,7 +7,7 @@ created: 2026-07-26 18:55
 ready: 2026-07-26 18:56
 doing: 2026-07-26 18:56
 verify: 2026-07-26 19:10
-done:
+done: 2026-07-26 19:12
 ---
 
 ## Objectif
@@ -148,4 +148,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-26 19:11] Review : DoD cochée, frontière moteur respectée (rien n'entre depuis l'app), aucun `git add -A`, Conventional Commits en français, hook de debug retiré.
+- [2026-07-26 19:11] Écart au périmètre **assumé et tracé** : le second défaut (`updateWithRelativeElement`) a été contourné et non réparé, parce qu'il bloquait la DoD sans en faire partie. Le vrai correctif part en candidat plutôt qu'en dérive.
+- [2026-07-26 19:12] Merge `--no-ff` de `claude/fix-seed-bbox-collision` sur `main` : **30fb622**. Candidat déposé sur `main` avant merge (`4c8da5e`), branche supprimée, worktree conservé.
