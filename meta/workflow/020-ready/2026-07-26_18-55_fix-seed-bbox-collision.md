@@ -4,7 +4,7 @@ title: Bbox de collision — le recalcul diverge du chemin incrémental
 type: fix
 branch:
 created: 2026-07-26 18:55
-ready:
+ready: 2026-07-26 18:56
 doing:
 verify:
 done:
