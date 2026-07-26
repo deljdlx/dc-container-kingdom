@@ -66,6 +66,42 @@ Nouvelle colonne `meta/workflow/100-follow-up/`, **hors pipeline** : c'est une
   existant, ou **rejeté** (fichier supprimé, motif noté en une ligne dans le
   commit de tri).
 
+### Fonctionnel — le tri des candidats (recipe consommatrice)
+
+La colonne a besoin de sa recipe **consommatrice** : sans elle on livre un
+producteur sans consommateur, c'est-à-dire la décharge. Les deux recipes sont donc
+**dans le même changement**.
+
+- Nouvelle recipe `meta/agents/recipes/workflow/follow-up-triage.md` : parcourir
+  `100-follow-up` et statuer sur **chaque** candidat (promu / fusionné / rejeté).
+- **Tri froid, groupé, différé** : il se fait en **une passe sur tout le dossier**,
+  plus tard que la clôture qui l'a produit, en comparant les candidats **entre eux
+  et au backlog existant**. Celui qui clôt un ticket est enthousiaste sur ses
+  propres pistes ; candidat par candidat, au fil de l'eau, on promeut tout — c'est
+  la comparaison qui rend le rejet possible.
+- **Deux portes, dans cet ordre** :
+  1. **Valeur** — « faut-il le faire ? » : c'est cette recipe qui la pose ;
+  2. **Forme** — « est-ce actionnable ? » :
+     [evaluate-a-ticket](../../agents/recipes/evaluate-a-ticket.md), appliqué **seulement**
+     aux candidats promus, une fois passés au `TEMPLATE`. Inutile de rendre
+     actionnable ce qu'on va jeter — et sa propriété « une seule passe » est
+     préservée.
+- **Critères de valeur** (falsifiables, pour que le tri reste mécanique) :
+  - **Preuve** — le candidat s'appuie sur un constat vérifié (bug reproduit,
+    mesure, gêne rencontrée), pas sur un « ce serait mieux si » ;
+  - **Coût du non-fait** — qu'est-ce qui casse ou coûte si on ne le fait jamais ?
+    « Rien de perceptible » ⇒ rejet ;
+  - **Doublon** — déjà couvert par un ticket du backlog ou par la rubrique `Suite`
+    d'un autre ticket ⇒ fusion ;
+  - **Péremption** — un candidat non promu après N passes de tri est **rejeté par
+    défaut** : ne pas l'avoir choisi N fois *est* la réponse (règle mécanique
+    anti-décharge, `N` à fixer en *specify*) ;
+  - **Reste de DoD** — si le candidat relevait en fait du ticket d'origine, ce
+    n'est pas un candidat mais le signe d'un ticket **clos trop tôt** : le
+    signaler comme tel plutôt que le promouvoir.
+- **Quand** : à trancher en *specify* — à chaque prise de nouvelle tâche, ou
+  au-delà de `N` candidats. Le déclencheur doit être **mécanique**.
+
 ### Fonctionnel — ce qui empêche la boucle infinie
 
 Le dossier seul ne borne rien : sans barre de valeur, il produit une chaîne de
@@ -73,9 +109,10 @@ tickets qui s'engendrent. Règles à écrire noir sur blanc dans la recipe :
 
 - **Le résultat par défaut de l'étape follow-up est du texte, pas un ticket.** La
   rubrique `Suite` suffit dans la majorité des cas ; le candidat est l'exception.
-- **Barre de valeur** : un candidat ne devient un ticket que s'il passe
-  [evaluate-a-ticket](../../agents/recipes/evaluate-a-ticket.md) — recipe qui existe
-  déjà et impose « une seule passe, pas de boucle ».
+- **Deux portes** avant qu'un candidat devienne un ticket : la **valeur**
+  (`follow-up-triage`, ci-dessus) puis la **forme**
+  ([evaluate-a-ticket](../../agents/recipes/evaluate-a-ticket.md), qui impose déjà
+  « une seule passe, pas de boucle »).
 - **Interdit — le follow-up « méta »** : « vérifier que le suivi précédent a bien
   été fait », « auditer l'audit ». S'il faut du suivi pour du suivi, c'est que la
   tâche n'était pas finie.
@@ -90,8 +127,13 @@ tickets qui s'engendrent. Règles à écrire noir sur blanc dans la recipe :
 
 ### Technique
 
-- Nouvelle recipe `meta/agents/recipes/workflow/ticket-follow-up.md` : courte,
-  orientée étapes, **agnostique au projet**, dans la lignée des recipes d'étape.
+- Deux recipes, courtes, orientées étapes, **agnostiques au projet**, dans la
+  lignée des recipes d'étape existantes :
+  - `meta/agents/recipes/workflow/ticket-follow-up.md` — la **production** (à la
+    clôture : « et ensuite ? ») ;
+  - `meta/agents/recipes/workflow/follow-up-triage.md` — la **consommation** (tri
+    du dossier, promotion vers `000-backlog`). Elle **délègue** le jugement de
+    forme à `evaluate-a-ticket` plutôt que de redire ses critères.
 - `meta/workflow/100-follow-up/` avec un `.gitkeep` (comme les autres colonnes) ;
   nommage des candidats aligné sur celui des tickets
   (`YYYY-MM-DD_HH-MM_titre.md`), pour qu'une promotion soit un simple `git mv`.
@@ -128,9 +170,9 @@ flowchart LR
   subgraph pipeline["cycle du ticket"]
     B["000-backlog"] --> R["020-ready"] --> D["040-doing"] --> V["060-verify"] --> DONE["080-done"]
   end
-  DONE -- "à la review : et ensuite ?" --> F["100-follow-up<br/>candidats (hors pipeline)"]
-  F -- "tri : promu" --> B
-  F -- "tri : fusionné / rejeté" --> X["supprimé"]
+  DONE -- "ticket-follow-up<br/>(à la review : et ensuite ?)" --> F["100-follow-up<br/>candidats (hors pipeline)"]
+  F -- "follow-up-triage : valeur OK<br/>puis evaluate-a-ticket : forme" --> B
+  F -- "follow-up-triage : fusionné / rejeté / périmé" --> X["supprimé"]
 ```
 
 ### Risques / questions ouvertes
@@ -158,6 +200,9 @@ flowchart LR
 
 - [ ] `meta/agents/recipes/workflow/ticket-follow-up.md` créé : court, orienté
       étapes, agnostique au projet, avec des exemples réels plutôt qu'un gabarit.
+- [ ] `meta/agents/recipes/workflow/follow-up-triage.md` créé : tri **groupé** du
+      dossier, trois issues, critères de **valeur** falsifiables, délégation de la
+      **forme** à `evaluate-a-ticket` (et pas de duplication de ses critères).
 - [ ] `TEMPLATE.md` porte la rubrique de suite : ligne d'explication, cas
       `aucune`, distinction explicite d'avec le `Journal`.
 - [ ] `meta/workflow/100-follow-up/` créé (`.gitkeep`), documenté comme **hors
@@ -170,7 +215,8 @@ flowchart LR
 - [ ] Les règles « référencer par `id` » et « créer sur `main`, depuis le tree
       principal » sont écrites.
 - [ ] `work-a-task`, `ticket-validate`, `ticket-work` et les index
-      (`meta/agents/recipes/README.md`, `meta/README.md`) renvoient vers la recipe.
+      (`meta/agents/recipes/README.md`, `meta/README.md`) renvoient vers les deux
+      recipes ; le déclencheur du tri est **mécanique** et écrit.
 - [ ] Les trois points d'entrée sont vérifiés (mis à jour seulement si nécessaire).
 - [ ] Démonstration sur un cas réel : la suite du ticket `2026-07-26_18-00`
       (fixtures du mock au `Status` figé) est remontée du journal vers la rubrique
