@@ -33,9 +33,13 @@ export class CollisionSystem {
    */
   constructor(element) {
     this._element = element;
-    // Created before the element's geometry is set (mirrors the original
-    // Element constructor ordering): an "undefined" box until zones are added.
-    this._collisionBoundingBox = new BoundingBox(element);
+    // Starts genuinely empty: the collision envelope bounds the collision and
+    // trigger zones (own and inherited from children), never the element's own
+    // rectangle — the narrow phase only ever tests zones. Seeding it from the
+    // element used to leave a half-defined box (the geometry is not set yet, so
+    // `x0` was null while `x1` took the default width), which inflated every
+    // ancestor's envelope with phantom edges.
+    this._collisionBoundingBox = new BoundingBox(element, false);
   }
 
   /** Build the outer bounding box once the element geometry is known. */
@@ -138,19 +142,30 @@ export class CollisionSystem {
   /**
    * Rebuild both aggregate boxes from the element's current zones and children.
    * Used when a child is detached, because incremental updates only ever grow.
+   *
+   * The two boxes seed differently, on purpose — mirroring the incremental path:
+   * the collision box starts **empty**, so it bounds the collision/trigger zones
+   * and nothing else (the narrow phase only ever tests zones, so widening the
+   * envelope to the element's rectangle would weaken pruning for no gain); the
+   * rendering box starts from the element's own rectangle, which it is meant to
+   * cover.
    */
   recomputeAggregates() {
-    const collisionBoundingBox = new BoundingBox(this._element);
+    const collisionBoundingBox = new BoundingBox(this._element, false);
     this._zones.collision.forEach((zone) => {
       collisionBoundingBox.updateWithBoundingBox(zone);
     });
     this._zones.trigger.forEach((zone) => {
       collisionBoundingBox.updateWithBoundingBox(zone);
     });
+
+    // Install before folding the children in: `updateWithRelativeElement` grows
+    // the box it reaches through the *element* (`parent.getCollisionBoundingBox()`),
+    // not the receiver — folding first would grow the box we are replacing.
+    this._collisionBoundingBox = collisionBoundingBox;
     this._element.getChildren().forEach((child) => {
       collisionBoundingBox.updateWithRelativeElement(this._element, child);
     });
-    this._collisionBoundingBox = collisionBoundingBox;
 
     const boundingBox = new BoundingBox(this._element);
     this._element.getChildren().forEach((child) => {
