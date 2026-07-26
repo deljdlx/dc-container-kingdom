@@ -4,7 +4,7 @@ title: updateWithRelativeElement grossit la mauvaise boîte
 type: refactor
 branch:
 created: 2026-07-26 19:11
-ready:
+ready: 2026-07-26 19:25
 doing:
 verify:
 done:
@@ -30,12 +30,42 @@ lecteur.
 
 ## Spécifications
 
-_À compléter en « specify ». Direction : que la méthode grossisse **le receveur**
-(`this`) à partir de la boîte de collision de l'enfant projetée par la position
-locale de celui-ci. Le paramètre `parentElement` devient alors inutile — donc
-changement de signature d'une classe **exportée** (`src/engine/index.js`) : mettre à
-jour les deux appels (`updateCollisionBoundingBox`, `recomputeAggregates`), la JSDoc,
-et retirer le contournement + son commentaire devenus sans objet._
+### Fonctionnel
+
+- La méthode grossit **le receveur**, et lui seul : aucun effet de bord sur une
+  autre boîte.
+- Un enfant dont l'agrégat de collision est **indéfini** (aucune zone, aucun
+  enfant) ne contribue rien — comportement actuel, déjà couvert par un test, à
+  conserver.
+- Le chemin incrémental est **inchangé** : le receveur y est déjà la boîte du
+  parent, donc le résultat est identique avant / après.
+
+### Technique
+
+- Signature : `updateWithRelativeElement(childElement)` — le paramètre
+  `parentElement` disparaît (il ne servait qu'à retrouver la boîte à modifier).
+- Implémentation : sortir si `childElement.getCollisionBoundingBox().isUndefined()`
+  — le helper existe déjà —, sinon projeter la boîte de l'enfant par
+  `childElement.x()` / `.y()` et **déléguer à `updateWithBoundingBox`**, de sorte
+  qu'il ne reste qu'un seul chemin de croissance.
+- **Aucune arithmétique sur `null`** : c'est le piège déjà rencontré dans
+  `2026-07-26_18-55` (`null + 100 === 100`, d'où des bords fantômes). Le garde
+  `isUndefined()` traite toute boîte partiellement définie comme absente, ce qui
+  est désormais cohérent — depuis ce même ticket, les agrégats sont soit vides,
+  soit complets.
+- Retirer de `recomputeAggregates` l'installation anticipée de la boîte **et** le
+  commentaire qui documente le piège : il n'y a plus de piège.
+- Mettre à jour les **deux** appels (`CollisionSystem:116` et `:167`), la JSDoc, et
+  les **deux** tests existants de `test/BoundingBox.test.js` — leurs assertions ne
+  changent pas, seul l'appel se simplifie (ils montaient justement un stub où le
+  receveur et la boîte du parent étaient le même objet, ce qui masquait le défaut).
+
+### Risques / vigilance
+
+- `BoundingBox` est exporté par le baril `src/engine/index.js` : c'est un
+  changement d'**API publique** du moteur. Vérifié : aucune doc ne cite la
+  signature, et il n'existe pas d'autre appelant que les deux ci-dessus (`grep`).
+- Ne pas affaiblir les tests existants : les assertions doivent rester les mêmes.
 
 ## Contexte / liens
 
