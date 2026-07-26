@@ -4,7 +4,7 @@ title: Recipe follow-up — clore chaque ticket par une vision de la suite
 type: docs
 branch:
 created: 2026-07-26 18:14
-ready:
+ready: 2026-07-26 18:29
 doing:
 verify:
 done:
@@ -93,14 +93,18 @@ producteur sans consommateur, c'est-à-dire la décharge. Les deux recipes sont 
     « Rien de perceptible » ⇒ rejet ;
   - **Doublon** — déjà couvert par un ticket du backlog ou par la rubrique `Suite`
     d'un autre ticket ⇒ fusion ;
-  - **Péremption** — un candidat non promu après N passes de tri est **rejeté par
-    défaut** : ne pas l'avoir choisi N fois *est* la réponse (règle mécanique
-    anti-décharge, `N` à fixer en *specify*) ;
+  - **Péremption** — **un sursis, pas deux** : un candidat conservé à un tri est
+    marqué (`- [date] tri : conservé`) ; s'il est encore là au tri suivant, il est
+    **rejeté**. Ne pas l'avoir choisi deux fois *est* la réponse. Règle mécanique
+    anti-décharge, sans compteur à maintenir ;
   - **Reste de DoD** — si le candidat relevait en fait du ticket d'origine, ce
     n'est pas un candidat mais le signe d'un ticket **clos trop tôt** : le
     signaler comme tel plutôt que le promouvoir.
-- **Quand** : à trancher en *specify* — à chaque prise de nouvelle tâche, ou
-  au-delà de `N` candidats. Le déclencheur doit être **mécanique**.
+- **Quand** : au **démarrage d'une tâche** (première étape de
+  [work-a-task](../../agents/recipes/workflow/work-a-task.md)) — si `100-follow-up` n'est
+  pas vide, on le trie **avant** de prendre la tâche suivante. C'est le seul
+  moment qui revient forcément, donc le plus mécanique ; et il garde le dossier
+  quasi vide, donc le tri coûte une minute.
 
 ### Fonctionnel — ce qui empêche la boucle infinie
 
@@ -137,6 +141,9 @@ tickets qui s'engendrent. Règles à écrire noir sur blanc dans la recipe :
 - `meta/workflow/100-follow-up/` avec un `.gitkeep` (comme les autres colonnes) ;
   nommage des candidats aligné sur celui des tickets
   (`YYYY-MM-DD_HH-MM_titre.md`), pour qu'une promotion soit un simple `git mv`.
+- **Format d'un candidat** : pas de frontmatter — c'est ce qui le distingue d'un
+  ticket. Un titre et trois lignes : **origine** (`id`), **constat** (la preuve),
+  **coût du non-fait** ; plus les lignes datées ajoutées par les tris successifs.
 - `meta/workflow/TEMPLATE.md` : rubrique `## Suite` (nom à confirmer) **après la
   DoD**, avec sa ligne d'explication, le cas `aucune`, et la distinction d'avec le
   `Journal` (le journal raconte le passé, la rubrique regarde l'avant).
@@ -177,12 +184,13 @@ flowchart LR
 
 ### Risques / questions ouvertes
 
-- **Nommage** à confirmer en *specify* : `## Suite` (recommandé — c'est la
-  question « et ensuite ? ») vs `## Suites` / `## Follow-up`. Garder le mot
-  « follow-up » dans la ligne d'explication pour qu'il reste cherchable.
-- **Risque de décharge** : `100-follow-up` ne vaut que par son tri. Si la règle de
-  tri n'est pas mécanique, mieux vaut **ne pas créer la colonne** et laisser les
-  pistes dans la rubrique `Suite`. À arbitrer en *specify*.
+- **Nommage — tranché** : `## Suite` (singulier : c'est la question « et
+  ensuite ? »). Le mot « follow-up » reste dans la ligne d'explication pour qu'il
+  demeure cherchable.
+- **Risque de décharge** : `100-follow-up` ne vaut que par son tri. Le déclencheur
+  retenu (au démarrage de chaque tâche) et la péremption au deuxième tri sont les
+  deux règles qui le rendent mécanique — si elles sautent, la colonne devient une
+  décharge et il vaut mieux la supprimer que la laisser pourrir.
 - **Risque de cérémonie** : si la rubrique devient un formulaire à trous, elle
   sera remplie mécaniquement et ne vaudra rien. Écrire la recipe avec des exemples
   **réels** plutôt qu'un gabarit.
