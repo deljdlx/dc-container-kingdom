@@ -14,3 +14,7 @@ répond-il à son objectif ?
    `meta/workflow/080-done/`, renseigner `done:` et **noter le hash du merge**
    (possible seulement post-merge).
 4. **Documenter la validation** dans `## Journal > Validation`, datée.
+5. **Répondre à « et ensuite ? »** : renseigner la rubrique `## Suite` du ticket —
+   ce qu'il ouvre, ce qu'il laisse de côté, les candidats déposés en
+   `100-follow-up/`. Voir [ticket-follow-up](ticket-follow-up.md) ; `aucune` est
+   une réponse valable, une rubrique vide n'en est pas une.

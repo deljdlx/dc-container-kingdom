@@ -23,7 +23,7 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 ## Règles essentielles
 
 - **Tâches** : prises dans le board `meta/workflow/000-backlog/` ; suivre le cycle
-  (`meta/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done).
+  (`meta/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done → **suite**).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
 - **Langue** : code et JSDoc en **anglais**, commits et échanges en **français**.
 - **Jamais de travail direct sur `main`** ni de bascule de la branche du **tree

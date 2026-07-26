@@ -77,6 +77,19 @@ atteignable — avant `14-19`, la détection était morte et masquait le problè
 - [x] `meta/documentation/container-kingdom.md` corrigé.
 - [x] `npm run verify` vert.
 
+## Suite
+
+- **Ouvre** : les fixtures du mock ont un `Status` **figé** (`"Up 8 days"`) — c'est
+  ce qui a rendu ce bug invisible en dev et en CI. Un mock où le libellé vieillit
+  aurait fait échouer quelque chose. → candidat déposé,
+  `2026-07-26_18-35_mock-status-realiste.md`.
+- **Laisse de côté** : le remplacement du `document.location.reload()` par un
+  rafraîchissement incrémental — déjà couvert par le ticket `2026-07-26_14-20`,
+  rendu plus urgent par ce correctif (le reload est désormais réellement atteint).
+- **Limite assumée** : le vieillissement du libellé n'est pas reproductible au
+  navigateur avec le mock actuel ; c'est le test unitaire (contre-épreuve par
+  `git stash`) qui couvre le cas.
+
 ## Journal
 
 Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%m-%d
@@ -103,4 +116,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 - [2026-07-26 18:09] Review : DoD cochée, frontière moteur non concernée (correctif côté app), aucun `git add -A`, commits Conventional Commits en français.
 - [2026-07-26 18:09] Merge `--no-ff` de `claude/fix-checksum-status-instable` sur `main` : **82d422b**. Branche supprimée, worktree `/tmp/dc-container-kingdom-claude` conservé.
-- [2026-07-26 18:09] Suite identifiée, non traitée ici : les fixtures du mock ont un `Status` figé, ce qui a rendu ce bug invisible en dev — rendre le mock plus réaliste mériterait son propre ticket. Le remplacement du `location.reload()` reste couvert par `2026-07-26_14-20`.
+- [2026-07-26 18:09] Suites identifiées à la clôture → déplacées dans la rubrique `## Suite` ci-dessus (le journal date le passé, la rubrique regarde l'avant).

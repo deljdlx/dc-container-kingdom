@@ -63,9 +63,9 @@ Contrôle **dur** (doit être vide) : une colonne se cite toujours
 `meta/workflow/<colonne>/`, jamais `meta/<colonne>/`.
 
 ```bash
-grep -rnE "meta/(000-backlog|020-ready|040-doing|060-verify|080-done)/" \
+grep -rnE "meta/(000-backlog|020-ready|040-doing|060-verify|080-done|100-follow-up)/" \
   --include=*.md . CLAUDE.md AGENTS.md .github/*.md \
-  | grep -vE "node_modules|/\.git/|/\.claude/"
+  | grep -vE "node_modules|/\.git/|/\.claude/" | grep -v "meta/workflow/"
 ```
 
 ### 3. `@imports` de `CLAUDE.md` — cibles existantes
@@ -81,7 +81,10 @@ done
 4. **Colonnes** — mêmes noms et même ordre (`000-backlog` → `020-ready` →
    `040-doing` → `060-verify` → `080-done`) dans : board README (table),
    [work-a-task](workflow/work-a-task.md) (table), chaque `ticket-*.md`, et les
-   fichiers d'entrée.
+   fichiers d'entrée. `100-follow-up` est **hors pipeline** : il ne doit apparaître
+   dans aucune séquence d'étapes, seulement comme boîte de candidats
+   ([ticket-follow-up](workflow/ticket-follow-up.md) /
+   [follow-up-triage](workflow/follow-up-triage.md)).
 5. **Cycle & topologie git** — aucune formulation contradictoire : branche créée au
    *work*, board sur `main`, clôture `done` sur `main` **post-merge** (section
    « Topologie git » de [work-a-task](workflow/work-a-task.md)).
@@ -89,8 +92,9 @@ done
    `.github/copilot-instructions.md` énoncent les mêmes règles essentielles (chemin
    du board, pointeur de cycle).
 7. **TEMPLATE ↔ recipes** — le frontmatter du TEMPLATE (`ready`/`doing`/`verify`/
-   `done`) et ses sections `Journal` (Travail / Vérification / Validation)
-   correspondent aux transitions et journaux décrits par les recipes d'étape.
+   `done`) et ses sections `Journal` (Travail / Vérification / Validation) et
+   `Suite` correspondent aux transitions, journaux et clôture décrits par les
+   recipes d'étape.
 
 ## Sortie
 

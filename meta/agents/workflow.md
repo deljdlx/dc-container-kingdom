@@ -9,6 +9,14 @@ par la recipe **[`recipes/workflow/work-a-task.md`](recipes/workflow/work-a-task
 dédiée, `npm run verify`, merge, journal de tâche). Voir
 [`../README.md`](../README.md).
 
+Deux gestes encadrent ce cycle :
+
+- **À la clôture**, répondre à « et ensuite ? » dans la rubrique `## Suite` du
+  ticket — [`recipes/workflow/ticket-follow-up.md`](recipes/workflow/ticket-follow-up.md).
+  `aucune` est une réponse valable ; une rubrique vide n'en est pas une.
+- **Avant de prendre la tâche suivante**, trier `100-follow-up/` s'il n'est pas
+  vide — [`recipes/workflow/follow-up-triage.md`](recipes/workflow/follow-up-triage.md).
+
 ## « Terminé » = vérifié
 
 Avant d'annoncer qu'une tâche est finie, **`npm run verify`** (= `lint` + `build`

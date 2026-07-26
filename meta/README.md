@@ -18,9 +18,19 @@ son avancement dans l'historique.
 | **`040-doing/`** | En cours — idéalement **une** tâche à la fois. |
 | **`060-verify/`** | Implémentation faite, **en validation** : `npm run verify`, navigateur, review, durcissement. |
 | **`080-done/`** | Terminé — archive du résultat (commit / merge noté). |
+| **`100-follow-up/`** | **Hors pipeline** — boîte de **candidats** (pas de tickets) émis à la clôture, triés vers `000-backlog/`. |
 
 Les préfixes numériques **espacés** (pas de 20) ordonnent les colonnes **et**
 laissent de la place pour en insérer (`010-…`, `030-…`, `050-…`, `070-…`).
+
+`100-follow-up/` est **détaché** de la plage `000` → `080` à dessein : ce n'est pas
+l'étape qui suit `080-done`, c'est une **boîte de sortie** qui **réalimente**
+`000-backlog`. Un ticket ne s'y déplace jamais ; elle ne reçoit que des
+**candidats** — des notes courtes, sans frontmatter, bon marché à écrire comme à
+jeter. Elle existe pour protéger la propriété la plus fragile du backlog : être
+**priorisé**. Voir [ticket-follow-up](agents/recipes/workflow/ticket-follow-up.md) (qui
+la remplit) et [follow-up-triage](agents/recipes/workflow/follow-up-triage.md) (qui la
+vide).
 
 ## Cycle de vie d'une tâche
 
@@ -33,6 +43,10 @@ Chaque transition **date** son passage (frontmatter) et **documente ses itérati
 3. **Travailler** → `040-doing/` — branche + `doing:` — [ticket-work](agents/recipes/workflow/ticket-work.md).
 4. **Vérifier** → `060-verify/` — `npm run verify` + `verify:` — [ticket-verify](agents/recipes/workflow/ticket-verify.md).
 5. **Valider & clore** → `080-done/` — review + merge + `done:` — [ticket-validate](agents/recipes/workflow/ticket-validate.md).
+6. **Suite** → rubrique `## Suite` du ticket (+ candidats en `100-follow-up/` si
+   besoin) — [ticket-follow-up](agents/recipes/workflow/ticket-follow-up.md). Ces
+   candidats sont triés au **démarrage de la tâche suivante** —
+   [follow-up-triage](agents/recipes/workflow/follow-up-triage.md).
 
 ## Créer une tâche
 

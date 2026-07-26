@@ -28,6 +28,16 @@ technique (comment) · schéma mermaid · risques. Doser — la DoD reste le con
 - [ ] critère concret et vérifiable 1
 - [ ] critère concret et vérifiable 2
 
+## Suite
+
+_« Et ensuite ? » — rempli à la **clôture** (follow-up, voir la recipe
+[ticket-follow-up](../agents/recipes/workflow/ticket-follow-up.md)) : ce que le ticket
+**ouvre**, ce qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
+`100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
+différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
+
+-
+
 ## Journal
 
 Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%m-%d

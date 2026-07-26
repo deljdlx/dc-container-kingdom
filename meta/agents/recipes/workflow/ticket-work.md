@@ -11,5 +11,8 @@
 3. **Documenter chaque itération** de travail dans `## Journal > Travail`, datée
    (`- [YYYY-MM-DD HH:MM] …` : décisions, obstacles, mesures).
 
-> Idéalement **une** tâche en `040-doing` à la fois. Une sous-tâche qui émerge →
-> la déposer en `000-backlog`, ne pas dériver.
+> Idéalement **une** tâche en `040-doing` à la fois. Une piste qui émerge → la
+> **déposer** ([ticket-follow-up](ticket-follow-up.md) : rubrique `## Suite`, ou
+> candidat en `100-follow-up/` si elle demande une décision), **ne pas dériver**.
+> Ce qui relève de la `DoD` du ticket courant, en revanche, reste dans le ticket —
+> un follow-up n'est pas une façon de clore à moitié.
