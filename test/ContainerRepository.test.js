@@ -78,7 +78,7 @@ describe('ContainerRepository', () => {
     expect(repo.lastContainersChecksum).toBe(checksum);
   });
 
-  it('does not trigger change callback on first load but does on descriptor changes', async () => {
+  it('does not trigger change callback on first load but does on a state change', async () => {
     const client = makeClient();
     repo = new ContainerRepository(client);
     const onChanged = vi.fn();
@@ -89,11 +89,54 @@ describe('ContainerRepository', () => {
 
     const changed = JSON.parse(JSON.stringify(containers));
     changed[0].State = 'exited';
-    changed[0].Status = 'Exited (0) 1 second ago';
     client.getContainersDescriptors.mockResolvedValue(changed);
 
     await repo.loadContainers();
     expect(onChanged).toHaveBeenCalledTimes(1);
+  });
+
+  it('triggers the change callback when a container appears or vanishes', async () => {
+    const client = makeClient();
+    repo = new ContainerRepository(client);
+    const onChanged = vi.fn();
+    repo.onContainersChanged = onChanged;
+
+    await repo.loadContainers();
+
+    const withoutFirst = JSON.parse(JSON.stringify(containers)).slice(1);
+    client.getContainersDescriptors.mockResolvedValue(withoutFirst);
+    await repo.loadContainers();
+    expect(onChanged).toHaveBeenCalledTimes(1);
+
+    client.getContainersDescriptors.mockResolvedValue(
+      JSON.parse(JSON.stringify(containers))
+    );
+    await repo.loadContainers();
+    expect(onChanged).toHaveBeenCalledTimes(2);
+  });
+
+  // `Status` is Docker's human-readable label and ages on its own ("Up 4
+  // seconds" → "Up 9 seconds"). Fingerprinting it made every poll report a
+  // change, and the app reloaded itself in a loop.
+  it('ignores the Status label ageing on its own', async () => {
+    const client = makeClient();
+    repo = new ContainerRepository(client);
+    const onChanged = vi.fn();
+    repo.onContainersChanged = onChanged;
+
+    await repo.loadContainers();
+    const baseline = repo.lastContainersChecksum;
+
+    const aged = JSON.parse(JSON.stringify(containers));
+    aged.forEach((descriptor, index) => {
+      descriptor.Status = `Up ${index + 1} seconds`;
+    });
+    client.getContainersDescriptors.mockResolvedValue(aged);
+
+    await repo.loadContainers();
+
+    expect(repo.lastContainersChecksum).toBe(baseline);
+    expect(onChanged).not.toHaveBeenCalled();
   });
 
   it('keeps checksum stable when descriptor order changes only', async () => {

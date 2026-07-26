@@ -2,11 +2,11 @@
 id: 2026-07-26_18-00
 title: Le champ Status rend le checksum instable et provoque un rechargement en boucle
 type: fix
-branch:
+branch: claude/fix-checksum-status-instable
 created: 2026-07-26 18:00
 ready: 2026-07-26 18:01
-doing:
-verify:
+doing: 2026-07-26 18:02
+verify: 2026-07-26 18:05
 done:
 ---
 
@@ -69,13 +69,13 @@ atteignable — avant `14-19`, la détection était morte et masquait le problè
 
 ## Definition of Done
 
-- [ ] `Status` ne fait plus partie de l'empreinte ; l'exclusion est justifiée par
+- [x] `Status` ne fait plus partie de l'empreinte ; l'exclusion est justifiée par
       un commentaire dans le code.
-- [ ] Test de non-régression : seul `Status` vieillit → **aucun** appel à
+- [x] Test de non-régression : seul `Status` vieillit → **aucun** appel à
       `onContainersChanged`, checksum inchangé.
-- [ ] Les détections légitimes restent couvertes (`State`, ajout / suppression).
-- [ ] `meta/documentation/container-kingdom.md` corrigé.
-- [ ] `npm run verify` vert.
+- [x] Les détections légitimes restent couvertes (`State`, ajout / suppression).
+- [x] `meta/documentation/container-kingdom.md` corrigé.
+- [x] `npm run verify` vert.
 
 ## Journal
 
@@ -84,11 +84,20 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-26 18:02] Ticket pris sur `claude/fix-checksum-status-instable` (worktree dédié `/tmp/dc-container-kingdom-claude`).
+- [2026-07-26 18:03] `status` retiré de `checksumDescriptor`, avec un commentaire expliquant pourquoi `Status` est exclu et pourquoi `State` suffit.
+- [2026-07-26 18:03] Test de non-régression « ignores the Status label ageing on its own » : seul le libellé vieillit → checksum identique, `onContainersChanged` non appelé.
+- [2026-07-26 18:03] Le test existant « does on descriptor changes » ne modifiait *à la fois* `State` et `Status` : resserré sur `State` seul, sinon il resterait vert même si `State` disparaissait de l'empreinte. Ajout d'un test apparition / disparition de conteneur.
+- [2026-07-26 18:04] `meta/documentation/container-kingdom.md` corrigé (l'empreinte y listait encore `status`) + note sur l'exclusion volontaire.
+- [2026-07-26 18:05] Contre-épreuve : correctif remisé (`git stash`) → le nouveau test **échoue** ; correctif restauré → vert. Le test n'est pas vacant.
 
 ### Vérification
 
--
+- [2026-07-26 18:05] `npm run verify` vert dans le worktree : lint + build + 204 tests (28 fichiers).
+- [2026-07-26 18:07] Validation navigateur (`npm run dev` sur un port frais, 5188) : app chargée, 35 maisons rendues, écran de chargement masqué, **0 erreur console**.
+- [2026-07-26 18:07] Sonde anti-rechargement : marqueur posé sur `window`, toujours présent après **26,5 s** (≈ 5 ticks de polling) et `performance.navigation.type` resté `navigate` — la page ne se recharge pas d'elle-même.
+- [2026-07-26 18:07] Limite assumée : les fixtures du mock ont un `Status` figé (`"Up 8 days"`), donc le vieillissement du libellé **ne peut pas** être reproduit au navigateur ; c'est le test unitaire (contre-épreuve par `git stash`) qui couvre le cas.
+- [2026-07-26 18:07] Serveur de dev arrêté, aucun résidu de debug dans le code.
 
 ### Validation
 
