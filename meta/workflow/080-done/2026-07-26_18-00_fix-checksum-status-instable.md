@@ -7,7 +7,7 @@ created: 2026-07-26 18:00
 ready: 2026-07-26 18:01
 doing: 2026-07-26 18:02
 verify: 2026-07-26 18:05
-done:
+done: 2026-07-26 18:09
 ---
 
 ## Objectif
@@ -101,4 +101,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-26 18:09] Review : DoD cochée, frontière moteur non concernée (correctif côté app), aucun `git add -A`, commits Conventional Commits en français.
+- [2026-07-26 18:09] Merge `--no-ff` de `claude/fix-checksum-status-instable` sur `main` : **82d422b**. Branche supprimée, worktree `/tmp/dc-container-kingdom-claude` conservé.
+- [2026-07-26 18:09] Suite identifiée, non traitée ici : les fixtures du mock ont un `Status` figé, ce qui a rendu ce bug invisible en dev — rendre le mock plus réaliste mériterait son propre ticket. Le remplacement du `location.reload()` reste couvert par `2026-07-26_14-20`.
