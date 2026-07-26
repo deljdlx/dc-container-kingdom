@@ -21,6 +21,8 @@ d'un dépôt à l'autre.
 - **[debug-empirically.md](debug-empirically.md)** — reproduire → isoler → prouver
   par la mesure → corriger → non-régression.
 - **[review-changes.md](review-changes.md)** — reviewer un changement (règles + qualité).
+- **[evaluate-a-ticket.md](evaluate-a-ticket.md)** — juger si un ticket est
+  *actionnable* + conseils classés (**une seule passe**, pas de boucle).
 - **[verify-a-change.md](verify-a-change.md)** — « terminé = vérifié » (auto + runtime).
 - **[audit-workflow-consistency.md](audit-workflow-consistency.md)** — après une
   évolution du workflow, vérifier que les specs restent cohérentes et à jour.
