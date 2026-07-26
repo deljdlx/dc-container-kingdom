@@ -7,7 +7,7 @@ created: 2026-07-26 19:11
 ready: 2026-07-26 19:25
 doing: 2026-07-26 19:26
 verify: 2026-07-26 19:30
-done:
+done: 2026-07-26 19:33
 ---
 
 ## Objectif
@@ -128,4 +128,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-26 19:32] Review : DoD cochée, frontière moteur respectée, aucun `git add -A`, Conventional Commits en français, aucun résidu de debug.
+- [2026-07-26 19:32] Changement d'**API publique** du moteur (`BoundingBox` est exporté) assumé : aucun autre appelant, aucune doc ne citait la signature.
+- [2026-07-26 19:33] Merge `--no-ff` de `claude/fix-update-with-relative-element` sur `main` : **2be55fd**. Branche supprimée, worktree conservé.
