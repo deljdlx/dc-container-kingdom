@@ -110,55 +110,29 @@ export class BoundingBox
   }
 
   /**
-   * Grow `parentElement`'s collision box to enclose `childElement`'s, translated
-   * by the child's local position (null corners are treated as "not yet set").
-   * @param {import('./Element.js').Element} parentElement
+   * Grow **this** box to enclose `childElement`'s collision box, translated by
+   * the child's local position — the shape an aggregate takes when it folds a
+   * child in.
+   *
+   * A child whose own aggregate is still undefined (no zone, no child of its
+   * own) contributes nothing: translating a `null` corner would silently turn it
+   * into the offset itself and grow the envelope with a phantom edge.
    * @param {import('./Element.js').Element} childElement
+   * @returns {BoundingBox} this
    */
-  updateWithRelativeElement(parentElement, childElement) {
-    if(
-      (parentElement.getCollisionBoundingBox().x1() <
-      childElement.getCollisionBoundingBox().x1() + childElement.x()
-      || parentElement.getCollisionBoundingBox().x1() === null)
-      && childElement.getCollisionBoundingBox().x1() !== null
-    ) {
-      parentElement.getCollisionBoundingBox().x1(
-        childElement.getCollisionBoundingBox().x1() + childElement.x()
-      )
+  updateWithRelativeElement(childElement) {
+    const childBox = childElement.getCollisionBoundingBox();
+    if(childBox.isUndefined()) {
+      return this;
     }
 
-    if(
-      (parentElement.getCollisionBoundingBox().x0() >
-      childElement.getCollisionBoundingBox().x0() + childElement.x()
-      || parentElement.getCollisionBoundingBox().x0() === null)
-      && childElement.getCollisionBoundingBox().x0() !== null
-    ) {
-      parentElement.getCollisionBoundingBox().x0(
-        childElement.getCollisionBoundingBox().x0() + childElement.x()
-      )
-    }
+    const translated = new BoundingBox();
+    translated.x0(childBox.x0() + childElement.x());
+    translated.x1(childBox.x1() + childElement.x());
+    translated.y0(childBox.y0() + childElement.y());
+    translated.y1(childBox.y1() + childElement.y());
 
-    if(
-      (parentElement.getCollisionBoundingBox().y1() <
-      childElement.getCollisionBoundingBox().y1() + childElement.y()
-      || parentElement.getCollisionBoundingBox().y1() === null)
-      && childElement.getCollisionBoundingBox().y1() !== null
-    ) {
-      parentElement.getCollisionBoundingBox().y1(
-        childElement.getCollisionBoundingBox().y1() + childElement.y()
-      )
-    }
-
-    if(
-      (parentElement.getCollisionBoundingBox().y0() >
-      childElement.getCollisionBoundingBox().y0() + childElement.y()
-      || parentElement.getCollisionBoundingBox().y0() === null)
-      && childElement.getCollisionBoundingBox().y0() !== null
-    ) {
-      parentElement.getCollisionBoundingBox().y0(
-        childElement.getCollisionBoundingBox().y0() + childElement.y()
-      )
-    }
+    return this.updateWithBoundingBox(translated);
   }
 
   // ===========================

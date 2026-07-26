@@ -113,7 +113,7 @@ export class CollisionSystem {
    * @param {import('./Element.js').Element} element the child that changed
    */
   updateCollisionBoundingBox(element) {
-    this._collisionBoundingBox.updateWithRelativeElement(this._element, element);
+    this._collisionBoundingBox.updateWithRelativeElement(element);
     const parent = this._element.getParent();
     if (parent) {
       parent.updateCollisionBoundingBox(this._element);
@@ -159,13 +159,10 @@ export class CollisionSystem {
       collisionBoundingBox.updateWithBoundingBox(zone);
     });
 
-    // Install before folding the children in: `updateWithRelativeElement` grows
-    // the box it reaches through the *element* (`parent.getCollisionBoundingBox()`),
-    // not the receiver — folding first would grow the box we are replacing.
-    this._collisionBoundingBox = collisionBoundingBox;
     this._element.getChildren().forEach((child) => {
-      collisionBoundingBox.updateWithRelativeElement(this._element, child);
+      collisionBoundingBox.updateWithRelativeElement(child);
     });
+    this._collisionBoundingBox = collisionBoundingBox;
 
     const boundingBox = new BoundingBox(this._element);
     this._element.getChildren().forEach((child) => {
