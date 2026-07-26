@@ -36,70 +36,121 @@ les tracer.
 
 ## Spécifications
 
-### Fonctionnel
+### Fonctionnel — la rubrique `Suite`
 
-- Toute clôture de ticket (étape *validate*) renseigne la rubrique **Suite** :
+- Toute clôture de ticket (étape *validate*, au moment de la review) renseigne la
+  rubrique **Suite** :
   - ce que le ticket **ouvre** (piste, amélioration entrevue, question restée
     sans réponse) ;
   - ce qu'il **laisse volontairement de côté** (périmètre écarté, limite de la
     vérification, dette acceptée) ;
-  - les **tickets créés** à cette occasion, s'il y en a.
-- La rubrique est **obligatoire mais courte** : une ligne suffit dans le cas
-  courant, et `aucune` est une réponse valable — elle dit « on y a réfléchi »,
-  pas « on a oublié ».
-- Une piste qui mérite d'être exécutée devient un ticket
-  ([ticket-create](../../agents/recipes/workflow/ticket-create.md)) ; une piste qui n'est
-  pas mûre reste **dans la rubrique**, consultable par le prochain qui touche au
-  sujet — sans polluer le backlog.
-- Garde-fou : une suite se **dépose**, elle ne se traite pas dans la foulée du
-  ticket courant (règle « ne pas dériver » de
-  [ticket-work](../../agents/recipes/workflow/ticket-work.md)).
+  - les **candidats déposés** en `100-follow-up`, s'il y en a.
+- Rubrique **obligatoire mais courte** : une ligne suffit dans le cas courant, et
+  `aucune` est une réponse valable — elle dit « on y a réfléchi », pas « on a
+  oublié ».
+
+### Fonctionnel — la colonne `100-follow-up`
+
+Nouvelle colonne `meta/workflow/100-follow-up/`, **hors pipeline** : c'est une
+**boîte de sortie de candidats**, pas une étape du cycle.
+
+- Un **ticket** ne s'y déplace jamais. Elle ne reçoit que des **candidats** :
+  notes courtes (quelques lignes, pas le `TEMPLATE`), bon marché à écrire comme à
+  jeter.
+- Le numéro `100` est **volontairement détaché** de la plage `000` → `080` : il ne
+  suit pas `080-done` dans le cycle, il **réalimente `000-backlog`** après tri.
+- Elle protège la propriété la plus fragile du backlog : être **priorisé**. Un
+  backlog où chacun déverse ses pistes n'est plus qu'une liste.
+- Un candidat a **trois issues, toutes explicites** : promu en ticket (`git mv`
+  vers `000-backlog` après passage au `TEMPLATE`), **fusionné** dans un ticket
+  existant, ou **rejeté** (fichier supprimé, motif noté en une ligne dans le
+  commit de tri).
+
+### Fonctionnel — ce qui empêche la boucle infinie
+
+Le dossier seul ne borne rien : sans barre de valeur, il produit une chaîne de
+tickets qui s'engendrent. Règles à écrire noir sur blanc dans la recipe :
+
+- **Le résultat par défaut de l'étape follow-up est du texte, pas un ticket.** La
+  rubrique `Suite` suffit dans la majorité des cas ; le candidat est l'exception.
+- **Barre de valeur** : un candidat ne devient un ticket que s'il passe
+  [evaluate-a-ticket](../../agents/recipes/evaluate-a-ticket.md) — recipe qui existe
+  déjà et impose « une seule passe, pas de boucle ».
+- **Interdit — le follow-up « méta »** : « vérifier que le suivi précédent a bien
+  été fait », « auditer l'audit ». S'il faut du suivi pour du suivi, c'est que la
+  tâche n'était pas finie.
+- **Interdit — sortir du travail non terminé** du ticket courant sous forme de
+  follow-up. C'est le vrai danger : « je crée un follow-up » devient la façon de
+  clore un ticket à moitié fait. Ce qui relève de la DoD reste dans le ticket.
+- **Tri forcé** : on ne prend pas une nouvelle tâche en laissant `100-follow-up`
+  s'accumuler. Une boîte que personne ne vide devient une décharge — pire qu'un
+  backlog dilué, parce qu'on apprend à ne plus l'ouvrir. Le seuil exact
+  (à chaque prise de tâche ? au-delà de N candidats ?) est à trancher en
+  *specify* ; il doit être **mécanique**, pas une bonne intention.
 
 ### Technique
 
 - Nouvelle recipe `meta/agents/recipes/workflow/ticket-follow-up.md` : courte,
   orientée étapes, **agnostique au projet**, dans la lignée des recipes d'étape.
-- `meta/workflow/TEMPLATE.md` : ajouter la rubrique `## Suite` (nom à confirmer)
-  **après la DoD**, avec une ligne d'explication et le cas `aucune`.
+- `meta/workflow/100-follow-up/` avec un `.gitkeep` (comme les autres colonnes) ;
+  nommage des candidats aligné sur celui des tickets
+  (`YYYY-MM-DD_HH-MM_titre.md`), pour qu'une promotion soit un simple `git mv`.
+- `meta/workflow/TEMPLATE.md` : rubrique `## Suite` (nom à confirmer) **après la
+  DoD**, avec sa ligne d'explication, le cas `aucune`, et la distinction d'avec le
+  `Journal` (le journal raconte le passé, la rubrique regarde l'avant).
 - **Rattachement, version légère** : quand un ticket naît d'un autre, le mentionner
-  par son **`id`** — dans la rubrique `Suite` côté origine, et dans
+  par son **`id`** — dans la rubrique `Suite` côté origine, dans
   `Contexte / liens` côté suite. Pas de champ de frontmatter, pas de graphe à
-  maintenir : la traçabilité est un bénéfice, pas une mécanique. Référencer par
-  `id` (`2026-07-26_14-19`) et **jamais** par chemin de colonne, qui change à
-  chaque transition.
-- **Bookkeeping** : les tickets de suite se créent **sur `main`, depuis le tree
-  principal**, jamais depuis la branche du ticket en cours — sinon ils n'arrivent
-  sur le board qu'au merge.
+  maintenir. Référencer par `id` (`2026-07-26_14-19`) et **jamais** par chemin de
+  colonne, qui change à chaque transition.
+- **Bookkeeping** : candidats et tickets de suite se créent **sur `main`, depuis
+  le tree principal**, jamais depuis la branche du ticket en cours — sinon ils
+  n'arrivent sur le board qu'au merge.
 - Cohérence documentaire (la doc obsolète est un bug) :
+  - `meta/README.md` — tableau des colonnes (+ dire que `100` est hors pipeline)
+    et cycle de vie ;
   - [work-a-task](../../agents/recipes/workflow/work-a-task.md) — la question de la suite
     fait partie de la clôture ;
   - [ticket-validate](../../agents/recipes/workflow/ticket-validate.md) — étape qui la
     déclenche ; [ticket-work](../../agents/recipes/workflow/ticket-work.md) — renvoi pour
     la piste qui émerge en cours de route ;
-  - index : `meta/agents/recipes/README.md`, `meta/README.md` ;
+  - index `meta/agents/recipes/README.md` ;
   - les trois points d'entrée (`CLAUDE.md`, `AGENTS.md`,
     `.github/copilot-instructions.md`) ne bougent **que si** la règle agent change.
 - Terminer par la recipe
   [audit-workflow-consistency](../../agents/recipes/audit-workflow-consistency.md) :
   c'est son cas d'usage exact (évolution du workflow).
 
+### Schéma
+
+```mermaid
+flowchart LR
+  subgraph pipeline["cycle du ticket"]
+    B["000-backlog"] --> R["020-ready"] --> D["040-doing"] --> V["060-verify"] --> DONE["080-done"]
+  end
+  DONE -- "à la review : et ensuite ?" --> F["100-follow-up<br/>candidats (hors pipeline)"]
+  F -- "tri : promu" --> B
+  F -- "tri : fusionné / rejeté" --> X["supprimé"]
+```
+
 ### Risques / questions ouvertes
 
 - **Nommage** à confirmer en *specify* : `## Suite` (recommandé — c'est la
   question « et ensuite ? ») vs `## Suites` / `## Follow-up`. Garder le mot
   « follow-up » dans la ligne d'explication pour qu'il reste cherchable.
-- **Risque de cérémonie** : si la rubrique devient un formulaire, elle sera
-  remplie mécaniquement et ne vaudra rien. La recipe doit assumer la brièveté et
-  donner deux ou trois exemples **réels** plutôt qu'un gabarit à trous.
-- **Frontière avec le Journal** : le journal raconte ce qui s'est passé, la
-  rubrique regarde l'avant. Le dire explicitement, sinon les deux se dupliquent.
-- **Ne pas rétro-remplir** tout `080-done` : se limiter au couple démonstratif.
+- **Risque de décharge** : `100-follow-up` ne vaut que par son tri. Si la règle de
+  tri n'est pas mécanique, mieux vaut **ne pas créer la colonne** et laisser les
+  pistes dans la rubrique `Suite`. À arbitrer en *specify*.
+- **Risque de cérémonie** : si la rubrique devient un formulaire à trous, elle
+  sera remplie mécaniquement et ne vaudra rien. Écrire la recipe avec des exemples
+  **réels** plutôt qu'un gabarit.
+- **Ne pas rétro-remplir** tout `080-done` : se limiter au cas démonstratif.
 
 ## Contexte / liens
 
-- `meta/workflow/TEMPLATE.md` (structure d'un ticket)
+- `meta/workflow/TEMPLATE.md`, `meta/README.md` (colonnes et cycle de vie)
 - `meta/agents/recipes/workflow/` (les 5 recipes d'étape + l'overview)
-- `meta/agents/recipes/README.md`, `meta/README.md` (index à tenir à jour)
+- `meta/agents/recipes/evaluate-a-ticket.md` (barre de valeur, anti-boucle)
 - Cas réels : `2026-07-26_18-00` (suite enterrée dans le journal),
   `2026-07-26_00-48` (audit qui doit engendrer des tickets)
 
@@ -107,17 +158,23 @@ les tracer.
 
 - [ ] `meta/agents/recipes/workflow/ticket-follow-up.md` créé : court, orienté
       étapes, agnostique au projet, avec des exemples réels plutôt qu'un gabarit.
-- [ ] `TEMPLATE.md` porte la rubrique de suite, avec sa ligne d'explication, le
-      cas `aucune` et la distinction explicite d'avec le `Journal`.
-- [ ] La règle « référencer par `id`, jamais par chemin de colonne » est écrite.
-- [ ] La règle « créer les tickets de suite sur `main`, depuis le tree principal »
-      est écrite.
-- [ ] `work-a-task`, `ticket-validate` et `ticket-work` renvoient vers la recipe ;
-      les index (`meta/agents/recipes/README.md`, `meta/README.md`) sont à jour.
+- [ ] `TEMPLATE.md` porte la rubrique de suite : ligne d'explication, cas
+      `aucune`, distinction explicite d'avec le `Journal`.
+- [ ] `meta/workflow/100-follow-up/` créé (`.gitkeep`), documenté comme **hors
+      pipeline** dans `meta/README.md` : reçoit des **candidats**, jamais des
+      tickets ; réalimente `000-backlog`.
+- [ ] Les trois issues d'un candidat (promu / fusionné / rejeté) sont décrites.
+- [ ] Les garde-fous anti-boucle sont écrits : texte par défaut, barre de valeur
+      via `evaluate-a-ticket`, interdiction du follow-up « méta », interdiction de
+      sortir du travail non terminé, règle de tri **mécanique**.
+- [ ] Les règles « référencer par `id` » et « créer sur `main`, depuis le tree
+      principal » sont écrites.
+- [ ] `work-a-task`, `ticket-validate`, `ticket-work` et les index
+      (`meta/agents/recipes/README.md`, `meta/README.md`) renvoient vers la recipe.
 - [ ] Les trois points d'entrée sont vérifiés (mis à jour seulement si nécessaire).
 - [ ] Démonstration sur un cas réel : la suite du ticket `2026-07-26_18-00`
-      (fixtures du mock au `Status` figé) est remontée du journal vers la rubrique,
-      et le ticket correspondant est créé s'il est jugé mûr.
+      (fixtures du mock au `Status` figé) est remontée du journal vers la rubrique
+      et déposée en candidat.
 - [ ] Passe `audit-workflow-consistency` faite ; `npm run verify` vert.
 
 ## Journal
