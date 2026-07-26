@@ -46,8 +46,14 @@ d'erreur transitoire côté daemon Docker.
 
 La détection de changement ne vit qu'à un seul endroit :
 `ContainerRepository.loadContainers()` calcule un checksum `SHA-256` normalisé
-(ID, image, état, status, réseaux, labels) et déclenche le callback explicite
+(ID, image, **état**, réseaux, labels) et déclenche le callback explicite
 `onContainersChanged` quand l'empreinte varie.
+
+Le champ `Status` de l'API Docker est **volontairement exclu** de l'empreinte :
+c'est le libellé lisible par un humain (`"Up 4 seconds"`, `"Up About a minute"`),
+qui **vieillit tout seul** — l'inclure faisait signaler un changement à presque
+chaque tick, et donc recharger la page en boucle. `State` (`running`, `exited`,
+`paused`…) porte la même information de façon stable.
 
 ## Données : de Docker à l'écran
 

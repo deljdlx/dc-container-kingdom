@@ -2,10 +2,10 @@
 id: 2026-07-26_18-00
 title: Le champ Status rend le checksum instable et provoque un rechargement en boucle
 type: fix
-branch:
+branch: claude/fix-checksum-status-instable
 created: 2026-07-26 18:00
 ready: 2026-07-26 18:01
-doing:
+doing: 2026-07-26 18:02
 verify:
 done:
 ---
@@ -84,7 +84,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-26 18:02] Ticket pris sur `claude/fix-checksum-status-instable` (worktree dédié `/tmp/dc-container-kingdom-claude`).
+- [2026-07-26 18:03] `status` retiré de `checksumDescriptor`, avec un commentaire expliquant pourquoi `Status` est exclu et pourquoi `State` suffit.
+- [2026-07-26 18:03] Test de non-régression « ignores the Status label ageing on its own » : seul le libellé vieillit → checksum identique, `onContainersChanged` non appelé.
+- [2026-07-26 18:03] Le test existant « does on descriptor changes » ne modifiait *à la fois* `State` et `Status` : resserré sur `State` seul, sinon il resterait vert même si `State` disparaissait de l'empreinte. Ajout d'un test apparition / disparition de conteneur.
+- [2026-07-26 18:04] `meta/documentation/container-kingdom.md` corrigé (l'empreinte y listait encore `status`) + note sur l'exclusion volontaire.
+- [2026-07-26 18:05] Contre-épreuve : correctif remisé (`git stash`) → le nouveau test **échoue** ; correctif restauré → vert. Le test n'est pas vacant.
 
 ### Vérification
 

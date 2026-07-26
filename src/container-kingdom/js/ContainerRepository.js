@@ -71,12 +71,16 @@ export class ContainerRepository {
     this._rebuildNetworks();
     this._rebuildComposes();
 
+    // Fingerprint only fields that change when the *infrastructure* changes.
+    // `Status` is deliberately excluded: it is Docker's human-readable label
+    // ("Up 4 seconds" → "Up 9 seconds" → "Up About a minute"), so it drifts on
+    // its own and would report a change at nearly every poll. `State`
+    // ("running", "exited", "paused"…) carries the same information, stably.
     const checksumDescriptor = descriptors
       .map(descriptor => ({
         id: descriptor.Id,
         imageId: descriptor.ImageID,
         state: descriptor.State,
-        status: descriptor.Status,
         networks: Object.keys(descriptor.NetworkSettings?.Networks ?? {}).sort(),
         labels: Object.entries(descriptor.Labels ?? {})
           .sort(([left], [right]) => left.localeCompare(right)),
