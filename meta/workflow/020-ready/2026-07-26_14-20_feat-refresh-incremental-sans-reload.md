@@ -4,7 +4,7 @@ title: Rafraîchir la carte sans recharger la page
 type: feat
 branch:
 created: 2026-07-26 14:20
-ready:
+ready: 2026-07-27 15:42
 doing:
 verify:
 done:
@@ -31,9 +31,26 @@ nouveaux) : le rendu doit suivre le même chemin **incrémental**.
   mémoire mis à jour en place.
 - Zoom, pan, console et panneau d'info **survivent** au rafraîchissement.
 
-### Technique
+### Technique — tranché en *specify*
 
 - Dépend du ticket « checksum mort » : il fournit le point d'entrée de détection.
+- **Le renderer tient son propre registre** `id → {x, y, house}`. Au moment où la
+  réconciliation a lieu, le repository a **déjà** détruit l'élément du conteneur
+  disparu et oublié le modèle : sans registre côté renderer, impossible de savoir
+  quelle cellule libérer.
+- **Routes redessinées en bloc**, pas en incrémental : leur tracé est une fonction
+  globale de la topologie réseau (un conteneur qui part peut couper une route qui
+  en traversait trois). Le renderer garde donc la liste des éléments de route et
+  d'arbre pour les détruire avant de retracer.
+- **Changement d'état** : mirroir par `ContainerView.refresh()`, qui tourne déjà à
+  chaque cycle de stats. Un `running → exited` se voit donc en 5 s **sans même**
+  que la détection de changement se déclenche.
+- **Bascules réseau du HUD** : `drawNetworksSwitches()` remet aujourd'hui tous les
+  réseaux à « activé ». Un rafraîchissement ne doit pas réactiver en douce un
+  réseau que l'utilisateur a masqué → conserver les choix existants.
+- **Ancrage de groupe** : quand le premier conteneur d'un compose est déjà tracé,
+  partir de **sa** cellule réelle pour placer les nouveaux venus, sinon un
+  conteneur qui rejoint un groupe existant atterrit loin de son groupe.
 - `ContainerKingdomRenderer.drawHouse()` s'appuie sur un drapeau
   `container.rendered` posé à la main et `ContainerPlacement.occupy()` n'a pas de
   contrepartie « libérer » — il faut un chemin de **retrait** symétrique.
