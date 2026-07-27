@@ -4,7 +4,7 @@ title: Catalogue — rendre navigables 414 éléments (index, filtres, tri)
 type: feat
 branch:
 created: 2026-07-27 17:33
-ready:
+ready: 2026-07-27 17:48
 doing:
 verify:
 done:
