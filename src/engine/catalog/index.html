@@ -46,9 +46,42 @@
           autocomplete="off"
         >
       </label>
+
+      <label class="catalog-filter">
+        <span class="catalog-filter__label">Kind</span>
+        <select class="catalog-filter__input" data-catalog-kind>
+          <option value="all">All</option>
+          <option value="sprite">Sprites</option>
+          <option value="character">Characters</option>
+          <option value="composite">Composites</option>
+        </select>
+      </label>
+
+      <label class="catalog-filter">
+        <span class="catalog-filter__label">Zones</span>
+        <select class="catalog-filter__input" data-catalog-zone>
+          <option value="all">Any</option>
+          <option value="collision">Collision</option>
+          <option value="trigger">Trigger</option>
+        </select>
+      </label>
+
+      <label class="catalog-filter">
+        <span class="catalog-filter__label">Sort</span>
+        <select class="catalog-filter__input" data-catalog-sort>
+          <option value="family">Family</option>
+          <option value="name">Name</option>
+          <option value="footprint">Footprint</option>
+        </select>
+      </label>
     </div>
 
+    <nav class="catalog-index" data-catalog-index aria-label="Families index"></nav>
+
     <div data-catalog-gallery aria-label="Engine sprites catalog"></div>
+    <p class="catalog-empty" data-catalog-empty hidden>
+      No element matches this filter combination. Adjust search, kind or zone filters.
+    </p>
   </main>
 
   <script type="module" src="./catalog.js"></script>

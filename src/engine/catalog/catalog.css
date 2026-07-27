@@ -101,6 +101,9 @@ body {
   top: 0;
   z-index: 2;
   margin-bottom: 22px;
+  display: grid;
+  grid-template-columns: minmax(220px, 2.2fr) repeat(3, minmax(130px, 1fr));
+  gap: 10px;
   padding: 12px 0;
   background: linear-gradient(180deg, #f3e3c1 72%, rgba(243, 227, 193, 0));
 }
@@ -137,6 +140,94 @@ body {
 
 .catalog-search__input:focus {
   outline: none;
+}
+
+.catalog-filter {
+  display: grid;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1px solid rgba(94, 62, 31, 0.18);
+  border-radius: 14px;
+  background: rgba(255, 251, 244, 0.92);
+  box-shadow: 0 10px 24px rgba(92, 63, 28, 0.1);
+}
+
+.catalog-filter__label {
+  color: #785b3b;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.catalog-filter__input {
+  min-width: 0;
+  border: 0;
+  background: transparent;
+  color: #3f3527;
+  font: inherit;
+  font-size: 0.92rem;
+}
+
+.catalog-filter__input:focus {
+  outline: none;
+}
+
+.catalog-index {
+  margin: 0 0 20px;
+}
+
+.catalog-index__list {
+  display: flex;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+
+.catalog-index__link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 12px;
+  border: 1px solid rgba(94, 62, 31, 0.17);
+  border-radius: 999px;
+  background: rgba(255, 251, 244, 0.88);
+  color: #4d3d2b;
+  text-decoration: none;
+  white-space: nowrap;
+  font-size: 0.88rem;
+  box-shadow: 0 8px 18px rgba(92, 63, 28, 0.09);
+}
+
+.catalog-index__count {
+  display: inline-grid;
+  place-items: center;
+  min-width: 1.5em;
+  height: 1.5em;
+  border-radius: 999px;
+  background: rgba(74, 106, 52, 0.14);
+  color: #456230;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.catalog-index__link--hidden {
+  opacity: 0.38;
+  pointer-events: none;
+}
+
+.catalog-empty {
+  margin: 30px 0 10px;
+  padding: 16px;
+  border: 1px dashed rgba(94, 62, 31, 0.28);
+  border-radius: 16px;
+  background: rgba(255, 251, 244, 0.75);
+  color: #5f4c37;
+  font-size: 0.95rem;
+  text-align: center;
 }
 
 .catalog-family {
@@ -310,6 +401,10 @@ body.debug .catalog-preview__frame {
     border-radius: 22px;
   }
 
+  .catalog-toolbar {
+    grid-template-columns: 1fr;
+  }
+
   .catalog-grid {
     grid-template-columns: 1fr;
   }
@@ -321,5 +416,9 @@ body.debug .catalog-preview__frame {
 
   .catalog-preview__frame {
     min-height: 176px;
+  }
+
+  .catalog-index__link {
+    font-size: 0.82rem;
   }
 }
