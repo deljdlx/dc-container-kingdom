@@ -2,10 +2,10 @@
 id: 2026-07-26_18-35
 title: Rendre le Status du mock Docker réaliste (libellé qui vieillit)
 type: test
-branch:
+branch: claude/mock-status-realiste
 created: 2026-07-26 18:35
 ready: 2026-07-27 11:12
-doing:
+doing: 2026-07-27 11:13
 verify:
 done:
 ---
@@ -70,27 +70,32 @@ stats) passe au travers.
 
 ## Definition of Done
 
-- [ ] Le `Status` servi par le mock **vieillit** avec l'horloge, comme celui de
+- [x] Le `Status` servi par le mock **vieillit** avec l'horloge, comme celui de
       l'API Docker (formats `Up X seconds` / `minutes` / `hours` / `days`).
-- [ ] L'horloge est **injectable** : les tests restent déterministes, sans
+- [x] L'horloge est **injectable** : les tests restent déterministes, sans
       `Date.now()` implicite dans les assertions.
-- [ ] Un test prouve la variabilité : deux lectures à des instants différents
+- [x] Un test prouve la variabilité : deux lectures à des instants différents
       donnent des `Status` différents pour un conteneur en cours d'exécution.
-- [ ] Les tests existants qui consomment les fixtures passent sans être affaiblis.
-- [ ] La mémoire servie **varie dans le temps**, sans faire clignoter les paliers.
-- [ ] `mock/README.md` décrit ce qui est **statique** et ce qui **varie dans le
+- [x] Les tests existants qui consomment les fixtures passent sans être affaiblis.
+- [x] La mémoire servie **varie dans le temps**, sans faire clignoter les paliers.
+- [x] `mock/README.md` décrit ce qui est **statique** et ce qui **varie dans le
       temps** dans le mock.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`) : ce que le ticket **ouvre**, ce
-qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
-`100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
-différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
-
--
+- **Ouvre — et ça compte** : les fixtures ont été capturées il y a 8 mois, donc en
+  dev le `Status` ne change qu'une fois par semaine. La variabilité est prouvée
+  **par les tests** (horloge injectée), mais un `npm run dev` ne la montre
+  toujours pas à l'œil : le bug d'origine (`2026-07-26_18-00`) resterait invisible
+  pendant une semaine devant un écran. → candidat déposé,
+  `2026-07-27_11-20_fixtures-ages-varies.md`.
+- **Laisse de côté** : `State` est `running` pour les 35 conteneurs des fixtures —
+  aucun `exited`, donc le format `Exited (0) X ago` n'est ni servi ni testé. Pas
+  déposé : sans conteneur arrêté dans les fixtures, ce serait du code sans usage.
+- **Gain collatéral** : ce ticket rend vérifiable au navigateur ce qui ne l'était
+  pas — le rafraîchissement de `2026-07-26_14-21`. Un mock réaliste ne protège pas
+  que des régressions : il rend les vérifications possibles.
 
 ## Journal
 
@@ -99,11 +104,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 11:13] Ticket pris sur `claude/mock-status-realiste`. Tri de `100-follow-up/` : boîte vide.
+- [2026-07-27 11:14] Tests d'abord (`test/docker-mock-time.test.js`, 6 cas) : vieillissement du `Status`, paliers du format Docker, déterminisme à horloge égale, `Created` qui **ne** dérive pas, propagation par la route HTTP, respiration de la mémoire sans saut de palier. 4 échouent avant correctif.
+- [2026-07-27 11:15] `getContainers(now)` calcule `Status` depuis `Created` + l'horloge, avec un `humanizeAge` qui suit les paliers du CLI Docker (`seconds` → `About a minute` → `minutes` → `About an hour` → `hours` → `days` → `weeks`). Horloge injectable, propagée par `handleDockerRequest`.
+- [2026-07-27 11:16] Mémoire : oscillation lente de ±3 % autour de la base par conteneur. Amplitude choisie **sous le pas des seuils** pour ne pas faire clignoter les classes `memory--*` — vérifié par test et au navigateur.
+- [2026-07-27 11:17] `mock/README.md` : tableau de ce qui est statique et de ce qui bouge, avec la raison — un double trop stable cache une famille entière de bugs.
 
 ### Vérification
 
--
+- [2026-07-27 11:17] `npm run verify` vert : lint + build + **225 tests** (33 fichiers). Aucun test existant n'a eu besoin d'être touché : ils comparent des ids, réseaux et labels, jamais le `Status`.
+- [2026-07-27 11:18] Navigateur — **test croisé** : la mémoire affichée bouge à l'écran (359.31 → 362.62 MB sur trois cycles) et les paliers `memory--*` restent stables. Cela valide **deux** choses d'un coup : le mock varie, et le rafraîchissement livré ce matin (`2026-07-26_14-21`) fonctionne bout en bout — ce qui était **invérifiable** avant ce ticket.
+- [2026-07-27 11:19] Le `Status` servi par l'API respecte le format Docker mais **ne bouge pas** en 6 s : les fixtures datent de 8 mois, donc à cette échelle le libellé ne change qu'une fois par semaine. Comportement correct, limite réelle — notée en `Suite`, pas passée sous silence.
+- [2026-07-27 11:19] 0 erreur console, serveur de dev arrêté.
 
 ### Validation
 
