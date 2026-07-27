@@ -6,7 +6,7 @@ branch: copilot/varied-fixture-ages
 created: 2026-07-27 11:20
 ready: 2026-07-27 19:40
 doing: 2026-07-27 19:40
-verify:
+verify: 2026-07-27 19:50
 done:
 ---
 
@@ -134,8 +134,12 @@ qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 
 ### Vérification
 
--
+- `npx vitest run test/docker-mock-time.test.js test/docker-mock.test.js`
+- `npm run verify`
+- Validation navigateur sur `http://127.0.0.1:5178/api/docker/containers/json?all=true` : le mock renvoie bien un mélange de statuts `Up 48 seconds`, `Up 2 minutes`, `Up 5 minutes`, `Up 2 hours`, `Up 9 hours`, `Up 2 days`, puis des âges plus anciens.
+- Relecture quelques minutes plus tard : le premier statut a avancé jusqu'à `Up 6 minutes`.
 
 ### Validation
 
--
+- Le serveur Vite de branche a bien rechargé `mock/docker-mock.js` après modification.
+- Le rendu dev sur `http://127.0.0.1:5178/` s'appuie sur cette réponse mockée.

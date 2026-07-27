@@ -27,6 +27,15 @@ describe('mock — le temps qui passe', () => {
     expect(jeune).not.toBe(plusVieux);
   });
 
+  it('expose plusieurs tranches d’âge dès le premier rendu', () => {
+    const statuses = getContainers(clockAfter(0)).map(container => container.Status);
+
+    expect(statuses.some(status => status.includes('seconds'))).toBe(true);
+    expect(statuses.some(status => status.includes('minutes') || status.includes('About a minute'))).toBe(true);
+    expect(statuses.some(status => status.includes('hours') || status.includes('About an hour'))).toBe(true);
+    expect(statuses.some(status => status.includes('days') || status.includes('weeks'))).toBe(true);
+  });
+
   it('suit les paliers de l’API Docker', () => {
     const statusApres = ms => getContainers(clockAfter(ms))[0].Status;
 
