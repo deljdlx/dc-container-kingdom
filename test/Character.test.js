@@ -10,41 +10,48 @@ beforeEach(() => {
 });
 
 describe('CharacterAnimator', () => {
-  it('advances a frame only every tickInterval ticks and cycles through 3 frames', () => {
-    const anim = new CharacterAnimator(3);
+  it('advances a frame every walked distance bucket and cycles through 3 frames', () => {
+    const anim = new CharacterAnimator(3, 4);
     expect(anim.getIndex()).toBe(0);
 
-    // interval 4 → frame changes on the 4th tick
-    anim.advance(4);
-    anim.advance(4);
-    anim.advance(4);
+    anim.advance(3.9);
     expect(anim.getIndex()).toBe(0);
-    anim.advance(4);
+
+    anim.advance(0.2);
     expect(anim.getIndex()).toBe(1);
 
-    for (let i = 0; i < 4; i++) anim.advance(4);
-    expect(anim.getIndex()).toBe(2);
-    for (let i = 0; i < 4; i++) anim.advance(4);
-    expect(anim.getIndex()).toBe(0); // wraps 3 → 0
+    anim.advance(8);
+    expect(anim.getIndex()).toBe(0); // wraps 2 -> 0 after two additional frames
   });
 
-  it('advances every tick when interval is 1', () => {
-    const anim = new CharacterAnimator(3);
-    anim.advance(1);
-    expect(anim.getIndex()).toBe(1);
-    anim.advance(1);
-    expect(anim.getIndex()).toBe(2);
+  it('ignores non-positive or invalid walked distance', () => {
+    const anim = new CharacterAnimator(3, 4);
+    anim.advance(0);
+    anim.advance(-10);
+    anim.advance(Number.NaN);
+    expect(anim.getIndex()).toBe(0);
   });
 
-  it('guards against a zero interval (never divides by zero)', () => {
-    const anim = new CharacterAnimator(3);
-    expect(() => anim.advance(0)).not.toThrow();
-    expect(Number.isNaN(anim.getIndex())).toBe(false);
+  it('keeps the same cadence for equal simulated time at 60/120/240 Hz', () => {
+    const speed = 80; // px/s
+    const frameRates = [60, 120, 240];
+
+    const indices = frameRates.map((fps) => {
+      const anim = new CharacterAnimator(3, 4);
+      const dt = 1 / fps;
+      for (let i = 0; i < fps; i++) {
+        anim.advance(speed * dt);
+      }
+      return anim.getIndex();
+    });
+
+    expect(indices[1]).toBe(indices[0]);
+    expect(indices[2]).toBe(indices[0]);
   });
 
   it('reset returns to the first frame', () => {
-    const anim = new CharacterAnimator(3);
-    anim.advance(1);
+    const anim = new CharacterAnimator(3, 4);
+    anim.advance(4);
     anim.reset();
     expect(anim.getIndex()).toBe(0);
   });
@@ -60,11 +67,10 @@ describe('Character — direction & animation', () => {
     expect(char.getDirection()).toBeNull();
   });
 
-  it('exposes the animator frame via getAnimationIndex and advances it on update', () => {
+  it('exposes the animator frame via getAnimationIndex and advances it from walked distance', () => {
     const char = new Character(0, 0);
-    char.moveSpeed(80); // → tickInterval = round(80/80) = 1 → advances every update
     expect(char.getAnimationIndex()).toBe(0);
-    char.update();
+    char.update(4);
     expect(char.getAnimationIndex()).toBe(1);
   });
 

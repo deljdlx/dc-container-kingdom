@@ -102,7 +102,7 @@ export class CharacterBehavior {
       character.setDirection(this._randomDirection());
     }
 
-    character.update();
+    character.update(blocked ? 0 : Math.max(Math.abs(dx), Math.abs(dy)));
   }
 
   /**

@@ -3,33 +3,41 @@
  * sprite sheet's walk cycle. Extracted from {@link Character} so the node keeps
  * only world/geometry concerns; the character exposes thin delegating methods.
  *
- * The frame only advances every `tickInterval` ticks, so faster characters
- * (larger move speed → smaller interval) animate faster.
+ * The cadence is driven by traveled distance, not by how often update() is
+ * called: the same walked distance yields the same animation state at 60/120/240 Hz.
  */
 export class CharacterAnimator {
   /** @type {number} current frame in the walk cycle */
   _index = 0;
 
-  /** @type {number} ticks elapsed since the last frame change */
-  _tick = 0;
+  /** @type {number} walked distance accumulated toward the next frame */
+  _distance = 0;
 
   /** @type {number} number of frames in the walk cycle */
   _frameCount;
 
-  /** @param {number} [frameCount] number of frames in the walk cycle */
-  constructor(frameCount = 3) {
+  /** @type {number} walked pixels required to advance one animation frame */
+  _distancePerFrame;
+
+  /**
+   * @param {number} [frameCount] number of frames in the walk cycle
+   * @param {number} [distancePerFrame] walked pixels between frame changes
+   */
+  constructor(frameCount = 3, distancePerFrame = 4) {
     this._frameCount = frameCount;
+    this._distancePerFrame = Math.max(0.0001, distancePerFrame);
   }
 
   /**
-   * Advance the clock by one tick, cycling to the next frame every
-   * `tickInterval` ticks.
-   * @param {number} tickInterval ticks between frame changes (min 1)
+   * Advance the clock by the distance walked this frame.
+   * @param {number} walkedDistance walked pixels since the previous update
    */
-  advance(tickInterval) {
-    const interval = Math.max(1, tickInterval);
-    this._tick = (this._tick + 1) % interval;
-    if (this._tick === 0) {
+  advance(walkedDistance = 0) {
+    const delta = Number.isFinite(walkedDistance) ? Math.max(0, walkedDistance) : 0;
+    const EPSILON = 1e-9;
+    this._distance += delta;
+    while (this._distance + EPSILON >= this._distancePerFrame) {
+      this._distance = Math.max(0, this._distance - this._distancePerFrame);
       this._index = (this._index + 1) % this._frameCount;
     }
   }
@@ -41,7 +49,7 @@ export class CharacterAnimator {
 
   /** Reset the clock back to the first frame. */
   reset() {
-    this._tick = 0;
+    this._distance = 0;
     this._index = 0;
   }
 }

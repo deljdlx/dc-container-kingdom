@@ -130,8 +130,8 @@ export class FleeBehavior {
       character.setDirection(stepY >= 0 ? 'down' : 'up');
     }
 
-    character.moveBlocked(stepX, stepY, () => this._isBlocked());
-    character.update();
+    const blocked = character.moveBlocked(stepX, stepY, () => this._isBlocked());
+    character.update(blocked ? 0 : Math.max(Math.abs(stepX), Math.abs(stepY)));
   }
 
   /**
