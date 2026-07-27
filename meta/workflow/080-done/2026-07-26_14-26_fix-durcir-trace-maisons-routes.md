@@ -7,7 +7,7 @@ created: 2026-07-26 14:26
 ready: 2026-07-27 10:57
 doing: 2026-07-27 10:58
 verify: 2026-07-27 11:03
-done:
+done: 2026-07-27 11:08
 ---
 
 ## Objectif
@@ -102,4 +102,5 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 11:07] Review : DoD cochée, frontière moteur respectée (l'app consomme, le moteur ignore Docker), aucun `git add -A`, Conventional Commits en français.
+- [2026-07-27 11:08] Merge `--no-ff` de `claude/fix-durcir-trace-maisons-routes` sur `main` : **487f3d9**. Branche supprimée, worktree conservé.
