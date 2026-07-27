@@ -7,7 +7,7 @@ created: 2026-07-24 21:53
 ready: 2026-07-27 10:41
 doing: 2026-07-27 10:42
 verify: 2026-07-27 10:45
-done:
+done: 2026-07-27 10:47
 ---
 
 ## Objectif
@@ -81,4 +81,5 @@ La section « Conventions » de `meta/documentation/development.md` **duplique**
 
 ### Validation
 
--
+- [2026-07-27 10:47] Review : DoD cochée, non-perte prouvée par `grep` et tracée, aucun `git add -A`, Conventional Commits en français.
+- [2026-07-27 10:47] Merge `--no-ff` de `claude/doc-dev-conventions-link` sur `main` : **06ea01c**. Branche supprimée, worktree conservé.
