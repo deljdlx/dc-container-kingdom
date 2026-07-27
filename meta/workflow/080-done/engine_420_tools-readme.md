@@ -7,7 +7,7 @@ created: 2026-07-25 16:49
 ready: 2026-07-27 21:33
 doing: 2026-07-27 21:33
 verify: 2026-07-27 21:34
-done:
+done: 2026-07-27 21:35
 ---
 
 ## Objectif
@@ -27,8 +27,12 @@ court descriptif pour situer ces outils moteur d'un coup d'œil.
 
 ## Definition of Done
 
-- [ ] `src/engine/tools/README.md` ajouté, décrivant le dossier et `GameConsole.js`.
-- [ ] `npm run verify` vert.
+- [x] `src/engine/tools/README.md` ajouté, décrivant le dossier et `GameConsole.js`.
+- [x] `npm run verify` vert.
+
+## Suite
+
+aucune
 
 ## Journal
 
@@ -45,4 +49,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
-- En attente de merge dans `main`.
+- Merge local sur `main` effectué : `77aa72fd3fe2fac383fee1cb6b009ac06d1f80eb`. Ticket déplacé en `080-done`.
