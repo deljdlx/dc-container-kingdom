@@ -48,8 +48,10 @@ une **note**, pas un ticket — pas de frontmatter, c'est ce qui les distingue :
 - **Coût du non-fait** : ce qui casse ou coûte si on ne le fait jamais.
 ```
 
-Nommer le fichier comme un ticket (`YYYY-MM-DD_HH-MM_titre.md`) : la promotion
-sera un simple `git mv`. Le tri viendra plus tard —
+Nommer le fichier **`YYYY-MM-DD_HH-MM_titre.md`** — un candidat garde la forme
+datée, justement parce qu'il n'est **pas** un ticket : ni projet ni priorité ne
+sont encore décidés, et c'est le tri qui tranchera. La promotion devient donc un
+`git mv` **qui renomme** au format `projet_priorité_titre.md` — voir
 [follow-up-triage](follow-up-triage.md).
 
 ## 3. Les trois interdits

@@ -1,8 +1,8 @@
 ---
-id: YYYY-MM-DD_HH-MM
+id: YYYY-MM-DD_HH-MM   # ancre IMMUABLE : on référence un ticket par là, jamais
+                       # par son nom de fichier ni son chemin de colonne
 title: Titre court de la tâche
 type: feat            # feat | fix | refactor | docs | test | chore
-group:                # optionnel — slug d'initiative (ex. git-kingdom)
 branch:               # rempli à l'étape « work » (passage en 040-doing)
 created: YYYY-MM-DD HH:MM
 ready:                # daté au passage en 020-ready

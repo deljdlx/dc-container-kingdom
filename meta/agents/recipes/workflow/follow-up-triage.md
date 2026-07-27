@@ -39,8 +39,10 @@ L'ordre compte : inutile de rendre actionnable ce qu'on va jeter.
 
 Les trois issues, toutes explicites :
 
-- **Promu** — passer la note au [`TEMPLATE`](../../../workflow/TEMPLATE.md),
-  `git mv` vers `000-backlog/`, puis [evaluate-a-ticket](../evaluate-a-ticket.md).
+- **Promu** — passer la note au [`TEMPLATE`](../../../workflow/TEMPLATE.md), puis
+  `git mv` vers `000-backlog/` **en renommant** `projet_priorité_titre.md` : c'est
+  ici, et pas avant, qu'on décide à quel projet le candidat appartient et où il se
+  range. Enchaîner sur [evaluate-a-ticket](../evaluate-a-ticket.md).
 - **Fusionné** — enrichir le ticket existant, supprimer la note.
 - **Rejeté** — supprimer la note, motif en une ligne dans le message de commit.
 

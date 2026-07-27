@@ -7,13 +7,13 @@ n'importe quel agent ou humain reprend le contexte juste en lisant ce dossier.
 
 ## Colonnes
 
-Une tâche est un fichier `YYYY-MM-DD_HH-MM_titre.md` (ou un dossier si elle a des
+Une tâche est un fichier `projet_priorité_titre.md` (ou un dossier si elle a des
 artefacts) qu'on **déplace de colonne en colonne** avec `git mv` — ce qui trace
-son avancement dans l'historique.
+son avancement dans l'historique. Voir « Nommer un ticket » plus bas.
 
 | Colonne | Rôle |
 |---|---|
-| **`000-backlog/`** | Backlog **priorisé** (le haut = le plus prioritaire). |
+| **`000-backlog/`** | Backlog **priorisé** — groupé par projet, `000` en tête (voir « Nommer un ticket »). |
 | **`020-ready/`** | **Spécifiée** et prête à démarrer (specs écrites si besoin, `ready:` daté). |
 | **`040-doing/`** | En cours — idéalement **une** tâche à la fois. |
 | **`060-verify/`** | Implémentation faite, **en validation** : `npm run verify`, navigateur, review, durcissement. |
@@ -48,32 +48,54 @@ Chaque transition **date** son passage (frontmatter) et **documente ses itérati
    candidats sont triés au **démarrage de la tâche suivante** —
    [follow-up-triage](agents/recipes/workflow/follow-up-triage.md).
 
-## Grouper des tâches (initiatives)
+## Nommer un ticket : `projet_priorité_titre`
 
-Plusieurs tickets qui servent une même initiative se relient par le champ
-**`group:`** du frontmatter — un slug libre (`git-kingdom`, …) — et par un
-**ticket chapeau** qui porte l'intention et liste ses enfants **par `id`**.
+Le nom de fichier **est** la clé de lecture du board. Il porte trois choses, dans
+cet ordre :
 
-```bash
-grep -l "^group: git-kingdom" meta/workflow/*/*.md   # tout le groupe, colonnes comprises
+```
+container-kingdom_000_securite-exposition-api-docker.md
+engine_010_mouvement-sous-pixel.md
+engine_040_catalogue-navigable.md
+board_500_nommage-des-tickets.md
+└──── projet ────┘ └─ prio ─┘ └──── titre ────┘
 ```
 
-**Pas de sous-dossier par groupe**, à dessein :
+- **`projet`** — le sous-projet auquel le ticket appartient : `engine`,
+  `container-kingdom`, `board`… **Obligatoire.** Ce n'est pas une étiquette
+  décorative : c'est l'axe selon lequel ce dépôt pourra un jour se découper.
+- **`priorité`** — trois chiffres, **`000` = le plus prioritaire**, `999` le
+  moins. **Numéroter clairsemé** (`010`, `020`, `050`…) pour insérer sans tout
+  renommer — même raison que les préfixes espacés des colonnes.
+- **`titre`** — court, en kebab-case. **Pas de type** (`fix-`, `feat-`…) : il
+  vit dans le frontmatter, le répéter ici ne fait que rallonger.
 
-- le backlog tire sa valeur d'être **priorisé** — N piles, c'est N sommets et plus
-  de réponse à « je prends quoi ensuite ? » ;
-- ici un **dossier signifie déjà « tâche avec artefacts »** (voir ci-dessus) ;
-- un ticket voyage de colonne en colonne par `git mv` : une arborescence de
-  groupes devrait être répliquée dans chaque colonne, ou s'aplatir en route.
+Ainsi `ls 000-backlog/` regroupe par projet **et** ordonne par priorité à
+l'intérieur de chacun — « le haut = le plus prioritaire » devient enfin vrai.
 
-Le groupe est donc une **étiquette**, pas un rangement : il traverse les colonnes
-sans les perturber, et un ticket peut très bien n'appartenir à aucun.
+```bash
+ls meta/workflow/000-backlog/engine_*        # un projet, dans l'ordre
+ls meta/workflow/*/container-kingdom_*       # un projet, toutes colonnes
+```
+
+**Pas de sous-dossier par projet**, à dessein : ici un **dossier signifie déjà
+« tâche avec artefacts »**, et un ticket voyage de colonne en colonne par
+`git mv` — une arborescence devrait être répliquée dans chaque colonne.
+
+> **Le nom bouge, l'`id` non.** Repriorité, changement de projet ou de titre =
+> un `git mv` (bookkeeping, à committer). Le champ **`id:`** du frontmatter, lui,
+> est **immuable** : c'est par lui qu'on référence un ticket, jamais par son nom
+> ni par son chemin de colonne, qui changent tous les deux.
+
+> **`080-done` n'est pas renommé** : une archive se lit par date, et une priorité
+> y est un fossile. Les tickets clos avant cette convention gardent leur nom.
 
 ## Créer une tâche
 
 Copier [`TEMPLATE.md`](workflow/TEMPLATE.md) dans `000-backlog/` sous le nom
-`YYYY-MM-DD_HH-MM_titre.md` (heure de création ; `titre` court en kebab-case).
-Voir [ticket-create](agents/recipes/workflow/ticket-create.md).
+`projet_priorité_titre.md` (voir ci-dessus). Un ticket naît à la priorité
+**`500`** — « non priorisé » : hiérarchiser est un acte délibéré, pas un réflexe
+de création. Voir [ticket-create](agents/recipes/workflow/ticket-create.md).
 
 ## Comment ça s'articule
 
