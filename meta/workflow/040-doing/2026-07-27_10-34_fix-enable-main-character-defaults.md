@@ -2,10 +2,10 @@
 id: 2026-07-27_10-34
 title: `enableMainCharacter()` sans arguments ne centre pas le joueur
 type: fix
-branch:
+branch: copilot/fix-enable-main-character-defaults
 created: 2026-07-27 10:34
 ready: 2026-07-27 17:25
-doing:
+doing: 2026-07-27 17:25
 verify:
 done:
 ---
