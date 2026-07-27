@@ -50,7 +50,19 @@ realpath readlink stat file du df tree sort uniq cut tr nl column comm diff jq g
 egrep fgrep rg find sed awk true test [ [[ which type command_ "
 
 readonly SAFE_GIT_SUBCOMMANDS=" status log show diff blame ls-files ls-tree rev-parse \
-describe shortlog for-each-ref merge-base cat-file count-objects symbolic-ref "
+describe shortlog for-each-ref merge-base cat-file count-objects symbolic-ref \
+check-ignore check-attr rev-list show-ref diff-tree "
+
+# Docker: this project reads the daemon constantly. Inspection only — anything
+# that can start, stop, remove or run is deliberately absent.
+readonly SAFE_DOCKER_SUBCOMMANDS=" ps images version info inspect logs stats top port \
+history events diff "
+
+# Management commands take a verb of their own (`docker image inspect`), and the
+# same group also carries destructive ones (`docker image rm`) — so the verb, not
+# the group, decides.
+readonly SAFE_DOCKER_GROUPS=" image container volume network system node service config secret "
+readonly SAFE_DOCKER_VERBS=" ls inspect history df logs stats top port diff version info "
 
 is_safe_segment() {
   local segment=$1 head
@@ -65,6 +77,25 @@ is_safe_segment() {
     esac
   done
 
+  # `timeout` runs an arbitrary command: unwrap it and judge what it wraps, never
+  # the wrapper itself. Same for `command`/`nice`, which are also pass-throughs.
+  while true; do
+    case $segment in
+      timeout\ *)
+        segment=${segment#timeout }
+        segment=${segment#"${segment%%[![:space:]]*}"}
+        while [ "${segment:0:1}" = '-' ]; do          # timeout options
+          segment=${segment#* }
+          segment=${segment#"${segment%%[![:space:]]*}"}
+        done
+        segment=${segment#* } ;;                      # the duration argument
+      command\ *|nice\ *)
+        segment=${segment#* } ;;
+      *) break ;;
+    esac
+    segment=${segment#"${segment%%[![:space:]]*}"}
+  done
+
   # Loop/case headers list literal words only — no command runs there.
   case $segment in
     for\ *|select\ *|case\ *) return 0 ;;
@@ -75,11 +106,23 @@ is_safe_segment() {
     ''|do|done|then|else|fi|esac|in|\{|\}|\(|\)) return 0 ;;
   esac
 
-  if [ "$head" = git ]; then
-    local subcommand=${segment#git}
+  if [ "$head" = git ] || [ "$head" = docker ]; then
+    local subcommand=${segment#"$head"}
     subcommand=${subcommand#"${subcommand%%[![:space:]]*}"}
     subcommand=${subcommand%%[[:space:]]*}
-    case $SAFE_GIT_SUBCOMMANDS in *" $subcommand "*) return 0 ;; esac
+    if [ "$head" = git ]; then
+      case $SAFE_GIT_SUBCOMMANDS in *" $subcommand "*) return 0 ;; esac
+      return 1
+    fi
+
+    case $SAFE_DOCKER_SUBCOMMANDS in *" $subcommand "*) return 0 ;; esac
+    case $SAFE_DOCKER_GROUPS in
+      *" $subcommand "*)
+        local verb=${segment#*"$subcommand"}
+        verb=${verb#"${verb%%[![:space:]]*}"}
+        verb=${verb%%[[:space:]]*}
+        case $SAFE_DOCKER_VERBS in *" $verb "*) return 0 ;; esac ;;
+    esac
     return 1
   fi
 
