@@ -4,6 +4,10 @@
 
 - Code, identifiants (variables/fonctions/classes), commentaires, **JSDoc** →
   **anglais**.
+- **Arborescence** — noms de **dossiers** et de fichiers de structure →
+  **anglais**, comme les colonnes du board (`000-backlog`, `100-follow-up`,
+  `200-ideas`). Une exception qui traîne se voit tout de suite au milieu de ses
+  sœurs.
 - Commits, PR, échanges → **français**.
 
 ## Style & design

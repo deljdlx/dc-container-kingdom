@@ -46,7 +46,7 @@ Les quatre issues, toutes explicites :
 - **Fusionné** — enrichir le ticket existant, supprimer la note.
 - **Rejeté** — supprimer la note, motif en une ligne dans le message de commit.
 - **Déporté** — l'idée est **vraie mais pas mûre**, et rien n'oblige à trancher :
-  `git mv` vers `200-idees/`. C'est la sortie honnête de ce qui ne mérite ni le
+  `git mv` vers `200-ideas/`. C'est la sortie honnête de ce qui ne mérite ni le
   backlog ni la corbeille. Sans elle, la règle de péremption ci-dessous finit par
   jeter des idées qu'on voulait garder — et on apprend à ne plus trier.
 
@@ -63,7 +63,7 @@ fois *est* la réponse — pas besoin de compteur, ni du courage de jeter.
 
 Le sursis ne vaut que pour ce qu'on **hésite à promouvoir maintenant**. Ce qu'on
 veut garder *sans* trancher n'a rien à faire ici : c'est une idée, elle part en
-`200-idees/`, où aucune horloge ne tourne.
+`200-ideas/`, où aucune horloge ne tourne.
 
 ## Bookkeeping
 

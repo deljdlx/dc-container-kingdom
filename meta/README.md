@@ -19,7 +19,7 @@ son avancement dans l'historique. Voir « Nommer un ticket » plus bas.
 | **`060-verify/`** | Implémentation faite, **en validation** : `npm run verify`, navigateur, review, durcissement. |
 | **`080-done/`** | Terminé — archive du résultat (commit / merge noté). |
 | **`100-follow-up/`** | **Hors pipeline** — boîte de **candidats** (pas de tickets) émis à la clôture, triés vers `000-backlog/`. |
-| **`200-idees/`** | **Hors pipeline, hors horloge** — boîte à idées : ce qu'on aimerait faire un jour, sans échéance ni obligation de trancher. |
+| **`200-ideas/`** | **Hors pipeline, hors horloge** — boîte à idées : ce qu'on aimerait faire un jour, sans échéance ni obligation de trancher. |
 
 Les préfixes numériques **espacés** (pas de 20) ordonnent les colonnes **et**
 laissent de la place pour en insérer (`010-…`, `030-…`, `050-…`, `070-…`).
@@ -33,12 +33,12 @@ jeter. Elle existe pour protéger la propriété la plus fragile du backlog : ê
 la remplit) et [follow-up-triage](agents/recipes/workflow/follow-up-triage.md) (qui la
 vide).
 
-### `200-idees/` — la boîte à idées
+### `200-ideas/` — la boîte à idées
 
 Les deux boîtes ne se ressemblent que de loin. Ce qui les sépare, c'est
 l'**horloge** :
 
-| | `100-follow-up/` | `200-idees/` |
+| | `100-follow-up/` | `200-ideas/` |
 |---|---|---|
 | D'où ça vient | la clôture d'un ticket | n'importe quand, de nulle part |
 | Ce que ça demande | **une décision, bientôt** | rien |
