@@ -7,7 +7,7 @@ created: 2026-07-27 19:04
 ready: 2026-07-27 19:11
 doing: 2026-07-27 19:12
 verify: 2026-07-27 19:16
-done:
+done: 2026-07-27 19:18 (merge 313b3b4)
 ---
 
 ## Objectif
@@ -139,4 +139,9 @@ l'expose. Hors périmètre tant que ce n'est pas vérifié.
 
 ### Validation
 
--
+- [2026-07-27 19:18] Review : les trois divergences sont closes, la réserve sur
+  les branches héritées est écrite plutôt que dissimulée sous une case cochée.
+  Mergé sur `main` en `--no-ff` : **313b3b4**.
+- [2026-07-27 19:18] Le trou trouvé en chemin (le glob `0*/` du périmètre d'audit)
+  valait à lui seul le ticket : la recipe censée surveiller le board ne regardait
+  aucune des deux boîtes hors pipeline.
