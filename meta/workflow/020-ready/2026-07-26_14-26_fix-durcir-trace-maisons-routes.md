@@ -4,7 +4,7 @@ title: Durcir le tracé des maisons, enclos et routes (bugs silencieux)
 type: fix
 branch:
 created: 2026-07-26 14:26
-ready:
+ready: 2026-07-27 10:57
 doing:
 verify:
 done:
@@ -36,16 +36,24 @@ lecteur.
 
 ## Spécifications
 
-### Technique
+### Technique — tranché en *specify*
 
-- Indexer `roadsMatrix` avec des clés numériques explicites (ou une `Map` de
-  coordonnées) et faire l'arithmétique sur des nombres. Ajouter un test qui prouve
-  la règle d'espacement des arbres.
-- `drawHouse()` : retourner la maison existante (ou `null` filtré par l'appelant) ;
-  `drawFences()` doit ignorer les entrées absentes et sortir proprement si moins de
-  deux maisons.
-- Nettoyer les arguments morts et fixer `manualZ` (booléen).
-- Consommer `application.getNetworks()` au lieu de reconstruire l'index.
+- **Extraire la matrice de routes** dans une petite structure dédiée plutôt que
+  d'empiler des objets indexés par nombre-devenu-chaîne : c'est la conversion
+  implicite en clé d'objet qui a produit le bug (`Object.keys` rend des chaînes,
+  `"350" + 50` concatène). Une `Map` clé `x,y` ou un helper `at(x, y)` rend
+  l'arithmétique impossible à re-casser, et se teste **sans DOM**.
+- `drawHouse()` : retourner la maison **existante** quand le conteneur est déjà
+  tracé ; `drawFences()` ignore les entrées absentes et sort si moins de deux
+  maisons.
+- Nettoyer les arguments morts (`drawContainers(containers)`, le 5ᵉ argument
+  d'`Element`) et écrire `manualZ` en booléen.
+- Consommer `application.getNetworks()` au lieu de reconstruire l'index — le
+  repository en est déjà l'autorité.
+- **Testabilité** : le renderer touche le DOM et le moteur, donc les tests visent
+  la **logique extraite** (matrice de routes, règle d'adjacence) plutôt que de
+  monter une application complète. Ce que le test ne couvre pas — la géométrie
+  réelle des routes — passe par la validation navigateur, comparaison avant/après.
 
 ### Risques / vigilance
 
