@@ -2,10 +2,10 @@
 id: 2026-07-27_17-37
 title: Routes en double — le tracé des réseaux empile des segments au même endroit
 type: fix
-branch:
+branch: copilot/fix-duplicate-roads
 created: 2026-07-27 17:37
 ready: 2026-07-27 18:45
-doing:
+doing: 2026-07-27 18:45
 verify: 
 done:
 ---
