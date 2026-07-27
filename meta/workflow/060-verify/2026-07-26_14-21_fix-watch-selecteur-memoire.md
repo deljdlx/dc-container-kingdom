@@ -6,7 +6,7 @@ branch: claude/fix-watch-selecteur-memoire
 created: 2026-07-26 14:21
 ready: 2026-07-27 10:52
 doing: 2026-07-27 10:53
-verify:
+verify: 2026-07-27 10:59
 done:
 ---
 
@@ -61,14 +61,14 @@ c'est 30 timers et 30 requêtes DOM par seconde pour, aujourd'hui, ne rien mettr
 
 ## Definition of Done
 
-- [ ] La valeur mémoire de la maison se met à jour quand les stats changent
+- [x] La valeur mémoire de la maison se met à jour quand les stats changent
       (vérifié au navigateur avec le mock).
-- [ ] Plus de `document.querySelector` global dans la boucle de watch.
-- [ ] Plus **aucun timer par conteneur** : le rafraîchissement est poussé après
+- [x] Plus de `document.querySelector` global dans la boucle de watch.
+- [x] Plus **aucun timer par conteneur** : le rafraîchissement est poussé après
       chaque chargement de stats.
-- [ ] Un conteneur retiré n'est plus rafraîchi — prouvé par un test, sans espionner
+- [x] Un conteneur retiré n'est plus rafraîchi — prouvé par un test, sans espionner
       une méthode qui n'existe plus.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Journal
 
@@ -87,7 +87,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Vérification
 
--
+- [2026-07-27 10:58] Contre-épreuve : correctif remisé (`git stash`) → les 4 tests échouent ; restauré → 4/4.
+- [2026-07-27 10:59] Navigateur, premier relevé **non concluant** : deux lectures à 12 s d'intervalle donnent les mêmes chiffres — parce que le mock renvoie une mémoire **constante par conteneur** (`20 + seed % 780`). Ce relevé ne distingue donc pas « ça rafraîchit » de « ça ne fait rien ». Angle mort déjà ticketé (`2026-07-26_18-35`).
+- [2026-07-27 10:59] Preuve décisive à la place : écrasement de la valeur affichée par une **sentinelle**, puis attente de deux cycles de stats → la sentinelle est **réécrite** avec la vraie valeur (`366.00 MB`), et `data-cpu-usage` repasse de `SENTINELLE` à `xxm`. Avant correctif le nœud n'était jamais touché : la sentinelle aurait survécu.
+- [2026-07-27 10:59] 0 erreur console, 35 maisons rendues, serveur de dev arrêté.
+- [2026-07-27 10:59] `npm run verify` vert : lint + build + **214 tests** (31 fichiers).
 
 ### Validation
 
