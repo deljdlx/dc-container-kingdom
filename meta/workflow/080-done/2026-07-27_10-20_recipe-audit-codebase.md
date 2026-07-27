@@ -7,7 +7,7 @@ created: 2026-07-27 10:20
 ready: 2026-07-27 10:25
 doing: 2026-07-27 10:26
 verify: 2026-07-27 10:30
-done:
+done: 2026-07-27 10:33
 ---
 
 ## Objectif
@@ -165,4 +165,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 10:32] Review : DoD cochée, recipe agnostique (vérifié par `grep`), index à jour, aucun `git add -A`, Conventional Commits en français.
+- [2026-07-27 10:32] Défaut du `TEMPLATE` corrigé en amont du cycle (lien relatif qui ne résolvait plus depuis une colonne, commit `bf6c014`) : sans quoi ce ticket serait né avec un lien mort.
+- [2026-07-27 10:33] Merge `--no-ff` de `claude/recipe-audit-codebase` sur `main` : **860cade**. Candidat déposé sur `main` avant merge, branche supprimée, worktree conservé.
