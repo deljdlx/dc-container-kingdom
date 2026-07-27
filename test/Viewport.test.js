@@ -125,6 +125,18 @@ describe('Viewport - movement is frame-rate independent', () => {
 });
 
 describe('Viewport - movement orchestration', () => {
+  it('centres the main character when called without coordinates', () => {
+    const { viewport } = createViewport(500, 300);
+
+    viewport.enableMainCharacter();
+    viewport.getCamera().update();
+
+    expect(viewport.getCharacter().x()).toBe(250);
+    expect(viewport.getCharacter().y()).toBe(150);
+    expect(viewport.getCamera().x()).toBe(24);
+    expect(viewport.getCamera().y()).toBe(24);
+  });
+
   it.each([
     ['up', 0, -7],
     ['down', 0, 7],

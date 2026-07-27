@@ -6,7 +6,7 @@ branch: copilot/fix-enable-main-character-defaults
 created: 2026-07-27 10:34
 ready: 2026-07-27 17:25
 doing: 2026-07-27 17:25
-verify:
+verify: 2026-07-27 17:26
 done:
 ---
 
@@ -64,11 +64,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:25] correction de `Viewport.enableMainCharacter()` : le fallback centre est désormais appliqué pour `undefined` et `null` (`== null`), cohérent avec la JSDoc. Ajout d'un test de régression dans `test/Viewport.test.js` : appel sans arguments => personnage centré (`250,150` sur viewport `500x300`) et caméra recalculée sur ce point.
 
 ### Vérification
 
--
+- [2026-07-27 17:26] vérification ciblée `npm test -- Viewport.test.js` (16 tests verts, nouveau cas sans arguments OK), puis `npm run verify` vert (lint + build + 39 fichiers / 271 tests). Le défaut reproduit (`x/y=null`) n'apparaît plus : le personnage est centré et la caméra suit ce point.
 
 ### Validation
 
