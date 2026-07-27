@@ -56,9 +56,9 @@ possiblement `Created`), sans casser les tests existants qui lisent les fixtures
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, voir la recipe
-[ticket-follow-up](../agents/recipes/workflow/ticket-follow-up.md)) : ce que le ticket
-**ouvre**, ce qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
+_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
+`meta/agents/recipes/workflow/ticket-follow-up.md`) : ce que le ticket **ouvre**, ce
+qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 `100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
 différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
 
