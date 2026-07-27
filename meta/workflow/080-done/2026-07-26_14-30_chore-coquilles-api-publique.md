@@ -7,7 +7,7 @@ created: 2026-07-26 14:30
 ready: 2026-07-27 17:07
 doing: 2026-07-27 17:09
 verify: 2026-07-27 17:11
-done:
+done: 2026-07-27 17:13 (merge a2d99f1)
 ---
 
 ## Objectif
@@ -76,6 +76,22 @@ un second nom à maintenir et à retirer plus tard. **Renommage sec.**
       **sans être modifiée** ailleurs que sur les noms.
 - [x] `npm run verify` vert.
 
+## Suite
+
+- **Ce que ça ouvre** — rien n'empêche une coquille de revenir : le contrôle a été
+  un `grep` manuel, à un instant donné. Si le sujet se répète, la parade serait
+  côté lint (règle de nommage) plutôt qu'humaine.
+- **Ce qu'on laisse de côté** — `drawVerticalRoads` et son jumeau
+  `drawHorizontalRoads` n'ont **ni l'un ni l'autre** de JSDoc, alors que ce sont
+  des méthodes à 5 paramètres positionnels. Le manque est symétrique et
+  préexistant : hors périmètre d'un ticket de renommage, mais il se voit d'autant
+  plus maintenant que les noms sont propres.
+- **Limite de la vérification** — aucune validation au navigateur : le diff est un
+  renommage strictement apparié (11+/11-) couvert par la suite, dont deux tests
+  qui tombent si le renommage est incohérent. Le tracé des routes n'a pas été
+  regardé à l'écran.
+- **Déposé en `100-follow-up/`** — rien.
+
 ## Journal
 
 Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%m-%d
@@ -118,4 +134,9 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:13] Review : DoD cochée, frontière moteur intacte (aucun import
+  ajouté, baril non touché), diff relu ligne à ligne — que du renommage. Mergé sur
+  `main` en `--no-ff` : **a2d99f1**. `npm run verify` repassé vert sur `main`
+  après merge (266 tests).
+- [2026-07-27 17:13] Rubrique `## Suite` ajoutée à la clôture : le ticket avait été
+  créé avant la recipe `ticket-follow-up` et n'en comportait pas.
