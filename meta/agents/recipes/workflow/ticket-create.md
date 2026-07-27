@@ -9,8 +9,9 @@
      qui crée un ticket le pose à `500` (« non priorisé »). Descendre vers `000`
      est une décision, prise par l'humain ou en *specify*, pas un réflexe de
      création.
-   - **`titre`** court, kebab-case, **sans préfixe de type** — il est dans le
-     frontmatter.
+   - **`titre`** court, kebab-case, **en anglais** (comme tout nom de fichier —
+     seul le *contenu* du ticket est français), **sans préfixe de type** : il est
+     déjà dans le frontmatter.
 2. Renseigner le frontmatter — `id`, `title`, `type` (`feat` | `fix` | `refactor` |
    `docs` | `test` | `chore`), `created` — et l'**Objectif** (le *quoi* et le
    *pourquoi*). L'**`id` est immuable** : le nom du fichier bougera (repriorité,

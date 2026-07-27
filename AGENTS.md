@@ -25,8 +25,9 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 - **Tâches** : prises dans le board `meta/workflow/000-backlog/` ; suivre le cycle
   (`meta/agents/recipes/workflow/work-a-task.md` : branche → `verify` → merge → done → **suite**).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
-- **Langue** : code, JSDoc et **noms de dossiers/fichiers** en **anglais** ;
-  commits, titres de tickets et échanges en **français**.
+- **Langue** : code, JSDoc et **tout nom de fichier/dossier** — titres de tickets
+  compris — en **anglais** ; commits, contenu des tickets et échanges en
+  **français**.
 - **Jamais de travail direct sur `main`** ni de bascule de la branche du **tree
   principal** : chaque agent travaille dans **son propre worktree**, sur une branche
   `<agent>/<slug>` (voir `meta/agents/recipes/parallel-worktrees.md`). Conventional

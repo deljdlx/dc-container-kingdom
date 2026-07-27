@@ -47,7 +47,8 @@ l'**horloge** :
 
 Une idée n'est **pas** un ticket : pas de frontmatter, pas de DoD, pas de
 priorité — elle n'est pas actionnable, et c'est normal. Nommer le fichier
-`sujet_titre.md` (`git-kingdom_second-consommateur-du-moteur.md`).
+`sujet_titre.md`, en anglais comme le reste de l'arborescence
+(`git-kingdom_second-engine-consumer.md`).
 
 **Aucun tri récurrent ne la vide** — c'est délibéré. Une boîte à idées soumise à
 une échéance devient une boîte à candidats, et on a déjà celle-là. On y pioche
@@ -79,11 +80,11 @@ Le nom de fichier **est** la clé de lecture du board. Il porte trois choses, da
 cet ordre :
 
 ```
-container-kingdom_000_securite-exposition-api-docker.md
-engine_010_mouvement-sous-pixel.md
-engine_040_catalogue-navigable.md
-board_500_nommage-des-tickets.md
-└──── projet ────┘ └─ prio ─┘ └──── titre ────┘
+container-kingdom_000_docker-api-exposure.md
+engine_010_sub-pixel-movement.md
+engine_040_navigable-catalog.md
+board_500_ticket-naming.md
+└──── projet ────┘ └─ prio ─┘ └── titre ──┘
 ```
 
 - **`projet`** — le sous-projet auquel le ticket appartient : `engine`,
@@ -92,8 +93,10 @@ board_500_nommage-des-tickets.md
 - **`priorité`** — trois chiffres, **`000` = le plus prioritaire**, `999` le
   moins. **Numéroter clairsemé** (`010`, `020`, `050`…) pour insérer sans tout
   renommer — même raison que les préfixes espacés des colonnes.
-- **`titre`** — court, en kebab-case. **Pas de type** (`fix-`, `feat-`…) : il
-  vit dans le frontmatter, le répéter ici ne fait que rallonger.
+- **`titre`** — court, en kebab-case, **en anglais** comme tout nom de fichier
+  (le *contenu* du ticket, lui, reste français — voir
+  [conventions](agents/conventions.md)). **Pas de type** (`fix-`, `feat-`…) :
+  il vit dans le frontmatter, le répéter ici ne fait que rallonger.
 
 Ainsi `ls 000-backlog/` regroupe par projet **et** ordonne par priorité à
 l'intérieur de chacun — « le haut = le plus prioritaire » devient enfin vrai.
