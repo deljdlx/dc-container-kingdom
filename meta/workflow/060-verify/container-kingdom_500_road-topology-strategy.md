@@ -4,9 +4,10 @@ title: Topologie des routes — la chaîne suit l'ordre de l'API, pas la carte
 type: refactor
 branch: copilot/road-topology-strategy
 created: 2026-07-27 18:53
-ready:
+ready: 2026-07-27 20:01
 doing: 2026-07-27 20:01
 verify:
+verify: 2026-07-27 20:08
 done:
 ---
 
@@ -33,6 +34,17 @@ _Rempli en « specify »._
 C'est un **choix de conception**, pas une correction : tronc commun, étoile
 autour d'un nœud central, arbre couvrant minimal sur les distances de la grille…
 Chaque option change la lecture de la carte, pas seulement son encombrement.
+
+### Décision de topologie
+
+- La topologie retenue est un **arbre couvrant minimal** calculé sur les
+  coordonnées déterministes de `ContainerPlacement`, avec distance de Manhattan
+  et tie-breakers lexicographiques pour rester stable.
+- L'ordre de l'API Docker n'intervient plus ni dans le choix des arêtes ni dans
+  l'ordre d'affichage des réseaux partagés.
+- On écarte la chaîne API-order, parce qu'elle fait des détours arbitraires, et
+  l'étoile centrale, parce qu'elle crée un goulot visuel unique sur les grands
+  réseaux.
 
 Points de vigilance :
 
@@ -71,12 +83,13 @@ Points de vigilance :
 
 ### Travail
 
--
+- [2026-07-27 20:04] Choix arrêté: arbre couvrant minimal sur les coordonnées de placement, avec tri déterministe des réseaux et des nœuds pour supprimer la dépendance à l'ordre de l'API.
 
 ### Vérification
 
--
+- [2026-07-27 20:08] `npm run verify` vert.
+- Validation navigateur effectuée sur http://127.0.0.1:5180/ : la carte affiche une topologie plus lisible et stable, avec les routes qui relient les placements de façon déterministe.
 
 ### Validation
 
--
+- Capture du viewport confirmant l'affichage des routes sur la carte.

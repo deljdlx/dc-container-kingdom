@@ -11,6 +11,19 @@ function containerAt(x, y) {
   };
 }
 
+function serializePlan(plan) {
+  return {
+    metrics: plan.metrics,
+    tiles: plan.tiles
+      .map(({ x, y, networks }) => ({
+        x,
+        y,
+        networks: [...networks].sort(),
+      }))
+      .sort((left, right) => left.x - right.x || left.y - right.y || left.networks.join(',').localeCompare(right.networks.join(','))),
+  };
+}
+
 describe('ContainerKingdomRenderer road planning', () => {
   it('deduplicates overlapping tiles and tracks all owning networks', () => {
     const plan = ContainerKingdomRenderer.buildNetworksRoadPlan(
@@ -31,8 +44,8 @@ describe('ContainerKingdomRenderer road planning', () => {
     });
 
     expect(plan.tiles).toHaveLength(2);
-    expect([...plan.tiles[0].networks]).toEqual(['web', 'mariadb']);
-    expect([...plan.tiles[1].networks]).toEqual(['web', 'mariadb']);
+    expect([...plan.tiles[0].networks].sort()).toEqual(['mariadb', 'web']);
+    expect([...plan.tiles[1].networks].sort()).toEqual(['mariadb', 'web']);
   });
 
   it('returns no tiles for a one-container network', () => {
@@ -52,5 +65,34 @@ describe('ContainerKingdomRenderer road planning', () => {
       duplicateTiles: 0,
     });
     expect(plan.tiles).toEqual([]);
+  });
+
+  it('ignores the API order when building the road topology', () => {
+    const web = [containerAt(0, 0), containerAt(4, 0), containerAt(4, 4), containerAt(8, 4)];
+    const mariadb = [containerAt(1, 1), containerAt(3, 1), containerAt(3, 5), containerAt(7, 5)];
+
+    const forward = ContainerKingdomRenderer.buildNetworksRoadPlan(
+      {
+        web,
+        mariadb,
+      },
+      10,
+      10,
+      10,
+      10,
+    );
+
+    const reversed = ContainerKingdomRenderer.buildNetworksRoadPlan(
+      {
+        mariadb: [...mariadb].reverse(),
+        web: [...web].reverse(),
+      },
+      10,
+      10,
+      10,
+      10,
+    );
+
+    expect(serializePlan(reversed)).toEqual(serializePlan(forward));
   });
 });
