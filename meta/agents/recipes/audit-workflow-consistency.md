@@ -19,7 +19,24 @@ exhaustive. Sœur de [verify-a-change](verify-a-change.md) et
   [`../workflow.md`](../workflow.md), `../engine-boundary.md`.
 - Fichiers d'entrée : `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`.
 
-## Contrôles mécaniques (commandes, depuis la racine du repo)
+## Contrôles mécaniques — automatisés
+
+> **Ils tournent déjà.** `test/board.test.js` porte les contrôles 1 à 3 ci-dessous
+> plus le nommage, le frontmatter, les colonnes connues et l'identité des trois
+> points d'entrée. Ils s'exécutent dans **`npm run verify`** : casser le board
+> échoue comme un test rouge, sans attendre la CI ni une passe manuelle.
+>
+> Les commandes qui suivent restent la **description de la procédure** — utiles
+> pour comprendre ce qui est vérifié, ou pour sonder un point précis à la main.
+> Le test fait foi.
+>
+> Deux limites y sont assumées, à connaître avant de s'y fier :
+> - **« titre en anglais » n'est pas testable** — le contrôle est un proxy (ASCII,
+>   kebab-case) qui attrape `complétude` mais pas `routes-en-double` ;
+> - **les contrôles d'`id` et de `## Suite` ne portent pas sur l'archive** : les
+>   doublons d'`id` de `080-done` et les rubriques absentes d'avant le
+>   2026-07-27 y restent. Réécrire l'historique pour faire passer un test serait
+>   le falsifier.
 
 ### 1. Liens markdown relatifs — tous résolvent
 

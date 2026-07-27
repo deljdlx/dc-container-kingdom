@@ -2,11 +2,11 @@
 id: 2026-07-27_19-03
 title: Un garde-fou automatique sur la cohérence du board
 type: test
-branch:
+branch: claude/board-doctor
 created: 2026-07-27 19:03
 ready: 2026-07-27 19:21
-doing:
-verify:
+doing: 2026-07-27 19:22
+verify: 2026-07-27 19:31
 done:
 ---
 
@@ -106,15 +106,15 @@ tel dans le test, sinon le prochain lecteur croira la règle garantie.
 
 ## Definition of Done
 
-- [ ] Casser une convention du board **fait échouer `npm run verify`**.
-- [ ] Aucune nouvelle chaîne d'outils ni nouveau job CI.
-- [ ] Les deux contrôles « inapplicables au passé » ont une stratégie **écrite**
+- [x] Casser une convention du board **fait échouer `npm run verify`**.
+- [x] Aucune nouvelle chaîne d'outils ni nouveau job CI.
+- [x] Les deux contrôles « inapplicables au passé » ont une stratégie **écrite**
       (pivot ou périmètre), et le vert du premier run le prouve.
-- [ ] Chaque contrôle a un test qui **échoue si on retire le contrôle** — un
+- [x] Chaque contrôle a un test qui **échoue si on retire le contrôle** — un
       garde-fou non testé ne garde rien.
-- [ ] La recipe d'audit renvoie vers le test au lieu de décrire des commandes à
+- [x] La recipe d'audit renvoie vers le test au lieu de décrire des commandes à
       rejouer à la main, pour ce qui est automatisé.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -124,11 +124,42 @@ tel dans le test, sinon le prochain lecteur croira la règle garantie.
 
 ### Travail
 
--
+- [2026-07-27 19:22] Forme retenue : `test/board.test.js` en vitest. Le dépôt n'a
+  aucune dépendance Python et sa CI est un job unique `npm run verify` — un
+  script dans un second langage aurait ajouté une chaîne d'outils **et** un
+  contrôle hors du « terminé = vérifié ».
+- [2026-07-27 19:25] 14 contrôles écrits : liens, colonnes citées, `@imports`,
+  colonnes documentées ET connues du test, nommage par colonne active, unicité
+  des `id`, frontmatter obligatoire, cohérence des dates de transition avec la
+  colonne, rubrique `## Suite`, identité des trois points d'entrée.
+- [2026-07-27 19:26] Le doublon d'`id` vivant est corrigé comme prévu :
+  `engine_420_tools-readme` passe en `2026-07-25_16-49`. Vérifié au préalable
+  qu'aucun ticket ne le référençait.
+- [2026-07-27 19:28] **La stratégie de pivot a dû changer en cours de route.** Le
+  ticket prévoyait de contrôler `## Suite` à partir de la naissance de la rubrique
+  (`2026-07-26_18-14`). Mesure faite : **24 tickets clos n'ont pas la section**,
+  dont **5 créés après** cette date. La rubrique était donc décorative, pas
+  appliquée — un contrôle rétroactif aurait été rouge en permanence, donc
+  désactivé. Pivot déplacé à l'**entrée en vigueur du contrôle** : à partir
+  d'aujourd'hui, plus aucune clôture sans `## Suite`. La dette d'avant reste
+  visible dans l'archive plutôt que réécrite pour faire passer un test.
+- [2026-07-27 19:29] Deux limites écrites dans le test **et** dans la recipe :
+  « titre en anglais » n'est pas testable (proxy ASCII + kebab-case), et les
+  contrôles d'`id` et de `Suite` ne portent pas sur `080-done`.
 
 ### Vérification
 
--
+- [2026-07-27 19:27] Premier run : **2 rouges**, tous deux réels — le doublon
+  d'`id` vivant et 7 rubriques `Suite` manquantes. Aucun faux positif : vérifié
+  sur pièce que la section était **absente** des fichiers, pas seulement vide.
+- [2026-07-27 19:30] **Preuve que les contrôles mordent** (DoD) : quatre
+  violations synthétiques injectées d'un coup — un ticket `badproj_99_Titre-Accentué.md`,
+  un ticket en `020-ready` sans `ready:`, un lien mort dans le README du board, une
+  ligne ajoutée au bloc de règles d'`AGENTS.md`. **Cinq tests sont passés au
+  rouge** (l'unicité des `id` en prime, déclenchée par les copies), et le vert est
+  revenu après nettoyage. Un garde-fou non testé ne garde rien.
+- [2026-07-27 19:31] `npm run verify` **vert** : lint + build + **296 tests /
+  43 fichiers**, dont les 19 nouveaux.
 
 ### Validation
 
