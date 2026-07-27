@@ -7,7 +7,7 @@ created: 2026-07-26 14:31
 ready:
 doing: 2026-07-27 16:35
 verify: 2026-07-27 16:40
-done:
+done: 2026-07-27 16:51
 ---
 
 ## Objectif
@@ -105,4 +105,5 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 16:51] Review : DoD cochée, aucun changement de code de production dans ce ticket, et l'écart sur `enableMainCharacter()` reste bien renvoyé vers `2026-07-27_10-34_fix-enable-main-character-defaults.md` au lieu d'être corrigé au passage.
+- [2026-07-27 16:51] Merge `--no-ff` de `codex/test-caracteriser-viewport-board` sur `main` : `f33caeb`.
