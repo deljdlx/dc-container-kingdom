@@ -22,11 +22,37 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:www.toptal.com)",
       "WebFetch(domain:gist.github.com)",
-      "Bash(gh api:*)"
+      "Bash(gh api:*)",
+      "Bash(cd *)",
+      "Bash(ls *)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(wc *)",
+      "Bash(sed -n *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(echo *)",
+      "Bash(date *)",
+      "Bash(for *)"
     ],
     "deny": [],
     "additionalDirectories": [
       "/tmp"
+    ]
+  },
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/allow-readonly-bash.sh\"",
+            "timeout": 10
+          }
+        ]
+      }
     ]
   }
 }
