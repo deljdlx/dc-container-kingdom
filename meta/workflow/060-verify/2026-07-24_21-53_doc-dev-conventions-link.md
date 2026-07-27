@@ -6,7 +6,7 @@ branch: claude/doc-dev-conventions-link
 created: 2026-07-24 21:53
 ready: 2026-07-27 10:41
 doing: 2026-07-27 10:42
-verify:
+verify: 2026-07-27 10:45
 done:
 ---
 
@@ -43,21 +43,25 @@ La section « Conventions » de `meta/documentation/development.md` **duplique**
 
 ## Definition of Done
 
-- [ ] La section Conventions de `development.md` pointe vers `meta/agents/conventions.md`
+- [x] La section Conventions de `development.md` pointe vers `meta/agents/conventions.md`
       au lieu de répéter les règles (garder au plus 1–2 lignes de contexte).
-- [ ] Le renvoi cite **les deux** sources (`conventions.md` **et** `workflow.md`),
+- [x] Le renvoi cite **les deux** sources (`conventions.md` **et** `workflow.md`),
       puisque la section actuelle mélange les deux.
-- [ ] Non-perte vérifiée puce par puce et tracée dans le journal.
-- [ ] `npm run verify` vert (les liens résolvent).
+- [x] Non-perte vérifiée puce par puce et tracée dans le journal.
+- [x] `npm run verify` vert (les liens résolvent).
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`) : ce que le ticket **ouvre**, ce
-qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
-`100-follow-up/`. `aucune` est une réponse valable._
-
--
+- **Aucun candidat.** La duplication visée est supprimée, rien ne reste ouvert sur
+  ce point.
+- **Ouvre, sans urgence** : la même question se pose pour les autres pages de
+  `documentation/` — mais je n'ai **pas** audité leur contenu, donc je ne dépose
+  rien : ce serait une intuition, pas un constat. Si le sujet revient, c'est un
+  périmètre tout trouvé pour la recipe `audit-codebase` (famille « doc qui ment »
+  / duplication d'autorité).
+- **Laisse de côté** : les tickets antérieurs à la rubrique `Suite` restent
+  non migrés ; celui-ci a été aligné **parce qu'on le prenait**, ce qui reste la
+  bonne façon de faire — pas de passe de migration de masse.
 
 ## Journal
 
@@ -71,7 +75,9 @@ qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 
 ### Vérification
 
--
+- [2026-07-27 10:45] Les trois liens de la nouvelle section résolvent ; contrôle de liens sur tout `meta/` + les points d'entrée → `links OK`.
+- [2026-07-27 10:45] `npm run verify` vert : lint + build + 210 tests (30 fichiers).
+- [2026-07-27 10:46] Relu côté lecteur : `development.md` reste autonome pour qui vient coder (commandes, mock, démo, debug, tests, piège rAF) et ne renvoie que pour les **règles** — le partage est net, pas un renvoi qui vide la page.
 
 ### Validation
 
