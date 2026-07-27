@@ -6,7 +6,7 @@ branch: claude/fix-durcir-trace-maisons-routes
 created: 2026-07-26 14:26
 ready: 2026-07-27 10:57
 doing: 2026-07-27 10:58
-verify:
+verify: 2026-07-27 11:03
 done:
 ---
 
