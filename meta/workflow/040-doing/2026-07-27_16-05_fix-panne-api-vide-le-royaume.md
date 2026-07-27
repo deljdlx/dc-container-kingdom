@@ -2,10 +2,10 @@
 id: 2026-07-27_16-05
 title: Une panne de l'API Docker vide le royaume
 type: fix
-branch:
+branch: claude/panne-api-vide-le-royaume
 created: 2026-07-27 16:05
 ready: 2026-07-27 16:31
-doing:
+doing: 2026-07-27 16:35
 verify:
 done:
 ---
