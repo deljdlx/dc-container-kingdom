@@ -12,7 +12,9 @@ exhaustive. Sœur de [verify-a-change](verify-a-change.md) et
   [work-a-task](workflow/work-a-task.md)).
 - Recipes de méthode : `meta/agents/recipes/*`.
 - Board : [`../../README.md`](../../README.md),
-  [`../../workflow/TEMPLATE.md`](../../workflow/TEMPLATE.md), colonnes `meta/workflow/0*/`.
+  [`../../workflow/TEMPLATE.md`](../../workflow/TEMPLATE.md), **toutes** les
+  colonnes `meta/workflow/*/` — le glob `0*/` oubliait les boîtes hors pipeline
+  (`100-follow-up`, `200-ideas`), qu'un audit doit regarder comme les autres.
 - Règles agent : [`../conventions.md`](../conventions.md),
   [`../workflow.md`](../workflow.md), `../engine-boundary.md`.
 - Fichiers d'entrée : `CLAUDE.md`, `AGENTS.md`, `.github/copilot-instructions.md`.
@@ -103,10 +105,16 @@ maillon.
 5. **Colonnes** — mêmes noms et même ordre (`000-backlog` → `020-ready` →
    `040-doing` → `060-verify` → `080-done`) dans : board README (table),
    [work-a-task](workflow/work-a-task.md) (table), chaque `ticket-*.md`, et les
-   fichiers d'entrée. `100-follow-up` est **hors pipeline** : il ne doit apparaître
-   dans aucune séquence d'étapes, seulement comme boîte de candidats
-   ([ticket-follow-up](workflow/ticket-follow-up.md) /
-   [follow-up-triage](workflow/follow-up-triage.md)).
+   fichiers d'entrée. **Deux boîtes sont hors pipeline** et ne doivent apparaître
+   dans aucune séquence d'étapes :
+   - `100-follow-up` — boîte de **candidats**, qui **périme**
+     ([ticket-follow-up](workflow/ticket-follow-up.md) /
+     [follow-up-triage](workflow/follow-up-triage.md)) ;
+   - `200-ideas` — boîte à **idées**, sans horloge ni tri récurrent.
+
+   Toute colonne présente sur le disque doit être décrite dans le board README :
+   une colonne que l'audit ignore est pire qu'une colonne non documentée, il donne
+   le vert sans l'avoir regardée.
 6. **Cycle & topologie git** — aucune formulation contradictoire : branche créée au
    *work*, board sur `main`, clôture `done` sur `main` **post-merge** (section
    « Topologie git » de [work-a-task](workflow/work-a-task.md)).
