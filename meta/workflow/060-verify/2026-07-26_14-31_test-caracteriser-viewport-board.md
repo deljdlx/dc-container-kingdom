@@ -2,11 +2,11 @@
 id: 2026-07-26_14-31
 title: Caractériser Viewport et Board (boucle, streaming d'aires)
 type: test
-branch:
+branch: codex/test-caracteriser-viewport-board
 created: 2026-07-26 14:31
 ready:
-doing:
-verify:
+doing: 2026-07-27 16:35
+verify: 2026-07-27 16:40
 done:
 ---
 
@@ -69,12 +69,21 @@ ciblé pour le reste. Ne pas laisser ce constat se reperdre.
 
 ## Definition of Done
 
-- [ ] `test/Viewport.test.js`, `test/Board.test.js`, `test/SceneGraph.test.js`
+- [x] `test/Viewport.test.js`, `test/Board.test.js`, `test/SceneGraph.test.js`
       couvrent les points listés.
-- [ ] Aucun changement de comportement du code de production dans ce ticket.
-- [ ] Les écarts constatés sont consignés (dans le ticket, et rattachés aux tickets
+- [x] Aucun changement de comportement du code de production dans ce ticket.
+- [x] Les écarts constatés sont consignés (dans le ticket, et rattachés aux tickets
       de correction existants).
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
+
+## Suite
+
+- Ouvre : la JSDoc de `Viewport.enableMainCharacter()` promet un centrage par
+  défaut que le comportement actuel n'honore pas ; l'écart reste suivi par
+  `2026-07-27_10-34_fix-enable-main-character-defaults.md`.
+- Laisse de côté : les autres pièces centrales du moteur encore sans tests
+  dédiés (`Application`, `Area`, `AreaRenderer`, `CharacterRenderer`) restent
+  hors périmètre de ce ticket.
 
 ## Journal
 
@@ -83,11 +92,16 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 16:35] Ticket pris dans le worktree dédié `/tmp/dc-container-kingdom-codex`, branche `codex/test-caracteriser-viewport-board`, et déplacé en `040-doing`.
+- [2026-07-27 16:36] Périmètre gardé tel quel en cours de route : `Viewport`, `Board`, `SceneGraph` seulement. Le constat plus large sur `Application` / `Area` / `AreaRenderer` / `CharacterRenderer` reste hors de ce ticket.
+- [2026-07-27 16:38] Relecture des tests existants : `test/Board.streaming-areas.test.js` couvre déjà une partie du cycle des aires (`freeArea`, `clear`, bornage du streaming), donc les nouveaux fichiers ciblent surtout les trous listés dans la DoD plutôt que de déplacer ou réécrire l'existant.
+- [2026-07-27 16:40] Écart constaté pendant la préparation : `Viewport.enableMainCharacter()` sans arguments ne centre pas le joueur malgré sa JSDoc. Comme ce ticket ne doit pas changer le code de production, l'écart est renvoyé vers `2026-07-27_10-34_fix-enable-main-character-defaults.md` au lieu d'être corrigé ici.
 
 ### Vérification
 
--
+- [2026-07-27 16:40] Passage ciblé vert : `npm test -- test/Viewport.test.js test/Board.test.js test/SceneGraph.test.js` → **20 tests** sur les trois nouvelles suites.
+- [2026-07-27 16:40] Les nouveaux tests couvrent les trous listés par la DoD sans modifier le code de production : boucle et clamp de `dt`, orchestration déplacement/collision/trigger, coordonnées d'aire et fenêtres 7x7 / 9x9, `Board.initialize/load/get/free`, et offsets `SceneGraph`.
+- [2026-07-27 16:40] `npm run verify` vert sur la branche de travail : `lint` + `build` + **252 tests** (38 fichiers). Les traces `stderr` de `DockerApiClient.test.js` et `ContainerRepository.test.js` restent celles déjà attendues par leurs assertions d'erreur.
 
 ### Validation
 
