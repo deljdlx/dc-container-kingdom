@@ -2,10 +2,10 @@
 id: 2026-07-27_19-04
 title: Aligner les règles écrites sur la pratique réelle
 type: docs
-branch:
+branch: claude/align-rules-with-practice
 created: 2026-07-27 19:04
 ready: 2026-07-27 19:11
-doing:
+doing: 2026-07-27 19:12
 verify:
 done:
 ---
