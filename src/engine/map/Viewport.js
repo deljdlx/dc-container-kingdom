@@ -151,16 +151,16 @@ export class Viewport
   /**
    * Create the player character, wire its renderer/app, place it (defaults to the
    * viewport centre) and have the camera follow it.
-   * @param {number|null} mainCharacterX defaults to half the viewport width
-   * @param {number|null} mainCharacterY defaults to half the viewport height
+   * @param {number|null} [mainCharacterX] defaults to half the viewport width
+   * @param {number|null} [mainCharacterY] defaults to half the viewport height
    */
   enableMainCharacter(mainCharacterX, mainCharacterY) {
     this.character = new Character();
     this.character.setRenderer(new MainCharacterRenderer(this.character));
-    if(mainCharacterX === null) {
+    if(mainCharacterX == null) {
       mainCharacterX = this.width() / 2;
     }
-    if(mainCharacterY === null) {
+    if(mainCharacterY == null) {
       mainCharacterY = this.height() / 2;
     }
     this.character.x(mainCharacterX);
