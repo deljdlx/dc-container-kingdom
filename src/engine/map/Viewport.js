@@ -270,7 +270,7 @@ export class Viewport
    * areas aren't thrashed when walking along a boundary.
    * @param {number} [radius] 4 → keep up to 9×9 before freeing
    */
-  freeAreasFromCurrentPosision(radius = 4) {
+  freeAreasFromCurrentPosition(radius = 4) {
     const at = this.getCurrentAreaCoordinates();
     const areas = this.board.getAreas();
     Object.keys(areas).forEach(x => {
@@ -341,7 +341,7 @@ export class Viewport
     this._lastAreaCoords = at;
 
     this.loadAreasFromCurrentPosition();
-    this.freeAreasFromCurrentPosision();
+    this.freeAreasFromCurrentPosition();
     this.getBoard().update(); // render the newly-loaded areas
   }
 

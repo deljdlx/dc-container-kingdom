@@ -6,7 +6,7 @@ branch: claude/coquilles-api-publique
 created: 2026-07-26 14:30
 ready: 2026-07-27 17:07
 doing: 2026-07-27 17:09
-verify:
+verify: 2026-07-27 17:11
 done:
 ---
 
@@ -69,12 +69,12 @@ un second nom à maintenir et à retirer plus tard. **Renommage sec.**
 
 ## Definition of Done
 
-- [ ] Les trois noms sont corrigés, aucun appel résiduel (`grep` à l'appui, y
+- [x] Les trois noms sont corrigés, aucun appel résiduel (`grep` à l'appui, y
       compris le nom passé en **chaîne** au `vi.spyOn` de `test/Viewport.test.js`).
-- [ ] Doc et JSDoc à jour ; décision sur l'alias déprécié tracée dans le ticket.
-- [ ] Aucun changement de comportement : renommage pur, la suite de tests passe
+- [x] Doc et JSDoc à jour ; décision sur l'alias déprécié tracée dans le ticket.
+- [x] Aucun changement de comportement : renommage pur, la suite de tests passe
       **sans être modifiée** ailleurs que sur les noms.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Journal
 
@@ -83,11 +83,38 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:07] Relevé avant de décider : `grep` des trois noms sur `*.js`,
+  `*.md`, `*.html` → **11 occurrences, 5 fichiers**, toutes internes. Rien dans
+  `meta/documentation/`, `src/engine/README.md`, la démo ni le catalogue. D'où
+  l'arbitrage de *specify* : **renommage sec**, un alias déprécié n'aurait
+  personne à protéger.
+- [2026-07-27 17:09] Cible du troisième nom vérifiée avant renommage :
+  `drawVerticalRoads` n'existait pas dans `ContainerKingdomRenderer` (seuls
+  `drawHorizontalRoads` et `drawHVerticalRoads` cohabitaient) — pas de collision.
+- [2026-07-27 17:10] Renommages appliqués :
+  `freeAreasFromCurrentPosision` → `freeAreasFromCurrentPosition`,
+  `updateBoudingBox` → `updateBoundingBox` (les deux côtés de la chaîne
+  `Element` ↔ `CollisionSystem` en même temps), `drawHVerticalRoads` →
+  `drawVerticalRoads`.
+- [2026-07-27 17:10] `src/engine/index.js` non touché, comme prévu : ce sont des
+  méthodes, pas des classes exportées — le baril public est inchangé. Les JSDoc
+  des trois méthodes ne contenaient pas la coquille (elles écrivaient déjà
+  « bounding box » correctement), donc rien à y reprendre.
 
 ### Vérification
 
--
+- [2026-07-27 17:10] `grep` des trois anciens noms sur tout le dépôt (hors
+  `node_modules`, hors journaux de tickets) : **vide**. Aucun appel résiduel.
+- [2026-07-27 17:10] `npm run verify` **vert** : lint + build + **266 tests /
+  39 fichiers** — compte identique à celui d'avant le change, donc aucun test
+  perdu ou neutralisé au passage.
+- [2026-07-27 17:10] Le diff est un renommage **pur** : 11 insertions / 11
+  suppressions, strictement appariées, sur 5 fichiers — aucune ligne de logique.
+- [2026-07-27 17:11] Vérifié que la suite **garde** réellement ce renommage :
+  en remettant volontairement la coquille dans `Viewport.js` seul, 2 tests
+  tombent (`vi.spyOn` lève sur une méthode inexistante). Coquille restaurée puis
+  retirée, suite de nouveau verte. Un renommage incohérent ne peut donc pas
+  passer inaperçu.
 
 ### Validation
 
