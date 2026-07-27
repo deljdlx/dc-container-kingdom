@@ -50,6 +50,80 @@ describe('Viewport - frame clock', () => {
   });
 });
 
+/**
+ * Walk right for `frames` frames of `step` ms, driving the loop by hand (rAF is
+ * paused in a background tab — see meta/recipes/verify-in-browser.md).
+ * @returns {number} pixels travelled
+ */
+function walkRight({ viewport }, { frames, step, speed }) {
+  viewport.enableMainCharacter(0, 0);
+  viewport.getCharacter().moveSpeed(speed);
+  viewport.move('right');
+
+  const startX = viewport.getCharacter().x();
+  let t = 1_000;
+  viewport.update(t);                  // first frame is dt = 0 by design
+  for (let i = 0; i < frames; i++) {
+    t += step;
+    viewport.update(t);
+  }
+  return viewport.getCharacter().x() - startX;
+}
+
+// Regression: `Math.round(dt * speed / 1000)` dropped the sub-pixel remainder and
+// skipped the frame entirely below 1px, so walking speed followed the display's
+// refresh rate — and stalled completely on fast displays.
+describe('Viewport - movement is frame-rate independent', () => {
+  it('covers the same distance for the same simulated time, whatever the dt', () => {
+    const coarse = walkRight(createViewport(), { frames: 40, step: 16, speed: 300 });
+    const fine = walkRight(createViewport(), { frames: 160, step: 4, speed: 300 });
+
+    expect(coarse).toBeGreaterThan(0);
+    expect(Math.abs(coarse - fine)).toBeLessThanOrEqual(1);
+  });
+
+  it('still walks at 240Hz with a slow character (0.4px per frame)', () => {
+    // 4ms × 100px/s = 0.4px per frame: every frame used to round to 0 and be
+    // thrown away, freezing the character for good.
+    const travelled = walkRight(createViewport(), { frames: 240, step: 4, speed: 100 });
+
+    expect(travelled).toBeGreaterThan(0);
+    expect(travelled).toBeCloseTo(96, 0); // 240 × 4ms = 960ms at 100px/s
+  });
+
+  it('keeps positions integral, so sprites never land on a sub-pixel', () => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(0, 0);
+    viewport.getCharacter().moveSpeed(100);
+    viewport.move('right');
+
+    let t = 1_000;
+    viewport.update(t);
+    for (let i = 0; i < 50; i++) {
+      t += 7;                                   // 0.7px per frame
+      viewport.update(t);
+      expect(Number.isInteger(viewport.getCharacter().x())).toBe(true);
+    }
+  });
+
+  it('does not bank the remainder across a stop', () => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(0, 0);
+    viewport.getCharacter().moveSpeed(100);
+    viewport.move('right');
+
+    let t = 1_000;
+    viewport.update(t);
+    t += 9; viewport.update(t);   // 0.9px accumulated, nothing moved yet
+    viewport.stop();
+    t += 9; viewport.update(t);   // standing still must not bank anything
+    viewport.move('right');
+    t += 1; viewport.update(t);   // 0.1px only: a banked remainder would jump 1px
+
+    expect(viewport.getCharacter().x()).toBe(0);
+  });
+});
+
 describe('Viewport - movement orchestration', () => {
   it.each([
     ['up', 0, -7],
