@@ -40,6 +40,13 @@ Caractériser, sans changer le code de production :
 - **SceneGraph** : `addChild` / `removeChild` / `getAllChildren` / offsets
   `relativeTo` — socle de l'arbre, non couvert directement.
 
+**Le trou est plus large que ces trois fichiers.** Mesure du 2026-07-27 (diff
+sources / tests, commande de la recipe `audit-codebase`) : `Application`, `Area`,
+`AreaRenderer` et `CharacterRenderer` n'ont eux non plus **aucun** test. Ce ticket
+garde son périmètre — les trois pièces ci-dessus, les plus centrales — mais celui
+qui le prend **décide en *specify*** s'il élargit ou s'il ouvre un second ticket
+ciblé pour le reste. Ne pas laisser ce constat se reperdre.
+
 ### Technique
 
 - Environnement de test : `vitest` en `environment: 'node'` aujourd'hui ; le
