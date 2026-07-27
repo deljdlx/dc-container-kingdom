@@ -2,10 +2,10 @@
 id: 2026-07-27_18-53
 title: Topologie des routes — la chaîne suit l'ordre de l'API, pas la carte
 type: refactor
-branch:
+branch: copilot/road-topology-strategy
 created: 2026-07-27 18:53
 ready:
-doing:
+doing: 2026-07-27 20:01
 verify:
 done:
 ---
