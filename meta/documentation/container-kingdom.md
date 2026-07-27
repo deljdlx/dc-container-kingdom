@@ -44,6 +44,16 @@ La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et sta
 avec un `try/catch/finally` qui garantit le réarmement du tick même en cas
 d'erreur transitoire côté daemon Docker.
 
+Le cycle de stats évite désormais le double fetch : le repository réutilise la
+liste déjà chargée des conteneurs et ne fan-out les appels
+`/containers/{id}/stats?stream=false` que pour les conteneurs `running`.
+L'appel `/containers/json?all=true&size=true` est supprimé (coûteux et inutile
+ici), ce qui retire une requête de liste redondante à chaque tick.
+
+Le calcul CPU dépend de deux échantillons successifs (`previousStats` dans
+`Container`) : la valeur reste donc couplée à l'intervalle de polling
+(`ContainerKingdom.LOOP_INTERVAL_MS`).
+
 **Une panne n'est pas un cluster vide.** `DockerApiClient` *propage* ses échecs
 (il renvoyait `[]`, ce qui faisait élaguer tous les conteneurs et vidait la carte
 au premier hoquet du daemon) ; `ContainerRepository.loadContainers()` capture

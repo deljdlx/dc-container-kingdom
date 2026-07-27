@@ -2,11 +2,11 @@
 id: 2026-07-26_14-32
 title: Alléger le polling des stats Docker (double fetch, size=true, N+1)
 type: refactor
-branch:
+branch: copilot/perf-polling-stats-docker
 created: 2026-07-26 14:32
 ready: 2026-07-27 17:40
-doing:
-verify:
+doing: 2026-07-27 17:40
+verify: 2026-07-27 17:42
 done:
 ---
 
@@ -71,11 +71,14 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:41] refactor `DockerApiClient.getAllContainersStats()` : l'API reçoit désormais une liste d'IDs (plus de relist `/containers/json`, plus de `size=true`) et applique une concurrence bornée (`STATS_CONCURRENCY_LIMIT=8`) sur le fan-out des `/stats`.
+- [2026-07-27 17:41] `ContainerRepository.loadContainersStats()` calcule les IDs `running` uniquement et les passe au client ; comportement d'échec inchangé (stats en erreur ignorées au niveau conteneur, boucle globale robuste).
+- [2026-07-27 17:41] tests et docs mis à jour : assertions sur l'absence de requête redondante, sur le filtrage running, et documentation du couplage CPU à l'intervalle de polling.
 
 ### Vérification
 
--
+- [2026-07-27 17:42] tests ciblés `DockerApiClient.test.js` + `ContainerRepository.test.js` verts : couverture du nouvel appel `getAllContainersStats(ids)`, assertion d'absence de `/containers/json` et `size=true` pendant l'agrégation, et vérification du filtrage `running` côté repository.
+- [2026-07-27 17:42] `npm run verify` vert (lint + build + 39 fichiers / 274 tests). DoD atteinte : plus de second listing Docker, plus de `size=true`, mock/tests/doc alignés.
 
 ### Validation
 

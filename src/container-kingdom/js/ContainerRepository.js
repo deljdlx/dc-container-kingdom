@@ -152,7 +152,10 @@ export class ContainerRepository {
    */
   async loadContainersStats() {
     try {
-      const stats = await this.dockerApiClient.getAllContainersStats();
+      const runningIds = Object.values(this.containers)
+        .filter(container => container.State === 'running')
+        .map(container => container.Id);
+      const stats = await this.dockerApiClient.getAllContainersStats(runningIds);
       stats.forEach((containerStats) => {
         const container = this.containers[containerStats.id];
         if (container) {
