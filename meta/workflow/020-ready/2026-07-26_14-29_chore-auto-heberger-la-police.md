@@ -4,7 +4,7 @@ title: Auto-héberger la police Changa (perf + hors-ligne)
 type: chore
 branch:
 created: 2026-07-26 14:29
-ready:
+ready: 2026-07-27 17:05
 doing:
 verify:
 done:
