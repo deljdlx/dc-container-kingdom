@@ -12,13 +12,17 @@ Toute la tâche se fait dans **ton propre worktree** :
 1. Entre dans ton worktree **`/tmp/dc-container-kingdom-copilot`** (chemin absolu,
    hors repo — le créer s'il manque) :
    ```bash
-   git worktree add /tmp/dc-container-kingdom-copilot main   # une seule fois
+   git worktree add --detach /tmp/dc-container-kingdom-copilot main   # une seule fois
    cd /tmp/dc-container-kingdom-copilot
    ```
 2. Repars propre, sur **ta** branche :
    ```bash
-   git clean -fd && git checkout main && git checkout -b copilot/<slug>
+   git clean -fd
+   git checkout -b copilot/<slug> main
    ```
+   **Jamais `git checkout main` ici** : `main` appartient au tree principal, la
+   commande échoue — et enchaînée en `&&` elle emporte la création de ta branche
+   avec elle, sans que rien ne le signale.
 3. **Tu ne peux pas** (worktree indisponible, HEAD du principal ≠ `main`, doute
    quelconque) → **ARRÊTE-TOI et demande**. N'écris rien dans le dossier principal.
 

@@ -28,6 +28,9 @@
   [recipes/parallel-worktrees.md](recipes/parallel-worktrees.md).
 - **Conventional Commits** + description **française** (`feat:`, `fix:`, `refactor:`,
   `docs:`, `test:`, `chore:`).
+- **Les merges aussi** : `merge: <description FR>`, passé explicitement en `-m`.
+  Le message par défaut de git (`Merge branch '<branche>'`) ne dit rien de ce qui a
+  été fait et n'est pas accepté.
 - **Jamais** de mention d'assistance IA (pas de `Co-Authored-By`, pas de
   « Generated with… »).
 - **Commiter / pusher uniquement sur demande.**

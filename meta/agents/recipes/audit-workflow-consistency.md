@@ -76,22 +76,44 @@ grep -oE '^@[^ ]+' CLAUDE.md | while read -r p; do
 done
 ```
 
+### 4. Les commandes documentées **s'exécutent**
+
+Un lien valide et une phrase juste ne garantissent rien : une commande peut être
+grammaticalement parfaite et **échouer** dans le contexte où la recipe la place.
+C'est le contrôle le plus rentable — et le seul qui manquait quand les trois
+commandes git de [parallel-worktrees](parallel-worktrees.md) se sont révélées
+fausses (2026-07-27).
+
+Rejouer **littéralement** chaque bloc `bash` d'une recipe modifiée, **dans le
+contexte qu'elle décrit** (un worktree secondaire n'est pas le tree principal),
+et vérifier le **code retour** — pas seulement l'absence de message rouge :
+
+```bash
+# une chaîne `a && b` s'arrête au premier échec : b ne s'exécute pas, silencieusement
+( cd <contexte décrit par la recipe> && <commande documentée> ) ; echo "rc=$?"
+```
+
+Piège récurrent : une commande qui échoue **au milieu** d'une chaîne `&&` laisse
+l'agent dans un état intermédiaire plausible — il croit avoir changé de branche,
+il n'a rien changé. Vérifier l'**effet** attendu, pas seulement le rc du dernier
+maillon.
+
 ## Contrôles de cohérence (lecture croisée)
 
-4. **Colonnes** — mêmes noms et même ordre (`000-backlog` → `020-ready` →
+5. **Colonnes** — mêmes noms et même ordre (`000-backlog` → `020-ready` →
    `040-doing` → `060-verify` → `080-done`) dans : board README (table),
    [work-a-task](workflow/work-a-task.md) (table), chaque `ticket-*.md`, et les
    fichiers d'entrée. `100-follow-up` est **hors pipeline** : il ne doit apparaître
    dans aucune séquence d'étapes, seulement comme boîte de candidats
    ([ticket-follow-up](workflow/ticket-follow-up.md) /
    [follow-up-triage](workflow/follow-up-triage.md)).
-5. **Cycle & topologie git** — aucune formulation contradictoire : branche créée au
+6. **Cycle & topologie git** — aucune formulation contradictoire : branche créée au
    *work*, board sur `main`, clôture `done` sur `main` **post-merge** (section
    « Topologie git » de [work-a-task](workflow/work-a-task.md)).
-6. **Entrées alignées** — `CLAUDE.md` / `AGENTS.md` /
+7. **Entrées alignées** — `CLAUDE.md` / `AGENTS.md` /
    `.github/copilot-instructions.md` énoncent les mêmes règles essentielles (chemin
    du board, pointeur de cycle).
-7. **TEMPLATE ↔ recipes** — le frontmatter du TEMPLATE (`ready`/`doing`/`verify`/
+8. **TEMPLATE ↔ recipes** — le frontmatter du TEMPLATE (`ready`/`doing`/`verify`/
    `done`) et ses sections `Journal` (Travail / Vérification / Validation) et
    `Suite` correspondent aux transitions, journaux et clôture décrits par les
    recipes d'étape.

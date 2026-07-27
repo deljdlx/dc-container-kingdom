@@ -35,8 +35,13 @@ nouveau par ticket** :
 Le créer une fois (`<repo>` = `dc-container-kingdom`, ex. `/tmp/dc-container-kingdom-copilot`) :
 
 ```bash
-git worktree add /tmp/<repo>-<agent> main
+git worktree add --detach /tmp/<repo>-<agent> main
 ```
+
+> **`--detach` n'est pas optionnel** : `main` est déjà monté par le primaire, et git
+> refuse de le monter deux fois (`fatal: 'main' is already used by worktree at …`).
+> Le worktree démarre donc sur un HEAD détaché à la hauteur de `main` — c'est sans
+> importance, chaque tâche crée sa branche juste après.
 
 > `/tmp` est **volatil** (vidé au reboot) : voulu — le worktree se recrée à la demande.
 > **Ne jamais** le placer *dans* le repo : `../` résout mal via le symlink et le
@@ -50,13 +55,22 @@ Depuis **son** worktree, repartir **propre** d'un `main` à jour :
 cd /tmp/<repo>-<agent>
 git status                          # doit être propre ; sinon stash ou demander
 git clean -fd                       # supprime les untracked d'une tâche précédente *
-git checkout main && git merge --ff-only @{u} 2>/dev/null || true
-git checkout -b <agent>/<slug>      # branche dédiée, nommée par agent
+git fetch origin 2>/dev/null || true
+git checkout -b <agent>/<slug> main # branche dédiée, créée DEPUIS main **
+git merge --ff-only origin/main 2>/dev/null || true   # rattrape un main local en retard
 ```
 
 > \* `git clean -fd` est **indispensable** : un fichier untracked laissé par une
 > tâche précédente (ex. un ticket déplacé de colonne) survit aux bascules de branche
 > et **pollue le board** (doublons). C'est la cause de fichiers présents en double.
+
+> \*\* **Ne pas** faire `git checkout main` ici : `main` appartient au primaire, la
+> commande échoue (`fatal: … already used by worktree`). Enchaînée en `&&`, elle
+> emporte le `checkout -b` avec elle — la branche n'est **jamais créée** et l'agent
+> travaille depuis le HEAD périmé de sa tâche précédente, sans rien voir.
+> `git checkout -b <agent>/<slug> main` branche **depuis** `main` sans le monter ;
+> le `--ff-only` qui suit met la branche à niveau si `main` local a du retard sur
+> l'amont (il s'exécute sur la branche, pas sur `main` — même effet, autorisé ici).
 
 Puis dérouler le cycle **dans ce worktree** : transitions `040-doing` → `060-verify`,
 implémentation, `npm run verify`, journal — tout sur la branche `<agent>/<slug>`.
@@ -73,8 +87,12 @@ changer sa branche (`main` reste `main`). **Ne jamais** y faire de `checkout` / 
    main :
    ```bash
    cd <repo>                         # le primaire, sur main
-   git merge --no-ff <agent>/<slug>  # avance main, ne change pas de branche
+   git merge --no-ff <agent>/<slug> -m "merge: <description FR>"
    ```
+   Le `-m` n'est pas cosmétique : sans lui git écrit `Merge branch '<agent>/<slug>'`,
+   qui ne dit rien de ce qui a été fait. Le message de merge suit la même règle que
+   les commits (voir [../conventions.md](../conventions.md)) — préfixe `merge:` et
+   description **française**.
    Si `main` a avancé, rebaser `<agent>/<slug>` sur `main` **dans le worktree**, puis
    re-merger. **Point de coordination** entre agents (FIFO, court).
 3. Clôturer le ticket **sur `main`, dans le primaire** : `git mv` vers `080-done`,
@@ -82,8 +100,15 @@ changer sa branche (`main` reste `main`). **Ne jamais** y faire de `checkout` / 
 4. **Laisser le primaire PROPRE** : `git status` doit être vide (sur `main`, aucun
    résidu stagé) avant de rendre la main. Un index sale committé sur `main`
    corromprait le board.
-5. **Ne pas supprimer le worktree** (fixe, réutilisé) : supprimer seulement la branche
-   (`git branch -d <agent>/<slug>`). Le worktree est renettoyé au démarrage suivant.
+5. **Ne pas supprimer le worktree** (fixe, réutilisé) : supprimer seulement la branche.
+   Il faut d'abord la **libérer** — git refuse de supprimer une branche montée par un
+   worktree (`error: cannot delete branch … used by worktree at …`) :
+   ```bash
+   cd /tmp/<repo>-<agent> && git checkout --detach main   # libère la branche
+   cd <repo> && git branch -d <agent>/<slug>
+   ```
+   Le worktree repart ainsi détaché sur `main`, exactement dans l'état où le
+   « Démarrer une tâche » ci-dessus l'attend.
 
 ## Coordination
 
