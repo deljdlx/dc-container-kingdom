@@ -4,9 +4,9 @@ title: Routes en double — le tracé des réseaux empile des segments au même 
 type: fix
 branch:
 created: 2026-07-27 17:37
-ready:
+ready: 2026-07-27 18:45
 doing:
-verify:
+verify: 
 done:
 ---
 
@@ -86,6 +86,14 @@ conteneur. Les routes doivent suivre la même logique.
 - **Sémantique visuelle** d'une route partagée : couleur du premier réseau,
   neutre, ou marquage spécifique ? Aujourd'hui c'est le **dernier réseau tracé**
   qui gagne, ce qui est arbitraire.
+
+### Décision de périmètre (specify)
+
+- Ce ticket corrige la **superposition** (une seule route par case) et rend les
+      routes **multi-réseaux** compatibles avec le filtre de réseau.
+- La **topologie** des tracés (chaîne d'ordre API vs heuristique spatiale) est
+      reportée dans un ticket dédié de follow-up, car c'est un changement de
+      conception séparé du bug de duplication.
 
 ## Contexte / liens
 
