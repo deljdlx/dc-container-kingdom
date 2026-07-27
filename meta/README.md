@@ -19,6 +19,7 @@ son avancement dans l'historique. Voir « Nommer un ticket » plus bas.
 | **`060-verify/`** | Implémentation faite, **en validation** : `npm run verify`, navigateur, review, durcissement. |
 | **`080-done/`** | Terminé — archive du résultat (commit / merge noté). |
 | **`100-follow-up/`** | **Hors pipeline** — boîte de **candidats** (pas de tickets) émis à la clôture, triés vers `000-backlog/`. |
+| **`200-idees/`** | **Hors pipeline, hors horloge** — boîte à idées : ce qu'on aimerait faire un jour, sans échéance ni obligation de trancher. |
 
 Les préfixes numériques **espacés** (pas de 20) ordonnent les colonnes **et**
 laissent de la place pour en insérer (`010-…`, `030-…`, `050-…`, `070-…`).
@@ -31,6 +32,30 @@ jeter. Elle existe pour protéger la propriété la plus fragile du backlog : ê
 **priorisé**. Voir [ticket-follow-up](agents/recipes/workflow/ticket-follow-up.md) (qui
 la remplit) et [follow-up-triage](agents/recipes/workflow/follow-up-triage.md) (qui la
 vide).
+
+### `200-idees/` — la boîte à idées
+
+Les deux boîtes ne se ressemblent que de loin. Ce qui les sépare, c'est
+l'**horloge** :
+
+| | `100-follow-up/` | `200-idees/` |
+|---|---|---|
+| D'où ça vient | la clôture d'un ticket | n'importe quand, de nulle part |
+| Ce que ça demande | **une décision, bientôt** | rien |
+| Durée de vie | **périme** : non trié deux fois = rejeté | illimitée, elle peut dormir des mois |
+| Ce qu'on y met | une piste précise, issue d'un constat | une envie, une direction, un « et si… » |
+
+Une idée n'est **pas** un ticket : pas de frontmatter, pas de DoD, pas de
+priorité — elle n'est pas actionnable, et c'est normal. Nommer le fichier
+`sujet_titre.md` (`git-kingdom_second-consommateur-du-moteur.md`).
+
+**Aucun tri récurrent ne la vide** — c'est délibéré. Une boîte à idées soumise à
+une échéance devient une boîte à candidats, et on a déjà celle-là. On y pioche
+quand on cherche quoi faire ensuite, pas quand un rituel l'impose.
+
+Le jour où une idée est retenue, elle ne « passe » pas en backlog : on **en tire
+des tickets**, qui naissent normalement ([ticket-create](agents/recipes/workflow/ticket-create.md)).
+La note peut rester — une idée réalisée à moitié reste une idée.
 
 ## Cycle de vie d'une tâche
 

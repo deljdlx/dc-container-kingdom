@@ -40,6 +40,11 @@ Déposer un **candidat** dans `100-follow-up/` seulement quand la piste demande 
 décision (la faire ou non) qu'on ne peut pas prendre maintenant. Un candidat est
 une **note**, pas un ticket — pas de frontmatter, c'est ce qui les distingue :
 
+> **Une direction n'est pas un candidat.** Si ce qui émerge est une envie large
+> (« et si on faisait X ? ») plutôt qu'une piste précise issue d'un constat, ça va
+> en **`200-idees/`**, pas ici — `100-follow-up/` **périme**, et jetterait au
+> deuxième tri ce qu'on voulait garder.
+
 ```markdown
 # Titre court de la piste
 

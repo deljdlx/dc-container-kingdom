@@ -37,7 +37,7 @@ L'ordre compte : inutile de rendre actionnable ce qu'on va jeter.
 | **Reste de DoD** — relevait en fait du ticket d'origine ? | oui → **ni promu ni rejeté** : signaler le ticket clos trop tôt |
 | **Péremption** — déjà marqué « conservé » à un tri précédent ? | oui → **rejeté** |
 
-Les trois issues, toutes explicites :
+Les quatre issues, toutes explicites :
 
 - **Promu** — passer la note au [`TEMPLATE`](../../../workflow/TEMPLATE.md), puis
   `git mv` vers `000-backlog/` **en renommant** `projet_priorité_titre.md` : c'est
@@ -45,6 +45,10 @@ Les trois issues, toutes explicites :
   range. Enchaîner sur [evaluate-a-ticket](../evaluate-a-ticket.md).
 - **Fusionné** — enrichir le ticket existant, supprimer la note.
 - **Rejeté** — supprimer la note, motif en une ligne dans le message de commit.
+- **Déporté** — l'idée est **vraie mais pas mûre**, et rien n'oblige à trancher :
+  `git mv` vers `200-idees/`. C'est la sortie honnête de ce qui ne mérite ni le
+  backlog ni la corbeille. Sans elle, la règle de péremption ci-dessous finit par
+  jeter des idées qu'on voulait garder — et on apprend à ne plus trier.
 
 ## Péremption : un sursis, pas deux
 
@@ -56,6 +60,10 @@ Un candidat qu'on ne promeut ni ne rejette est **marqué** :
 
 S'il est encore là au tri suivant, il est **rejeté**. Ne pas l'avoir choisi deux
 fois *est* la réponse — pas besoin de compteur, ni du courage de jeter.
+
+Le sursis ne vaut que pour ce qu'on **hésite à promouvoir maintenant**. Ce qu'on
+veut garder *sans* trancher n'a rien à faire ici : c'est une idée, elle part en
+`200-idees/`, où aucune horloge ne tourne.
 
 ## Bookkeeping
 
