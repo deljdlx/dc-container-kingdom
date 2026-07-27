@@ -12,9 +12,9 @@ function makeClient(descriptors = containers) {
   let t = 1_000_000_000_000;
   return {
     getContainersDescriptors: vi.fn().mockResolvedValue(descriptors),
-    getAllContainersStats: vi.fn(async () => {
+    getAllContainersStats: vi.fn(async (ids = []) => {
       t += 5000;
-      return descriptors.map(d => ({ id: d.Id, ...makeStats(d.Id, t) }));
+      return ids.map(id => ({ id, ...makeStats(id, t) }));
     }),
   };
 }
@@ -68,6 +68,21 @@ describe('ContainerRepository', () => {
     await repo.loadContainers();
 
     expect(await repo.loadContainersStats()).toBe(false);
+  });
+
+  it('requests stats for running containers only', async () => {
+    const mixed = JSON.parse(JSON.stringify(containers.slice(0, 3)));
+    mixed[0].State = 'running';
+    mixed[1].State = 'exited';
+    mixed[2].State = 'paused';
+    const client = makeClient(mixed);
+    repo = new ContainerRepository(client);
+
+    await repo.loadContainers();
+    await repo.loadContainersStats();
+
+    expect(client.getAllContainersStats).toHaveBeenCalledTimes(1);
+    expect(client.getAllContainersStats).toHaveBeenCalledWith([mixed[0].Id]);
   });
 
   it('keeps a stable checksum across identical reloads', async () => {

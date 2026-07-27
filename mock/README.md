@@ -25,3 +25,12 @@ The clock is **injectable** everywhere (`getContainers(now)`, `makeStats(id, now
 `handleDockerRequest(method, path, now)`), so tests stay deterministic: same
 clock, same answer. The fixtures keep their own `Status`, but it is a fallback —
 never served as-is.
+
+## Routes used by the app loop
+
+The refresh loop now calls one descriptors route and per-container stats only:
+
+- `GET /containers/json?all=true`
+- `GET /containers/{id}/stats?stream=false` (running containers only)
+
+It no longer calls `GET /containers/json?all=true&size=true`.

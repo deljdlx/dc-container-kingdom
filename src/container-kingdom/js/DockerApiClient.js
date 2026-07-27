@@ -1,6 +1,9 @@
 
 export class DockerApiClient
 {
+  /** @type {number} max concurrent per-container stats requests */
+  static STATS_CONCURRENCY_LIMIT = 8;
+
   /**
    * Get all container descriptors from Docker API.
    *
@@ -59,27 +62,42 @@ export class DockerApiClient
   }
 
   /**
-   * Get stats for all containers.
+   * Get stats for the provided container ids.
    *
-   * Rejects when the container list cannot be fetched, so the caller can tell a
-   * dead daemon from a cluster with nothing to report. A single container whose
-   * stats fail is dropped, not fatal — it may simply have just exited.
+   * The caller already owns the descriptor set; this method only fans out the
+   * `/stats` calls. A single container whose stats fail is dropped, not fatal —
+   * it may have just exited between listing and stats polling.
+   *
+   * Concurrency is capped to avoid spiking daemon load on large fleets.
+   * @param {string[]} containerIds
+   * @param {number} [concurrencyLimit]
    * @returns {Promise<Array>} Array of container stats
-   * @throws {Error} when the container list cannot be fetched
    */
-  async getAllContainersStats() {
-    const response = await fetch('/api/docker/containers/json?all=true&size=true');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+  async getAllContainersStats(containerIds = [], concurrencyLimit = DockerApiClient.STATS_CONCURRENCY_LIMIT) {
+    if (containerIds.length === 0) {
+      return [];
     }
-    const containers = await response.json();
 
-    const statsPromises = containers.map(container =>
-      this.loadContainerStats(container.Id).catch(() => null)
+    const queue = [...containerIds];
+    const safeConcurrency = Math.max(1, Math.min(concurrencyLimit, queue.length));
+    const groups = await Promise.all(
+      Array.from({ length: safeConcurrency }, async () => {
+        const localStats = [];
+        while (queue.length > 0) {
+          const containerId = queue.shift();
+          if (!containerId) {
+            continue;
+          }
+          const stats = await this.loadContainerStats(containerId).catch(() => null);
+          if (stats !== null) {
+            localStats.push(stats);
+          }
+        }
+        return localStats;
+      })
     );
-    const stats = await Promise.all(statsPromises);
 
-    return stats.filter(stat => stat !== null);
+    return groups.flat();
   }
 
   /**
