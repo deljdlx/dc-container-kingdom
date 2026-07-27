@@ -2,10 +2,10 @@
 id: 2026-07-26_14-23
 title: Déplacement — le dt perdu sous le pixel rend la vitesse dépendante du taux de rafraîchissement
 type: fix
-branch:
+branch: claude/mouvement-sous-pixel
 created: 2026-07-26 14:23
 ready: 2026-07-27 17:18
-doing:
+doing: 2026-07-27 17:19
 verify:
 done:
 ---
