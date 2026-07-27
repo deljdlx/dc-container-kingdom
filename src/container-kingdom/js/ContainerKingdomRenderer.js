@@ -387,7 +387,7 @@ export class ContainerKingdomRenderer
           roadsMatrix
         );
 
-        this.drawHVerticalRoads(
+        this.drawVerticalRoads(
           networkName,
           yFromInPixels, yToInPixels,
           xFromInPixels,
@@ -452,7 +452,7 @@ export class ContainerKingdomRenderer
     return xFromInPixels;
   }
 
-  drawHVerticalRoads(
+  drawVerticalRoads(
     networkName,
     yFromInPixels, yToInPixels,
     xFromInPixels,

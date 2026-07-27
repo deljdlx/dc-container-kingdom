@@ -151,7 +151,7 @@ describe('Viewport - area streaming', () => {
     viewport.enableMainCharacter(10, 10);
 
     const loadAreas = vi.spyOn(viewport, 'loadAreasFromCurrentPosition');
-    const freeAreas = vi.spyOn(viewport, 'freeAreasFromCurrentPosision');
+    const freeAreas = vi.spyOn(viewport, 'freeAreasFromCurrentPosition');
     const boardUpdate = vi.spyOn(viewport.getBoard(), 'update').mockImplementation(() => {});
 
     viewport._streamAreas();
@@ -191,7 +191,7 @@ describe('Viewport - area streaming', () => {
       }
     }
 
-    viewport.freeAreasFromCurrentPosision();
+    viewport.freeAreasFromCurrentPosition();
 
     expect(countLoadedAreas(board)).toBe(81);
     expect(board.areaExistsAt(4, 4)).toBe(true);

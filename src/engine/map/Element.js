@@ -417,7 +417,7 @@ export class Element
     this.scene.addChild(x, y, element, name);
 
     this.updateCollisionBoundingBox(element);
-    this.updateBoudingBox(element);
+    this.updateBoundingBox(element);
 
     const parent = this.getParent();
     if(parent) {
@@ -465,8 +465,8 @@ export class Element
    * Grow the outer bounding box to enclose a changed child.
    * @param {Element} element
    */
-  updateBoudingBox(element) {
-    this.collision.updateBoudingBox(element);
+  updateBoundingBox(element) {
+    this.collision.updateBoundingBox(element);
   }
 
   /**

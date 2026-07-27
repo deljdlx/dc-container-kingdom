@@ -124,7 +124,7 @@ export class CollisionSystem {
    * Grow the outer bounding box to enclose a child, then propagate up.
    * @param {import('./Element.js').Element} element the child that changed
    */
-  updateBoudingBox(element) {
+  updateBoundingBox(element) {
     const boundingBox = new BoundingBox();
     boundingBox.x0(element.x());
     boundingBox.y0(element.y());
@@ -135,7 +135,7 @@ export class CollisionSystem {
     this._boundingBox.updateWithBoundingBox(boundingBox);
     const parent = this._element.getParent();
     if (parent) {
-      parent.updateBoudingBox(this._element);
+      parent.updateBoundingBox(this._element);
     }
   }
 
