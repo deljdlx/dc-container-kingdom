@@ -2,10 +2,10 @@
 id: 2026-07-26_14-27
 title: Pan / zoom tactile de la carte (mobile-first)
 type: feat
-branch:
+branch: copilot/feat-pan-zoom-tactile
 created: 2026-07-26 14:27
 ready: 2026-07-27 10:12
-doing:
+doing: 2026-07-27 10:12
 verify:
 done:
 ---
