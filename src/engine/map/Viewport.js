@@ -325,9 +325,9 @@ export class Viewport
       const increment = Math.floor(this._moveRemainder);
       if(increment >= 1) {
         this._moveRemainder -= increment;
-        this.moveCharacter(increment);
+        const walkedDistance = this.moveCharacter(increment);
         this._streamAreas();
-        this.character.update();
+        this.character.update(walkedDistance);
       }
     } else {
       // Standing still owes nothing: a banked remainder would surface as a jump
@@ -365,10 +365,11 @@ export class Viewport
    * Move the player through the world by `increment`, reverting on collision.
    * The camera follows separately, so the player is no longer glued to centre.
    * @param {number} increment pixels to move along the current direction
+   * @returns {number} actually walked pixels (0 when blocked)
    */
   moveCharacter(increment) {
     if(!this.character) {
-      return;
+      return 0;
     }
 
     let dx = 0;
@@ -398,10 +399,11 @@ export class Viewport
     // move went through, the single-pass hits are already at the final position.
     if(blocked) {
       this.character.getTrigger(this.board);
+      return 0;
     }
-    else {
-      this.character.reconcileTrigger(detected.trigger);
-    }
+
+    this.character.reconcileTrigger(detected.trigger);
+    return Math.max(Math.abs(dx), Math.abs(dy));
   }
 
   /** Render the viewport. @returns {*} the renderer's render result */

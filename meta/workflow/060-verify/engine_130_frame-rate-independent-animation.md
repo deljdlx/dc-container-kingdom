@@ -2,11 +2,11 @@
 id: 2026-07-27_17-23
 title: Décorréler la cadence d'animation du taux de rafraîchissement
 type: fix
-branch:
+branch: copilot/frame-rate-independent-animation
 created: 2026-07-27 17:23
-ready:
-doing:
-verify:
+ready: 2026-07-27 21:10
+doing: 2026-07-27 21:10
+verify: 2026-07-27 21:14
 done:
 ---
 
@@ -50,12 +50,15 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 21:14] Comparaison des approches: cadence pilotée par `dt` seule rejetée (elle peut continuer à avancer si le personnage n'avance pas), cadence pilotée par distance retenue (les pas suivent les pixels réellement parcourus).
+- [2026-07-27 21:14] Refactor moteur: `CharacterAnimator` passe en accumulation de distance, `Character.update()` reçoit la distance parcourue, propagation sur le joueur (`Viewport.moveCharacter`) et les PNJ (`CharacterBehavior`, `PatrolBehavior`, `FleeBehavior`).
+- [2026-07-27 21:14] Ajout de preuves automatisées: stabilité 60/120/240 Hz dans `CharacterAnimator` et stabilité PNJ à temps simulé égal dans `CharacterBehavior`.
 
 ### Vérification
 
--
+- [2026-07-27 21:14] `npx vitest run test/Character.test.js test/CharacterBehavior.test.js test/PatrolBehavior.test.js test/FleeBehavior.test.js` vert.
+- [2026-07-27 21:14] `npm run verify` vert.
 
 ### Validation
 
--
+- En attente de merge dans `main`.

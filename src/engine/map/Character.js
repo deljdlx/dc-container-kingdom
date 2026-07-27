@@ -88,9 +88,13 @@ export class Character extends Element
     return this._animator.getIndex();
   }
 
-  /** Advance the walk-cycle clock and re-render. Called each moved frame. */
-  update() {
-    this._animator.advance(Math.round(this.moveSpeed() / 80));
+  /**
+   * Advance the walk-cycle clock by the distance walked since the previous
+   * update, then re-render.
+   * @param {number} walkedDistance walked pixels since the previous update
+   */
+  update(walkedDistance = 0) {
+    this._animator.advance(walkedDistance);
     this.getRenderer().update();
   }
 

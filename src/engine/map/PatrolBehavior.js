@@ -104,7 +104,7 @@ export class PatrolBehavior {
       }
     }
 
-    character.update();
+    character.update(blocked ? 0 : this._speed);
   }
 
   /**
