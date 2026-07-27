@@ -2,10 +2,10 @@
 id: 2026-07-26_14-32
 title: Alléger le polling des stats Docker (double fetch, size=true, N+1)
 type: refactor
-branch:
+branch: copilot/perf-polling-stats-docker
 created: 2026-07-26 14:32
 ready: 2026-07-27 17:40
-doing:
+doing: 2026-07-27 17:40
 verify:
 done:
 ---
