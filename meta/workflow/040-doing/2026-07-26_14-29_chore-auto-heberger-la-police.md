@@ -2,10 +2,10 @@
 id: 2026-07-26_14-29
 title: Auto-héberger la police Changa (perf + hors-ligne)
 type: chore
-branch:
+branch: copilot/chore-auto-heberger-la-police
 created: 2026-07-26 14:29
 ready: 2026-07-27 17:05
-doing:
+doing: 2026-07-27 17:05
 verify:
 done:
 ---
