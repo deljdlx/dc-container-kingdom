@@ -6,7 +6,7 @@ branch: copilot/engine-tools-readme
 created: 2026-07-25 16:49
 ready: 2026-07-27 21:33
 doing: 2026-07-27 21:33
-verify:
+verify: 2026-07-27 21:34
 done:
 ---
 
@@ -37,12 +37,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 21:34] Ajout de [src/engine/tools/README.md](src/engine/tools/README.md) avec un descriptif bref du dossier et une ligne dédiée à `GameConsole.js`, dans le style concis des README moteur.
 
 ### Vérification
 
--
+- [2026-07-27 21:34] `npm run verify` vert.
 
 ### Validation
 
--
+- En attente de merge dans `main`.
