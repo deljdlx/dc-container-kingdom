@@ -62,6 +62,15 @@ export class ContainerKingdomLayout
    */
   console = null;
 
+  /** @type {number} Current horizontal pan (px, applied via CSS transform). */
+  _panX = 0;
+
+  /** @type {number} Current vertical pan (px, applied via CSS transform). */
+  _panY = 0;
+
+  /** @type {number} Current zoom scale (1 = 100 %). */
+  _scale = 1;
+
   constructor(application) {
     this.application = application;
     this.containersList = new ContainersList(this.application);
@@ -85,16 +94,13 @@ export class ContainerKingdomLayout
   async focusOnContainer(container) {
     const absoluteX = container.getElement().x();
     const absoluteY = container.getElement().y();
-
     const board = document.querySelector('#viewport').firstElementChild;
+    if (!board) return;
 
-    let moveX = (window.innerWidth / 2 - absoluteX) * 1.5;
-    let moveY = (window.innerHeight / 2 - absoluteY) * 1.5 - container.getElement().height();
-
-    board.style.left = moveX + 'px';
-    board.style.top = moveY + 'px';
-
-    board.style.transform = 'scale(1.5)';
+    this._scale = 1.5;
+    this._panX = window.innerWidth / 2 - absoluteX * this._scale;
+    this._panY = window.innerHeight / 2 - absoluteY * this._scale - container.getElement().height();
+    this._applyTransform(board);
   }
 
 
@@ -151,11 +157,23 @@ export class ContainerKingdomLayout
 
   zoom(zoom) {
     const board = document.querySelector('#viewport').firstElementChild;
-    if(!board) {
-      return;
-    }
+    if (!board) return;
 
-    board.style.transform = `scale(${zoom})`;
+    this._scale = zoom;
+    this._applyTransform(board);
+  }
+
+  /**
+   * Apply the current pan/scale state as a single CSS transform on the board.
+   * Uses transform-origin 0 0 so that _panX/_panY are viewport-space offsets.
+   *
+   * @param {HTMLElement} board
+   */
+  _applyTransform(board) {
+    board.style.transformOrigin = '0 0';
+    board.style.transform = `translate(${this._panX}px, ${this._panY}px) scale(${this._scale})`;
+    board.style.left = '';
+    board.style.top = '';
   }
 
   showIframe(url) {
@@ -262,66 +280,102 @@ export class ContainerKingdomLayout
   }
 
   makeViewportDraggable() {
-    document.querySelector('#viewport').addEventListener('mousedown', (event) => {
-      const firstChild = document.querySelector('#viewport').firstElementChild;
-      if (!firstChild) {
-          return;
+    const viewport = document.querySelector('#viewport');
+    /** @type {Map<number, {x: number, y: number}>} Active pointer positions, keyed by pointerId. */
+    const activePointers = new Map();
+    /** @type {{x: number, y: number, panX: number, panY: number} | null} */
+    let panStart = null;
+    /** @type {{dist: number, midX: number, midY: number, panX: number, panY: number, scale: number} | null} */
+    let pinchStart = null;
+    let gestureHasMoved = false;
+
+    viewport.addEventListener('pointerdown', (e) => {
+      viewport.setPointerCapture(e.pointerId);
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+      if (activePointers.size === 1) {
+        panStart = { x: e.clientX, y: e.clientY, panX: this._panX, panY: this._panY };
+        gestureHasMoved = false;
+      } else if (activePointers.size === 2) {
+        const pts = [...activePointers.values()];
+        const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        const midX = (pts[0].x + pts[1].x) / 2;
+        const midY = (pts[0].y + pts[1].y) / 2;
+        pinchStart = { dist, midX, midY, panX: this._panX, panY: this._panY, scale: this._scale };
+        panStart = null;
       }
-
-      const offsetX = event.clientX - firstChild.offsetLeft;
-      const offsetY = event.clientY - firstChild.offsetTop;
-
-      function onMouseMove(event) {
-          firstChild.style.left = (event.clientX - offsetX) + 'px';
-          firstChild.style.top = (event.clientY - offsetY) + 'px';
-      }
-
-      document.body.addEventListener('mousemove', onMouseMove);
-
-      document.body.addEventListener('mouseup', () => {
-          document.body.removeEventListener('mousemove', onMouseMove);
-      }, { once: true });
     });
+
+    viewport.addEventListener('pointermove', (e) => {
+      if (!activePointers.has(e.pointerId)) return;
+      activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
+      const board = viewport.firstElementChild;
+      if (!board) return;
+
+      if (activePointers.size >= 2 && pinchStart) {
+        const pts = [...activePointers.values()];
+        const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
+        const midX = (pts[0].x + pts[1].x) / 2;
+        const midY = (pts[0].y + pts[1].y) / 2;
+        const newScale = Math.min(3, Math.max(0.1, pinchStart.scale * (dist / pinchStart.dist)));
+        // Keep the pinch midpoint fixed in world space while scaling
+        const worldMidX = (pinchStart.midX - pinchStart.panX) / pinchStart.scale;
+        const worldMidY = (pinchStart.midY - pinchStart.panY) / pinchStart.scale;
+        this._scale = newScale;
+        this._panX = midX - worldMidX * newScale;
+        this._panY = midY - worldMidY * newScale;
+        this._applyTransform(board);
+        gestureHasMoved = true;
+      } else if (activePointers.size === 1 && panStart) {
+        const dx = e.clientX - panStart.x;
+        const dy = e.clientY - panStart.y;
+        if (!gestureHasMoved && Math.hypot(dx, dy) > 5) {
+          gestureHasMoved = true;
+        }
+        if (gestureHasMoved) {
+          this._panX = panStart.panX + dx;
+          this._panY = panStart.panY + dy;
+          this._applyTransform(board);
+        }
+      }
+    });
+
+    const onPointerEnd = (e) => {
+      if (gestureHasMoved) {
+        // Suppress the click that would fire after a drag gesture
+        viewport.addEventListener('click', (ce) => ce.stopPropagation(), { capture: true, once: true });
+      }
+      activePointers.delete(e.pointerId);
+      if (activePointers.size < 2) pinchStart = null;
+      if (activePointers.size === 0) {
+        panStart = null;
+        gestureHasMoved = false;
+      }
+    };
+
+    viewport.addEventListener('pointerup', onPointerEnd);
+    viewport.addEventListener('pointercancel', onPointerEnd);
   }
 
 
   makeViewportZoomable() {
-    document.querySelector('#viewport').addEventListener('wheel', (event) => {
-      const board = document.querySelector('#viewport').firstElementChild;
-      if(!board) {
-        return;
-      }
+    const viewport = document.querySelector('#viewport');
+    viewport.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      const board = viewport.firstElementChild;
+      if (!board) return;
 
-      // JDLX_TODO : Fix zoom origin
-      // const clientX = event.clientX;
-      // const clientY = event.clientY;
-      // const offsetX = board.offsetLeft;
-      // const offsetY = board.offsetTop;
-      // const savedTransformOrigin = board.style.transform;
-      // board.style.transformOrigin = `${clientX - offsetX}px ${clientY - offsetY}px`;
+      const delta = e.deltaY > 0 ? -0.05 : 0.05;
+      const newScale = Math.min(3, Math.max(0.1, this._scale + delta));
 
-      const scale = board.style.transform.match(/scale\((.*)\)/);
-      let currentScale = 1;
+      // Zoom centred on the cursor position in viewport space
+      const worldX = (e.clientX - this._panX) / this._scale;
+      const worldY = (e.clientY - this._panY) / this._scale;
+      this._scale = newScale;
+      this._panX = e.clientX - worldX * this._scale;
+      this._panY = e.clientY - worldY * this._scale;
 
-      if(scale) {
-        currentScale = parseFloat(scale[1]);
-      }
-
-      if(event.deltaY > 0) {
-        if(currentScale <= 0.1) {
-          return;
-        }
-        board.style.transform = `scale(${parseFloat(currentScale) - 0.05})`;
-      } else {
-        if(currentScale >= 3) {
-          return;
-        }
-        board.style.transform = `scale(${parseFloat(currentScale) + 0.05})`;
-      }
-
-      // JDLX_TODO : Fix zoom origin
-      // board.style.transformOrigin = savedTransformOrigin;
-
-    });
+      this._applyTransform(board);
+    }, { passive: false });
   }
 }
