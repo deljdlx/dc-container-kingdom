@@ -7,7 +7,7 @@ created: 2026-07-26 14:21
 ready: 2026-07-27 10:52
 doing: 2026-07-27 10:53
 verify: 2026-07-27 10:59
-done:
+done: 2026-07-27 11:01
 ---
 
 ## Objectif
@@ -95,4 +95,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 11:00] Review : DoD cochée, frontière moteur non concernée (app uniquement), séparation données / DOM tenue, aucun `git add -A`, Conventional Commits en français.
+- [2026-07-27 11:00] Suppression d'API (`stopWatch`, `WATCH_INTERVAL_MS`) assumée : aucun appelant résiduel (`grep`), et le test qui l'espionnait a été requalifié vers ce qui compte, pas supprimé.
+- [2026-07-27 11:01] Merge `--no-ff` de `claude/fix-watch-selecteur-memoire` sur `main` : **05d8c99**. Branche supprimée, worktree conservé.
