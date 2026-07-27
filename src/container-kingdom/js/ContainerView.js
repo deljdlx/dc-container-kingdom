@@ -2,21 +2,18 @@
 /**
  * DOM/view layer for a {@link Container}. Owns everything that touches the
  * document: the info panel rendered on click, the action buttons, and the
- * live "watch" loop that mirrors CPU/memory onto the container's map house.
+ * refresh that mirrors CPU/memory onto the container's map house.
  *
  * Keeping this out of {@link Container} lets the domain model stay pure and
  * unit-testable.
  */
 export class ContainerView {
-  static WATCH_INTERVAL_MS = 1000;
-
   /**
    * @type {Container}
    * @private
    */
   _container;
   _actionsEnabled = false;
-  _watchTimeoutId = null;
 
   /**
    * @param {Container} container
@@ -25,7 +22,6 @@ export class ContainerView {
   constructor(container, actionsEnabled = false) {
     this._container = container;
     this._actionsEnabled = actionsEnabled;
-    this.watch();
   }
 
   /**
@@ -68,7 +64,6 @@ export class ContainerView {
         deleteButton.innerHTML = 'Destroy';
         deleteButton.addEventListener('click', async () => {
           await this._container.destroy();
-          this.stopWatch();
         });
         actionContainer.appendChild(deleteButton);
       }
@@ -109,32 +104,28 @@ export class ContainerView {
   }
 
   /**
-   * Reflect the container's live CPU/memory onto its map house, then reschedule.
+   * Mirror the container's current CPU/memory onto its house on the map.
+   *
+   * Called by the orchestrator once each stats load lands: the data pushes to
+   * the view instead of the view polling the data. The house node is addressed
+   * through the container's own element, never through a document-wide lookup —
+   * that indirection is what let the memory figure sit frozen while a selector
+   * silently matched nothing.
+   *
+   * A container with no house yet (not drawn on the map) is a no-op.
    */
-  watch() {
+  refresh() {
     const element = this._container.getElement();
-    if (element) {
-      const dom = element.getDom();
-      dom.dataset.cpuUsage = this._container.getCpuUsageThreshold().css;
-
-      const memoryUsageContainer = document.querySelector(`[data-container-id="${this._container.getId()}"] .memory-usage`);
-      if (memoryUsageContainer) {
-        memoryUsageContainer.innerHTML = this._container.getMemoryUsage(true);
-      }
+    if (!element) {
+      return;
     }
 
-    this._watchTimeoutId = setTimeout(() => {
-      this.watch();
-    }, ContainerView.WATCH_INTERVAL_MS);
-  }
+    const dom = element.getDom();
+    dom.dataset.cpuUsage = this._container.getCpuUsageThreshold().css;
 
-  /**
-   * Stop the watch timer to prevent leaks.
-   */
-  stopWatch() {
-    if (this._watchTimeoutId) {
-      clearTimeout(this._watchTimeoutId);
-      this._watchTimeoutId = null;
+    const memoryUsage = dom.querySelector('.container__memory-usage');
+    if (memoryUsage) {
+      memoryUsage.innerHTML = this._container.getMemoryUsage(true);
     }
   }
 }

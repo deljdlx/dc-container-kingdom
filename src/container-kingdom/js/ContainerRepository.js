@@ -36,8 +36,8 @@ export class ContainerRepository {
   /**
    * Fetch descriptors and reconcile the current state: drop vanished
    * containers, refresh existing ones in place (keeping their stats history so
-   * CPU can be computed and their watch timer alive), create the new ones, then
-   * rebuild the derived network/compose indexes.
+   * CPU can be computed), create the new ones, then rebuild the derived
+   * network/compose indexes.
    */
   async loadContainers() {
     const descriptors = await this.dockerApiClient.getContainersDescriptors();
@@ -46,7 +46,6 @@ export class ContainerRepository {
     // Remove containers that disappeared.
     Object.keys(this.containers).forEach(id => {
       if (!seenIds.has(id)) {
-        this.containerViews[id]?.stopWatch();
         const element = this.containers[id].getElement();
         if (element) {
           element.destroy();
@@ -56,7 +55,7 @@ export class ContainerRepository {
       }
     });
 
-    // Update existing containers, create the new ones (one watch per container).
+    // Update existing containers, create the new ones (one view per container).
     descriptors.forEach(descriptor => {
       const existing = this.containers[descriptor.Id];
       if (existing) {
@@ -156,10 +155,9 @@ export class ContainerRepository {
     this.onContainersChanged();
   }
 
-  /** Stop every watch loop and drop all containers. */
+  /** Drop every container and its view. */
   clear() {
     Object.values(this.containers).forEach(container => {
-      this.containerViews[container.Id]?.stopWatch();
       delete this.containerViews[container.Id];
       delete this.containers[container.Id];
     });
@@ -178,6 +176,13 @@ export class ContainerRepository {
    */
   getContainerView(containerId) {
     return this.containerViews[containerId];
+  }
+
+  /**
+   * @returns {ContainerView[]} the view of every live container
+   */
+  getContainerViews() {
+    return Object.values(this.containerViews);
   }
 
   getCompose(composeName) {

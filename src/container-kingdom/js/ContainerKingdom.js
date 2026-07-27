@@ -81,6 +81,9 @@ export class ContainerKingdom
     const loaded = await this.repository.loadContainersStats();
     if (loaded) {
       this.hud.renderClusterInfo();
+      // Push the fresh figures onto the map. Stats only move when this load
+      // lands, so there is nothing for the views to poll in between.
+      this.repository.getContainerViews().forEach(view => view.refresh());
     }
   }
 

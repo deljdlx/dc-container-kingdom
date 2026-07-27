@@ -2,10 +2,10 @@
 id: 2026-07-26_14-21
 title: Le watch par conteneur cible un sélecteur inexistant (mémoire jamais rafraîchie)
 type: fix
-branch:
+branch: claude/fix-watch-selecteur-memoire
 created: 2026-07-26 14:21
 ready: 2026-07-27 10:52
-doing:
+doing: 2026-07-27 10:53
 verify:
 done:
 ---
@@ -77,7 +77,13 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 10:53] Ticket pris sur `claude/fix-watch-selecteur-memoire`. Tri de `100-follow-up/` fait avant : boîte vide. Priorité choisie sur le backlog : fonctionnalité visiblement cassée, correctif minuscule, ticket indépendant.
+- [2026-07-27 10:54] Défaut re-prouvé avant de coder : le sélecteur `.memory-usage` cherché dans tout le document contre un markup `container__memory-usage` — plus 35 timers d'une seconde qui ne rafraîchissent rien.
+- [2026-07-27 10:55] Tests d'abord (`test/ContainerView.refresh.test.js`, 4 cas) : écriture de la valeur, **nœud cherché dans sa propre maison** (un leurre ailleurs dans la page ne doit pas être touché), absence de maison inoffensive, aucun timer planifié. Les 4 échouent avant correctif.
+- [2026-07-27 10:56] `watch()` → `refresh()` : plus de `document.querySelector`, la vue s'adresse au nœud qu'elle possède. Un renommage de classe ailleurs ne peut plus la casser en silence.
+- [2026-07-27 10:57] Timers **supprimés**, pas corrigés : les stats ne bougent qu'au chargement (cycle de 5 s), donc un timer par conteneur à 1 s ne pouvait rien rafraîchir de neuf. La donnée pousse désormais vers la vue depuis `ContainerKingdom.loadContainersStats()`.
+- [2026-07-27 10:57] `stopWatch()` et ses appels retirés : laisser une API vide aurait laissé croire qu'il reste quelque chose à arrêter. La séparation est tenue — le repository expose `getContainerViews()` (données), l'orchestrateur pilote le DOM.
+- [2026-07-27 10:58] Test `prunes containers… stops their watch` requalifié : il espionnait une méthode qui n'existe plus ; il vérifie maintenant **ce qui compte** — un conteneur disparu n'a plus de vue, donc plus rien à rafraîchir.
 
 ### Vérification
 

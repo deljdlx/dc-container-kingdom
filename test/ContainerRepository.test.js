@@ -152,19 +152,22 @@ describe('ContainerRepository', () => {
     expect(repo.lastContainersChecksum).toBe(baseline);
   });
 
-  it('prunes containers that vanished and stops their watch', async () => {
+  it('prunes containers that vanished, view included', async () => {
     const client = makeClient();
     repo = new ContainerRepository(client);
     await repo.loadContainers();
 
     const removedId = containers[0].Id;
-    const stopWatch = vi.spyOn(repo.getContainerView(removedId), 'stopWatch');
+    expect(repo.getContainerView(removedId)).toBeDefined();
 
     client.getContainersDescriptors.mockResolvedValue(containers.slice(1));
     await repo.loadContainers();
 
+    // Dropping the view is what stops the refresh: nothing left to push to.
     expect(repo.getContainers()[removedId]).toBeUndefined();
-    expect(stopWatch).toHaveBeenCalled();
+    expect(repo.getContainerView(removedId)).toBeUndefined();
+    expect(repo.getContainerViews().map(view => view.getContainer().Id))
+      .not.toContain(removedId);
   });
 
   describe('reconciliation across reloads', () => {
