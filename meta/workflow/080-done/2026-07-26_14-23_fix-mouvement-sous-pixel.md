@@ -7,7 +7,7 @@ created: 2026-07-26 14:23
 ready: 2026-07-27 17:18
 doing: 2026-07-27 17:19
 verify: 2026-07-27 17:22
-done:
+done: 2026-07-27 17:24 (merge 6ea5a38)
 ---
 
 ## Objectif
@@ -84,6 +84,20 @@ correctif de boucle en refonte de l'animation. La DoD de ce ticket porte sur la
 - [x] Effet sur la cadence d'animation **mesuré** et déposé en candidat.
 - [x] Doc à jour, `npm run verify` vert.
 
+## Suite
+
+- **Ce que ça ouvre** — le déplacement est maintenant indépendant de l'écran,
+  l'animation non : le décalage entre les deux est **plus visible qu'avant**,
+  puisqu'ils ne dérivaient plus ensemble. Candidat déposé.
+- **Ce qu'on laisse de côté** — les PNJ passent par `Character.moveBlocked()`
+  depuis leurs behaviors, sans banque de sous-pixels : leurs déplacements gardent
+  la granularité que leur behavior leur donne. Non mesuré ici, non couvert.
+- **Limite de la vérification** — aucun contrôle au navigateur (extension Chrome
+  indisponible) ; la boucle a été pilotée à la main dans les tests, ce qui est le
+  chemin recommandé par la recipe, mais l'effet visuel de la marche n'a pas été
+  regardé à l'écran.
+- **Déposé en `100-follow-up/`** — `2026-07-27_17-23_cadence-animation-suit-la-frequence.md`.
+
 ## Journal
 
 Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%m-%d
@@ -138,4 +152,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:24] Review : DoD cochée, frontière moteur intacte (le correctif
+  est entièrement dans `src/engine/`, rien d'importé de l'app), doc de la game
+  loop mise à jour (schéma mermaid + point sur la banque de sous-pixels). Mergé
+  sur `main` en `--no-ff` : **6ea5a38**. `npm run verify` repassé vert après merge
+  (270 tests).
+- [2026-07-27 17:24] Candidat déposé sur `main` **avant** le merge, depuis le tree
+  principal, comme l'impose la recipe — sinon il n'atteint le board qu'au merge.
