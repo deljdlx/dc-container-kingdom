@@ -7,7 +7,7 @@ created: 2026-07-26 14:29
 ready: 2026-07-27 17:05
 doing: 2026-07-27 17:05
 verify: 2026-07-27 17:14
-done:
+done: 2026-07-27 17:19
 ---
 
 ## Objectif
@@ -47,12 +47,12 @@ d'un coup :
 
 ## Definition of Done
 
-- [ ] Plus aucune requête vers un domaine externe au chargement de l'app
+- [x] Plus aucune requête vers un domaine externe au chargement de l'app
       (vérifié dans l'onglet réseau).
-- [ ] Police correctement appliquée en dev **et** dans le build (`npm run build` +
+- [x] Police correctement appliquée en dev **et** dans le build (`npm run build` +
       `npm run preview`).
-- [ ] Seules les graisses utilisées sont embarquées ; licence mentionnée.
-- [ ] `npm run verify` vert.
+- [x] Seules les graisses utilisées sont embarquées ; licence mentionnée.
+- [x] `npm run verify` vert.
 
 ## Journal
 
@@ -70,4 +70,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:19] merge `deccd8b` sur `main` (`--no-ff`) puis passage en `080-done` ; DoD validée intégralement.
+
+## Suite
+
+- **Ce que ça ouvre** : optionnaliser la télémétrie (analytics interne) derrière une variable d'environnement explicite, désactivée par défaut en local.
+- **Ce qu'on laisse de côté** : normalisation de la stratégie de polices pour la démo/catalogue moteur ; hors périmètre car ces pages n'importaient pas Google Fonts.
+- **Ce qui a été déposé** : aucun candidat en `100-follow-up`.
