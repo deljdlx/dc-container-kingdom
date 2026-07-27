@@ -10,6 +10,10 @@ Two standalone local pages ship with the engine:
 - [Autonomous demo](http://localhost:5173/engine/demo/) (source: [`engine/demo/`](demo/))
 - [Sprites catalog](http://localhost:5173/engine/catalog/)
 
+The catalog now supports family jump links, combinable filters (text + kind +
+zones), sorting, and URL-shareable state through query params (`q`, `kind`,
+`zone`, `sort`).
+
 ## Boundary
 
 - Dependencies flow **app → engine only**. The engine imports nothing from

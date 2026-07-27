@@ -9,6 +9,10 @@ animés, collisions, events. Il ne connaît **rien** de l'app qui l'embarque.
 > décrit les **concepts internes**. Le détail au niveau code est dans les
 > **JSDoc** (exhaustifs) de chaque fichier.
 
+Le catalogue moteur (`/engine/catalog/`) propose désormais une navigation par
+familles (index cliquable), des filtres combinables (texte/type/zones), un tri,
+et un état partageable dans l'URL (`q`, `kind`, `zone`, `sort`).
+
 ## 1. Scene graph : `Element` et ses sous-systèmes
 
 `Element` est le nœud de base de l'arbre de scène. Plutôt qu'une god-class, il

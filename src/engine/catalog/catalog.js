@@ -4,62 +4,101 @@ import {
   setAssetsBase,
 } from '../index.js';
 import * as engine from '../index.js';
+import {
+  buildFamilyIndex,
+  filterAndSortCatalogEntries,
+  groupByFamily,
+  parseCatalogState,
+  serializeCatalogState,
+} from './catalog-navigation.js';
 import { getCatalogEntries } from './catalog-registry.js';
 import { getStageMetrics } from './preview-layout.js';
 
 applyDebugFlag();
 setAssetsBase('/engine/images');
 
-const catalogEntries = getCatalogEntries(engine);
 const summaryNode = document.querySelector('[data-catalog-summary]');
 const galleryNode = document.querySelector('[data-catalog-gallery]');
 const filterNode = document.querySelector('[data-catalog-filter]');
+const kindNode = document.querySelector('[data-catalog-kind]');
+const zoneNode = document.querySelector('[data-catalog-zone]');
+const sortNode = document.querySelector('[data-catalog-sort]');
+const indexNode = document.querySelector('[data-catalog-index]');
+const emptyNode = document.querySelector('[data-catalog-empty]');
 
-const cards = buildFamilySections(catalogEntries, galleryNode);
-applyFilter('');
+const catalogEntries = getCatalogEntries(engine).map((entry) => buildEntryMetadata(entry));
+const familyDescriptors = buildFamilyIndex(catalogEntries);
+const familySections = buildFamilySections(familyDescriptors, galleryNode);
+const cardCache = new Map();
 
-filterNode.addEventListener('input', () => applyFilter(filterNode.value));
+buildFamilyNav(familyDescriptors, indexNode);
+
+let state = parseCatalogState(new URLSearchParams(window.location.search));
+syncControls(state);
+applyState(state, false);
+
+filterNode.addEventListener('input', () => {
+  state = {
+    ...state,
+    query: filterNode.value,
+  };
+  applyState(state, true);
+});
+
+kindNode.addEventListener('change', () => {
+  state = {
+    ...state,
+    kind: kindNode.value,
+  };
+  applyState(state, true);
+});
+
+zoneNode.addEventListener('change', () => {
+  state = {
+    ...state,
+    zone: zoneNode.value,
+  };
+  applyState(state, true);
+});
+
+sortNode.addEventListener('change', () => {
+  state = {
+    ...state,
+    sort: sortNode.value,
+  };
+  applyState(state, true);
+});
+
+window.addEventListener('popstate', () => {
+  state = parseCatalogState(new URLSearchParams(window.location.search));
+  syncControls(state);
+  applyState(state, false);
+});
 
 /**
- * Render one section per family, and return the cards with what they filter on.
- * @param {ReturnType<typeof getCatalogEntries>} entries
+ * @param {Array<{family: string, count: number}>} families
  * @param {HTMLElement} container
- * @returns {Array<{haystack: string, node: HTMLElement, section: HTMLElement}>}
+ * @returns {Map<string, {section: HTMLElement, heading: HTMLHeadingElement, count: HTMLSpanElement, grid: HTMLElement, total: number}>}
  */
-function buildFamilySections(entries, container) {
-  const built = [];
-  let section = null;
-  let grid = null;
-  let family = null;
-
-  entries.forEach((entry) => {
-    if (entry.family !== family) {
-      family = entry.family;
-      const familyEntries = entries.filter((candidate) => candidate.family === family);
-      ({ section, grid } = buildFamilySection(family, familyEntries));
-      container.append(section);
-    }
-
-    const node = buildCard(entry);
-    grid.append(node);
-    built.push({
-      haystack: `${entry.name} ${entry.family} ${entry.kindLabel}`.toLowerCase(),
-      node,
-      section,
-    });
+function buildFamilySections(families, container) {
+  const sections = new Map();
+  families.forEach((familyDescriptor) => {
+    const sectionDescriptor = buildFamilySection(familyDescriptor.family, familyDescriptor.count);
+    container.append(sectionDescriptor.section);
+    sections.set(familyDescriptor.family, sectionDescriptor);
   });
-
-  return built;
+  return sections;
 }
 
 /**
  * @param {string} family
- * @param {ReturnType<typeof getCatalogEntries>} familyEntries
- * @returns {{section: HTMLElement, grid: HTMLElement}}
+ * @param {number} familyCount
+ * @returns {{section: HTMLElement, heading: HTMLHeadingElement, count: HTMLSpanElement, grid: HTMLElement, total: number}}
  */
-function buildFamilySection(family, familyEntries) {
+function buildFamilySection(family, familyCount) {
   const section = document.createElement('section');
   section.className = 'catalog-family';
+  section.id = toFamilyAnchor(family);
 
   const heading = document.createElement('h2');
   heading.className = 'catalog-family__title';
@@ -67,7 +106,7 @@ function buildFamilySection(family, familyEntries) {
 
   const count = document.createElement('span');
   count.className = 'catalog-family__count';
-  count.textContent = `${familyEntries.length}`;
+  count.textContent = `${familyCount}`;
   heading.append(count);
 
   const grid = document.createElement('div');
@@ -75,35 +114,160 @@ function buildFamilySection(family, familyEntries) {
   grid.setAttribute('aria-label', `${family} elements`);
 
   section.append(heading, grid);
-  return { section, grid };
+  return {
+    section,
+    heading,
+    count,
+    grid,
+    total: familyCount,
+  };
 }
 
 /**
- * Show the cards matching `query`, hide the rest, and keep the summary honest.
- * @param {string} query
+ * @param {ReturnType<typeof parseCatalogState>} nextState
+ * @param {boolean} persist
  */
-function applyFilter(query) {
-  const needle = query.trim().toLowerCase();
-  const visibleSections = new Set();
-  let visible = 0;
+function applyState(nextState, persist) {
+  const visibleEntries = filterAndSortCatalogEntries(catalogEntries, nextState);
+  const groupedEntries = groupByFamily(visibleEntries);
 
-  cards.forEach((card) => {
-    const matches = needle === '' || card.haystack.includes(needle);
-    card.node.hidden = !matches;
-    if (matches) {
-      visible += 1;
-      visibleSections.add(card.section);
+  familySections.forEach((sectionDescriptor, family) => {
+    const familyEntries = groupedEntries.get(family) ?? [];
+    sectionDescriptor.section.hidden = familyEntries.length === 0;
+    sectionDescriptor.count.textContent = familyEntries.length === sectionDescriptor.total
+      ? `${sectionDescriptor.total}`
+      : `${familyEntries.length} / ${sectionDescriptor.total}`;
+    sectionDescriptor.grid.replaceChildren(...familyEntries.map((entry) => getCard(entry)));
+  });
+
+  updateFamilyIndex(groupedEntries);
+
+  const total = catalogEntries.length;
+  const visible = visibleEntries.length;
+  emptyNode.hidden = visible !== 0;
+  summaryNode.textContent = buildSummaryText(visible, total, nextState.query);
+
+  if (persist) {
+    const params = serializeCatalogState(nextState);
+    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ''}${window.location.hash}`;
+    window.history.replaceState({}, '', nextUrl);
+  }
+}
+
+/**
+ * @param {Map<string, Array<{name: string}>>} groupedEntries
+ */
+function updateFamilyIndex(groupedEntries) {
+  indexNode.querySelectorAll('a[data-family-link]').forEach((linkNode) => {
+    const family = linkNode.getAttribute('data-family-link');
+    if (!family) {
+      return;
     }
+
+    const countNode = linkNode.querySelector('[data-family-count]');
+    const visibleCount = groupedEntries.get(family)?.length ?? 0;
+    if (countNode) {
+      countNode.textContent = String(visibleCount);
+    }
+
+    linkNode.classList.toggle('catalog-index__link--hidden', visibleCount === 0);
+    linkNode.setAttribute('aria-disabled', visibleCount === 0 ? 'true' : 'false');
+    linkNode.tabIndex = visibleCount === 0 ? -1 : 0;
+  });
+}
+
+/**
+ * @param {Array<{family: string, count: number}>} families
+ * @param {HTMLElement} container
+ */
+function buildFamilyNav(families, container) {
+  const list = document.createElement('ul');
+  list.className = 'catalog-index__list';
+
+  families.forEach((familyDescriptor) => {
+    const item = document.createElement('li');
+
+    const link = document.createElement('a');
+    link.className = 'catalog-index__link';
+    link.href = `#${toFamilyAnchor(familyDescriptor.family)}`;
+    link.setAttribute('data-family-link', familyDescriptor.family);
+
+    const label = document.createElement('span');
+    label.textContent = familyDescriptor.family;
+
+    const count = document.createElement('span');
+    count.className = 'catalog-index__count';
+    count.setAttribute('data-family-count', '');
+    count.textContent = String(familyDescriptor.count);
+
+    link.append(label, count);
+    item.append(link);
+    list.append(item);
   });
 
-  galleryNode.querySelectorAll('.catalog-family').forEach((section) => {
-    section.hidden = !visibleSections.has(section);
-  });
+  container.append(list);
+}
 
-  const total = cards.length;
-  summaryNode.textContent = needle === ''
-    ? `${total} public visual elements available from engine/index.js.`
-    : `${visible} of ${total} public visual elements match "${query.trim()}".`;
+/**
+ * @param {string} family
+ * @returns {string}
+ */
+function toFamilyAnchor(family) {
+  return `family-${family.toLowerCase().replace(/[^a-z0-9]+/g, '-')}`;
+}
+
+/**
+ * @param {ReturnType<typeof parseCatalogState>} nextState
+ */
+function syncControls(nextState) {
+  filterNode.value = nextState.query;
+  kindNode.value = nextState.kind;
+  zoneNode.value = nextState.zone;
+  sortNode.value = nextState.sort;
+}
+
+/**
+ * @param {number} visible
+ * @param {number} total
+ * @param {string} query
+ * @returns {string}
+ */
+function buildSummaryText(visible, total, query) {
+  if (!query.trim()) {
+    return `${visible} public visual elements available from engine/index.js.`;
+  }
+  return `${visible} of ${total} public visual elements match "${query.trim()}".`;
+}
+
+/**
+ * @param {{name: string, family: string, kind: string, kindLabel: string, ElementClass: Function}} entry
+ * @returns {{name: string, family: string, kind: string, kindLabel: string, ElementClass: Function, collisionCount: number, triggerCount: number, footprint: number}}
+ */
+function buildEntryMetadata(entry) {
+  const element = new entry.ElementClass();
+  const stageMetrics = getStageMetrics(element);
+
+  return {
+    ...entry,
+    collisionCount: element.getCollisionZones('collision').length,
+    triggerCount: element.getCollisionZones('trigger').length,
+    footprint: stageMetrics.contentWidth * stageMetrics.contentHeight,
+  };
+}
+
+/**
+ * @param {{name: string, family: string, kind: string, kindLabel: string, ElementClass: Function}} entry
+ * @returns {HTMLElement}
+ */
+function getCard(entry) {
+  const cachedCard = cardCache.get(entry.name);
+  if (cachedCard) {
+    return cachedCard;
+  }
+
+  const built = buildCard(entry);
+  cardCache.set(entry.name, built);
+  return built;
 }
 
 /**

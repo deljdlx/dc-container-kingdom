@@ -6,7 +6,7 @@ branch: copilot/feat-ux-catalogue-navigable
 created: 2026-07-27 17:33
 ready: 2026-07-27 17:48
 doing: 2026-07-27 17:48
-verify:
+verify: 2026-07-27 17:52
 done:
 ---
 
@@ -109,12 +109,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:52] Ajout d'une barre d'outils navigable dans `engine/catalog` : filtres combinables (texte + kind + zones), tri (`family`/`name`/`footprint`), index des familles cliquable avec compteurs visibles avant navigation.
+- [2026-07-27 17:52] État de navigation reflété dans l'URL (`q`, `kind`, `zone`, `sort`) via `history.replaceState`, avec parsing robuste au chargement/back-forward.
+- [2026-07-27 17:52] Ajout d'un état explicite « aucun résultat » et d'une adaptation responsive de la toolbar/index pour un usage mobile.
+- [2026-07-27 17:52] Décision rendue sur le rendu à la demande : pas de virtualisation lourde dans ce ticket (risque de complexité DOM + previews live) ; compromis retenu = cache des cartes et reconstruction ciblée par section au changement de filtres, pour garder un comportement déterministe et simple à maintenir.
 
 ### Vérification
 
--
+- [2026-07-27 17:52] `npm run verify` OK (lint + build + tests) : 40 fichiers de test, 278 tests passants.
+- [2026-07-27 17:52] Ajout de tests unitaires purs sur la logique de navigation (`test/catalog-navigation.test.js`) : parsing/sérialisation URL, combinaison des filtres, tri, regroupement par famille.
 
 ### Validation
 
--
+- [2026-07-27 17:52] Validation navigateur sur `http://localhost:5175/engine/catalog/` : présence des contrôles, index 44 familles, navigation par ancre vers famille (`#family-woman`) sans scroller la galerie à la main.
+- [2026-07-27 17:52] Validation état URL : exemple observé `?q=tree&kind=sprite&zone=collision&sort=footprint` et restauration de vue associée.
+- [2026-07-27 17:52] Validation état vide : message explicite affiché lorsque la combinaison de filtres ne retourne aucun élément.
