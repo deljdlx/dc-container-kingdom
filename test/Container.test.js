@@ -70,6 +70,28 @@ describe('Container (domain model)', () => {
       expect(c.getCpuUsageThreshold().css).toBe('xxs');
     });
 
+    it('covers every CPU bucket in ascending order', () => {
+      const c = makeContainer();
+      const samples = [
+        { usage: 0.5, expected: 'xxs' },
+        { usage: 2, expected: 'xs' },
+        { usage: 7, expected: 's' },
+        { usage: 15, expected: 'm' },
+        { usage: 25, expected: 'xm' },
+        { usage: 35, expected: 'xxm' },
+        { usage: 45, expected: 'l' },
+        { usage: 55, expected: 'xl' },
+        { usage: 65, expected: 'xxl' },
+        { usage: 75, expected: 'xxxl' },
+        { usage: 95, expected: 'critical' },
+      ];
+
+      for (const sample of samples) {
+        c.cpuUsage = sample.usage;
+        expect(c.getCpuUsageThreshold().css).toBe(sample.expected);
+      }
+    });
+
     it('maps very high usage to critical', () => {
       const c = makeContainer();
       c.cpuUsage = 95;

@@ -6,7 +6,7 @@ branch: copilot/feat-echelle-cpu-complete
 created: 2026-07-26 14:28
 ready: 2026-07-27 17:30
 doing: 2026-07-27 17:30
-verify:
+verify: 2026-07-27 17:32
 done:
 ---
 
@@ -69,11 +69,14 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:30] CPU: refonte de `.cpu-indicator` dans `infra-viewer.css` en mode variables CSS par palier (`--cpu-size`, `--cpu-color`, `--cpu-speed`, etc.) avec un seul `@keyframes orbit` mutualisé ; ajout des styles manquants `s`→`xxxl` + `critical` et rendu progressif monotone. Accessibilité: `@media (prefers-reduced-motion: reduce)` coupe l'orbite.
+- [2026-07-27 17:30] Mémoire: ajout des styles manquants `memory--xxl` et `memory--xxxl` dans `memory.css` pour éviter le fallback transparent aux gros conteneurs.
+- [2026-07-27 17:30] Test: extension de `test/Container.test.js` pour couvrir explicitement tous les buckets CPU (`xxs`→`critical`) et verrouiller la couverture de la plage 5%→80%.
 
 ### Vérification
 
--
+- [2026-07-27 17:32] `npm test -- Container.test.js` vert (nouveau test couvrant tous les buckets CPU), puis `npm run verify` vert (lint + build + 39 fichiers / 272 tests).
+- [2026-07-27 17:32] Validation navigateur sur fixtures en dev (`127.0.0.1:5176`) : 35 maisons, plusieurs paliers CPU effectivement rencontrés (`xs`, `s`, `m`, `xm`, `xxm`) avec variation lisible de taille/couleur/vitesse (`animationName=orbit`, durées distinctes) ; paliers mémoire observés incluant `memory--xxl` (et styles `xxl`/`xxxl` présents côté CSS).
 
 ### Validation
 
