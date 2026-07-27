@@ -2,10 +2,10 @@
 id: 2026-07-27_10-20
 title: Recipe — audit en profondeur de la codebase
 type: docs
-branch:
+branch: claude/recipe-audit-codebase
 created: 2026-07-27 10:20
 ready: 2026-07-27 10:25
-doing:
+doing: 2026-07-27 10:26
 verify:
 done:
 ---
@@ -143,7 +143,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 10:26] Ticket pris sur `claude/recipe-audit-codebase` (worktree `/tmp/dc-container-kingdom-claude`). Tri de `100-follow-up/` d'abord, comme le veut `work-a-task` : boîte **vide**, rien à trier.
+- [2026-07-27 10:27] `meta/agents/recipes/audit-codebase.md` écrite : ce que ça produit (tickets, pas rapport), périmètre annoncé, 7 étapes, règle de preuve, 9 familles de défauts, barre de tri avant dépôt.
+- [2026-07-27 10:27] **Tension d'agnosticité tranchée** : les recipes de méthode ne doivent citer ni API ni chemin du projet, mais la DoD demande des exemples réels. Résolu en décrivant chaque famille par son **symptôme** (générique) et en isolant les ids du board dans une **colonne à part**, explicitement remplaçable en cas de réutilisation ailleurs. Vérifié par `grep` : la recipe ne cite aucun `src/`, aucune API, aucune commande du projet.
+- [2026-07-27 10:28] Manque repéré à la relecture : la recipe sœur `audit-workflow-consistency` donne des commandes, la mienne restait déclarative — donc inapplicable telle quelle. Ajout d'un bloc « Repérage » avec deux commandes **génériques** (inventaire par taille, sources sans test) et un mot sur la centralité qui, elle, se lit dans les imports.
+- [2026-07-27 10:29] Index `meta/agents/recipes/README.md` à jour (section Méthode).
 
 ### Vérification
 
