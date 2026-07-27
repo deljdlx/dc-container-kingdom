@@ -4,7 +4,7 @@ title: Déplacement — le dt perdu sous le pixel rend la vitesse dépendante du
 type: fix
 branch:
 created: 2026-07-26 14:23
-ready:
+ready: 2026-07-27 17:18
 doing:
 verify:
 done:
@@ -40,6 +40,20 @@ indépendant de la fréquence d'écran.
 - Vérifier l'effet sur `Character._animator.advance(Math.round(moveSpeed / 80))` :
   la cadence de la marche est elle aussi dérivée de la vitesse, pas du temps.
 
+### Décision de périmètre : le déplacement, pas la cadence d'animation
+
+Le ticket demande de « vérifier l'effet » sur
+`Character._animator.advance(Math.round(moveSpeed / 80))`. Relevé fait :
+`CharacterAnimator` compte des **ticks** (des appels), jamais du temps — donc la
+cadence de la marche dépend elle aussi du taux de rafraîchissement, et l'
+accumulateur ne la corrigera pas.
+
+**On ne le corrige pas ici.** C'est un second défaut, dans une autre classe, qui
+touche aussi les PNJ et leurs behaviors : le traiter dans la foulée gonflerait un
+correctif de boucle en refonte de l'animation. La DoD de ce ticket porte sur la
+**distance parcourue**. L'effet est donc **mesuré** pendant la vérification et
+**déposé** en candidat (`100-follow-up/`) plutôt que corrigé au passage.
+
 ### Risques / vigilance
 
 - Les positions doivent rester **entières côté DOM** (`left/top` en px) pour
@@ -60,8 +74,14 @@ indépendant de la fréquence d'écran.
 - [ ] À vitesse constante, la distance parcourue pour un même temps simulé est la
       même quel que soit le pas de `dt` (test : 40 frames à 16 ms vs 160 à 4 ms,
       tolérance ≤ 1 px).
-- [ ] Aucune configuration `dt`/vitesse ne bloque le déplacement.
-- [ ] Le rendu reste en pixels entiers.
+- [ ] Aucune configuration `dt`/vitesse ne bloque le déplacement — en particulier
+      le cas 240 Hz / `speed = 100`, aujourd'hui **totalement figé**.
+- [ ] Preuves automatisées qui **échouent avant correction**.
+- [ ] Le rendu reste en pixels entiers (aucune position fractionnaire n'atteint le
+      DOM ni les bounding boxes).
+- [ ] Le clamp de `dt` à 100 ms est conservé (test de caractérisation existant
+      toujours vert).
+- [ ] Effet sur la cadence d'animation **mesuré** et déposé en candidat.
 - [ ] Doc à jour, `npm run verify` vert.
 
 ## Journal
