@@ -2,10 +2,10 @@
 id: 2026-07-27_11-20
 title: Des fixtures d'âges variés, pour voir le temps passer en dev
 type: test
-branch:
+branch: copilot/varied-fixture-ages
 created: 2026-07-27 11:20
 ready: 2026-07-27 19:40
-doing:
+doing: 2026-07-27 19:40
 verify:
 done:
 ---
