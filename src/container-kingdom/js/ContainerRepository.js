@@ -38,9 +38,22 @@ export class ContainerRepository {
    * containers, refresh existing ones in place (keeping their stats history so
    * CPU can be computed), create the new ones, then rebuild the derived
    * network/compose indexes.
+   *
+   * A failed fetch is a strict **no-op**: an unreachable daemon is not an empty
+   * cluster, so containers, indexes and checksum are left untouched and the
+   * last known kingdom stays on screen. Only an answering daemon may prune.
+   * @returns {Promise<boolean>} true when the state was reconciled, false when
+   *   the fetch failed and the previous state was kept
    */
   async loadContainers() {
-    const descriptors = await this.dockerApiClient.getContainersDescriptors();
+    let descriptors;
+    try {
+      descriptors = await this.dockerApiClient.getContainersDescriptors();
+    } catch (error) {
+      console.error('Error loading containers:', error);
+      return false;
+    }
+
     const seenIds = new Set(descriptors.map(descriptor => descriptor.Id));
 
     // Remove containers that disappeared.
@@ -93,6 +106,8 @@ export class ContainerRepository {
     if (changed) {
       this.handleNewContainers();
     }
+
+    return true;
   }
 
   _rebuildNetworks() {

@@ -42,11 +42,25 @@ describe('DockerApiClient', () => {
     expect(containers[0]).toHaveProperty('Names');
   });
 
-  it('returns an empty array on network failure instead of throwing', async () => {
+  // An outage must stay distinguishable from an empty cluster: reporting `[]`
+  // made callers prune every container the first time the daemon hiccupped.
+  it('propagates a network failure instead of reporting an empty cluster', async () => {
     vi.stubGlobal('fetch', async () => {
       throw new Error('network down');
     });
-    await expect(client.getContainersDescriptors()).resolves.toEqual([]);
+    await expect(client.getContainersDescriptors()).rejects.toThrow('network down');
+  });
+
+  it('propagates an HTTP failure on the descriptors route', async () => {
+    vi.stubGlobal('fetch', async () => new Response('nope', { status: 500 }));
+    await expect(client.getContainersDescriptors()).rejects.toThrow('500');
+  });
+
+  it('propagates a network failure when aggregating stats', async () => {
+    vi.stubGlobal('fetch', async () => {
+      throw new Error('network down');
+    });
+    await expect(client.getAllContainersStats()).rejects.toThrow('network down');
   });
 
   it('loads stats with the fields the app relies on', async () => {

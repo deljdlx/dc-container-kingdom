@@ -35,6 +35,9 @@ export class ContainerKingdom
   _loopTimeoutId = null;
   _loopEnabled = true;
 
+  /** @type {boolean} whether the last poll reached the Docker daemon */
+  _dockerReachable = true;
+
 
   constructor(dockerApiClient) {
     this.dockerApiClient = dockerApiClient;
@@ -55,9 +58,12 @@ export class ContainerKingdom
 
     this.viewer = new ContainerKingdomRenderer(this, this.layout.getViewport());
 
-    await this.repository.loadContainers();
+    // A daemon that is already down must not block the boot: the kingdom comes
+    // up empty but usable, and the HUD says why.
+    const reconciled = await this.repository.loadContainers();
     this.layout.renderContainersList();
-    await this.loadContainersStats();
+    const statsLoaded = await this.loadContainersStats();
+    this._setDockerReachable(reconciled && statsLoaded);
 
     await this.viewer.drawContainers();
     this.viewer.drawNetworks();
@@ -90,6 +96,9 @@ export class ContainerKingdom
     return this.layout;
   }
 
+  /**
+   * @returns {Promise<boolean>} true when fresh stats landed
+   */
   async loadContainersStats() {
     const loaded = await this.repository.loadContainersStats();
     if (loaded) {
@@ -98,6 +107,23 @@ export class ContainerKingdom
       // lands, so there is nothing for the views to poll in between.
       this.repository.getContainerViews().forEach(view => view.refresh());
     }
+    return loaded;
+  }
+
+  /**
+   * Track whether the daemon answers, and surface it in the HUD.
+   *
+   * While it does not, the map holds its last known state — frozen figures read
+   * as live ones unless something says otherwise. Only redraws on a change, as
+   * the loop calls this on every tick.
+   * @param {boolean} reachable
+   */
+  _setDockerReachable(reachable) {
+    if (this._dockerReachable === reachable) {
+      return;
+    }
+    this._dockerReachable = reachable;
+    this.hud.renderConnectionStatus(reachable);
   }
 
   async loop() {
@@ -106,8 +132,16 @@ export class ContainerKingdom
     }
 
     try {
-      await this.repository.loadContainers();
-      await this.loadContainersStats();
+      // A failed reconciliation left the previous state in place: skip the rest
+      // of the tick rather than paint half-refreshed data over it.
+      const reconciled = await this.repository.loadContainers();
+      if (!reconciled) {
+        this._setDockerReachable(false);
+        return;
+      }
+
+      const statsLoaded = await this.loadContainersStats();
+      this._setDockerReachable(statsLoaded);
       this.layout.renderContainersList();
     } catch (error) {
       console.error('Container refresh loop failed:', error);
