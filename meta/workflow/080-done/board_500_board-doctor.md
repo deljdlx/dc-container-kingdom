@@ -7,7 +7,7 @@ created: 2026-07-27 19:03
 ready: 2026-07-27 19:21
 doing: 2026-07-27 19:22
 verify: 2026-07-27 19:31
-done:
+done: 2026-07-27 19:33 (merge 97bb5e1)
 ---
 
 ## Objectif
@@ -118,7 +118,19 @@ tel dans le test, sinon le prochain lecteur croira la règle garantie.
 
 ## Suite
 
--
+- **Ce que ça ouvre** — le garde-fou ne couvre que le **mécanique**. Le contrôle 4
+  de la recipe d'audit (« les commandes documentées s'exécutent »), qui avait
+  révélé trois commandes git fausses, reste **manuel** : rejouer un bloc `bash`
+  dans le contexte qu'il décrit ne se scripte pas trivialement.
+- **Ce qu'on laisse de côté** — l'archive garde ses deux doublons d'`id`
+  (`2026-07-24_21-53`, `2026-07-25_15-19`, trois tickets chacun) et ses 24
+  rubriques `Suite` absentes. Assumé : réécrire l'historique pour verdir un test
+  serait le falsifier.
+- **Ce que la mesure a appris** — la rubrique `## Suite` était **décorative**
+  depuis sa création : 5 tickets créés après elle ont été clos sans. Une règle
+  qu'aucun contrôle ne porte n'est pas une règle, c'est une intention. Le même
+  soupçon vaut pour les autres règles non couvertes.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -163,4 +175,11 @@ tel dans le test, sinon le prochain lecteur croira la règle garantie.
 
 ### Validation
 
--
+- [2026-07-27 19:33] Review : les 14 contrôles sont verts et **prouvés non
+  vacuous** (cinq passent au rouge sur violation synthétique). Les deux limites
+  assumées — proxy ASCII pour « anglais », archive hors périmètre — sont écrites
+  dans le test *et* dans la recipe, pas seulement dans le ticket. Mergé sur
+  `main` en `--no-ff` : **97bb5e1**.
+- [2026-07-27 19:33] La recipe d'audit ne décrit plus une procédure à rejouer à la
+  main pour ce qui est automatisé : elle renvoie au test et garde les commandes
+  comme description.
