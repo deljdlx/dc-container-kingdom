@@ -7,7 +7,7 @@ created: 2026-07-27 17:37
 ready: 2026-07-27 18:45
 doing: 2026-07-27 18:45
 verify: 2026-07-27 18:52
-done:
+done: 2026-07-27 18:53
 ---
 
 ## Objectif
@@ -126,7 +126,8 @@ conteneur. Les routes doivent suivre la même logique.
 
 ## Suite
 
--
+- Candidate ajouté : `2026-07-27_18-53_container-road-topology-strategy.md`
+      (topologie du tracé réseau à revoir hors correctif de duplication).
 
 ## Journal
 
@@ -150,3 +151,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 - [2026-07-27 18:52] Validation navigateur sur `http://localhost:5175/` : `roadElements=633`, `uniqueRoadPositions=633`, `duplicatePositions=0`, `maxStackAtSamePosition=1` (aucune superposition observée).
 - [2026-07-27 18:52] Validation filtre réseau sur tronçon partagé (`web` + `mariadb`) : tronçon visible après extinction de `web`, puis masqué seulement après extinction de `mariadb`.
+- [2026-07-27 18:53] Merge validé sur `main` : `c57dbdc`.
