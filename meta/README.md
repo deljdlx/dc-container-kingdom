@@ -48,6 +48,27 @@ Chaque transition **date** son passage (frontmatter) et **documente ses itérati
    candidats sont triés au **démarrage de la tâche suivante** —
    [follow-up-triage](agents/recipes/workflow/follow-up-triage.md).
 
+## Grouper des tâches (initiatives)
+
+Plusieurs tickets qui servent une même initiative se relient par le champ
+**`group:`** du frontmatter — un slug libre (`git-kingdom`, …) — et par un
+**ticket chapeau** qui porte l'intention et liste ses enfants **par `id`**.
+
+```bash
+grep -l "^group: git-kingdom" meta/workflow/*/*.md   # tout le groupe, colonnes comprises
+```
+
+**Pas de sous-dossier par groupe**, à dessein :
+
+- le backlog tire sa valeur d'être **priorisé** — N piles, c'est N sommets et plus
+  de réponse à « je prends quoi ensuite ? » ;
+- ici un **dossier signifie déjà « tâche avec artefacts »** (voir ci-dessus) ;
+- un ticket voyage de colonne en colonne par `git mv` : une arborescence de
+  groupes devrait être répliquée dans chaque colonne, ou s'aplatir en route.
+
+Le groupe est donc une **étiquette**, pas un rangement : il traverse les colonnes
+sans les perturber, et un ticket peut très bien n'appartenir à aucun.
+
 ## Créer une tâche
 
 Copier [`TEMPLATE.md`](workflow/TEMPLATE.md) dans `000-backlog/` sous le nom

@@ -5,7 +5,10 @@
    création ; `titre` court en kebab-case).
 2. Renseigner le frontmatter — `id`, `title`, `type` (`feat` | `fix` | `refactor` |
    `docs` | `test` | `chore`), `created` — et l'**Objectif** (le *quoi* et le
-   *pourquoi*).
+   *pourquoi*). `group:` est **optionnel** : un slug d'initiative, quand le ticket
+   sert un chantier qui en compte plusieurs (voir
+   [`../../../README.md`](../../../README.md)). Le groupe est une étiquette, pas un
+   dossier — le backlog reste une seule liste priorisée.
 3. Tu **peux amorcer** `Spécifications` / `Definition of Done` si la tâche est déjà
    claire, mais ce n'est pas requis : *specify* reste la porte qui les **confirme /
    affine** et pose `ready:` ([ticket-specify](ticket-specify.md)). Laisse vides les

@@ -2,6 +2,7 @@
 id: YYYY-MM-DD_HH-MM
 title: Titre court de la tâche
 type: feat            # feat | fix | refactor | docs | test | chore
+group:                # optionnel — slug d'initiative (ex. git-kingdom)
 branch:               # rempli à l'étape « work » (passage en 040-doing)
 created: YYYY-MM-DD HH:MM
 ready:                # daté au passage en 020-ready
