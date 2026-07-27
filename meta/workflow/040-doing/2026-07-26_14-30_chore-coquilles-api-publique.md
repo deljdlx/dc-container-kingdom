@@ -2,10 +2,10 @@
 id: 2026-07-26_14-30
 title: Corriger les coquilles de l'API publique (Posision, Bouding, drawHVertical)
 type: chore
-branch:
+branch: claude/coquilles-api-publique
 created: 2026-07-26 14:30
 ready: 2026-07-27 17:07
-doing:
+doing: 2026-07-27 17:09
 verify:
 done:
 ---
