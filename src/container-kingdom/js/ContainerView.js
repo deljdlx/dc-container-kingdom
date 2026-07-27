@@ -123,6 +123,16 @@ export class ContainerView {
     const dom = element.getDom();
     dom.dataset.cpuUsage = this._container.getCpuUsageThreshold().css;
 
+    // The house wears its container's state: a `running` → `exited` shows up on
+    // the next stats cycle, without waiting for the container set to change.
+    const state = this._container.State;
+    if (state) {
+      [...dom.classList]
+        .filter(className => className.startsWith('state--'))
+        .forEach(className => dom.classList.remove(className));
+      dom.classList.add(`state--${state}`);
+    }
+
     const memoryUsage = dom.querySelector('.container__memory-usage');
     if (memoryUsage) {
       memoryUsage.innerHTML = this._container.getMemoryUsage(true);

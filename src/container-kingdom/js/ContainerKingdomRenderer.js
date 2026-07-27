@@ -64,6 +64,22 @@ export class ContainerKingdomRenderer
    */
   grid;
 
+  /**
+   * Houses drawn so far, by container id. The repository destroys a vanished
+   * container's element and forgets the model before we get a say, so the
+   * renderer keeps its own record — without it there is no way to know which
+   * cell to give back.
+   * @type {Map<string, {x: number, y: number, house: object}>}
+   */
+  _placed = new Map();
+
+  /**
+   * Road and tree elements laid for the current network topology, kept so a
+   * refresh can wipe them before tracing again.
+   * @type {Array<object>}
+   */
+  _networkElements = [];
+
 
   constructor(application, viewport) {
     this.application = application;
@@ -129,6 +145,23 @@ export class ContainerKingdomRenderer
       return;
     }
     
+    const anchor = this._placed.get(firstContainer.getId());
+    if (anchor) {
+      // The group already stands somewhere: newcomers join it rather than being
+      // placed from scratch, which would scatter them across the map.
+      let {x, y} = anchor;
+      const houses = [anchor.house];
+      for (const container of containerList.slice(1)) {
+        ({x, y} = this.placement.getClosestFreeCoords(x, y, 0));
+        houses.push(await this.drawHouse(container, x, y));
+      }
+      const drawn = houses.filter(Boolean);
+      if (drawn.length > 1) {
+        this.drawFences(drawn);
+      }
+      return;
+    }
+
     let {x, y} = this.placement.computeContainerCoords(firstContainer);
     try {
       ({x, y} = this.placement.getClosestFreeCoords(x, y, 2));
@@ -215,6 +248,7 @@ export class ContainerKingdomRenderer
 
     container.rendered = true;
     this.placement.occupy(x, y);
+    this._placed.set(container.getId(), { x, y, house });
 
     container.setRpgEngineData({
       element: house,
@@ -276,6 +310,33 @@ export class ContainerKingdomRenderer
     return house;
   }
 
+
+  /**
+   * Reconcile the map with the current container set: give back the cells of
+   * those that vanished, draw the ones that appeared, then trace the roads
+   * again — a departure can cut a road that served three containers, so the
+   * network layer is redrawn whole rather than patched.
+   */
+  async syncContainers() {
+    const live = new Set(Object.keys(this.application.getContainers()));
+
+    this._placed.forEach(({ x, y }, id) => {
+      if (!live.has(id)) {
+        this.placement.release(x, y);
+        this._placed.delete(id);
+      }
+    });
+
+    await this.drawContainers();
+    this.clearNetworks();
+    this.drawNetworks();
+  }
+
+  /** Remove every road and tree laid for the previous network topology. */
+  clearNetworks() {
+    this._networkElements.forEach(element => element.destroy());
+    this._networkElements = [];
+  }
 
   /**
    * Draw the roads that join containers sharing a network.
@@ -357,7 +418,7 @@ export class ContainerKingdomRenderer
       if(matrix.hasHorizontalNeighbour(x, y, this.roadWidth)) {
         return;
       }
-      area.addElement(x, y + this.roadHeight * 2, new Tree00());
+      this._networkElements.push(area.addElement(x, y + this.roadHeight * 2, new Tree00()));
     });
   }
 
@@ -436,6 +497,7 @@ export class ContainerKingdomRenderer
       y,
       new Ground00()
     );
+    this._networkElements.push(road);
     road.addClass('network');
     road.addClass('network--' + networkName);
     return road;

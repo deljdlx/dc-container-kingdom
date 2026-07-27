@@ -50,6 +50,25 @@ export class ContainerPlacement {
   }
 
   /**
+   * Give a cell back, so a later placement can reuse it. A container that
+   * vanishes must not leave its plot fenced off for the rest of the session.
+   * @param {number} x
+   * @param {number} y
+   */
+  release(x, y) {
+    this.matrix[x]?.[y]?.pop();
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {boolean} whether anything stands on that cell
+   */
+  isOccupied(x, y) {
+    return (this.matrix[x]?.[y]?.length ?? 0) > 0;
+  }
+
+  /**
    * Compute the id-hash bounds across all containers; needed to normalise
    * a container's hash into a cell coordinate.
    * @param {Object<string, {Id: string}>|Array<{Id: string}>} containers
