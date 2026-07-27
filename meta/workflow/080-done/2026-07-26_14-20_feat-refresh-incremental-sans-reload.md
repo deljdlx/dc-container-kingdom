@@ -7,7 +7,7 @@ created: 2026-07-26 14:20
 ready: 2026-07-27 15:42
 doing: 2026-07-27 15:43
 verify: 2026-07-27 16:04
-done:
+done: 2026-07-27 16:07
 ---
 
 ## Objectif
@@ -117,4 +117,6 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 16:06] Review : DoD cochée, frontière moteur respectée, sonde temporaire retirée, aucun `git add -A`, Conventional Commits en français.
+- [2026-07-27 16:06] Deux mesures fausses avant la bonne (rechargement de Vite, puis `fetch` cassé par ma propre sonde) : consignées dans le journal plutôt que tues — la seconde a produit un vrai candidat.
+- [2026-07-27 16:07] Merge `--no-ff` de `claude/refresh-incremental` sur `main` : **cfbec43**. Candidat déposé sur `main` avant merge, branche supprimée, worktree conservé.
