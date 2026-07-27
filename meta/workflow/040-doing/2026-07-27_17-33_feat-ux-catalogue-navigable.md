@@ -2,10 +2,10 @@
 id: 2026-07-27_17-33
 title: Catalogue — rendre navigables 414 éléments (index, filtres, tri)
 type: feat
-branch:
+branch: copilot/feat-ux-catalogue-navigable
 created: 2026-07-27 17:33
 ready: 2026-07-27 17:48
-doing:
+doing: 2026-07-27 17:48
 verify:
 done:
 ---
