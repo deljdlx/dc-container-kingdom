@@ -1,6 +1,7 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { ContainerRepository } from '../src/container-kingdom/js/ContainerRepository.js';
-import { makeStats } from '../mock/docker-mock.js';
+import { DockerApiClient } from '../src/container-kingdom/js/DockerApiClient.js';
+import { handleDockerRequest, makeStats } from '../mock/docker-mock.js';
 import containers from '../mock/fixtures/containers.json' with { type: 'json' };
 
 /**
@@ -168,6 +169,104 @@ describe('ContainerRepository', () => {
     expect(repo.getContainerView(removedId)).toBeUndefined();
     expect(repo.getContainerViews().map(view => view.getContainer().Id))
       .not.toContain(removedId);
+  });
+
+  // Regression: the client used to swallow its errors and return `[]`, which the
+  // repository could not tell from an empty cluster — one daemon hiccup pruned
+  // every container and wiped the map.
+  describe('when the Docker API is unreachable', () => {
+    beforeEach(() => {
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+    });
+
+    afterEach(() => {
+      vi.restoreAllMocks();
+      vi.unstubAllGlobals();
+    });
+
+    // The bug as observed: behind the *real* client, a broken `fetch` was
+    // reported as an empty cluster and the 35 houses vanished in one cycle.
+    it('survives a broken fetch behind the real client', async () => {
+      vi.stubGlobal('fetch', async (url) => {
+        const { pathname, search } = new URL(url, 'http://local');
+        const result = handleDockerRequest(
+          'GET',
+          pathname.replace(/^\/api\/docker/, '') + search,
+          0
+        );
+        return new Response(JSON.stringify(result.body), { status: result.status });
+      });
+      repo = new ContainerRepository(new DockerApiClient());
+      await repo.loadContainers();
+      const before = repo.getContainers(true).length;
+      expect(before).toBeGreaterThan(0);
+
+      vi.stubGlobal('fetch', async () => {
+        throw new Error('network down');
+      });
+      await repo.loadContainers();
+
+      expect(repo.getContainers(true)).toHaveLength(before);
+    });
+
+    it('keeps every container and view instead of pruning them', async () => {
+      const client = makeClient();
+      repo = new ContainerRepository(client);
+      await repo.loadContainers();
+      const before = repo.getContainers(true).length;
+      expect(before).toBeGreaterThan(0);
+
+      client.getContainersDescriptors.mockRejectedValue(new Error('daemon down'));
+      const reconciled = await repo.loadContainers();
+
+      expect(reconciled).toBe(false);
+      expect(repo.getContainers(true)).toHaveLength(before);
+      expect(repo.getContainerViews()).toHaveLength(before);
+    });
+
+    it('leaves the checksum and the derived indexes untouched', async () => {
+      const client = makeClient();
+      repo = new ContainerRepository(client);
+      const onChanged = vi.fn();
+      repo.onContainersChanged = onChanged;
+      await repo.loadContainers();
+      const checksum = repo.lastContainersChecksum;
+      const networks = Object.keys(repo.getNetworks()).length;
+
+      client.getContainersDescriptors.mockRejectedValue(new Error('daemon down'));
+      await repo.loadContainers();
+
+      expect(repo.lastContainersChecksum).toBe(checksum);
+      expect(Object.keys(repo.getNetworks())).toHaveLength(networks);
+      expect(onChanged).not.toHaveBeenCalled();
+    });
+
+    it('still prunes when the daemon answers with a genuinely empty cluster', async () => {
+      const client = makeClient();
+      repo = new ContainerRepository(client);
+      await repo.loadContainers();
+
+      client.getContainersDescriptors.mockResolvedValue([]);
+      const reconciled = await repo.loadContainers();
+
+      expect(reconciled).toBe(true);
+      expect(repo.getContainers(true)).toHaveLength(0);
+    });
+
+    it('reconciles again once the daemon answers', async () => {
+      const client = makeClient();
+      repo = new ContainerRepository(client);
+      await repo.loadContainers();
+      const before = repo.getContainers(true).length;
+
+      client.getContainersDescriptors.mockRejectedValue(new Error('daemon down'));
+      await repo.loadContainers();
+      client.getContainersDescriptors.mockResolvedValue(containers.slice(1));
+      const reconciled = await repo.loadContainers();
+
+      expect(reconciled).toBe(true);
+      expect(repo.getContainers(true)).toHaveLength(before - 1);
+    });
   });
 
   describe('reconciliation across reloads', () => {

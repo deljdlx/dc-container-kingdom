@@ -2,11 +2,11 @@
 id: 2026-07-27_16-05
 title: Une panne de l'API Docker vide le royaume
 type: fix
-branch:
+branch: claude/panne-api-vide-le-royaume
 created: 2026-07-27 16:05
 ready: 2026-07-27 16:31
-doing:
-verify:
+doing: 2026-07-27 16:35
+verify: 2026-07-27 16:41
 done:
 ---
 
@@ -77,17 +77,17 @@ l'effacement, en plus discret.
 
 ## Definition of Done
 
-- [ ] `getContainersDescriptors()` et `getAllContainersStats()` propagent l'échec
+- [x] `getContainersDescriptors()` et `getAllContainersStats()` propagent l'échec
       au lieu de renvoyer `[]`.
-- [ ] `loadContainers()` est un **no-op strict** en cas de panne (aucun conteneur
+- [x] `loadContainers()` est un **no-op strict** en cas de panne (aucun conteneur
       supprimé, aucun `destroy()`, checksum inchangé) et le signale par son retour.
-- [ ] Un cluster réellement vide élague toujours (pas de régression du vrai vide).
-- [ ] Une panne au démarrage laisse l'app utilisable (écran de chargement masqué).
-- [ ] La panne est signalée dans le HUD, et le signalement disparaît au retour.
-- [ ] Preuve automatisée qui **échoue avant correction** : N conteneurs → panne →
+- [x] Un cluster réellement vide élague toujours (pas de régression du vrai vide).
+- [x] Une panne au démarrage laisse l'app utilisable (écran de chargement masqué).
+- [x] La panne est signalée dans le HUD, et le signalement disparaît au retour.
+- [x] Preuve automatisée qui **échoue avant correction** : N conteneurs → panne →
       toujours N conteneurs, plus les cas « vrai vide » et « retour à la normale ».
-- [ ] `npm run verify` vert.
-- [ ] JSDoc / doc à jour là où le contrat public change.
+- [x] `npm run verify` vert.
+- [x] JSDoc / doc à jour là où le contrat public change.
 
 ## Suite
 
@@ -97,11 +97,40 @@ l'effacement, en plus discret.
 
 ### Travail
 
--
+- [2026-07-27 16:36] Preuves posées **avant** correction. La plus fidèle au
+  symptôme observé branche le **vrai** `DockerApiClient` sur un `fetch` cassé :
+  elle échoue en `expected [] to have a length of 35 but got 0` — les 35 maisons
+  effacées, exactement le constat d'origine. 14 tests rouges au total (repository,
+  client, HUD, boucle).
+- [2026-07-27 16:38] Correction en trois temps. (1) `DockerApiClient` :
+  `getContainersDescriptors()` et `getAllContainersStats()` ne capturent plus —
+  elles **propagent**, comme le faisaient déjà les autres méthodes de la classe.
+  (2) `ContainerRepository.loadContainers()` capture l'échec et sort **avant**
+  toute mutation : rien de détruit, indexes et checksum intacts, retour `false`.
+  (3) `ContainerKingdom` dérive un `_dockerReachable` de ces retours et interrompt
+  le tick sur panne, plutôt que de peindre des données à moitié rafraîchies.
+- [2026-07-27 16:39] Signalement : `KingdomHud.renderConnectionStatus()` pose une
+  puce `.docker-status` dans le `#header` (CSS avec pulsation, neutralisée sous
+  `prefers-reduced-motion`), effacée dès le retour du daemon. `_setDockerReachable`
+  ne redessine **qu'au changement** — la boucle l'appelle toutes les 5 s.
+- [2026-07-27 16:40] Un détail de conception écarté : `init()` n'a pas eu besoin
+  d'un `try`. Le repository ne lève plus, donc une panne au démarrage suit le
+  chemin nominal (carte vide, écran de chargement masqué) — ajouter un `try`
+  aurait été du bruit.
+- [2026-07-27 16:40] Doc mise à jour : `meta/documentation/container-kingdom.md`,
+  section orchestration — « une panne n'est pas un cluster vide ».
 
 ### Vérification
 
--
+- [2026-07-27 16:39] Les 14 tests rouges passent au vert ; la preuve fidèle rend
+  bien 35 conteneurs après le `fetch` cassé.
+- [2026-07-27 16:39] `npm run verify` **vert** : eslint propre, `vite build` ok,
+  **246 tests / 36 fichiers** — aucune régression sur les suites existantes.
+- [2026-07-27 16:42] **Validation navigateur non faite** : l'extension Chrome
+  n'était pas connectée (« Browser extension is not connected »). Serveur de dev
+  laissé sur `http://localhost:5410` pour un contrôle visuel manuel de la puce.
+  Le comportement DOM correspondant est couvert automatiquement sous jsdom
+  (`test/KingdomHud.status.test.js` : apparition, effacement, pas d'empilement).
 
 ### Validation
 

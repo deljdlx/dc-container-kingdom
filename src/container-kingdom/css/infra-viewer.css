@@ -43,6 +43,40 @@
 }
 
 /* =============================================== */
+/* Outage chip: the map holds its last known state, this says so. */
+.docker-status {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 20px;
+  padding: 2px 10px;
+  background-color: #b3261e;
+  color: #fff;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  animation: docker-status-pulse 2s ease-in-out infinite;
+}
+
+.docker-status::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+@keyframes docker-status-pulse {
+  50% { opacity: 0.65; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docker-status { animation: none; }
+}
+
+/* =============================================== */
 .networks-switches {
   display: flex;
   align-items: center;

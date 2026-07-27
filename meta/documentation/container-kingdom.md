@@ -44,6 +44,16 @@ La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et sta
 avec un `try/catch/finally` qui garantit le réarmement du tick même en cas
 d'erreur transitoire côté daemon Docker.
 
+**Une panne n'est pas un cluster vide.** `DockerApiClient` *propage* ses échecs
+(il renvoyait `[]`, ce qui faisait élaguer tous les conteneurs et vidait la carte
+au premier hoquet du daemon) ; `ContainerRepository.loadContainers()` capture
+l'échec, devient un **no-op strict** — rien de détruit, indexes et checksum
+inchangés — et renvoie `false`. La boucle interrompt alors son tick, garde la
+dernière vue connue à l'écran et le signale via `KingdomHud.renderConnectionStatus()`
+(puce `.docker-status` dans le header, effacée dès que le daemon répond) : sans
+elle, des chiffres figés se liraient comme des chiffres frais. Seul un daemon qui
+**répond** peut faire disparaître des maisons.
+
 Quand l'empreinte change, `ContainerKingdom.refreshKingdom()` **réconcilie la carte
 en place** — plus aucun `location.reload()` : le zoom, le déplacement et la console
 ouverte survivent. Le renderer rend sa cellule au placement pour un conteneur

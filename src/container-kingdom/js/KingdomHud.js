@@ -50,6 +50,30 @@ export class KingdomHud {
   }
 
   /**
+   * Show — or clear — the "daemon unreachable" chip in the header.
+   *
+   * During an outage the map keeps its last known state on purpose; without
+   * this chip the frozen houses and figures would read as live ones.
+   * @param {boolean} reachable
+   */
+  renderConnectionStatus(reachable) {
+    let element = document.querySelector('.docker-status');
+
+    if (reachable) {
+      element?.remove();
+      return;
+    }
+
+    if (!element) {
+      element = document.createElement('div');
+      element.classList.add('docker-status');
+      element.setAttribute('role', 'status');
+      this._header.prepend(element);
+    }
+    element.textContent = 'Docker API unreachable — showing last known state';
+  }
+
+  /**
    * Render the per-network toggle switches. Every network starts enabled.
    */
   drawNetworksSwitches() {

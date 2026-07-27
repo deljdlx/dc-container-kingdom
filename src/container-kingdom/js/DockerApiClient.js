@@ -2,20 +2,20 @@
 export class DockerApiClient
 {
   /**
-   * Get all container descriptors from Docker API
+   * Get all container descriptors from Docker API.
+   *
+   * Rejects when the daemon cannot be reached. Reporting an empty array instead
+   * would make an outage indistinguishable from an empty cluster, and callers
+   * would prune every container on the first hiccup.
    * @returns {Promise<Array>} Array of container descriptors
+   * @throws {Error} when the request fails
    */
   async getContainersDescriptors() {
-    try {
-      const response = await fetch('/api/docker/containers/json?all=true');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      return await response.json();
-    } catch (error) {
-      console.error('Error while fetching containers descriptors:', error);
-      return [];
+    const response = await fetch('/api/docker/containers/json?all=true');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    return await response.json();
   }
 
   /**
@@ -59,27 +59,27 @@ export class DockerApiClient
   }
 
   /**
-   * Get stats for all containers
+   * Get stats for all containers.
+   *
+   * Rejects when the container list cannot be fetched, so the caller can tell a
+   * dead daemon from a cluster with nothing to report. A single container whose
+   * stats fail is dropped, not fatal — it may simply have just exited.
    * @returns {Promise<Array>} Array of container stats
+   * @throws {Error} when the container list cannot be fetched
    */
   async getAllContainersStats() {
-    try {
-      const response = await fetch('/api/docker/containers/json?all=true&size=true');
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const containers = await response.json();
-
-      const statsPromises = containers.map(container =>
-        this.loadContainerStats(container.Id).catch(() => null)
-      );
-      const stats = await Promise.all(statsPromises);
-
-      return stats.filter(stat => stat !== null);
-    } catch (error) {
-      console.error('Error fetching all container stats:', error);
-      return [];
+    const response = await fetch('/api/docker/containers/json?all=true&size=true');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
     }
+    const containers = await response.json();
+
+    const statsPromises = containers.map(container =>
+      this.loadContainerStats(container.Id).catch(() => null)
+    );
+    const stats = await Promise.all(statsPromises);
+
+    return stats.filter(stat => stat !== null);
   }
 
   /**
