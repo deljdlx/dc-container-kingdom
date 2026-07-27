@@ -4,7 +4,7 @@ title: Alléger le polling des stats Docker (double fetch, size=true, N+1)
 type: refactor
 branch:
 created: 2026-07-26 14:32
-ready:
+ready: 2026-07-27 17:40
 doing:
 verify:
 done:
