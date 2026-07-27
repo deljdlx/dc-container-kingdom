@@ -4,7 +4,7 @@ title: `enableMainCharacter()` sans arguments ne centre pas le joueur
 type: fix
 branch:
 created: 2026-07-27 10:34
-ready:
+ready: 2026-07-27 17:25
 doing:
 verify:
 done:
