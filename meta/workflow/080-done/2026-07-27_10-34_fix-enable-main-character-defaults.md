@@ -7,7 +7,7 @@ created: 2026-07-27 10:34
 ready: 2026-07-27 17:25
 doing: 2026-07-27 17:25
 verify: 2026-07-27 17:26
-done:
+done: 2026-07-27 17:27
 ---
 
 ## Objectif
@@ -48,14 +48,16 @@ Le centre attendu pour un viewport `500×300` est `x = 250`, `y = 150`.
 
 ## Definition of Done
 
-- [ ] `Viewport.enableMainCharacter()` centre bien le joueur quand aucun argument
+- [x] `Viewport.enableMainCharacter()` centre bien le joueur quand aucun argument
       n'est fourni.
-- [ ] Un test couvre explicitement l'appel sans arguments.
-- [ ] `npm run verify` passe.
+- [x] Un test couvre explicitement l'appel sans arguments.
+- [x] `npm run verify` passe.
 
 ## Suite
 
--
+- **Ce que ça ouvre** : ajouter un test API de robustesse pour `enableMainCharacter(null, undefined)` (mixte) pour figer définitivement le contrat "fallback centre".
+- **Ce qu'on laisse de côté** : harmoniser toutes les API moteur qui distinguent encore `null` vs `undefined` ; hors périmètre de ce fix ciblé.
+- **Ce qui a été déposé** : aucun candidat en `100-follow-up`.
 
 ## Journal
 
@@ -72,4 +74,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:27] merge `a84a112` sur `main` (`--no-ff`) puis passage en `080-done`; DoD validée intégralement.
