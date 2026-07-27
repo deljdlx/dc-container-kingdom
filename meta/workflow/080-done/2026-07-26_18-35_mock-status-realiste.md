@@ -7,7 +7,7 @@ created: 2026-07-26 18:35
 ready: 2026-07-27 11:12
 doing: 2026-07-27 11:13
 verify: 2026-07-27 11:17
-done:
+done: 2026-07-27 11:21
 ---
 
 ## Objectif
@@ -119,4 +119,5 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 11:20] Review : DoD cochée, horloge injectable partout, aucun test existant affaibli, `mock/README.md` à jour.
+- [2026-07-27 11:21] Merge `--no-ff` de `claude/mock-status-realiste` sur `main` : **6b26c49**. Candidat déposé sur `main` avant merge, branche supprimée, worktree conservé.
