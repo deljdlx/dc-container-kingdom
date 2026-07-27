@@ -7,7 +7,7 @@ created: 2026-07-27 16:05
 ready: 2026-07-27 16:31
 doing: 2026-07-27 16:35
 verify: 2026-07-27 16:41
-done:
+done: 2026-07-27 16:43 (merge fbc37a6)
 ---
 
 ## Objectif
@@ -91,7 +91,21 @@ l'effacement, en plus discret.
 
 ## Suite
 
--
+- **Ce que ça ouvre** — la panne est maintenant un **état de l'app**
+  (`_dockerReachable`), pas un accident local. D'autres lectures pourraient s'y
+  brancher : geler le compteur CPU/mémoire au lieu d'afficher des chiffres figés
+  comme s'ils étaient frais, ou dater la puce (« dernière vue à 16:42 »).
+- **Ce qu'on laisse de côté** — aucune **temporisation** : une panne d'un seul
+  tick allume la puce immédiatement. Sur un daemon qui hoquette, elle clignotera.
+  Un seuil (2 échecs consécutifs) serait plus doux, mais gagne à être réglé sur
+  du vrai bruit observé plutôt qu'à l'aveugle.
+- **Ce qu'on laisse de côté (2)** — `getContainerLogs()` avale toujours ses
+  erreurs et renvoie `''` : un log vide et un daemon muet restent
+  indistinguables. Périmètre différent (une vue, pas la carte), impact sans
+  commune mesure — pas de candidat déposé.
+- **Vérification** — la puce n'a **pas** été validée visuellement (extension
+  Chrome non connectée) ; seul son comportement DOM est couvert, sous jsdom.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -134,4 +148,9 @@ l'effacement, en plus discret.
 
 ### Validation
 
--
+- [2026-07-27 16:43] Review : DoD cochée point par point, frontière moteur non
+  concernée (le changement est entièrement dans `container-kingdom/`), JSDoc des
+  deux contrats modifiés (`getContainersDescriptors`, `loadContainers`) à jour,
+  aucun résidu de debug. Mergé sur `main` en `--no-ff` : **fbc37a6**.
+- [2026-07-27 16:43] Réserve assumée : la puce n'a pas eu de contrôle visuel
+  (extension navigateur indisponible) — reportée en `## Suite`.
