@@ -86,16 +86,15 @@ C'est le **même chemin** que celui appelé par rAF, donc une vérification fid�
 
 ## Conventions
 
-- **Langue** : code / identifiants / commentaires / JSDoc → **anglais** ;
-  commits / PR / échanges → **français**.
-- **Commits** : Conventional Commits + description FR (`feat:`, `fix:`, `refactor:`,
-  `docs:`, `test:`, `chore:`). **Jamais** de mention d'assistance IA. **Commiter /
-  pusher uniquement sur demande.** Ne jamais `git add -A`/`.` — stager des chemins
-  explicites.
-- **Workflow** typique : créer une branche → coder → **vérifier** (lint + build +
-  tests, + navigateur si pertinent) → committer → merger sur `main` (`--no-ff`).
-- **PR** : utiliser la checklist du template PR (`.github/pull_request_template.md`)
-  pour tracer les vérifications et l'impact doc.
-- **Design** : SOLID / découplage ; JSDoc sur l'API publique et la logique subtile,
-  code auto-documenté ailleurs ; tests sur la logique critique.
-- **« Terminé » = vérifié.** Rapporter fidèlement (un test qui échoue se dit).
+Les règles ne vivent **pas ici** : elles ont leur source unique dans
+[`../agents/`](../agents/). Répétées, elles dériveraient — et c'est la copie qu'on
+finirait par lire.
+
+- [**`agents/conventions.md`**](../agents/conventions.md) — la **langue** (code et
+  JSDoc en anglais, commits et échanges en français), le **style** (SOLID, JSDoc sur
+  l'API publique, tests sur le critique) et les règles **git** : une branche par
+  changement, Conventional Commits, jamais de mention d'assistance IA, jamais de
+  `git add -A`, commiter et pusher **sur demande**, template de PR.
+- [**`agents/workflow.md`**](../agents/workflow.md) — le **cycle d'une tâche** sur le
+  board, la règle « **terminé = vérifié** », et l'obligation de tenir la doc à jour
+  dans le même changement.
