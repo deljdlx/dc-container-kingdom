@@ -16,15 +16,17 @@ drifted every second against a real daemon. So the mock reproduces the
 | Field | Behaviour |
 |---|---|
 | `Id`, `Names`, `Image`, `Labels`, `NetworkSettings`, `State` | **static** — read from the fixtures |
-| `Created` | **static** — a birth date does not drift |
+| `Created` | **mostly static** — a few entries are re-anchored at mock start so a dev session still sees seconds/minutes/hours while the rest keep the captured age |
 | `Status` | **computed** from `Created` and the clock (`Up 4 seconds` → `Up About a minute` → `Up 8 days`) |
 | CPU stats | **computed** — grows with the clock so two samples yield a real percentage |
 | Memory stats | **computed** — breathes ±3% around a per-container base, too little to flip a `memory--*` threshold |
 
 The clock is **injectable** everywhere (`getContainers(now)`, `makeStats(id, now)`,
 `handleDockerRequest(method, path, now)`), so tests stay deterministic: same
-clock, same answer. The fixtures keep their own `Status`, but it is a fallback —
-never served as-is.
+clock, same answer. The mock keeps the fixture payloads intact but re-anchors a
+handful of `Created` values at startup to keep the `Status` column lively during
+development. The fixtures keep their own `Status`, but it is a fallback — never
+served as-is.
 
 ## Routes used by the app loop
 

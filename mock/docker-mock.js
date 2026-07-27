@@ -9,6 +9,15 @@
 import containers from './fixtures/containers.json' with { type: 'json' };
 
 const ONLINE_CPUS = 8;
+const MOCK_START_SECONDS = Math.floor(Date.now() / 1000);
+const FAST_MOVING_AGE_SECONDS = [
+  5,
+  90,
+  5 * 60,
+  2 * 60 * 60,
+  9 * 60 * 60,
+  2 * 24 * 60 * 60,
+];
 
 /**
  * Deterministic 32-bit hash of a string. Used to derive stable per-container
@@ -23,6 +32,22 @@ function hash(value) {
     h = Math.imul(h, 16777619);
   }
   return h >>> 0;
+}
+
+/**
+ * Give a small subset of containers a launch-relative age so a dev session
+ * can actually watch the Status line change instead of waiting for weeks.
+ * The rest keep their captured age, which preserves the shape of the real data.
+ * @param {number} index
+ * @param {{Created: number}} container
+ * @returns {number} age in seconds
+ */
+function getFixtureAgeSeconds(index, container) {
+  if (index < FAST_MOVING_AGE_SECONDS.length) {
+    return FAST_MOVING_AGE_SECONDS[index];
+  }
+
+  return Math.max(0, MOCK_START_SECONDS - container.Created);
 }
 
 /**
@@ -62,18 +87,26 @@ function humanizeAge(seconds) {
  *
  * `Status` is Docker's human-readable label and ages on its own — a mock that
  * froze it hid a real bug for a whole session (a fingerprint built on it looked
- * stable here and drifted every second against a real daemon). `Created`, by
- * contrast, is a birth date and stays put; the fixtures' own `Status` is only a
- * fallback and is never served as-is.
+ * stable here and drifted every second against a real daemon). `Created` stays
+ * fixed during one mock session, but a small subset of entries is re-anchored
+ * at startup so the visible ages span seconds, minutes, hours and days.
+ * The fixtures' own `Status` is only a fallback and is never served as-is.
  *
  * @param {number} [now] injectable clock (ms), so tests stay deterministic
  * @returns {Array<object>} the container descriptors
  */
 export function getContainers(now = Date.now()) {
-  return containers.map(container => ({
-    ...container,
-    Status: `Up ${humanizeAge(Math.max(0, Math.floor(now / 1000 - container.Created)))}`,
-  }));
+  const nowSeconds = Math.floor(now / 1000);
+
+  return containers.map((container, index) => {
+    const createdSeconds = MOCK_START_SECONDS - getFixtureAgeSeconds(index, container);
+
+    return {
+      ...container,
+      Created: createdSeconds,
+      Status: `Up ${humanizeAge(Math.max(0, nowSeconds - createdSeconds))}`,
+    };
+  });
 }
 
 /**
