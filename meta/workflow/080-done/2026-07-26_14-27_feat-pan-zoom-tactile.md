@@ -7,7 +7,7 @@ created: 2026-07-26 14:27
 ready: 2026-07-27 10:12
 doing: 2026-07-27 10:12
 verify: 2026-07-27 10:17
-done:
+done: 2026-07-27 10:23
 ---
 
 ## Objectif
@@ -55,12 +55,12 @@ son D-pad tactile.
 
 ## Definition of Done
 
-- [ ] Pan un doigt et pinch-zoom fonctionnels sur petit écran.
-- [ ] Zoom centré sur le point de geste (TODO `Fix zoom origin` levé) — ou TODO
+- [x] Pan un doigt et pinch-zoom fonctionnels sur petit écran.
+- [x] Zoom centré sur le point de geste (TODO `Fix zoom origin` levé) — ou TODO
       explicitement conservé et justifié si écarté du périmètre.
-- [ ] Tap sur maison / PNJ toujours fonctionnel, pas de faux clic après un pan.
-- [ ] Souris + trackpad non régressés.
-- [ ] Validation navigateur desktop **et** petit écran, `npm run verify` vert.
+- [x] Tap sur maison / PNJ toujours fonctionnel, pas de faux clic après un pan.
+- [x] Souris + trackpad non régressés.
+- [x] Validation navigateur desktop **et** petit écran, `npm run verify` vert.
 
 ## Journal
 
@@ -77,4 +77,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 10:23] merge `1c4197b` sur main (`--no-ff`). DoD cochée intégralement : pan doigt + pinch-zoom, seuil anti-faux-clic, zoom centré curseur, TODO levé, souris non régressée, touch-action CSS.
+
+## Suite
+
+- **Ce que ça ouvre** : inertie au lâcher du pan (momentum) et transitions de `focusOnContainer` animées seraient des plus-values visuelles directes.
+- **Ce qu'on laisse de côté** : D-pad tactile mobile pour déplacer le personnage — écarté du périmètre, l'app reste en mode « carte » sans personnage sur mobile.
+- **Ce qui a été déposé** : aucun candidat en `100-follow-up`.
