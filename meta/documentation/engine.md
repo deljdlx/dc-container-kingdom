@@ -52,8 +52,11 @@ Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`
 flowchart TD
     U["update(timestamp)"] --> DT["dt = clamp(Δt, 0, 100 ms)<br/>pas de téléport après une pause"]
     DT --> Q{"le joueur bouge ?"}
-    Q -->|oui| MC["moveCharacter · _streamAreas · character.update"]
-    Q -->|non| B
+    Q -->|oui| ACC["reste += dt × vitesse / 1000<br/>increment = partie entière"]
+    Q -->|non| RST["reste = 0"]
+    ACC --> MC["si increment ≥ 1 :<br/>moveCharacter · _streamAreas · character.update"]
+    RST --> B
+    MC --> B
     MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
     B --> C["camera.update"]
     C --> R["renderer.update"]
@@ -64,6 +67,13 @@ Points clés :
 - **Une seule horloge.** Joueur et PNJ sont tickés par la même game loop avec le
   même `dt` (les behaviors s'enregistrent via `viewport.addBehavior`). Pas de
   `setTimeout` maison.
+- **Le sous-pixel est mis en banque, pas jeté.** Le déplacement se fait en pixels
+  entiers (les sprites pixel-art ne doivent pas atterrir sur un demi-pixel), mais
+  la fraction restante est **reportée sur la frame suivante**. Arrondir chaque
+  frame isolément liait la vitesse de marche à la fréquence d'écran — et sous un
+  pixel par frame (écran rapide ou personnage lent) chaque frame arrondissait à
+  zéro : le personnage ne partait **jamais**. La banque se remet à zéro à l'arrêt,
+  pour qu'un reste dormant ne ressorte pas en saut au pas suivant.
 - **rAF est en pause quand l'onglet est caché** → tout gèle (voir
   [development.md](development.md) pour tester en pilotage manuel).
 

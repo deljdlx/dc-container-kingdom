@@ -56,6 +56,12 @@ export class Viewport
   /** @type {Array<{update: (dt: number) => void}>} behaviors ticked each frame */
   _behaviors = [];
 
+  /**
+   * @type {number} sub-pixel distance owed to the character, carried between
+   * frames so walking speed stays independent of the refresh rate
+   */
+  _moveRemainder = 0;
+
   loop;
 
   // pixels per second
@@ -311,12 +317,22 @@ export class Viewport
     this._timestamp = timestamp;
 
     if(this.character && this.moving) {
-      const increment = Math.round(dt * this.character.moveSpeed() / 1000);
+      // Bank the distance owed, spend whole pixels only. Rounding each frame in
+      // isolation tied the walking speed to the refresh rate — and below one
+      // pixel per frame (fast display or slow character) every frame rounded to
+      // zero and was dropped, freezing the character for good.
+      this._moveRemainder += dt * this.character.moveSpeed() / 1000;
+      const increment = Math.floor(this._moveRemainder);
       if(increment >= 1) {
+        this._moveRemainder -= increment;
         this.moveCharacter(increment);
         this._streamAreas();
         this.character.update();
       }
+    } else {
+      // Standing still owes nothing: a banked remainder would surface as a jump
+      // on the next step.
+      this._moveRemainder = 0;
     }
 
     // NPC behaviors run on the same clock as the player.

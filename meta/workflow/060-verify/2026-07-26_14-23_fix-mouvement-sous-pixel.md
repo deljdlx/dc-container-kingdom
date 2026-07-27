@@ -6,7 +6,7 @@ branch: claude/mouvement-sous-pixel
 created: 2026-07-26 14:23
 ready: 2026-07-27 17:18
 doing: 2026-07-27 17:19
-verify:
+verify: 2026-07-27 17:22
 done:
 ---
 
@@ -71,18 +71,18 @@ correctif de boucle en refonte de l'animation. La DoD de ce ticket porte sur la
 
 ## Definition of Done
 
-- [ ] À vitesse constante, la distance parcourue pour un même temps simulé est la
+- [x] À vitesse constante, la distance parcourue pour un même temps simulé est la
       même quel que soit le pas de `dt` (test : 40 frames à 16 ms vs 160 à 4 ms,
       tolérance ≤ 1 px).
-- [ ] Aucune configuration `dt`/vitesse ne bloque le déplacement — en particulier
+- [x] Aucune configuration `dt`/vitesse ne bloque le déplacement — en particulier
       le cas 240 Hz / `speed = 100`, aujourd'hui **totalement figé**.
-- [ ] Preuves automatisées qui **échouent avant correction**.
-- [ ] Le rendu reste en pixels entiers (aucune position fractionnaire n'atteint le
+- [x] Preuves automatisées qui **échouent avant correction**.
+- [x] Le rendu reste en pixels entiers (aucune position fractionnaire n'atteint le
       DOM ni les bounding boxes).
-- [ ] Le clamp de `dt` à 100 ms est conservé (test de caractérisation existant
+- [x] Le clamp de `dt` à 100 ms est conservé (test de caractérisation existant
       toujours vert).
-- [ ] Effet sur la cadence d'animation **mesuré** et déposé en candidat.
-- [ ] Doc à jour, `npm run verify` vert.
+- [x] Effet sur la cadence d'animation **mesuré** et déposé en candidat.
+- [x] Doc à jour, `npm run verify` vert.
 
 ## Journal
 
@@ -91,11 +91,50 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:19] Preuves posées avant correction, dans le fichier de
+  caractérisation que `2026-07-26_14-31` vient de livrer — il avait été écrit
+  comme filet pour ce correctif, il a servi tel quel. Trois rouges :
+  40 px d'écart entre 16 ms et 4 ms pour un même temps simulé ; **0 px parcouru**
+  à 240 Hz avec `speed = 100` (personnage figé, exactement le constat du ticket) ;
+  et un pas de 9 ms qui produisait 1 px là où il n'en devait que 0,9.
+- [2026-07-27 17:20] Correction : `Math.round` par frame → **banque de
+  sous-pixels**. `_moveRemainder += dt × vitesse / 1000`, on ne consomme que la
+  partie entière (`Math.floor`) et on reporte le reste. La frame n'est plus jetée
+  quand elle vaut moins d'un pixel : elle alimente la banque.
+- [2026-07-27 17:20] Détail qui aurait fait un bug : la banque est **remise à
+  zéro à l'arrêt**. Sans ça, un reste dormant ressortait en saut d'un pixel au
+  pas suivant — couvert par un test dédié.
+- [2026-07-27 17:21] Les positions restent **entières** : seule la banque est
+  fractionnaire, `moveCharacter()` ne reçoit que des entiers. Rien de flottant
+  n'atteint le DOM ni les bounding boxes.
 
 ### Vérification
 
--
+- [2026-07-27 17:20] Les 3 tests rouges passent au vert ; `npm run verify`
+  **vert** : lint + build + **270 tests / 39 fichiers** (266 + 4 nouveaux),
+  aucune régression. Le test de caractérisation du clamp `dt` à 100 ms — celui
+  qui encadre la frame de reprise d'onglet — est toujours vert sans retouche.
+- [2026-07-27 17:22] Mesure de l'effet sur l'animation (sonde temporaire, retirée
+  après lecture), sur 960 ms simulées :
+
+  | vitesse | `dt` | distance | avances d'animation |
+  |---|---|---|---|
+  | 300 | 16 ms (~60 Hz) | 287 px | 60 |
+  | 300 | 8 ms (~125 Hz) | 287 px | 120 |
+  | 300 | 4 ms (~250 Hz) | 287 px | 240 |
+  | 100 | 16 ms | 96 px | 60 |
+  | 100 | 4 ms (~250 Hz) | 96 px | 96 |
+
+  La **distance est désormais identique** quel que soit le `dt` — l'objectif du
+  ticket est atteint et mesuré. En revanche la cadence d'animation, elle, suit
+  toujours la fréquence : jusqu'à **4× plus rapide** à 250 Hz. C'est le second
+  défaut annoncé en *specify* (`CharacterAnimator` compte des appels, pas du
+  temps) ; il est **déposé en candidat**, pas corrigé ici.
+- [2026-07-27 17:22] **Pas de validation au navigateur** : l'extension Chrome
+  n'est toujours pas connectée. La boucle a été pilotée à la main dans les tests
+  (`viewport.update(t)` à timestamps croissants), qui est le chemin recommandé
+  par la recipe pour ce type de vérification — mais l'effet visuel de la marche
+  n'a pas été regardé à l'écran.
 
 ### Validation
 
