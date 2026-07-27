@@ -40,7 +40,7 @@ export class ContainerKingdom
     this.dockerApiClient = dockerApiClient;
     this.repository = new ContainerRepository(dockerApiClient);
     this.repository.onContainersChanged = () => {
-      document.location.reload();
+      this.refreshKingdom();
     };
     this.layout = new ContainerKingdomLayout(this);
 
@@ -68,6 +68,19 @@ export class ContainerKingdom
     this.layout.hideLoadingScreen();
 
     await this.loop();
+  }
+
+  /**
+   * Bring the map back in line with the container set, in place — no page
+   * reload, so zoom, panning and the open console survive.
+   */
+  async refreshKingdom() {
+    await this.viewer.syncContainers();
+    // Elements added after start-up live in the scene graph but have no DOM
+    // until the viewport paints them — the first draw is rendered by `init`,
+    // every later one needs this.
+    await this.layout.getViewport().render();
+    this.hud.drawNetworksSwitches();
   }
 
   /**

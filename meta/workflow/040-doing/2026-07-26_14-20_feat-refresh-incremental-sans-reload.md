@@ -2,10 +2,10 @@
 id: 2026-07-26_14-20
 title: Rafraîchir la carte sans recharger la page
 type: feat
-branch:
+branch: claude/refresh-incremental
 created: 2026-07-26 14:20
 ready: 2026-07-27 15:42
-doing:
+doing: 2026-07-27 15:43
 verify:
 done:
 ---
@@ -80,14 +80,14 @@ nouveaux) : le rendu doit suivre le même chemin **incrémental**.
 
 ## Definition of Done
 
-- [ ] Ajout / suppression / changement d'état d'un conteneur se reflètent **sans**
+- [x] Ajout / suppression / changement d'état d'un conteneur se reflètent **sans**
       `location.reload()`.
-- [ ] Le placement libère la cellule d'un conteneur disparu (réutilisable).
-- [ ] Zoom / pan / console préservés lors d'un rafraîchissement.
-- [ ] Tests sur la logique de réconciliation du rendu (placement, drapeaux).
-- [ ] Validation navigateur avec le mock (`mock/fixtures/containers.json` modifié
+- [x] Le placement libère la cellule d'un conteneur disparu (réutilisable).
+- [x] Zoom / pan / console préservés lors d'un rafraîchissement.
+- [x] Tests sur la logique de réconciliation du rendu (placement, drapeaux).
+- [x] Validation navigateur avec le mock (`mock/fixtures/containers.json` modifié
       à chaud si possible) — voir `meta/recipes/verify-in-browser.md`.
-- [ ] Doc à jour, `npm run verify` vert.
+- [x] Doc à jour, `npm run verify` vert.
 
 ## Journal
 
@@ -96,11 +96,24 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 15:43] Ticket pris sur `claude/refresh-incremental`. Tri de `100-follow-up/` fait avant : candidat des fixtures **promu**, boîte vide.
+- [2026-07-27 15:45] `ContainerPlacement` gagne `release()` / `isOccupied()` : une cellule rendue redevient réutilisable.
+- [2026-07-27 15:47] Le renderer tient son **propre registre** `id → {x, y, house}`. Sans lui, impossible de libérer la bonne cellule : quand la réconciliation a lieu, le repository a déjà détruit l'élément et oublié le modèle.
+- [2026-07-27 15:48] `syncContainers()` : libère les partis, dessine les nouveaux, efface la couche réseau et la retrace. Routes redessinées **en bloc** — un départ peut couper une route qui servait trois conteneurs.
+- [2026-07-27 15:49] Ancrage de groupe : un conteneur qui rejoint un compose déjà tracé part de la cellule **réelle** de son groupe, au lieu d'être replacé de zéro (il atterrissait loin des siens).
+- [2026-07-27 15:50] `ContainerView.refresh()` remet aussi la classe `state--*` : un `running → exited` se voit au cycle de stats suivant, sans même que la détection de changement se déclenche.
+- [2026-07-27 15:51] `KingdomHud.drawNetworksSwitches()` conserve les choix de l'utilisateur : un rafraîchissement ne doit pas réactiver en douce un réseau masqué.
+- [2026-07-27 15:52] `onContainersChanged` → `refreshKingdom()` : **plus aucun `location.reload()` dans l'app**.
+- [2026-07-27 16:00] **Défaut trouvé au navigateur, pas en test** : après réconciliation, `_networkElements` contenait 914 éléments et le DOM 0. Les éléments ajoutés après le démarrage vivent dans le graphe de scène **sans DOM** tant que le viewport n'a pas été rendu — au démarrage c'est `init()` qui peint. `refreshKingdom()` rend donc le viewport après la réconciliation. Verrouillé par un test qui vérifie l'**ordre** sync → render.
 
 ### Vérification
 
--
+- [2026-07-27 15:55] Première tentative de validation **invalide** : j'ai retiré un conteneur en éditant `mock/fixtures/containers.json`, mais Vite surveille le fichier et a rechargé la page — impossible de distinguer « l'app se rafraîchit » de « Vite recharge ». Fixtures restaurées, méthode changée : interception de `fetch` dans la page, aucun fichier touché.
+- [2026-07-27 15:58] Deuxième mesure **faussée par ma sonde** : `delete window.fetch` supprime `fetch` (propriété propre de `window`), donc l'app a reçu `ReferenceError`, `getContainersDescriptors()` a renvoyé `[]`, et les 35 maisons ont disparu. Ce n'était pas une régression — mais ça a révélé un vrai défaut, déposé en candidat (`2026-07-27_16-05`).
+- [2026-07-27 16:02] Mesure propre, depuis un chargement neuf : **35 → 34 → 35 maisons**, la maison du conteneur revenu est bien présente, routes retracées (880 → 844 → 906), **`window.__sansReload` intact** (aucun rechargement) et zoom `scale(1.4)` **préservé**.
+- [2026-07-27 16:03] Réconciliation à vide : neutre — 35 maisons et 880 routes avant comme après.
+- [2026-07-27 16:04] Sonde temporaire (`window.__kingdom`) retirée ; `git diff` de `bootstrap.js` vide.
+- [2026-07-27 16:04] `npm run verify` vert : lint + build + **232 tests** (35 fichiers), dont 7 nouveaux sur la réconciliation et le rendu.
 
 ### Validation
 

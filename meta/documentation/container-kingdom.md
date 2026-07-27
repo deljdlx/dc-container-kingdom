@@ -44,6 +44,19 @@ La **boucle de polling** (`loop`) recharge périodiquement l'état Docker et sta
 avec un `try/catch/finally` qui garantit le réarmement du tick même en cas
 d'erreur transitoire côté daemon Docker.
 
+Quand l'empreinte change, `ContainerKingdom.refreshKingdom()` **réconcilie la carte
+en place** — plus aucun `location.reload()` : le zoom, le déplacement et la console
+ouverte survivent. Le renderer rend sa cellule au placement pour un conteneur
+disparu, dessine la maison d'un nouveau venu, puis **retrace la couche réseau en
+bloc** (le tracé des routes est une fonction globale de la topologie). Un point
+d'attention : les éléments ajoutés après le démarrage vivent dans le graphe de
+scène **sans DOM** tant que le viewport n'a pas été rendu — d'où le `render()` qui
+suit la réconciliation.
+
+Un changement d'**état** (`running` → `exited`) n'a même pas besoin de cette
+détection : `ContainerView.refresh()` remet la classe `state--*` de la maison à
+chaque cycle de stats.
+
 La détection de changement ne vit qu'à un seul endroit :
 `ContainerRepository.loadContainers()` calcule un checksum `SHA-256` normalisé
 (ID, image, **état**, réseaux, labels) et déclenche le callback explicite

@@ -64,13 +64,16 @@ export class KingdomHud {
     container.append(caption);
 
     Object.keys(this._application.getNetworks()).forEach(networkName => {
-      this.selectedNetworks[networkName] = true;
+      // Keep what the user chose: redrawing the switches on a refresh must not
+      // silently switch a hidden network back on.
+      const enabled = this.selectedNetworks[networkName] ?? true;
+      this.selectedNetworks[networkName] = enabled;
 
       const label = document.createElement('label');
       label.classList.add('network-switch');
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
-      checkbox.checked = true;
+      checkbox.checked = enabled;
       label.append(checkbox);
       label.append(networkName);
       container.append(label);
