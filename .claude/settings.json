@@ -24,6 +24,7 @@
       "WebFetch(domain:gist.github.com)",
       "Bash(gh api:*)",
       "Bash(cd *)",
+      "Bash(wc *)",
       "Bash(ls *)",
       "Bash(cat *)",
       "Bash(head *)",
