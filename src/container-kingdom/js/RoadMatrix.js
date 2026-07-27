@@ -27,7 +27,48 @@ export class RoadMatrix {
    * @param {object} road the engine element drawn there
    */
   add(x, y, road) {
-    this._tiles.set(RoadMatrix.key(x, y), { x, y, road });
+    this._tiles.set(RoadMatrix.key(x, y), {
+      x,
+      y,
+      road,
+      networks: new Set(),
+    });
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {{x: number, y: number, road: object, networks: Set<string>}|undefined}
+   */
+  get(x, y) {
+    return this._tiles.get(RoadMatrix.key(x, y));
+  }
+
+  /**
+   * Record that a road tile belongs to a network.
+   * @param {number} x
+   * @param {number} y
+   * @param {string} networkName
+   */
+  assignNetwork(x, y, networkName) {
+    const tile = this.get(x, y);
+    if (!tile) {
+      return;
+    }
+    tile.networks.add(networkName);
+  }
+
+  /**
+   * @param {number} x
+   * @param {number} y
+   * @returns {string[]} network names attached to the tile
+   */
+  getNetworks(x, y) {
+    const tile = this.get(x, y);
+    if (!tile) {
+      return [];
+    }
+    return [...tile.networks];
   }
 
   /**
@@ -43,7 +84,7 @@ export class RoadMatrix {
    * @returns {Array<{x: number, y: number, road: object}>} every recorded tile
    */
   tiles() {
-    return [...this._tiles.values()];
+    return [...this._tiles.values()].map(({ x, y, road }) => ({ x, y, road }));
   }
 
   /**

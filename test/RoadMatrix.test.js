@@ -52,4 +52,15 @@ describe('RoadMatrix', () => {
 
     expect(matrix.hasHorizontalNeighbour(350, 200, 50)).toBe(false);
   });
+
+  it('tracks multiple networks on a single road tile', () => {
+    const matrix = new RoadMatrix();
+    matrix.add(350, 100, {});
+
+    matrix.assignNetwork(350, 100, 'web');
+    matrix.assignNetwork(350, 100, 'mariadb');
+    matrix.assignNetwork(350, 100, 'web');
+
+    expect(matrix.getNetworks(350, 100)).toEqual(['web', 'mariadb']);
+  });
 });

@@ -80,6 +80,16 @@ export class ContainerKingdomRenderer
    */
   _networkElements = [];
 
+  /**
+   * Last road tracing metrics, used to quantify overlap reduction.
+   * @type {{attemptedTiles: number, distinctTiles: number, duplicateTiles: number}}
+   */
+  _lastRoadMetrics = {
+    attemptedTiles: 0,
+    distinctTiles: 0,
+    duplicateTiles: 0,
+  };
+
 
   constructor(application, viewport) {
     this.application = application;
@@ -346,61 +356,179 @@ export class ContainerKingdomRenderer
   drawNetworks() {
     const networks = this.application.getNetworks();
 
+    const roadPlan = ContainerKingdomRenderer.buildNetworksRoadPlan(
+      networks,
+      this.cellWidth,
+      this.cellHeight,
+      this.roadWidth,
+      this.roadHeight,
+    );
+    this._lastRoadMetrics = roadPlan.metrics;
+
     const roadsMatrix = new RoadMatrix();
 
-    Object.keys(networks).forEach((networkName) => {
-      const connectedCells = [];
-      networks[networkName].forEach((container) => {
-        connectedCells.push(container.rpgEngine.data.coords);
+    const anchorContainer = Object.values(networks)
+      .flat()
+      .find((container) => container?.rpgEngine?.data?.element);
+
+    if (!anchorContainer) {
+      this.drawRoadTrees(roadsMatrix);
+      return networks;
+    }
+
+    const offsetLeft = anchorContainer.rpgEngine.data.element.width() / 2;
+    const offsetTop = anchorContainer.rpgEngine.data.element.height();
+
+    roadPlan.tiles.forEach((tile) => {
+      const networkNames = [...tile.networks];
+      if (networkNames.length === 0) {
+        return;
+      }
+
+      const [firstNetwork, ...otherNetworks] = networkNames;
+      const road = this.drawRoad(
+        firstNetwork,
+        tile.x + offsetLeft,
+        tile.y + offsetTop,
+      );
+
+      otherNetworks.forEach((networkName) => {
+        road.addClass('network--' + networkName);
       });
 
-      if(!networks[networkName][0]) {
-        return;
-      }
-
-      let from = connectedCells[0];
-      const fromContainer = networks[networkName][0];
-      if(!fromContainer.rpgEngine.data.element) {
-        return;
-      }
-
-      const offsetLeft = fromContainer.rpgEngine.data.element.width() / 2;
-      const offsetTop = fromContainer.rpgEngine.data.element.height();
-
-      for(let i = 1 ; i < connectedCells.length ; i++) {
-        if(!networks[networkName][i]) {
-          continue;
-        }
-        const to = connectedCells[i];
-
-        let xFromInPixels = from.x * this.cellWidth;
-        let yFromInPixels = from.y * this.cellHeight;
-
-        const xToInPixels = to.x * this.cellWidth;
-        const yToInPixels = to.y * this.cellHeight;
-
-        xFromInPixels = this.drawHorizontalRoads(
-          networkName,
-          xFromInPixels, xToInPixels,
-          yFromInPixels,
-          offsetLeft, offsetTop,
-          roadsMatrix
-        );
-
-        this.drawVerticalRoads(
-          networkName,
-          yFromInPixels, yToInPixels,
-          xFromInPixels,
-          offsetLeft, offsetTop,
-          roadsMatrix
-        );
-        from = connectedCells[i];
-      }
+      roadsMatrix.add(tile.x, tile.y, road);
+      networkNames.forEach((networkName) => {
+        roadsMatrix.assignNetwork(tile.x, tile.y, networkName);
+      });
     });
 
     this.drawRoadTrees(roadsMatrix);
 
     return networks;
+  }
+
+  /**
+   * @returns {{attemptedTiles: number, distinctTiles: number, duplicateTiles: number}}
+   */
+  getLastRoadMetrics() {
+    return this._lastRoadMetrics;
+  }
+
+  /**
+   * Build a deduplicated road occupancy plan from the current network chains.
+   * @param {Object<string, Array<{rpgEngine?: {data?: {coords?: {x: number, y: number}}}}>>} networks
+   * @param {number} cellWidth
+   * @param {number} cellHeight
+   * @param {number} roadWidth
+   * @param {number} roadHeight
+   * @returns {{tiles: Array<{x: number, y: number, networks: Set<string>}>, metrics: {attemptedTiles: number, distinctTiles: number, duplicateTiles: number}}}
+   */
+  static buildNetworksRoadPlan(networks, cellWidth, cellHeight, roadWidth, roadHeight) {
+    const tilesByKey = new Map();
+    const metrics = {
+      attemptedTiles: 0,
+      distinctTiles: 0,
+      duplicateTiles: 0,
+    };
+
+    Object.keys(networks).forEach((networkName) => {
+      const connectedCells = networks[networkName]
+        .map((container) => container?.rpgEngine?.data?.coords)
+        .filter(Boolean);
+
+      const tiles = ContainerKingdomRenderer.computeNetworkTiles(
+        connectedCells,
+        cellWidth,
+        cellHeight,
+        roadWidth,
+        roadHeight,
+      );
+
+      tiles.forEach((tile) => {
+        metrics.attemptedTiles += 1;
+        const key = RoadMatrix.key(tile.x, tile.y);
+        const existing = tilesByKey.get(key);
+        if (existing) {
+          existing.networks.add(networkName);
+          return;
+        }
+
+        tilesByKey.set(key, {
+          x: tile.x,
+          y: tile.y,
+          networks: new Set([networkName]),
+        });
+        metrics.distinctTiles += 1;
+      });
+    });
+
+    metrics.duplicateTiles = metrics.attemptedTiles - metrics.distinctTiles;
+
+    return {
+      tiles: [...tilesByKey.values()],
+      metrics,
+    };
+  }
+
+  /**
+   * Rebuild the tile chain generated by the current "horizontal then vertical"
+   * routing strategy for a single network.
+   * @param {Array<{x: number, y: number}>} connectedCells
+   * @param {number} cellWidth
+   * @param {number} cellHeight
+   * @param {number} roadWidth
+   * @param {number} roadHeight
+   * @returns {Array<{x: number, y: number}>}
+   */
+  static computeNetworkTiles(connectedCells, cellWidth, cellHeight, roadWidth, roadHeight) {
+    if (connectedCells.length <= 1) {
+      return [];
+    }
+
+    const tiles = [];
+    let from = connectedCells[0];
+
+    for (let i = 1; i < connectedCells.length; i++) {
+      const to = connectedCells[i];
+
+      let xFromInPixels = from.x * cellWidth;
+      let yFromInPixels = from.y * cellHeight;
+
+      const xToInPixels = to.x * cellWidth;
+      const yToInPixels = to.y * cellHeight;
+
+      const xDirection = (xToInPixels - xFromInPixels) > 0 ? 1 : -1;
+      let xLoopCounter = 0;
+      while (Math.abs(xFromInPixels - xToInPixels) > roadWidth) {
+        if (xLoopCounter > ContainerKingdomRenderer.LOOP_PROTECTION_MAX) {
+          console.error('Loop detected on X axis');
+          break;
+        }
+        xLoopCounter += 1;
+        tiles.push({ x: xFromInPixels, y: yFromInPixels });
+        xFromInPixels += roadWidth * xDirection;
+      }
+
+      const yDirection = (yToInPixels - yFromInPixels) > 0 ? 1 : -1;
+      let yLoopCounter = 0;
+      while (Math.abs(yFromInPixels - yToInPixels) >= roadHeight) {
+        if (yLoopCounter > ContainerKingdomRenderer.LOOP_PROTECTION_MAX) {
+          console.error('Loop detected on Y axis');
+          break;
+        }
+        yLoopCounter += 1;
+        tiles.push({ x: xFromInPixels, y: yFromInPixels });
+        yFromInPixels += roadHeight * yDirection;
+      }
+
+      if (yDirection < 1) {
+        tiles.push({ x: xFromInPixels, y: yFromInPixels });
+      }
+
+      from = to;
+    }
+
+    return tiles;
   }
 
   /**

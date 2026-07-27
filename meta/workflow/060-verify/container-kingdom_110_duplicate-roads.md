@@ -6,7 +6,7 @@ branch: copilot/fix-duplicate-roads
 created: 2026-07-27 17:37
 ready: 2026-07-27 18:45
 doing: 2026-07-27 18:45
-verify: 
+verify: 2026-07-27 18:52
 done:
 ---
 
@@ -135,12 +135,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 18:52] Refonte du tracé réseau dans `ContainerKingdomRenderer` : génération d'un plan logique dédupliqué par case (`buildNetworksRoadPlan`) puis rendu d'une seule route par tuile avec classes multi-réseaux (`network--<nom>` cumulées).
+- [2026-07-27 18:52] Extension de `RoadMatrix` pour suivre l'appartenance multi-réseaux par case (`assignNetwork`, `getNetworks`) sans changer l'API `tiles()` utilisée par la décoration d'arbres.
+- [2026-07-27 18:52] Correctif `KingdomHud.handleNetworkSwitch()` : les routes partagées ne sont masquées que si tous leurs réseaux sont désactivés (même logique que les maisons).
+- [2026-07-27 18:52] Décision de topologie conservée : ce ticket traite la superposition uniquement ; l'optimisation du cheminement (ordre/heuristique spatiale) part en follow-up dédié.
 
 ### Vérification
 
--
+- [2026-07-27 18:52] Mesure avant/après (test de caractérisation automatisé) : scénario de recouvrement contrôlé `web + mariadb` = `attemptedTiles: 4` (avant déduplication), `distinctTiles: 2` (après), `duplicateTiles: 2`.
+- [2026-07-27 18:52] Tests ciblés passants : `ContainerKingdomRenderer.road-plan.test.js`, `KingdomHud.network-switch.test.js`, `RoadMatrix.test.js`.
+- [2026-07-27 18:52] `npm run verify` vert (lint + build + tests) : 42 fichiers, 282 tests passants.
 
 ### Validation
 
--
+- [2026-07-27 18:52] Validation navigateur sur `http://localhost:5175/` : `roadElements=633`, `uniqueRoadPositions=633`, `duplicatePositions=0`, `maxStackAtSamePosition=1` (aucune superposition observée).
+- [2026-07-27 18:52] Validation filtre réseau sur tronçon partagé (`web` + `mariadb`) : tronçon visible après extinction de `web`, puis masqué seulement après extinction de `mariadb`.
