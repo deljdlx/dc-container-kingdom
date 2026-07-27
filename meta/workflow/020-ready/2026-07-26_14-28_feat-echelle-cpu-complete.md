@@ -4,7 +4,7 @@ title: Indicateur CPU — échelle incomplète (invisible entre 5 % et 80 %)
 type: feat
 branch:
 created: 2026-07-26 14:28
-ready:
+ready: 2026-07-27 17:30
 doing:
 verify:
 done:
