@@ -2,11 +2,11 @@
 id: 2026-07-27_10-20
 title: Recipe — audit en profondeur de la codebase
 type: docs
-branch:
+branch: claude/recipe-audit-codebase
 created: 2026-07-27 10:20
 ready: 2026-07-27 10:25
-doing:
-verify:
+doing: 2026-07-27 10:26
+verify: 2026-07-27 10:30
 done:
 ---
 
@@ -111,30 +111,37 @@ qu'un cas d'école :
 
 ## Definition of Done
 
-- [ ] `meta/agents/recipes/audit-codebase.md` créé : court, orienté étapes,
+- [x] `meta/agents/recipes/audit-codebase.md` créé : court, orienté étapes,
       agnostique au projet.
-- [ ] Les familles de défauts sont listées avec, pour chacune, un **exemple réel**
+- [x] Les familles de défauts sont listées avec, pour chacune, un **exemple réel**
       du board (id vérifiable) — aucun exemple inventé.
-- [ ] La règle de **preuve** est explicite (rien n'entre dans un ticket sans
+- [x] La règle de **preuve** est explicite (rien n'entre dans un ticket sans
       reproduction) et renvoie à `debug-empirically`.
-- [ ] L'articulation avec le board est écrite : ticket vs candidat, barre de
+- [x] L'articulation avec le board est écrite : ticket vs candidat, barre de
       valeur, lecture préalable de `000-backlog` **et** `080-done`.
-- [ ] Anti-boucle : une seule passe, et « rien trouvé » explicitement valable.
-- [ ] Le périmètre annoncé et le déclencheur « à la demande » sont écrits dans la
+- [x] Anti-boucle : une seule passe, et « rien trouvé » explicitement valable.
+- [x] Le périmètre annoncé et le déclencheur « à la demande » sont écrits dans la
       recipe, avec leur justification.
-- [ ] `meta/agents/recipes/README.md` à jour ; passe `audit-workflow-consistency`
+- [x] `meta/agents/recipes/README.md` à jour ; passe `audit-workflow-consistency`
       faite.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`) : ce que le ticket **ouvre**, ce
-qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
-`100-follow-up/`. Quelques lignes ; `aucune` est une réponse valable. À la
-différence du `Journal`, qui date le passé, cette rubrique regarde l'avant._
-
--
+- **Ouvre** : éprouver les commandes de la recipe a produit sa première trouvaille
+  — des pièces centrales du moteur sans aucun test (`Application`, `Area`,
+  `AreaRenderer`, `CharacterRenderer`…). Recouvrement **partiel** avec
+  `2026-07-26_14-31`, qui ne couvre que `Viewport` / `Board` / `SceneGraph` : au
+  tri de décider entre fusion et ticket distinct. → candidat déposé,
+  `2026-07-27_10-31_pieces-moteur-sans-test.md`.
+- **Laisse de côté** : la recipe n'a **jamais été appliquée de bout en bout** par
+  quelqu'un d'autre que son auteur. Tant que ce n'est pas arrivé, on a écrit une
+  méthode, pas prouvé qu'elle est suivable — même limite que
+  `2026-07-26_18-14` pour le follow-up.
+- **Tension assumée** : les ids du board dans le tableau des familles rendent la
+  recipe **moins agnostique** que ses sœurs. Choix délibéré — des exemples réels
+  valent mieux qu'un catalogue abstrait —, isolé dans une colonne remplaçable.
+  Si la recipe part dans un autre dépôt, c'est la colonne qu'on jette.
 
 ## Journal
 
@@ -143,11 +150,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 10:26] Ticket pris sur `claude/recipe-audit-codebase` (worktree `/tmp/dc-container-kingdom-claude`). Tri de `100-follow-up/` d'abord, comme le veut `work-a-task` : boîte **vide**, rien à trier.
+- [2026-07-27 10:27] `meta/agents/recipes/audit-codebase.md` écrite : ce que ça produit (tickets, pas rapport), périmètre annoncé, 7 étapes, règle de preuve, 9 familles de défauts, barre de tri avant dépôt.
+- [2026-07-27 10:27] **Tension d'agnosticité tranchée** : les recipes de méthode ne doivent citer ni API ni chemin du projet, mais la DoD demande des exemples réels. Résolu en décrivant chaque famille par son **symptôme** (générique) et en isolant les ids du board dans une **colonne à part**, explicitement remplaçable en cas de réutilisation ailleurs. Vérifié par `grep` : la recipe ne cite aucun `src/`, aucune API, aucune commande du projet.
+- [2026-07-27 10:28] Manque repéré à la relecture : la recipe sœur `audit-workflow-consistency` donne des commandes, la mienne restait déclarative — donc inapplicable telle quelle. Ajout d'un bloc « Repérage » avec deux commandes **génériques** (inventaire par taille, sources sans test) et un mot sur la centralité qui, elle, se lit dans les imports.
+- [2026-07-27 10:29] Index `meta/agents/recipes/README.md` à jour (section Méthode).
 
 ### Vérification
 
--
+- [2026-07-27 10:29] Les deux commandes du bloc « Repérage » ont été **exécutées**, pas seulement écrites : l'inventaire par taille sort bien les pièces centrales, et le diff sources/tests liste de vrais fichiers non couverts (`Application`, `Area`, `AreaRenderer`…). Une recipe dont les commandes ne tournent pas serait pire qu'aucune recipe.
+- [2026-07-27 10:29] Les **10 ids** cités dans le tableau des familles existent sur le board (`ls` sur chaque colonne) — aucun exemple inventé.
+- [2026-07-27 10:30] Passe `audit-workflow-consistency` : liens markdown → `links OK` ; colonnes toujours citées `meta/workflow/<colonne>/` → vide ; agnosticité vérifiée par `grep` (aucun `src/`, aucune API, aucune commande du projet dans la recipe).
+- [2026-07-27 10:30] `npm run verify` vert : lint + build + **210 tests** (30 fichiers).
 
 ### Validation
 

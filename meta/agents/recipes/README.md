@@ -25,6 +25,9 @@ d'un dépôt à l'autre.
 - **[debug-empirically.md](debug-empirically.md)** — reproduire → isoler → prouver
   par la mesure → corriger → non-régression.
 - **[review-changes.md](review-changes.md)** — reviewer un changement (règles + qualité).
+- **[audit-codebase.md](audit-codebase.md)** — auditer **le code** en profondeur
+  (périmètre annoncé, familles de défauts, **preuve obligatoire**) et en sortir des
+  tickets — **à la demande**, une seule passe.
 - **[evaluate-a-ticket.md](evaluate-a-ticket.md)** — juger si un ticket est
   *actionnable* + conseils classés (**une seule passe**, pas de boucle).
 - **[verify-a-change.md](verify-a-change.md)** — « terminé = vérifié » (auto + runtime).
