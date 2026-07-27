@@ -2,10 +2,10 @@
 id: 2026-07-27_17-23
 title: Décorréler la cadence d'animation du taux de rafraîchissement
 type: fix
-branch:
+branch: copilot/frame-rate-independent-animation
 created: 2026-07-27 17:23
-ready:
-doing:
+ready: 2026-07-27 21:10
+doing: 2026-07-27 21:10
 verify:
 done:
 ---
