@@ -4,7 +4,7 @@ title: Recipe — audit en profondeur de la codebase
 type: docs
 branch:
 created: 2026-07-27 10:20
-ready:
+ready: 2026-07-27 10:25
 doing:
 verify:
 done:
@@ -85,17 +85,19 @@ qu'un cas d'école :
 
 ### Risques / questions ouvertes
 
-- **Périmètre — à trancher en *specify*** : un audit = **un sous-système** ou tout
-  le dépôt ? Recommandation : un sous-système, parce qu'un audit exhaustif coûte
-  cher et retrouve surtout ce qu'il a déjà trouvé.
+- **Périmètre — tranché** : un audit porte sur **un périmètre annoncé à l'avance**
+  (un sous-système, ou une famille de défauts en transverse), **jamais « tout le
+  dépôt »**. Deux raisons : un audit exhaustif coûte cher et retrouve surtout ce
+  qu'il a déjà trouvé ; et un périmètre annoncé rend le résultat **falsifiable**
+  (« j'ai regardé ça, pas ça ») au lieu de laisser croire à une couverture totale.
+- **Déclencheur — tranché** : **à la demande uniquement**. Un audit périodique
+  produirait du bruit à trier, et la charge de tri retomberait sur `100-follow-up/`.
 - **Faux positifs** : le vrai danger est le ticket écrit depuis une simple lecture
   et jamais reproduit. C'est pour ça que la règle de preuve est le **cœur** de la
   recipe, pas un ornement — deux fois hier, la mesure a contredit une hypothèse
   qui semblait solide.
 - **Rendement décroissant** : sans lecture préalable de `080-done`, chaque audit
   re-propose ce qui est déjà corrigé.
-- **Déclencheur** : à la demande uniquement, ou périodique ? Recommandation : à la
-  demande — un audit automatique produirait du bruit à trier.
 
 ## Contexte / liens
 
@@ -118,7 +120,8 @@ qu'un cas d'école :
 - [ ] L'articulation avec le board est écrite : ticket vs candidat, barre de
       valeur, lecture préalable de `000-backlog` **et** `080-done`.
 - [ ] Anti-boucle : une seule passe, et « rien trouvé » explicitement valable.
-- [ ] Le périmètre par défaut (sous-système vs dépôt) est tranché **et justifié**.
+- [ ] Le périmètre annoncé et le déclencheur « à la demande » sont écrits dans la
+      recipe, avec leur justification.
 - [ ] `meta/agents/recipes/README.md` à jour ; passe `audit-workflow-consistency`
       faite.
 - [ ] `npm run verify` vert.
