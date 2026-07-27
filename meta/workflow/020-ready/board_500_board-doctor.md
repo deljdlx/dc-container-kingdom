@@ -4,7 +4,7 @@ title: Un garde-fou automatique sur la cohérence du board
 type: test
 branch:
 created: 2026-07-27 19:03
-ready:
+ready: 2026-07-27 19:21
 doing:
 verify:
 done:
@@ -76,8 +76,25 @@ permanence est un garde-fou qu'on désactive sous quinze jours :
 - **`## Suite` non vide en `080-done`** — la rubrique date du `2026-07-26_18-14` ;
   la majorité des 41 tickets clos lui sont antérieurs.
 
-À trancher en *specify* : date-pivot, périmètre « colonnes actives seulement », ou
-correction préalable des doublons vivants.
+**Tranché en *specify*** — les deux, selon le cas :
+
+- **Doublons d'`id`** : les deux tickets **vivants** sont corrigés dans ce ticket.
+  Vérifié : `2026-07-25_16-48` n'est référencé par aucun autre ticket, seulement
+  porté par les trois qui le partagent. On décale l'`id` (et son `created`
+  redondant) de l'un d'une minute. L'**archive garde ses doublons** —
+  `2026-07-24_21-53` et `2026-07-25_15-19`, trois tickets chacun — donc le
+  contrôle ne porte que sur les **colonnes actives**. Réécrire l'archive pour
+  satisfaire un contrôle serait falsifier l'historique pour faire passer un test.
+- **`## Suite` en `080-done`** : **date-pivot**. La rubrique naît avec
+  `2026-07-26_18-14` ; le contrôle ne s'applique qu'aux tickets dont le `done:`
+  lui est postérieur.
+
+### Ce qui n'est pas mécanisable, et qu'il ne faut pas prétendre vérifier
+
+« Le titre est en anglais » **ne se teste pas**. Ce qu'on peut vérifier est un
+**proxy** : ASCII pur et kebab-case minuscule — ce qui attrape `priorité`,
+`réseaux`, `complétude`, mais laisse passer `routes-en-double`. À écrire comme
+tel dans le test, sinon le prochain lecteur croira la règle garantie.
 
 ## Contexte / liens
 
