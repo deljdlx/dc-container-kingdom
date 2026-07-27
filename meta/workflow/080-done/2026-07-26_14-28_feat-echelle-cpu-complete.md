@@ -7,7 +7,7 @@ created: 2026-07-26 14:28
 ready: 2026-07-27 17:30
 doing: 2026-07-27 17:30
 verify: 2026-07-27 17:32
-done:
+done: 2026-07-27 17:33
 ---
 
 ## Objectif
@@ -54,13 +54,19 @@ Symétriquement, `memory.css` couvre `xxs`…`xxm`, `l`, `xl` mais pas `xxl` /
 
 ## Definition of Done
 
-- [ ] Les 11 paliers CPU et tous les paliers mémoire ont un rendu visible et
+- [x] Les 11 paliers CPU et tous les paliers mémoire ont un rendu visible et
       ordonné (croissance monotone perçue).
-- [ ] Une seule `@keyframes` mutualisée, paramétrée ; `prefers-reduced-motion`
+- [x] Une seule `@keyframes` mutualisée, paramétrée ; `prefers-reduced-motion`
       respecté.
-- [ ] Validation navigateur sur un jeu de fixtures couvrant plusieurs paliers
+- [x] Validation navigateur sur un jeu de fixtures couvrant plusieurs paliers
       (ajuster `mock/fixtures/containers.json` si besoin).
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
+
+## Suite
+
+- **Ce que ça ouvre** : ajouter un mode visuel de calibration (page/dev flag) qui force un échantillon par palier CPU/mémoire pour QA graphique exhaustive.
+- **Ce qu'on laisse de côté** : tuning fin du coût GPU (profiling précis) sur des charges supérieures à 35 conteneurs ; à mesurer si le volume augmente.
+- **Ce qui a été déposé** : aucun candidat en `100-follow-up`.
 
 ## Journal
 
@@ -80,4 +86,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:33] merge `7eb887c` sur `main` (`--no-ff`) puis passage en `080-done`; DoD validée intégralement.
