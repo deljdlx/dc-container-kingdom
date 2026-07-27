@@ -2,11 +2,11 @@
 id: 2026-07-27_19-04
 title: Aligner les règles écrites sur la pratique réelle
 type: docs
-branch:
+branch: claude/align-rules-with-practice
 created: 2026-07-27 19:04
 ready: 2026-07-27 19:11
-doing:
-verify:
+doing: 2026-07-27 19:12
+verify: 2026-07-27 19:16
 done:
 ---
 
@@ -76,28 +76,66 @@ l'expose. Hors périmètre tant que ce n'est pas vérifié.
 
 ## Definition of Done
 
-- [ ] `conventions.md` ne donne plus qu'**un** schéma de nommage de branche, et
-      il correspond aux branches réellement présentes dans le dépôt.
-- [ ] `git push` n'est plus auto-autorisé — un push demande une confirmation,
+- [x] `conventions.md` ne donne plus qu'**un** schéma de nommage de branche, et
+      il correspond aux branches réellement présentes dans le dépôt — **réserve
+      écrite** : 4 branches antérieures au multi-agents subsistent, toutes mergées
+      (voir `## Suite`).
+- [x] `git push` n'est plus auto-autorisé — un push demande une confirmation,
       conformément à la règle.
-- [ ] La recipe d'audit connaît `200-ideas`.
-- [ ] Aucune correction cosmétique ailleurs : les fichiers qui n'ont pas à
+- [x] La recipe d'audit connaît `200-ideas`.
+- [x] Aucune correction cosmétique ailleurs : les fichiers qui n'ont pas à
       mentionner la boîte à idées ne la mentionnent pas.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
--
+- **Ce qu'on laisse de côté** — quatre branches antérieures au multi-agents
+  survivent et contredisent visuellement la convention : `docs/mock-readme`,
+  `feat/engine-sprites-catalog-page`, `feat/missing-character-bases`,
+  `refactor/lazy-speech-bubble`. **Toutes les quatre sont mergées dans `main`** :
+  les supprimer est trivial. Ce n'est pas fait ici — effacer des branches qu'on
+  n'a pas créées relève de la règle d'isolation, ça se demande.
+- **Ce que ça ouvre** — `settings.json` ne vaut que pour Claude Code ; Copilot et
+  Codex ignorent ces garde-fous. Les règles qui comptent vraiment gagneraient à
+  être vérifiées côté board (voir `2026-07-27_19-03`) plutôt que côté permissions,
+  qui n'engagent qu'un seul agent.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-07-27 19:12] Tri préalable de `100-follow-up` : un candidat déposé par
+  copilot (topologie des routes) promu en `container-kingdom_500_road-topology-strategy`,
+  boîte vidée avant de démarrer.
+- [2026-07-27 19:13] Nommage de branche : le bullet donnait deux schémas
+  contradictoires en six lignes. Retenu `<agent>/<slug>`, avec la raison écrite —
+  le préfixe dit **qui détient** la branche, ce dont dépend la règle d'isolation.
+  Les préfixes par type (`feat/`, `fix/`…) disparaissent : le type vit déjà dans
+  le frontmatter du ticket et dans le message de commit.
+- [2026-07-27 19:14] `git push` retiré de la liste `allow` de `.claude/settings.json`.
+  Les `deny` sur `--force` restent : ils protègent d'un geste irréversible, pas
+  d'un geste non demandé.
+- [2026-07-27 19:15] Recipe d'audit : `200-ideas` ajoutée aux contrôles — et un
+  second trou trouvé en chemin, plus grave. Son **périmètre** ciblait les colonnes
+  par le glob `meta/workflow/0*/`, qui excluait **les deux** boîtes hors pipeline.
+  L'audit ne les avait donc jamais regardées, `100-follow-up` comprise. Corrigé en
+  `meta/workflow/*/`.
 
 ### Vérification
 
--
+- [2026-07-27 19:15] Contrôle des liens (contrôle 1 de la recipe d'audit) : vert.
+  Aucun schéma `feat/…` / `fix/…` / `docs/…` ne subsiste dans `conventions.md`.
+  `jq` confirme que `Bash(git push *)` a quitté la liste `allow` et que le JSON
+  reste valide.
+- [2026-07-27 19:15] `npm run verify` **vert** : lint + build + **282 tests**.
+  Le change est documentaire, mais il touche `.claude/settings.json` : la
+  validation JSON était le vrai risque.
+- [2026-07-27 19:16] Réserve assumée sur la première DoD : quatre branches
+  antérieures à la convention subsistent (`docs/…`, `feat/…`, `refactor/…`).
+  Vérifié qu'elles sont **toutes mergées dans `main`**, donc supprimables sans
+  perte — mais supprimer des branches qu'on n'a pas créées se demande. Reporté en
+  `## Suite`.
 
 ### Validation
 

@@ -26,11 +26,12 @@
 
 ## Git
 
-- **Une branche par feature/fix** — jamais de travail direct sur `main`. Créer une
-  branche dédiée (`feat/…`, `fix/…`, `refactor/…`, `docs/…`, `chore/…`), coder →
-  vérifier → merger sur `main` (`--no-ff`). En **multi-agents**, chaque agent
-  travaille dans **son propre worktree** (branche préfixée par l'agent, `claude/…` /
-  `copilot/…`) et ne change **jamais** la branche du working tree principal — voir
+- **Une branche par ticket**, nommée **`<agent>/<slug>`** (`claude/…`, `copilot/…`,
+  `codex/…`) — jamais de travail direct sur `main`. Le préfixe dit **qui détient la
+  branche**, ce dont dépend la règle d'isolation : un agent ne touche, n'édite ni ne
+  merge que **les siennes**. Coder → vérifier → merger sur `main` (`--no-ff`).
+  Chaque agent travaille dans **son propre worktree** et ne change **jamais** la
+  branche du working tree principal — voir
   [recipes/parallel-worktrees.md](recipes/parallel-worktrees.md).
 - **Conventional Commits** + description **française** (`feat:`, `fix:`, `refactor:`,
   `docs:`, `test:`, `chore:`).
