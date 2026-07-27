@@ -114,14 +114,21 @@ export class KingdomHud {
    * of its networks are off.
    */
   handleNetworkSwitch(networkName, checked) {
-    const roads = document.querySelectorAll('.map-element.network.network--' + networkName);
+    this.selectedNetworks[networkName] = checked;
+
+    const roads = document.querySelectorAll('.map-element.network');
     roads.forEach(road => {
-      if (checked) {
-        road.classList.remove('hidden');
-        this.selectedNetworks[networkName] = true;
-      } else {
+      let mustBeHidden = true;
+      Object.keys(this.selectedNetworks).forEach(netName => {
+        if (this.selectedNetworks[netName] && road.classList.contains('network--' + netName)) {
+          mustBeHidden = false;
+        }
+      });
+
+      if (mustBeHidden) {
         road.classList.add('hidden');
-        this.selectedNetworks[networkName] = false;
+      } else {
+        road.classList.remove('hidden');
       }
     });
 

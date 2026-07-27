@@ -118,6 +118,9 @@ Le renderer dessine sur une **grille de cellules** (`cellWidth`) :
   les auras colorées reflètent le statut/CPU.
 - **`drawNetworks()`** — relie par des tuiles de **route** les maisons partageant
   un même réseau Docker.
+  Le tracé est désormais **dédupliqué par case** (une seule `Ground00` par tuile
+  occupée), même quand plusieurs réseaux traversent le même tronçon ; chaque
+  route porte alors plusieurs classes `network--<nom>`.
 
 Interaction : cliquer un PNJ ouvre une **bulle** (`quickReaction`) avec un lien
 vers l'URL de démo du conteneur, le cas échéant.
@@ -128,7 +131,8 @@ vers l'URL de démo du conteneur, le cas échéant.
   classes d'éléments par nom** (`registerElement('House00', House00)`, …) pour
   l'instanciation par nom, branche `map.update`, et gère la structure de page.
 - **`KingdomHud`** — l'overlay : usage mémoire/CPU agrégé et **interrupteurs de
-  réseaux** (afficher/masquer un réseau).
+  réseaux** (afficher/masquer un réseau). Un tronçon partagé n'est masqué que
+  lorsque **tous** ses réseaux sont désactivés.
 - **`ContainersList` / `ContainersListEntry`** — la barre latérale listant les
   stacks et leurs conteneurs.
 - **`Log` / `LogEntry`**, **`sha256`** — utilitaires (journal, checksum du polling).
