@@ -8,7 +8,7 @@ ready: 2026-07-27 20:01
 doing: 2026-07-27 20:01
 verify:
 verify: 2026-07-27 20:08
-done:
+done: 2026-07-27 20:11
 ---
 
 ## Objectif
@@ -77,7 +77,7 @@ Points de vigilance :
 
 ## Suite
 
--
+aucune
 
 ## Journal
 
@@ -89,6 +89,7 @@ Points de vigilance :
 
 - [2026-07-27 20:08] `npm run verify` vert.
 - Validation navigateur effectuée sur http://127.0.0.1:5180/ : la carte affiche une topologie plus lisible et stable, avec les routes qui relient les placements de façon déterministe.
+- Merge local sur `main` : `a44395830658d9a4f5350170f36faedbe70ee66a`.
 
 ### Validation
 
