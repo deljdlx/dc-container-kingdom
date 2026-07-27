@@ -4,7 +4,7 @@ title: Des fixtures d'âges variés, pour voir le temps passer en dev
 type: test
 branch:
 created: 2026-07-27 11:20
-ready:
+ready: 2026-07-27 19:40
 doing:
 verify:
 done:
@@ -33,6 +33,18 @@ gagne en réalisme mais éloigne les fixtures de la capture d'origine — et le 
 `18-35` a justement posé que `Created` ne dérive pas. Trancher entre « fixtures
 retouchées une fois pour toutes » et « âges recalés au démarrage »._
 
+### Décision de périmètre (specify)
+
+- `Created` est recalé **au démarrage du mock** à partir d'un profil d'âges
+      synthétique et déterministe : quelques conteneurs restent à quelques secondes,
+      d'autres à quelques minutes / heures / jours, de sorte qu'au moins un statut
+      bouge sous les yeux pendant une session de dev.
+- La capture brute n'est pas réenregistrée : on garde les fixtures actuelles et
+      on leur applique un étalonnage relatif au lancement, ce qui évite une solution
+      qui s'use avec le temps.
+- Le contrat du ticket `18-35` reste respecté côté tests : même horloge,
+      même réponse ; `Created` ne dépend pas du temps qui passe à l'intérieur d'une
+      même exécution.
 ## Source de fixtures réelles : la prod
 
 Les fixtures actuelles viennent d'une capture réelle. On peut en refaire une :
