@@ -2,10 +2,10 @@
 id: 2026-07-24_21-53
 title: development.md — renvoyer vers agents/ pour les conventions
 type: docs
-branch:
+branch: claude/doc-dev-conventions-link
 created: 2026-07-24 21:53
 ready: 2026-07-27 10:41
-doing:
+doing: 2026-07-27 10:42
 verify:
 done:
 ---
@@ -63,7 +63,11 @@ qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 
 ### Travail
 
--
+- [2026-07-27 10:42] Ticket pris sur `claude/doc-dev-conventions-link`. Tri de `100-follow-up/` fait avant : candidat **fusionné** dans `2026-07-26_14-31`, boîte vide.
+- [2026-07-27 10:42] Ticket antérieur aux champs de transition et à la rubrique `Suite` : aligné sur le format courant **en le prenant**, pas par une passe de migration de masse.
+- [2026-07-27 10:43] Contrôle de non-perte avant suppression, puce par puce (`grep` sur les deux sources) : langue, Conventional Commits, mention IA, `git add -A`, `--no-ff`, template de PR, SOLID, JSDoc → tous présents dans `conventions.md` ; « terminé = vérifié » et le cycle → `workflow.md`. **Aucune règle n'existait uniquement ici.**
+- [2026-07-27 10:44] Section réécrite en renvoi vers les **deux** sources — la version d'origine mélangeait conventions et workflow, un renvoi vers la seule `conventions.md` aurait laissé « terminé = vérifié » sans propriétaire.
+- [2026-07-27 10:44] Renvoi rédigé pour être **utile** : il dit ce qu'on trouve dans chaque source, pas seulement où c'est. 15 lignes de duplication → 10 lignes de pointeur qualifié.
 
 ### Vérification
 
