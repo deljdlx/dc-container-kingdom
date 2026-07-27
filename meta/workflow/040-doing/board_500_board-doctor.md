@@ -2,10 +2,10 @@
 id: 2026-07-27_19-03
 title: Un garde-fou automatique sur la cohérence du board
 type: test
-branch:
+branch: claude/board-doctor
 created: 2026-07-27 19:03
 ready: 2026-07-27 19:21
-doing:
+doing: 2026-07-27 19:22
 verify:
 done:
 ---
