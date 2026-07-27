@@ -33,19 +33,73 @@ gagne en réalisme mais éloigne les fixtures de la capture d'origine — et le 
 `18-35` a justement posé que `Created` ne dérive pas. Trancher entre « fixtures
 retouchées une fois pour toutes » et « âges recalés au démarrage »._
 
+## Source de fixtures réelles : la prod
+
+Les fixtures actuelles viennent d'une capture réelle. On peut en refaire une :
+
+```bash
+curl -s "https://container-kingdom.deljdlx.fr/api/docker/containers/json?all=true" \
+  > mock/fixtures/containers.json
+```
+
+Vérifié le 2026-07-27 : **HTTP 200 sans authentification**, **37 conteneurs**,
+5 réseaux. Une capture fraîche apporte de la **variété d'âges réelle** — des
+conteneurs redémarrés récemment côtoient des conteneurs en place depuis des mois
+— là où les fixtures actuelles sont toutes du même jour.
+
+### ⚠️ Deux réserves, à traiter avant de committer quoi que ce soit
+
+**1. Le dépôt GitHub est public** (`deljdlx/dc-container-kingdom`, vérifié :
+l'API GitHub répond `200` sans authentification). Committer la capture brute
+**publie l'infrastructure de l'hôte, définitivement, dans l'historique git**.
+Ce que contient le payload, en agrégats relevés le 2026-07-27 :
+
+| Namespace de label | Occurrences | Ce que ça révèle |
+|---|---|---|
+| `com.docker.*` | 373 | noms de projets compose, **chemins du serveur** (`working_dir`) |
+| `traefik.http.*` | 132 | règles de routage, donc les **domaines hébergés** |
+| `traefik.docker` / `traefik.enable` | 61 | topologie d'exposition |
+| `org.opencontainers.*` | 32 | provenance des images |
+| `maintainer` | 25 | — |
+
+S'y ajoutent les **noms d'images et leurs versions** (surface de CVE connues) et
+les noms de conteneurs. **Une passe d'anonymisation est nécessaire** : renommer
+projets/domaines/chemins, en préservant la *forme* des données (c'est elle qui
+fait la valeur d'une fixture réaliste). À décider en *specify* : à la main une
+fois pour toutes, ou par un script rejouable dans `mock/`.
+
+**2. Une capture fraîche ne règle pas le problème de ce ticket — elle le
+repousse.** Les fixtures d'aujourd'hui *sont* une capture réelle : elles étaient
+variées le jour de la capture, et c'est le temps qui les a toutes alignées sur
+`Up 36 weeks`. Recapturer redonne de la variété **aujourd'hui** et la reperdra
+de la même façon. La variété d'âges **au moment du dev** reste donc conditionnée
+à l'ancrage relatif décrit ci-dessus — la capture apporte le **réalisme**, pas la
+**fraîcheur**.
+
+> Cette URL est aussi la démonstration du ticket `2026-07-27_17-28` (sécurité) :
+> si `curl` suffit ici, il suffit à n'importe qui.
+
 ## Contexte / liens
 
+- **Prod** : <https://container-kingdom.deljdlx.fr/> — API Docker proxifiée sous
+  `/api/docker/` (voir `compose/nginx.conf`)
 - `mock/fixtures/containers.json` (`Created`, tous du même jour)
 - `mock/docker-mock.js` (`getContainers(now)`, `humanizeAge`)
 - `mock/README.md` (tableau statique / variable dans le temps)
 - Ticket d'origine : `2026-07-26_18-35` ; bug qu'il visait : `2026-07-26_18-00`
+- Sécurité de cette exposition : `2026-07-27_17-28`
 
 ## Definition of Done
 
 - [ ] En dev, au moins un conteneur affiche un `Status` qui **change sous les yeux**
       en quelques secondes ou minutes.
+- [ ] La solution **ne se périme pas** : relue dans six mois, elle produit encore
+      des âges variés sans nouvelle capture.
 - [ ] Le déterminisme des tests est préservé (horloge injectable, même horloge →
       même réponse).
+- [ ] **Si** les fixtures sont recapturées depuis la prod : aucune donnée
+      identifiante ne rentre dans le dépôt public — domaines, chemins serveur,
+      noms de projets et d'images anonymisés, forme des données préservée.
 - [ ] La décision sur `Created` (retouché vs recalé au démarrage) est tranchée et
       **écrite**, y compris son effet sur la règle posée par `18-35`.
 - [ ] `mock/README.md` reflète le choix.
