@@ -7,7 +7,7 @@ created: 2026-07-27 11:20
 ready: 2026-07-27 19:40
 doing: 2026-07-27 19:40
 verify: 2026-07-27 19:50
-done:
+done: 2026-07-27 19:59
 ---
 
 ## Objectif
@@ -103,19 +103,19 @@ de la même façon. La variété d'âges **au moment du dev** reste donc conditi
 
 ## Definition of Done
 
-- [ ] En dev, au moins un conteneur affiche un `Status` qui **change sous les yeux**
+- [x] En dev, au moins un conteneur affiche un `Status` qui **change sous les yeux**
       en quelques secondes ou minutes.
-- [ ] La solution **ne se périme pas** : relue dans six mois, elle produit encore
+- [x] La solution **ne se périme pas** : relue dans six mois, elle produit encore
       des âges variés sans nouvelle capture.
-- [ ] Le déterminisme des tests est préservé (horloge injectable, même horloge →
+- [x] Le déterminisme des tests est préservé (horloge injectable, même horloge →
       même réponse).
-- [ ] **Si** les fixtures sont recapturées depuis la prod : aucune donnée
+- [x] **Si** les fixtures sont recapturées depuis la prod : aucune donnée
       identifiante ne rentre dans le dépôt public — domaines, chemins serveur,
       noms de projets et d'images anonymisés, forme des données préservée.
-- [ ] La décision sur `Created` (retouché vs recalé au démarrage) est tranchée et
+- [x] La décision sur `Created` (retouché vs recalé au démarrage) est tranchée et
       **écrite**, y compris son effet sur la règle posée par `18-35`.
-- [ ] `mock/README.md` reflète le choix.
-- [ ] `npm run verify` vert.
+- [x] `mock/README.md` reflète le choix.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -124,7 +124,7 @@ _« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
 qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 `100-follow-up/`. `aucune` est une réponse valable._
 
--
+aucune
 
 ## Journal
 
@@ -143,3 +143,4 @@ qu'il **laisse de côté** (limite, dette), les **candidats** déposés en
 
 - Le serveur Vite de branche a bien rechargé `mock/docker-mock.js` après modification.
 - Le rendu dev sur `http://127.0.0.1:5178/` s'appuie sur cette réponse mockée.
+- Merge `main`: `92c59eb`.
