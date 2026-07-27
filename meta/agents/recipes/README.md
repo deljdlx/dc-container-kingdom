@@ -15,6 +15,9 @@ d'un dépôt à l'autre.
   « et ensuite ? » (rubrique `## Suite`, candidats en `100-follow-up/`) ·
   [follow-up-triage](workflow/follow-up-triage.md) — trier ces candidats vers le
   backlog, au démarrage de la tâche suivante.
+- **Ordonner** : [prioritize-the-backlog](workflow/prioritize-the-backlog.md) —
+  classer par **coût du non-fait** ; bandes de priorité, et l'arrêt à la tête de
+  liste plutôt qu'au rangement complet.
 
 ## Méthode (mobilisées pendant work / verify / validate)
 
