@@ -57,3 +57,8 @@ own `import`s, so dependencies are explicit and the bundler can build `dist/`.
 - `mock/docker-mock.js` — framework-agnostic mock, shared by the dev server and the tests.
 - `mock/vite-docker-mock-plugin.js` — wires the mock into the Vite dev server.
 
+## Third-Party Assets
+
+- `src/container-kingdom/fonts/changa/*` — Changa font files (local hosting for the app), licensed under SIL Open Font License 1.1.
+- `src/container-kingdom/fonts/changa/OFL.txt` — license text.
+

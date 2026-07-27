@@ -2,11 +2,11 @@
 id: 2026-07-26_14-29
 title: Auto-héberger la police Changa (perf + hors-ligne)
 type: chore
-branch:
+branch: copilot/chore-auto-heberger-la-police
 created: 2026-07-26 14:29
 ready: 2026-07-27 17:05
-doing:
-verify:
+doing: 2026-07-27 17:05
+verify: 2026-07-27 17:14
 done:
 ---
 
@@ -61,11 +61,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 17:14] audit des usages : aucune graisse explicite dans les CSS app/engine chargés par l'app ; seules les valeurs par défaut normal/bold sont pertinentes (400/700). Intégration locale : retrait Google Fonts dans `src/index.html`, ajout de `container-kingdom/css/fonts.css` avec `@font-face` `font-display: swap` (woff2 locaux, sous-ensembles arabic/latin-ext/latin), ajout des fichiers dans `src/container-kingdom/fonts/changa/` et mention OFL dans `README.md`.
+- [2026-07-27 17:17] suppression du script analytics externe `metrics.jlb.ninja` dans `src/index.html` pour respecter la DoD « aucune requête externe au chargement de l'app ».
 
 ### Vérification
 
--
+- [2026-07-27 17:17] `npm run verify` vert (lint + build + 39 fichiers / 266 tests). Vérification runtime : `npm run preview` (`127.0.0.1:4173`) + `npm run dev` (`127.0.0.1:5175`) ; via `performance.getEntriesByType('resource')`, `externalCount = 0` sur les deux, `hasLocalChanga = true`, `bodyFontFamily = "Changa, sans-serif"` en dev.
 
 ### Validation
 
