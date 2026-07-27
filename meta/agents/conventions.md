@@ -4,10 +4,12 @@
 
 - Code, identifiants (variables/fonctions/classes), commentaires, **JSDoc** →
   **anglais**.
-- **Arborescence** — noms de **dossiers** et de fichiers de structure →
-  **anglais**, comme les colonnes du board (`000-backlog`, `100-follow-up`,
-  `200-ideas`). Une exception qui traîne se voit tout de suite au milieu de ses
-  sœurs.
+- **Arborescence** — noms de **dossiers** et de **fichiers** → **anglais**, comme
+  les colonnes du board (`000-backlog`, `100-follow-up`, `200-ideas`). Une
+  exception se voit immédiatement au milieu de ses sœurs.
+  - Seule réserve : le **titre** d'un ticket ou d'une idée reste de la prose,
+    donc français (`engine_020_input-clavier-diagonales.md`) — au même titre que
+    les commits. La **structure** du nom (projet, priorité), elle, est anglaise.
 - Commits, PR, échanges → **français**.
 
 ## Style & design
