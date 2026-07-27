@@ -4,7 +4,7 @@ title: Aligner les règles écrites sur la pratique réelle
 type: docs
 branch:
 created: 2026-07-27 19:04
-ready:
+ready: 2026-07-27 19:11
 doing:
 verify:
 done:
