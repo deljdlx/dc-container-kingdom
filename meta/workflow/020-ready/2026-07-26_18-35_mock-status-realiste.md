@@ -4,7 +4,7 @@ title: Rendre le Status du mock Docker réaliste (libellé qui vieillit)
 type: test
 branch:
 created: 2026-07-26 18:35
-ready:
+ready: 2026-07-27 11:12
 doing:
 verify:
 done:
@@ -27,10 +27,37 @@ stats) passe au travers.
 
 ## Spécifications
 
-_À compléter en « specify ». Piste : `makeStats(id, now)` montre déjà le patron —
-une valeur dérivée d'une horloge **injectable**, donc déterministe en test. Le même
-traitement peut s'appliquer aux champs temporels des descripteurs (`Status`, et
-possiblement `Created`), sans casser les tests existants qui lisent les fixtures._
+### Fonctionnel
+
+- Le `Status` servi **se calcule** à partir de `Created` (présent dans les
+  fixtures) et de l'horloge, au format de l'API Docker : `Up 4 seconds`,
+  `Up About a minute`, `Up 3 hours`, `Up 8 days`…
+- Deux lectures à des instants différents donnent des `Status` différents pour un
+  conteneur en cours d'exécution.
+- **La mémoire varie aussi** (voir ci-dessous) — même famille de défaut, et c'est
+  ce qui a rendu invérifiable au navigateur le rafraîchissement du ticket
+  `2026-07-26_14-21`.
+
+### Technique
+
+- `getContainers(now)` calcule `Status` par-dessus les fixtures ; `Created`, lui,
+  reste **fixe** : c'est une date de naissance, pas une valeur qui dérive.
+  L'horloge est **injectable**, comme `makeStats(id, now)` le fait déjà, donc les
+  tests restent déterministes.
+- `handleDockerRequest(method, path, now)` propage son `now` à `getContainers`.
+- **Mémoire** : `makeStats` sert aujourd'hui `20 + (seed % 780)` MB, strictement
+  constant. Ajouter une **oscillation lente** dérivée de `now` autour de cette
+  base — assez pour qu'un rafraîchissement se voie, assez faible pour que les
+  seuils mémoire (`memory--*`) ne clignotent pas. Le CPU, lui, varie déjà.
+- Les fixtures gardent leur `Status` : il devient une valeur de repli, jamais
+  servie telle quelle. Le noter dans `mock/README.md`.
+
+### Risques / vigilance
+
+- **Ne pas casser les tests existants** qui lisent les fixtures : ils comparent
+  des ids, des réseaux, des labels — pas le `Status`. À vérifier, pas à supposer.
+- La bascule d'un palier mémoire (`memory--l` → `memory--xl`) change une classe
+  CSS : garder l'amplitude sous le pas des seuils pour éviter le scintillement.
 
 ## Contexte / liens
 
@@ -50,6 +77,7 @@ possiblement `Created`), sans casser les tests existants qui lisent les fixtures
 - [ ] Un test prouve la variabilité : deux lectures à des instants différents
       donnent des `Status` différents pour un conteneur en cours d'exécution.
 - [ ] Les tests existants qui consomment les fixtures passent sans être affaiblis.
+- [ ] La mémoire servie **varie dans le temps**, sans faire clignoter les paliers.
 - [ ] `mock/README.md` décrit ce qui est **statique** et ce qui **varie dans le
       temps** dans le mock.
 - [ ] `npm run verify` vert.
