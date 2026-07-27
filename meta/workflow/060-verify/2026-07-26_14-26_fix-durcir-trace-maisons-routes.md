@@ -2,11 +2,11 @@
 id: 2026-07-26_14-26
 title: Durcir le tracé des maisons, enclos et routes (bugs silencieux)
 type: fix
-branch:
+branch: claude/fix-durcir-trace-maisons-routes
 created: 2026-07-26 14:26
 ready: 2026-07-27 10:57
-doing:
-verify:
+doing: 2026-07-27 10:58
+verify: 2026-07-27 11:03
 done:
 ---
 
@@ -72,11 +72,11 @@ lecteur.
 
 ## Definition of Done
 
-- [ ] La règle d'adjacence des arbres de route fonctionne (test unitaire dédié).
-- [ ] Un second passage de rendu sur un conteneur déjà tracé ne lève plus d'erreur.
-- [ ] Plus d'arguments morts ; `manualZ` renseigné avec un booléen.
-- [ ] L'index réseau n'est plus dupliqué dans le renderer.
-- [ ] Validation navigateur (routes/arbres inchangés hors correction attendue),
+- [x] La règle d'adjacence des arbres de route fonctionne (test unitaire dédié).
+- [x] Un second passage de rendu sur un conteneur déjà tracé ne lève plus d'erreur.
+- [x] Plus d'arguments morts ; `manualZ` renseigné avec un booléen.
+- [x] L'index réseau n'est plus dupliqué dans le renderer.
+- [x] Validation navigateur (routes/arbres inchangés hors correction attendue),
       `npm run verify` vert.
 
 ## Journal
@@ -86,11 +86,19 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 10:58] Ticket pris sur `claude/fix-durcir-trace-maisons-routes`. Tri de `100-follow-up/` : boîte vide.
+- [2026-07-27 11:00] **Extraction** de `RoadMatrix` plutôt que rustine : la cause du bug était l'indexation par nombre-devenu-chaîne (`Object.keys` rend `"350"`, donc `"350" + 50` concatène). Une `Map` à clé `x,y` rend l'arithmétique impossible à re-casser, et se teste **sans DOM** — 5 tests, dont un qui pose explicitement le piège d'origine (une case en 35050 ne doit pas compter comme voisine).
+- [2026-07-27 11:01] `drawRoadTrees` réécrite sur la matrice ; `drawHouse` retourne la maison **existante** au lieu de `undefined` ; `drawFences` filtre les absentes et sort sous deux maisons.
+- [2026-07-27 11:01] Arguments morts retirés des **deux côtés** : `drawContainers()` / `drawNetworks()` ne prennent plus de paramètre ignoré, et `ContainerKingdom` cesse de leur en passer. 5ᵉ argument d'`Element` supprimé.
+- [2026-07-27 11:02] `manualZ = 0` → `true`, avec le commentaire qui dit **pourquoi** (le fond de cluster ne doit pas peindre par-dessus les maisons). `0` marchait par accident : falsy, donc la profondeur n'était plus recalculée.
+- [2026-07-27 11:02] `drawNetworks` consomme `application.getNetworks()` : l'index par réseau a désormais une seule autorité, le repository.
 
 ### Vérification
 
--
+- [2026-07-27 11:03] `npm run verify` vert : lint + build + **219 tests** (32 fichiers), dont les 5 nouveaux sur `RoadMatrix`.
+- [2026-07-27 11:04] Navigateur : 35 maisons, 880 nœuds de route, 5 clusters, écran de chargement masqué, 0 erreur console — le tracé n'a pas bougé.
+- [2026-07-27 11:05] Première sonde **non concluante** (0 arbre trouvé) : elle supposait l'arbre à `route + 2·hauteur`, alors que la matrice enregistre les coordonnées **avant** l'offset appliqué au dessin des routes. Corrigée en reconstruisant l'offset depuis une maison — et non en concluant.
+- [2026-07-27 11:06] Preuve de la règle : **45 arbres de route, 0 violation**. Contrefactuel mesuré sur la même carte : **70 %** des 633 cases ont un voisin horizontal, donc sans la règle ~31 des 45 arbres tomberaient au milieu d'une voie. Le correctif change bien quelque chose de visible.
 
 ### Validation
 

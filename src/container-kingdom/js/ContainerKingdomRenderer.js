@@ -1,4 +1,5 @@
 import { ContainerPlacement } from './ContainerPlacement.js';
+import { RoadMatrix } from './RoadMatrix.js';
 import {
   Element,
   Ground00,
@@ -104,6 +105,7 @@ export class ContainerKingdomRenderer
   }
 
 
+  /** Draw every compose group as a cluster of houses. Reads the containers from the application. */
   async drawContainers() {
     this.placement.computeBounds(
       this.application.getContainers(true)
@@ -148,12 +150,21 @@ export class ContainerKingdomRenderer
       houses.push(house);
     }
 
-    if(houses.length > 1) {
-      this.drawFences(houses);
+    const drawn = houses.filter(Boolean);
+    if(drawn.length > 1) {
+      this.drawFences(drawn);
     }
   }
 
+  /**
+   * Draw the enclosure around a compose group.
+   * @param {Array<object>} houses at least two drawn houses
+   */
   drawFences(houses) {
+    if(houses.length < 2) {
+      return;
+    }
+
     let xMin = Number.MAX_SAFE_INTEGER;
     let xMax = Number.MIN_SAFE_INTEGER;
     let yMin = Number.MAX_SAFE_INTEGER;
@@ -177,9 +188,10 @@ export class ContainerKingdomRenderer
       -16,
       xMax - xMin,
       yMax - yMin,
-      true,
     );
-    element.manualZ = 0;
+    // The cluster outline is a backdrop: it opts out of y-based depth sorting
+    // so it never paints over the houses it surrounds.
+    element.manualZ = true;
     element.getDom().classList.add('compose-cluster');
 
     houses[0].addElement(-padding, -padding, element);
@@ -188,7 +200,9 @@ export class ContainerKingdomRenderer
 
   async drawHouse(container, x, y) {
     if(container.rendered) {
-      return;
+      // Already on the map: hand back the existing house so callers that group
+      // houses (fences) keep working on a second pass.
+      return container.getElement();
     }
     const board = this.viewport.getBoard();
     const area = board.getAreaAt(0, 0);
@@ -263,21 +277,15 @@ export class ContainerKingdomRenderer
   }
 
 
-  drawNetworks(containers) {
-    const networks = {};
+  /**
+   * Draw the roads that join containers sharing a network.
+   * The per-network index is owned by the repository — read, never rebuilt.
+   * @returns {Object<string, Array<object>>} the network index used
+   */
+  drawNetworks() {
+    const networks = this.application.getNetworks();
 
-    Object.values(containers).forEach((container) => {
-      const containerNetworks = container.NetworkSettings.Networks;
-      Object.keys(containerNetworks).forEach((networkName) => {
-        if(!networks[networkName]) {
-          networks[networkName] = [];
-        }
-        networks[networkName].push(container);
-      });
-    });
-
-
-    const roadsMatrix = {};
+    const roadsMatrix = new RoadMatrix();
 
     Object.keys(networks).forEach((networkName) => {
       const connectedCells = [];
@@ -334,28 +342,22 @@ export class ContainerKingdomRenderer
     return networks;
   }
 
+  /**
+   * Scatter trees along the roads, skipping tiles whose road continues left or
+   * right — a tree there would sit in the middle of the lane.
+   * @param {RoadMatrix} matrix
+   */
   drawRoadTrees(matrix) {
     const area = this.viewport.getBoard().getAreaAt(0, 0);
 
-    const width = this.roadWidth;
-    const height = this.roadHeight;
-
-    Object.keys(matrix).forEach((x) => {
-      Object.keys(matrix[x]).forEach((y) => {
-        if(Math.random() > 0.8) {
-          if(
-            (matrix[x + width] && matrix[x + width][y])
-            || (matrix[x - width] && matrix[x - width][y])
-          ){
-            return;
-          }
-          area.addElement(
-            parseInt(x),
-            parseInt(y) + height * 2,
-            new Tree00()
-          );
-        }
-      });
+    matrix.tiles().forEach(({ x, y }) => {
+      if(Math.random() <= 0.8) {
+        return;
+      }
+      if(matrix.hasHorizontalNeighbour(x, y, this.roadWidth)) {
+        return;
+      }
+      area.addElement(x, y + this.roadHeight * 2, new Tree00());
     });
   }
 
@@ -382,10 +384,7 @@ export class ContainerKingdomRenderer
         yFromInPixels + offsetTop,
       );
 
-      if(!roadsMatrix[xFromInPixels]) {
-        roadsMatrix[xFromInPixels] = {};
-      }
-      roadsMatrix[xFromInPixels][yFromInPixels] = road;
+      roadsMatrix.add(xFromInPixels, yFromInPixels, road);
 
       xFromInPixels += this.roadWidth * xDirection;
     }
@@ -415,10 +414,7 @@ export class ContainerKingdomRenderer
         yFromInPixels + offsetTop,
       );
 
-      if(!roadsMatrix[xFromInPixels]) {
-        roadsMatrix[xFromInPixels] = {};
-      }
-      roadsMatrix[xFromInPixels][yFromInPixels] = road;
+      roadsMatrix.add(xFromInPixels, yFromInPixels, road);
 
       yFromInPixels += this.roadHeight * yDirection;
     }
@@ -429,10 +425,7 @@ export class ContainerKingdomRenderer
         xFromInPixels + offsetLeft,
         yFromInPixels + offsetTop,
       )
-      if(!roadsMatrix[xFromInPixels]) {
-        roadsMatrix[xFromInPixels] = [];
-      }
-      roadsMatrix[xFromInPixels][yFromInPixels] = road;
+      roadsMatrix.add(xFromInPixels, yFromInPixels, road);
     }
   }
 
