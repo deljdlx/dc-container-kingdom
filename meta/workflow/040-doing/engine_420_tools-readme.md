@@ -2,10 +2,10 @@
 id: 2026-07-25_16-49
 title: README pour src/engine/tools/
 type: docs
-branch:
+branch: copilot/engine-tools-readme
 created: 2026-07-25 16:49
-ready:
-doing:
+ready: 2026-07-27 21:33
+doing: 2026-07-27 21:33
 verify:
 done:
 ---
