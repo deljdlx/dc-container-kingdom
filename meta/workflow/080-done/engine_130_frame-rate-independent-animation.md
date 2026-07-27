@@ -7,7 +7,7 @@ created: 2026-07-27 17:23
 ready: 2026-07-27 21:10
 doing: 2026-07-27 21:10
 verify: 2026-07-27 21:14
-done:
+done: 2026-07-27 21:18
 ---
 
 ## Objectif
@@ -41,7 +41,7 @@ rendant la cadence d'animation indépendante de la fréquence des frames.
 
 ## Suite
 
--
+aucune
 
 ## Journal
 
@@ -61,4 +61,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
-- En attente de merge dans `main`.
+- Merge local sur `main` effectué: `9f37349599ad52106e9bb60512e7330815d7772b`. Ticket déplacé en `080-done`.
