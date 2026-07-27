@@ -6,7 +6,7 @@ branch: copilot/feat-pan-zoom-tactile
 created: 2026-07-26 14:27
 ready: 2026-07-27 10:12
 doing: 2026-07-27 10:12
-verify:
+verify: 2026-07-27 10:17
 done:
 ---
 
@@ -69,11 +69,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-27 10:12] implémentation : pointer events sur `makeViewportDraggable` (pan 1 doigt + pinch-zoom 2 doigts, seuil 5 px anti-faux-clic) ; `makeViewportZoomable` réécrit avec zoom centré curseur ; `_applyTransform` unifie translate+scale sur la même matrice (TODO levé) ; `zoom()` et `focusOnContainer()` mis à jour ; `touch-action: none` ajouté sur `#viewport` dans map-overrides.css
 
 ### Vérification
 
--
+- [2026-07-27 10:17] `npm run verify` : lint OK, build OK, 30 fichiers / 210 tests verts. DoD cochée (pan, pinch-zoom, seuil anti-faux-clic, zoom centré, TODO levé, souris non régressée, touch-action CSS).
 
 ### Validation
 

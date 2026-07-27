@@ -6,4 +6,6 @@
 #viewport {
   /* Prevent selecting the map tiles while dragging the board around. */
   user-select: none;
+  /* Hand all pointer gestures (pan, pinch) to JS; block native browser scroll/zoom. */
+  touch-action: none;
 }
