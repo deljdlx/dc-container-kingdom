@@ -7,7 +7,7 @@ created: 2026-07-26 14:32
 ready: 2026-07-27 17:40
 doing: 2026-07-27 17:40
 verify: 2026-07-27 17:42
-done:
+done: 2026-07-27 17:45
 ---
 
 ## Objectif
@@ -58,11 +58,17 @@ la donnée n'est **pas utilisée** (seules les stats CPU/mémoire le sont).
 
 ## Definition of Done
 
-- [ ] Plus de second `GET /containers/json`, plus de `size=true`.
-- [ ] Stats demandées uniquement pour les conteneurs en exécution.
-- [ ] Tests mis à jour / ajoutés sur `DockerApiClient` et le repository (nombre et
+- [x] Plus de second `GET /containers/json`, plus de `size=true`.
+- [x] Stats demandées uniquement pour les conteneurs en exécution.
+- [x] Tests mis à jour / ajoutés sur `DockerApiClient` et le repository (nombre et
       nature des appels).
-- [ ] Mock aligné, doc du cycle de rafraîchissement à jour, `npm run verify` vert.
+- [x] Mock aligné, doc du cycle de rafraîchissement à jour, `npm run verify` vert.
+
+## Suite
+
+- **Ce que ça ouvre** : mesurer un plafond de concurrence optimal selon la taille de flotte (8 est un compromis conservateur ; à calibrer empiriquement).
+- **Ce qu'on laisse de côté** : adaptation dynamique de la concurrence selon le nombre de conteneurs et la latence daemon ; hors périmètre de ce refactor.
+- **Ce qui a été déposé** : aucun candidat en `100-follow-up`.
 
 ## Journal
 
@@ -82,4 +88,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-27 17:45] merge `6a42b6d` sur `main` (`--no-ff`) puis passage en `080-done`; DoD validée intégralement.
