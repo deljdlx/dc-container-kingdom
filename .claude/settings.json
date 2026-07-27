@@ -34,9 +34,41 @@
       "Bash(find *)",
       "Bash(echo *)",
       "Bash(date *)",
-      "Bash(for *)"
+      "Bash(for *)",
+      "Bash(git mv *)",
+      "Bash(git add *)",
+      "Bash(git merge *)",
+      "Bash(git clean *)",
+      "Bash(git switch *)",
+      "Bash(git restore *)",
+      "Bash(npx vitest *)",
+      "Bash(npx vite *)",
+      "Bash(sed -i *)",
+      "Bash(python3 *)",
+      "Bash(mkdir *)",
+      "Bash(cp *)",
+      "Bash(mv *)",
+      "Bash(chmod *)",
+      "Bash(pkill -f *)",
+      "Bash(jq *)",
+      "Bash(curl -s *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(cut *)",
+      "Bash(awk *)",
+      "Bash(diff *)",
+      "Bash(which *)",
+      "Bash(pwd)",
+      "Bash(true)"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(git add -A*)",
+      "Bash(git add --all*)",
+      "Bash(git add .)",
+      "Bash(git push --force*)",
+      "Bash(git push -f *)",
+      "Bash(rm -rf /*)"
+    ],
     "additionalDirectories": [
       "/tmp"
     ]
