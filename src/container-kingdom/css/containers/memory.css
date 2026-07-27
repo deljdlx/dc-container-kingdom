@@ -111,3 +111,51 @@
   background-color: #f308;
 }
 /* =============================================== */
+
+.container.memory--xxl .container__name::before {
+  content: "⛈️";
+  font-size: 1rem;
+}
+.container.memory--xxl .map-element__sprite{
+  filter: sepia(1) hue-rotate(-55deg) saturate(3.2);
+  border-radius: 50%;
+
+  animation: pulsar 1.3s infinite ease-in-out;
+}
+.container.memory--xxl::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #f06;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #f068;
+}
+/* =============================================== */
+
+.container.memory--xxxl .container__name::before {
+  content: "🔥";
+  font-size: 1rem;
+}
+.container.memory--xxxl .map-element__sprite{
+  filter: sepia(1) hue-rotate(-75deg) saturate(3.4);
+  border-radius: 50%;
+
+  animation: pulsar 1s infinite ease-in-out;
+}
+.container.memory--xxxl::before {
+  display: block;
+  content: " ";
+  width: calc(100% + 60px);
+  height: calc(100% + 60px);
+  top: -38px;
+  left: -38px;
+  border : solid 10px #f0f;
+  border-radius: 50%;
+  position: absolute;
+  background-color: #f0f8;
+}
+/* =============================================== */

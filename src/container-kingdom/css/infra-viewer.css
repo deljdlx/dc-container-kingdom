@@ -170,61 +170,137 @@
 
 /* =============================================== */
 
-*[data-cpu-usage="xxs"] .cpu-indicator {
-  background-color: #0f09;
-  border: 1px solid #080;
-  animation: orbit 20s linear infinite;
-}
-
-*[data-cpu-usage="xs"] .cpu-indicator {
-  background-color: #af09;
-  border: 1px solid #580;
-  width: 25px;
-  height: 25px;
-  animation: orbit 10s linear infinite;
-}
-
-
-*[data-cpu-usage="critical"] .cpu-indicator {
-  background-color: #f00;
-  border: 4px solid #f0f;
-  width: 30px;
-  height: 30px;
-  top: calc(50% - 15px);
-  left: calc(50% - 15px);
-  animation: orbit-pulse 0.5s linear infinite;
-  z-index: 1000000;
-}
-
-
-
 .cpu-indicator {
-  width: 20px;
-  height: 20px;
-  background-color: transparent;
+  --cpu-size: 18px;
+  --cpu-border-width: 1px;
+  --cpu-color: transparent;
+  --cpu-border-color: transparent;
+  --cpu-glow: transparent;
+  --cpu-speed: 16s;
+  --cpu-orbit-radius: 92px;
+
+  width: var(--cpu-size);
+  height: var(--cpu-size);
+  background-color: var(--cpu-color);
+  border: var(--cpu-border-width) solid var(--cpu-border-color);
+  box-shadow: 0 0 12px var(--cpu-glow);
   border-radius: 50%;
   position: absolute;
-  top: calc(50% - 10px);
-  left: calc(50% - 10px);
-  transform: translate(-50%, -100px);
-  animation: orbit 2s linear infinite;
-  z-index:10
+  top: 50%;
+  left: 50%;
+  opacity: 0;
+  animation: none;
+  z-index: 10;
+}
+
+[data-cpu-usage] .cpu-indicator {
+  opacity: 1;
+  animation: orbit var(--cpu-speed) linear infinite;
+}
+
+[data-cpu-usage="xxs"] .cpu-indicator {
+  --cpu-size: 14px;
+  --cpu-color: #2fa84e99;
+  --cpu-border-color: #0f5d26;
+  --cpu-glow: #2fa84e66;
+  --cpu-speed: 18s;
+}
+
+[data-cpu-usage="xs"] .cpu-indicator {
+  --cpu-size: 15px;
+  --cpu-color: #59b65099;
+  --cpu-border-color: #2d6f1d;
+  --cpu-glow: #59b65066;
+  --cpu-speed: 16s;
+}
+
+[data-cpu-usage="s"] .cpu-indicator {
+  --cpu-size: 16px;
+  --cpu-color: #88c85b99;
+  --cpu-border-color: #477526;
+  --cpu-glow: #88c85b66;
+  --cpu-speed: 14s;
+}
+
+[data-cpu-usage="m"] .cpu-indicator {
+  --cpu-size: 17px;
+  --cpu-color: #c7d95f99;
+  --cpu-border-color: #797f2b;
+  --cpu-glow: #c7d95f66;
+  --cpu-speed: 12s;
+}
+
+[data-cpu-usage="xm"] .cpu-indicator {
+  --cpu-size: 18px;
+  --cpu-color: #e5cd5f99;
+  --cpu-border-color: #8a6724;
+  --cpu-glow: #e5cd5f66;
+  --cpu-speed: 10s;
+}
+
+[data-cpu-usage="xxm"] .cpu-indicator {
+  --cpu-size: 20px;
+  --cpu-color: #e4aa5599;
+  --cpu-border-color: #8c4b22;
+  --cpu-glow: #e4aa5566;
+  --cpu-speed: 8.5s;
+}
+
+[data-cpu-usage="l"] .cpu-indicator {
+  --cpu-size: 22px;
+  --cpu-color: #dc874e99;
+  --cpu-border-color: #8f3a1e;
+  --cpu-glow: #dc874e77;
+  --cpu-speed: 7.25s;
+}
+
+[data-cpu-usage="xl"] .cpu-indicator {
+  --cpu-size: 24px;
+  --cpu-color: #d7684c99;
+  --cpu-border-color: #972a20;
+  --cpu-glow: #d7684c88;
+  --cpu-speed: 6.25s;
+}
+
+[data-cpu-usage="xxl"] .cpu-indicator {
+  --cpu-size: 26px;
+  --cpu-color: #d44d5399;
+  --cpu-border-color: #9e1f2b;
+  --cpu-glow: #d44d5399;
+  --cpu-speed: 5.25s;
+}
+
+[data-cpu-usage="xxxl"] .cpu-indicator {
+  --cpu-size: 29px;
+  --cpu-border-width: 2px;
+  --cpu-color: #d43f6899;
+  --cpu-border-color: #a0124b;
+  --cpu-glow: #d43f68aa;
+  --cpu-speed: 4.25s;
+}
+
+[data-cpu-usage="critical"] .cpu-indicator {
+  --cpu-size: 34px;
+  --cpu-border-width: 3px;
+  --cpu-color: #ff244ecc;
+  --cpu-border-color: #ff9f1a;
+  --cpu-glow: #ff244ecc;
+  --cpu-speed: 2.2s;
+  z-index: 1000000;
 }
 
 @keyframes orbit {
   0% {
-    transform: rotate(0deg) translateX(100px) rotate(0deg);
+    transform: rotate(0deg) translateX(var(--cpu-orbit-radius)) rotate(0deg);
   }
   100% {
-    transform: rotate(360deg) translateX(100px) rotate(-360deg);
+    transform: rotate(360deg) translateX(var(--cpu-orbit-radius)) rotate(-360deg);
   }
 }
 
-@keyframes orbit-pulse {
-  0% {
-    transform: rotate(0deg) translateX(100px) rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg) translateX(100px) rotate(-360deg) scale(2.5);
+@media (prefers-reduced-motion: reduce) {
+  [data-cpu-usage] .cpu-indicator {
+    animation: none;
+    transform: translate(-50%, -50%);
   }
 }
