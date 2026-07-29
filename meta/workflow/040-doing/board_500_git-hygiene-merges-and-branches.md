@@ -2,10 +2,10 @@
 id: 2026-07-29_08-53
 title: Hygiène git — branches mergées qui traînent et merges au message par défaut
 type: chore
-branch:
+branch: copilot/git-hygiene-merges-branches
 created: 2026-07-29 08:53
-ready:
-doing:
+ready: 2026-07-29 15:18
+doing: 2026-07-29 15:18
 verify:
 done:
 ---
