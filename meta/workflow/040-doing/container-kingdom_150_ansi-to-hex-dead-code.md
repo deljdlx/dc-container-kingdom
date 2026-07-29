@@ -2,10 +2,10 @@
 id: 2026-07-29_08-41
 title: ansiToHex() — du code mort qui fabrique du HTML depuis le texte d'un conteneur
 type: chore
-branch:
+branch: copilot/ansi-to-hex-dead-code
 created: 2026-07-29 08:41
-ready:
-doing:
+ready: 2026-07-29 14:40
+doing: 2026-07-29 14:40
 verify:
 done:
 ---
