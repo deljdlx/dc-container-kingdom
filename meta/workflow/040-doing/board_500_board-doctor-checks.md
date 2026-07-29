@@ -2,10 +2,10 @@
 id: 2026-07-29_08-43
 title: Un seul board-doctor — consolider le garde-fou et le rendre déterministe
 type: feat
-branch:
+branch: claude/board-doctor-consolidation
 created: 2026-07-29 08:43
 ready: 2026-07-29 18:14
-doing:
+doing: 2026-07-29 18:41
 verify:
 done:
 ---
