@@ -25,7 +25,7 @@ boucle à la main** :
    ```js
    const vp = window.__vp;
    let t = performance.now();
-   vp.moving = 1; vp.direction = 'down'; vp.getCharacter().setDirection('down');
+   vp.move('down');                       // ou vp.press('down'); vp.press('right'); en diagonale
    for (let i = 0; i < 40; i++) { t += 16; vp.update(t); } // ~40 frames à 16 ms
    ```
    `vp.update(t)` est **le même chemin** que celui appelé par rAF → vérification

@@ -74,7 +74,7 @@ timestamps croissants :
 // après avoir exposé le viewport (window.__vp = viewport) le temps du test
 const vp = window.__vp;
 let t = performance.now();
-vp.moving = 1; vp.direction = 'down'; vp.getCharacter().setDirection('down');
+vp.move('down');                          // ou vp.press('down'); vp.press('right'); en diagonale
 for (let i = 0; i < 40; i++) { t += 16; vp.update(t); }   // ~40 frames à 16 ms
 ```
 

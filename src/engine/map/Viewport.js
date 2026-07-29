@@ -1,6 +1,7 @@
 import { Board } from './Board.js';
 import { Camera } from './Camera.js';
 import { Character } from './Character.js';
+import { DirectionalInput } from './DirectionalInput.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
@@ -20,14 +21,21 @@ export class Viewport
   _application;
 
   /**
-   * @type {number}
+   * @type {DirectionalInput} which directions are currently held — the single
+   * source of truth for "is the player moving, and where to"
    */
-  direction;
+  _input = new DirectionalInput();
 
   /**
-   * @type {number}
+   * @type {Object<string, string>} keyboard keys mapped to directions. Anything
+   * absent from this table is not a movement key and is left alone.
    */
-  moving = 0;
+  static KEY_DIRECTIONS = {
+    ArrowUp: 'up',
+    ArrowDown: 'down',
+    ArrowLeft: 'left',
+    ArrowRight: 'right',
+  };
 
   /**
    * @type {number}
@@ -57,10 +65,16 @@ export class Viewport
   _behaviors = [];
 
   /**
-   * @type {number} sub-pixel distance owed to the character, carried between
-   * frames so walking speed stays independent of the refresh rate
+   * @type {number} sub-pixel distance owed to the character along x, carried
+   * between frames so walking speed stays independent of the refresh rate
    */
-  _moveRemainder = 0;
+  _moveRemainderX = 0;
+
+  /**
+   * @type {number} sub-pixel distance owed along y — banked per axis, which is
+   * also what normalises diagonal speed without a second rounding step
+   */
+  _moveRemainderY = 0;
 
   loop;
 
@@ -316,23 +330,34 @@ export class Viewport
     const dt = this._timestamp ? Math.min(timestamp - this._timestamp, 100) : 0;
     this._timestamp = timestamp;
 
-    if(this.character && this.moving) {
-      // Bank the distance owed, spend whole pixels only. Rounding each frame in
-      // isolation tied the walking speed to the refresh rate — and below one
-      // pixel per frame (fast display or slow character) every frame rounded to
-      // zero and was dropped, freezing the character for good.
-      this._moveRemainder += dt * this.character.moveSpeed() / 1000;
-      const increment = Math.floor(this._moveRemainder);
-      if(increment >= 1) {
-        this._moveRemainder -= increment;
-        const walkedDistance = this.moveCharacter(increment);
+    if(this.character && this._input.isMoving()) {
+      // Bank the distance owed on each axis, spend whole pixels only. Rounding
+      // each frame in isolation tied the walking speed to the refresh rate — and
+      // below one pixel per frame (fast display or slow character) every frame
+      // rounded to zero and was dropped, freezing the character for good.
+      // Feeding each axis with its share of the UNIT vector is also what keeps a
+      // diagonal from covering ~1.41× the distance of a straight line.
+      const vector = this._input.getVector();
+      const distance = dt * this.character.moveSpeed() / 1000;
+      this._moveRemainderX += distance * vector.x;
+      this._moveRemainderY += distance * vector.y;
+
+      // Truncate towards zero: flooring a negative remainder would spend a pixel
+      // that has not been earned yet.
+      const dx = Math.trunc(this._moveRemainderX);
+      const dy = Math.trunc(this._moveRemainderY);
+      if(dx !== 0 || dy !== 0) {
+        this._moveRemainderX -= dx;
+        this._moveRemainderY -= dy;
+        const walkedDistance = this.moveCharacter(dx, dy);
         this._streamAreas();
         this.character.update(walkedDistance);
       }
     } else {
       // Standing still owes nothing: a banked remainder would surface as a jump
       // on the next step.
-      this._moveRemainder = 0;
+      this._moveRemainderX = 0;
+      this._moveRemainderY = 0;
     }
 
     // NPC behaviors run on the same clock as the player.
@@ -362,32 +387,44 @@ export class Viewport
   }
 
   /**
-   * Move the player through the world by `increment`, reverting on collision.
-   * The camera follows separately, so the player is no longer glued to centre.
-   * @param {number} increment pixels to move along the current direction
-   * @returns {number} actually walked pixels (0 when blocked)
+   * Move the player through the world by (dx, dy), reverting on collision. The
+   * camera follows separately, so the player is no longer glued to centre.
+   *
+   * A blocked diagonal falls back to each axis on its own ("slide along wall"):
+   * without it, walking diagonally into a wall stops the character dead instead
+   * of letting it follow the wall.
+   * @param {number} dx pixels along x
+   * @param {number} dy pixels along y
+   * @returns {number} actually walked pixels (0 when blocked on every attempt)
    */
-  moveCharacter(increment) {
+  moveCharacter(dx, dy) {
     if(!this.character) {
       return 0;
     }
 
-    let dx = 0;
-    let dy = 0;
-    switch(this.direction) {
-      case 'up': { dy = -increment; break; }
-      case 'down': { dy = increment; break; }
-      case 'left': { dx = -increment; break; }
-      case 'right': { dx = increment; break; }
-    }
+    // A straight move has a single candidate; a diagonal degrades to one axis at
+    // a time, most complete first.
+    const attempts = (dx !== 0 && dy !== 0)
+      ? [[dx, dy], [dx, 0], [0, dy]]
+      : [[dx, dy]];
 
     // Move, reverting on a solid collision. The single detection pass also
     // yields the trigger hits, reconciled below at the final position.
     let detected;
-    const blocked = this.character.moveBlocked(dx, dy, () => {
-      detected = this.character.detectCollisionAndTrigger(this.board);
-      return detected.collision.length > 0;
-    });
+    let blocked = true;
+    let walkedX = 0;
+    let walkedY = 0;
+    for(const [attemptX, attemptY] of attempts) {
+      blocked = this.character.moveBlocked(attemptX, attemptY, () => {
+        detected = this.character.detectCollisionAndTrigger(this.board);
+        return detected.collision.length > 0;
+      });
+      if(!blocked) {
+        walkedX = attemptX;
+        walkedY = attemptY;
+        break;
+      }
+    }
 
     this.handle("map.update", {
       map: this,
@@ -403,7 +440,7 @@ export class Viewport
     }
 
     this.character.reconcileTrigger(detected.trigger);
-    return Math.max(Math.abs(dx), Math.abs(dy));
+    return Math.hypot(walkedX, walkedY);
   }
 
   /** Render the viewport. @returns {*} the renderer's render result */
@@ -418,19 +455,61 @@ export class Viewport
 
   // ===========================
 
-  /** Stop the player's movement. */
-  stop() {
-    this.moving = 0;
+  /** @returns {DirectionalInput} the directions currently held */
+  getInput() {
+    return this._input;
   }
 
   /**
-   * Start moving the player in a direction and orient its sprite accordingly.
+   * Stop the player's movement, whatever is held. The sprite keeps facing where
+   * it was: an idle character still looks somewhere.
+   */
+  stop() {
+    this._input.releaseAll();
+  }
+
+  /**
+   * Move the player in a single direction, dropping anything else held, and
+   * orient its sprite accordingly. Kept for hosts that drive the viewport
+   * directly; keyboard input goes through {@link press}/{@link release}.
    * @param {string} direction one of 'up' | 'down' | 'left' | 'right'
    */
   move(direction) {
-    this.direction = direction;
-    this.moving = 1;
-    this.character.setDirection(this.direction);
+    this._input.releaseAll();
+    this.press(direction);
+  }
+
+  /**
+   * Hold a direction down, adding it to the ones already held (this is what
+   * makes diagonals possible).
+   * @param {string} direction one of 'up' | 'down' | 'left' | 'right'
+   */
+  press(direction) {
+    if(this._input.press(direction)) {
+      this._faceInputDirection();
+    }
+  }
+
+  /**
+   * Release a direction. The character keeps moving as long as another one is
+   * still held — this is what killed the "phantom stop".
+   * @param {string} direction one of 'up' | 'down' | 'left' | 'right'
+   */
+  release(direction) {
+    if(this._input.release(direction)) {
+      this._faceInputDirection();
+    }
+  }
+
+  /**
+   * Point the sprite at the most recent direction still held. Nothing held means
+   * the character is idle: it keeps facing where it stopped.
+   */
+  _faceInputDirection() {
+    const facing = this._input.getFacing();
+    if(this.character && facing) {
+      this.character.setDirection(facing);
+    }
   }
 
   /**
@@ -439,23 +518,17 @@ export class Viewport
    */
   run() {
     if(this.character) {
-      document.body.addEventListener('keyup', () => {
-        this.stop();
+      document.body.addEventListener('keydown', (event) => {
+        // Auto-repeat re-fires keydown while a key is held; re-pressing would
+        // make it the newest input again and steal the facing direction.
+        if(event.repeat) {
+          return;
+        }
+        this.press(Viewport.KEY_DIRECTIONS[event.key]);
       });
 
-      document.body.addEventListener('keydown', (event) => {
-        if (event.key === 'ArrowLeft') {
-          this.move('left');
-        }
-        if (event.key === 'ArrowRight') {
-          this.move('right');
-        }
-        if (event.key === 'ArrowUp') {
-          this.move('up');
-        }
-        if (event.key === 'ArrowDown') {
-          this.move('down');
-        }
+      document.body.addEventListener('keyup', (event) => {
+        this.release(Viewport.KEY_DIRECTIONS[event.key]);
       });
     }
 

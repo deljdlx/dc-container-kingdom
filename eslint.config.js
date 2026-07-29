@@ -46,6 +46,7 @@ export default [
         fetch: 'readonly',
         window: 'readonly',
         document: 'readonly',
+        KeyboardEvent: 'readonly',
       },
     },
   },

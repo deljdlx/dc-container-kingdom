@@ -67,8 +67,9 @@ classDiagram
 ```
 
 Au-dessus : `Board` (grille d'`Area`s tuilées, **streamées 7×7** autour du
-joueur), `Viewport` (game loop rAF, registre de behaviors, déplacement du
-joueur), `Camera` (suit une cible, découplée du personnage), et les
+joueur), `Viewport` (game loop rAF, registre de behaviors, déplacement du joueur
+— entrées déléguées à `DirectionalInput`), `Camera` (suit une cible, découplée
+du personnage), et les
 `Renderer/*` spécialisés (area, board, character, sprite).
 
 Les personnages (`Character`) sont des `Element`s animés. Leur IA est déléguée
