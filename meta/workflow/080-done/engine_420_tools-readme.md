@@ -41,7 +41,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
-- [2026-07-27 21:34] Ajout de [src/engine/tools/README.md](src/engine/tools/README.md) avec un descriptif bref du dossier et une ligne dédiée à `GameConsole.js`, dans le style concis des README moteur.
+- [2026-07-27 21:34] Ajout de `src/engine/tools/README.md` avec un descriptif bref du dossier et une ligne dédiée à `GameConsole.js`, dans le style concis des README moteur.
 
 ### Vérification
 
