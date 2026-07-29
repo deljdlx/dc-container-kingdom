@@ -7,7 +7,7 @@ created: 2026-07-29 14:53
 ready: 2026-07-29 14:55
 doing: 2026-07-29 14:55
 verify: 2026-07-29 14:56
-done:
+done: 2026-07-29 14:57
 ---
 
 ## Objectif
@@ -28,9 +28,13 @@ ou ajuster des tests unitaires quand le changement le nécessite.
 
 ## Definition of Done
 
-- [ ] La recipe mentionne explicitement l'ajout / mise à jour de tests unitaires
+- [x] La recipe mentionne explicitement l'ajout / mise à jour de tests unitaires
       quand pertinent pour le ticket.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
+
+## Suite
+
+aucune
 
 ## Suite
 
@@ -51,4 +55,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
-- En attente de merge dans `main`.
+- Merge local sur `main` effectué : `acadd8521133012f84f4718d37ee4dec4463b276`. Ticket déplacé en `080-done`.
