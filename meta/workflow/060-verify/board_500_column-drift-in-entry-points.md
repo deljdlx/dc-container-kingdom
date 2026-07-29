@@ -6,7 +6,7 @@ branch: copilot/column-drift-entry-points
 created: 2026-07-29 08:50
 ready: 2026-07-29 15:00
 doing: 2026-07-29 15:00
-verify:
+verify: 2026-07-29 15:02
 done:
 ---
 
