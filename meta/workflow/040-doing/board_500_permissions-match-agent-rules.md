@@ -2,10 +2,10 @@
 id: 2026-07-29_08-52
 title: Aligner les permissions Claude Code sur les règles qu'elles sont censées tenir
 type: chore
-branch:
+branch: copilot/permissions-match-agent-rules
 created: 2026-07-29 08:52
-ready:
-doing:
+ready: 2026-07-29 15:05
+doing: 2026-07-29 15:05
 verify:
 done:
 ---
