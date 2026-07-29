@@ -74,14 +74,14 @@ endroit, pour que les entrées puissent s'y référer.
 
 ## Definition of Done
 
-- [ ] Les 5 fichiers du tableau énoncent la même séquence de colonnes et la même
+- [x] Les 5 fichiers du tableau énoncent la même séquence de colonnes et la même
       source de tâches.
-- [ ] `200-ideas` figure dans le grep de contrôle **et** dans le contrôle 5 de
+- [x] `200-ideas` figure dans le grep de contrôle **et** dans le contrôle 5 de
       `audit-workflow-consistency`.
-- [ ] `ticket-work.md` ne présente plus le worktree comme conditionnel.
-- [ ] Contrôles 1, 2, 3, 5 et 7 de `audit-workflow-consistency` rejoués et verts
+- [x] `ticket-work.md` ne présente plus le worktree comme conditionnel.
+- [x] Contrôles 1, 2, 3, 5 et 7 de `audit-workflow-consistency` rejoués et verts
       (résultats notés au journal).
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -97,11 +97,17 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 15:01] Alignement des points d'entrée [CLAUDE.md](../../../CLAUDE.md), [AGENTS.md](../../../AGENTS.md) et [.github/copilot-instructions.md](../../../.github/copilot-instructions.md) : source de tâches clarifiée (`020-ready` prioritaire, sinon `000-backlog` avec *specify*) et séquence complète du pipeline.
+- [2026-07-29 15:01] Mise à jour de [meta/agents/workflow.md](../../../agents/workflow.md), [meta/agents/recipes/audit-workflow-consistency.md](../../../agents/recipes/audit-workflow-consistency.md) (ajout de `200-ideas` au contrôle dur) et [meta/agents/recipes/workflow/ticket-work.md](../../../agents/recipes/workflow/ticket-work.md) pour rendre le worktree dédié inconditionnel.
+- [2026-07-29 15:02] Correction opportuniste d'un lien cassé détecté par le contrôle 1 dans [meta/workflow/080-done/board_500_ticket-work-tests-needed.md](../../080-done/board_500_ticket-work-tests-needed.md) afin de restaurer un board vert.
 
 ### Vérification
 
--
+- [2026-07-29 15:02] Contrôle 1 rejoué (script liens markdown relatifs) : `CONTROL1 links OK`.
+- [2026-07-29 15:02] Contrôle 2 rejoué (grep dur `meta/<colonne>/`) : aucun résultat.
+- [2026-07-29 15:02] Contrôle 3 rejoué (`@imports` de `CLAUDE.md`) : 3/3 cibles `OK`.
+- [2026-07-29 15:02] Contrôles 5 et 7 rejoués (grep ciblé) : séquence `000-backlog → 020-ready → 040-doing → 060-verify → 080-done` et colonnes hors pipeline `100-follow-up` / `200-ideas` présentes dans les docs de référence.
+- [2026-07-29 15:02] `npm run verify` vert (lint, build, 45 fichiers de test / 332 tests).
 
 ### Validation
 
