@@ -2,10 +2,10 @@
 id: 2026-07-26_14-22
 title: Entrées clavier — arrêt fantôme et pas de diagonale
 type: fix
-branch:
+branch: claude/keyboard-input-diagonals
 created: 2026-07-26 14:22
 ready: 2026-07-29 09:29
-doing:
+doing: 2026-07-29 09:36
 verify:
 done:
 ---
