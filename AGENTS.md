@@ -4,6 +4,10 @@
 > source de vérité est [`meta/agents/`](meta/agents/)**. Points d'entrée frères :
 > [`CLAUDE.md`](CLAUDE.md), [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
 
+<!--<ENTRYPOINT_COMMON>-->
+
+## Le projet
+
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
 mini-RPG maison** (vanilla JS, ES modules). Deux couches :
 
@@ -46,3 +50,5 @@ Lire le dossier **[`meta/agents/`](meta/agents/)** pour les règles complètes :
 - [`meta/agents/engine-boundary.md`](meta/agents/engine-boundary.md) — frontière + archi.
 
 Pour comprendre le **code** : **[`meta/documentation/`](meta/documentation/)**.
+
+<!--</ENTRYPOINT_COMMON>-->

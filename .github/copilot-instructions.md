@@ -28,6 +28,8 @@ Toute la tâche se fait dans **ton propre worktree** :
 
 Détail : [`../meta/agents/recipes/parallel-worktrees.md`](../meta/agents/recipes/parallel-worktrees.md).
 
+<!--<ENTRYPOINT_COMMON>-->
+
 ## Le projet
 
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
@@ -72,3 +74,5 @@ Lire le dossier **[`../meta/agents/`](../meta/agents/)** pour les règles compl�
 - [`../meta/agents/engine-boundary.md`](../meta/agents/engine-boundary.md) — frontière + archi.
 
 Pour comprendre le **code** : **[`../meta/documentation/`](../meta/documentation/)**.
+
+<!--</ENTRYPOINT_COMMON>-->
