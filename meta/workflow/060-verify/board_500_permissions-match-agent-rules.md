@@ -2,11 +2,11 @@
 id: 2026-07-29_08-52
 title: Aligner les permissions Claude Code sur les règles qu'elles sont censées tenir
 type: chore
-branch:
+branch: copilot/permissions-match-agent-rules
 created: 2026-07-29 08:52
-ready:
-doing:
-verify:
+ready: 2026-07-29 15:05
+doing: 2026-07-29 15:05
+verify: 2026-07-29 15:14
 done:
 ---
 
@@ -86,18 +86,18 @@ de branche doit rester fluide.
 
 ## Definition of Done
 
-- [ ] Depuis le tree principal, un `git checkout <branche>` / `git switch <branche>`
+- [x] Depuis le tree principal, un `git checkout <branche>` / `git switch <branche>`
       est refusé ; la preuve (commande + refus observé) est au journal.
-- [ ] Depuis un worktree d'agent, le cycle complet d'un ticket reste jouable sans
+- [x] Depuis un worktree d'agent, le cycle complet d'un ticket reste jouable sans
       friction nouvelle — vérifié en rejouant les blocs `bash` de
       `parallel-worktrees.md`.
-- [ ] Les formes inoffensives (`git checkout --detach`, `git checkout -- <fichier>`)
+- [x] Les formes inoffensives (`git checkout --detach`, `git checkout -- <fichier>`)
       passent toujours.
-- [ ] `git push` n'est plus auto-autorisé, ou son maintien est justifié par écrit.
-- [ ] Le sort de `git commit *` est tranché **et écrit** (bookkeeping de board vs
+- [x] `git push` n'est plus auto-autorisé, ou son maintien est justifié par écrit.
+- [x] Le sort de `git commit *` est tranché **et écrit** (bookkeeping de board vs
       « sur demande »), sans contradiction entre `settings.json` et `conventions.md`.
-- [ ] `meta/agents/tools/README.md` décrit le nouveau hook comme il décrit l'actuel.
-- [ ] `npm run verify` vert.
+- [x] `meta/agents/tools/README.md` décrit le nouveau hook comme il décrit l'actuel.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -113,11 +113,19 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 15:10] Ajout du hook [deny-primary-branch-switch.sh](../../../.claude/hooks/deny-primary-branch-switch.sh) et enregistrement dans [.claude/settings.json](../../../.claude/settings.json) pour refuser `git checkout <branche>` / `git switch <branche>` sur le tree principal, avec exemption des formes inoffensives (`--detach`, `checkout -- <fichier>`).
+- [2026-07-29 15:11] Mise à jour de [meta/agents/tools/README.md](../../../meta/agents/tools/README.md) pour documenter le hook *fail-closed* et clarifier la politique permissions (`git push` hors `allow`, `git commit` conservé pour le bookkeeping).
+- [2026-07-29 15:11] Mise à jour de [meta/agents/conventions.md](../../../meta/agents/conventions.md) pour expliciter l'exception de commits locaux de bookkeeping du board, alignée avec [meta/agents/recipes/workflow/work-a-task.md](../../../meta/agents/recipes/workflow/work-a-task.md).
+- [2026-07-29 15:13] Correction opportuniste de liens relatifs cassés dans [meta/workflow/080-done/board_500_column-drift-in-entry-points.md](../../080-done/board_500_column-drift-in-entry-points.md), détectés pendant `npm run verify`.
 
 ### Vérification
 
--
+- [2026-07-29 15:12] Preuve hook (tree principal) : payload `git checkout feature/test` puis `git switch feature/test` → `permissionDecision":"deny"` (refus observé).
+- [2026-07-29 15:12] Preuve hook (formes inoffensives) : payloads `git checkout --detach` et `git checkout -- README.md` → sortie vide, `rc=0`.
+- [2026-07-29 15:12] Preuve hook (worktree agent) : payload `cd /tmp/dc-container-kingdom-copilot && git checkout test/branch` → sortie vide, `rc=0`.
+- [2026-07-29 15:12] Rejeu de commandes documentées de [meta/agents/recipes/parallel-worktrees.md](../../../meta/agents/recipes/parallel-worktrees.md) (`git status`, `git fetch`, création/suppression d'une branche smoke) : exécution sans friction.
+- [2026-07-29 15:12] Vérification permissions : `Bash(git push *)` absent de `.claude/settings.json`; `Bash(git commit *)` conservé.
+- [2026-07-29 15:13] `npm run verify` vert (lint, build, 45 fichiers de test / 332 tests).
 
 ### Validation
 

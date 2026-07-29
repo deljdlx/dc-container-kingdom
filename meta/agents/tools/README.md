@@ -16,6 +16,18 @@ Outils et scripts destinés aux agents.
   Substitution de commande, redirection, `find -exec` et `sed -i` le font
   s'abstenir. Enregistré dans `.claude/settings.json`.
 
+- **`deny-primary-branch-switch.sh`** — hook `PreToolUse` sur `Bash` : refuse les
+  commandes qui changent la branche active du **tree principal**
+  (`git checkout <branche>`, `git switch <branche>`). Le hook détecte le contexte
+  principal vs worktree avec `git rev-parse --git-common-dir` et `--git-dir`, et
+  laisse passer les formes inoffensives (`git checkout --detach`,
+  `git switch --detach`, `git checkout -- <fichier>`). En cas de doute sur le
+  contexte, il refuse (*fail-closed*).
+
+- **Permissions git clarifiées** : `git push` n'est plus dans `allow` (demande de
+  confirmation requise), alors que `git commit` reste autorisé pour le
+  bookkeeping du board décrit par `work-a-task`.
+
 > Ces hooks sont spécifiques à Claude Code ; les autres agents les ignorent. Les
 > **règles**, elles, valent pour tout le monde et vivent dans
 > [`../conventions.md`](../conventions.md) et [`../workflow.md`](../workflow.md) —
