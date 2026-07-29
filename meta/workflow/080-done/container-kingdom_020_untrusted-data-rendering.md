@@ -7,7 +7,7 @@ created: 2026-07-29 08:26
 ready: 2026-07-29 08:27
 doing: 2026-07-29 08:31
 verify: 2026-07-29 08:40
-done:
+done: 2026-07-29 08:42 (merge d5f08d1)
 ---
 
 ## Objectif
@@ -73,7 +73,20 @@ même choix de représentation.
 
 ## Suite
 
--
+- **Ce que ça n'a pas fermé** — la chaîne n'est coupée qu'à moitié. L'API Docker
+  reste **lisible sans authentification depuis Internet**, et le CORS `*` permet à
+  n'importe quel site tiers de l'interroger : `2026-07-27_17-28` porte cette
+  moitié, et il attend une décision du propriétaire.
+- **Ce que ça ouvre** — le dépôt n'a aucune règle de lint contre `innerHTML`. Le
+  correctif tient tant que personne n'en réécrit un ; une règle ESLint
+  (`no-unsanitized` ou une interdiction locale de la propriété) transformerait la
+  discipline en garde-fou. Non fait ici : ajouter une règle de lint touche tout le
+  dépôt, c'est un ticket.
+- **Limite de la vérification** — pas de contrôle au navigateur (extension
+  indisponible) : le repli `details/summary` des logs multi-lignes et le
+  surlignage sont couverts sous jsdom, pas vus à l'écran.
+- **Déposé en `100-follow-up/`** — `2026-07-29_08-41` : `ansiToHex()`, code mort
+  qui fabrique du HTML depuis le texte brut d'un conteneur.
 
 ## Journal
 
@@ -116,4 +129,10 @@ même choix de représentation.
 
 ### Validation
 
--
+- [2026-07-29 08:42] Review : les cinq points d'injection sont clos, les preuves
+  échouent sans le correctif (`git stash` à l'appui), frontière moteur non
+  concernée. Mergé sur `main` en `--no-ff` : **d5f08d1**.
+- [2026-07-29 08:42] Une correction de ma propre spécification est consignée au
+  journal : le « piège » que le ticket annonçait sur les formatters n'existait
+  pas. Mieux vaut le dire que laisser croire à une difficulté qu'on aurait
+  vaincue.
