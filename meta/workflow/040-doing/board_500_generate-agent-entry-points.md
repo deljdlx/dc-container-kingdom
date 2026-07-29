@@ -2,10 +2,10 @@
 id: 2026-07-29_08-51
 title: Générer AGENTS.md et copilot-instructions.md depuis une source unique
 type: chore
-branch:
+branch: copilot/generate-agent-entry-points
 created: 2026-07-29 08:51
-ready:
-doing:
+ready: 2026-07-29 15:34
+doing: 2026-07-29 15:34
 verify:
 done:
 ---
