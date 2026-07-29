@@ -41,7 +41,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
-- [2026-07-29 14:31] Relecture légère de [meta/documentation/engine.md](meta/documentation/engine.md) : correction de formulations (français), précision du schéma de boucle (`character.update(walkedDistance)`), et mise à jour de la section API publique pour refléter les exports actuels (`Coordinates`, `BoundingBox`, `EventEmitter`, `GameConsole`, etc.).
+- [2026-07-29 14:31] Relecture légère de [meta/documentation/engine.md](../../documentation/engine.md) : correction de formulations (français), précision du schéma de boucle (`character.update(walkedDistance)`), et mise à jour de la section API publique pour refléter les exports actuels (`Coordinates`, `BoundingBox`, `EventEmitter`, `GameConsole`, etc.).
 
 ### Vérification
 

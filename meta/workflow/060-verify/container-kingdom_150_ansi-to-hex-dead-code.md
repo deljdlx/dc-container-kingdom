@@ -6,7 +6,7 @@ branch: copilot/ansi-to-hex-dead-code
 created: 2026-07-29 08:41
 ready: 2026-07-29 14:40
 doing: 2026-07-29 14:40
-verify:
+verify: 2026-07-29 14:44
 done:
 ---
 
@@ -80,12 +80,15 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 14:44] Vérification d'usage avant suppression: `rg -n "ansiToHex" src test` ne remonte que `src/container-kingdom/js/LogEntry.js` (définition seule, aucun appel).
+- [2026-07-29 14:44] Suppression de `LogEntry.ansiToHex()` et de sa table ANSI associée (code mort qui fabriquait du HTML à partir du texte brut).
 
 ### Vérification
 
--
+- [2026-07-29 14:44] `npx vitest run test/untrusted-rendering.test.js` vert.
+- [2026-07-29 14:44] `npm run verify` vert.
+- [2026-07-29 14:44] Correctif annexe nécessaire au gate board: lien relatif cassé réparé dans `meta/workflow/080-done/engine_430_proofread-engine-doc.md`.
 
 ### Validation
 
--
+- En attente de merge dans `main`.
