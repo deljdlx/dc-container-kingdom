@@ -7,7 +7,7 @@ created: 2026-07-29 08:51
 ready: 2026-07-29 15:29
 doing: 2026-07-29 15:29
 verify: 2026-07-29 15:32
-done: 2026-07-29 15:31
+done: 2026-07-29 15:33
 ---
 
 ## Objectif
@@ -96,10 +96,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
-- [2026-07-29 15:30] Création d'une source unique [meta/agents/entry-points/common.md](../../../agents/entry-points/common.md) pour le tronc commun (projet, commandes, règles, liens de détail) avec placeholder `{{META_PREFIX}}` pour les liens markdown.
+- [2026-07-29 15:30] Création d'une source unique [meta/agents/entry-points/common.md](../../agents/entry-points/common.md) pour le tronc commun (projet, commandes, règles, liens de détail) avec placeholder `{{META_PREFIX}}` pour les liens markdown.
 - [2026-07-29 15:30] Ajout des marqueurs `<!--<ENTRYPOINT_COMMON>-->` / `<!--</ENTRYPOINT_COMMON>-->` dans [AGENTS.md](../../../AGENTS.md), [CLAUDE.md](../../../CLAUDE.md) et [.github/copilot-instructions.md](../../../.github/copilot-instructions.md), en conservant les sections spécifiques (préambule Copilot et `@imports` Claude).
 - [2026-07-29 15:30] Ajout du générateur/check [scripts/generate-agent-entry-points.mjs](../../../scripts/generate-agent-entry-points.mjs), scripts npm [package.json](../../../package.json) et étape CI [quality.yml](../../../.github/workflows/quality.yml) via `npm run check:agent-entry-points`.
-- [2026-07-29 15:31] Ajustement d'une règle du tronc commun dans [meta/agents/entry-points/common.md](../../../agents/entry-points/common.md) (bloc `Règles essentielles` rendu identique entre entrées) puis régénération immédiate pour démontrer la propagation.
+- [2026-07-29 15:31] Ajustement d'une règle du tronc commun dans [meta/agents/entry-points/common.md](../../agents/entry-points/common.md) (bloc `Règles essentielles` rendu identique entre entrées) puis régénération immédiate pour démontrer la propagation.
 
 ### Vérification
 
@@ -110,3 +110,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 ### Validation
 
 - [2026-07-29 15:31] Merge sur `main` effectué : `17c07d230362c6811517ecaccb99918df2dc1fd3`. Ticket déplacé en `080-done`.
+- [2026-07-29 15:33] Correction post-déplacement des liens relatifs du ticket clos pour restaurer un board vert.
