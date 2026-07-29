@@ -7,7 +7,7 @@ created: 2026-07-29 08:50
 ready: 2026-07-29 15:00
 doing: 2026-07-29 15:00
 verify: 2026-07-29 15:02
-done:
+done: 2026-07-29 15:03
 ---
 
 ## Objectif
@@ -85,10 +85,7 @@ endroit, pour que les entrées puissent s'y référer.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`)._
-
--
+aucune
 
 ## Journal
 
@@ -111,4 +108,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-29 15:03] Merge sur `main` effectué : `f4df0bb255f3c16769259cd5fadc9052764d152e`. Ticket déplacé en `080-done`.
