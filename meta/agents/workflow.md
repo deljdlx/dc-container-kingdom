@@ -50,7 +50,7 @@ main** en appelant `viewport.update(timestamp)` avec des timestamps croissants :
 ```js
 const vp = window.__vp; // hook temporaire, à retirer avant de committer
 let t = performance.now();
-vp.moving = 1; vp.direction = 'down'; vp.getCharacter().setDirection('down');
+vp.move('down');                       // ou vp.press('down'); vp.press('right'); en diagonale
 for (let i = 0; i < 40; i++) { t += 16; vp.update(t); } // ~40 frames à 16 ms
 ```
 

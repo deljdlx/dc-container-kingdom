@@ -2,11 +2,11 @@
 id: 2026-07-26_14-22
 title: Entrées clavier — arrêt fantôme et pas de diagonale
 type: fix
-branch:
+branch: claude/keyboard-input-diagonals
 created: 2026-07-26 14:22
 ready: 2026-07-29 09:29
-doing:
-verify:
+doing: 2026-07-29 09:36
+verify: 2026-07-29 09:55
 done:
 ---
 
@@ -50,8 +50,8 @@ Le ticket laissait trois points ouverts. Tranchés, avec leur raison :
 
 - Suivre l'**ensemble des touches de direction enfoncées** ; le personnage marche
   tant qu'au moins une l'est, dans la résultante des directions.
-- Diagonales supportées ; le sprite prend une direction d'animation cohérente
-  (priorité à définir en *specify* : dernière touche pressée, ou horizontale).
+- Diagonales supportées ; le sprite prend une direction d'animation cohérente —
+  **la dernière touche encore enfoncée** (tranché ci-dessus).
 - Relâcher une touche parmi plusieurs ne stoppe pas le mouvement.
 - Une touche non directionnelle n'a aucun effet sur le déplacement.
 
@@ -97,22 +97,22 @@ Le ticket laissait trois points ouverts. Tranchés, avec leur raison :
 
 ## Definition of Done
 
-- [ ] Deux flèches maintenues → déplacement diagonal ; relâcher l'une garde le
+- [x] Deux flèches maintenues → déplacement diagonal ; relâcher l'une garde le
       mouvement sur l'autre.
-- [ ] Vitesse diagonale normalisée (pas de bonus en biais) : la distance parcourue
+- [x] Vitesse diagonale normalisée (pas de bonus en biais) : la distance parcourue
       en diagonale sur un temps donné est celle d'une ligne droite, à 1 px près.
-- [ ] Une touche non directionnelle ne stoppe plus le personnage, ni ne le fait
+- [x] Une touche non directionnelle ne stoppe plus le personnage, ni ne le fait
       partir.
-- [ ] Le sprite regarde la **dernière** direction encore enfoncée ; relâcher la
+- [x] Le sprite regarde la **dernière** direction encore enfoncée ; relâcher la
       plus récente le fait revenir à celle d'avant.
-- [ ] Un axe bloqué n'annule pas l'autre (glissement le long d'un mur), et les
+- [x] Un axe bloqué n'annule pas l'autre (glissement le long d'un mur), et les
       triggers restent réconciliés à la position finale.
-- [ ] Tests : `DirectionalInput` (appuis / relâchés / ordre / vecteur / direction
+- [x] Tests : `DirectionalInput` (appuis / relâchés / ordre / vecteur / direction
       d'animation) **sans jsdom**, et le déplacement diagonal en pilotant
       `viewport.update(t)` à la main.
-- [ ] Les tests d'indépendance au taux de rafraîchissement passent **sans que
+- [x] Les tests d'indépendance au taux de rafraîchissement passent **sans que
       leurs assertions changent**.
-- [ ] Démo moteur toujours pilotable (clavier + D-pad, deux boutons à la fois),
+- [x] Démo moteur toujours pilotable (clavier + D-pad, deux boutons à la fois),
       doc `meta/documentation/engine.md` à jour, `npm run verify` vert.
 
 ## Suite
@@ -129,11 +129,63 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 09:45] Nouveau `src/engine/map/DirectionalInput.js` : les directions
+  tenues **dans l'ordre d'appui**, sans DOM ni notion de touche. Rend `isMoving()`
+  (deux directions opposées s'annulent), `getVector()` (unitaire — la diagonale
+  vaut 0,7071 par axe) et `getFacing()` (la dernière tenue). Exporté par le baril
+  `src/engine/index.js`.
+- [2026-07-29 09:47] `Viewport` : `moving`/`direction` supprimés au profit de
+  `_input`. `move()`/`stop()` conservés (API publique) et réimplémentés par-dessus ;
+  ajout de `press()`/`release()`/`getInput()`. La table `KEY_DIRECTIONS` isole la
+  traduction touche → direction ; une touche absente de la table ne fait plus rien
+  du tout — c'est la fin de l'arrêt fantôme.
+- [2026-07-29 09:48] L'auto-répétition du clavier (`event.repeat`) est ignorée :
+  sans ça, maintenir une touche la faisait redevenir « la plus récente » et volait
+  la direction du sprite à la touche réellement pressée après elle.
+- [2026-07-29 09:50] Banque sous-pixel **par axe** (`_moveRemainderX/Y`) alimentée
+  par la composante du vecteur unitaire : la normalisation de la diagonale tombe
+  toute seule, sans second arrondi, et l'indépendance au taux de rafraîchissement
+  est préservée. `Math.trunc` (et non `floor`) pour ne pas dépenser un pixel non
+  encore acquis quand la composante est négative.
+- [2026-07-29 09:52] `moveCharacter(dx, dy)` : essaie le vecteur complet, puis
+  l'axe horizontal, puis le vertical (« slide along wall »). La distance rendue à
+  l'animation est la **norme** (`Math.hypot`) du déplacement retenu, pas la plus
+  grande composante — sinon le cycle de marche ralentit en diagonale.
+- [2026-07-29 09:53] Doc mise à jour : `documentation/engine.md` (§3 game loop +
+  mermaid, nouveau §3.1 `DirectionalInput`, §11 API publique),
+  `documentation/architecture.md`, et les **trois** copies de l'extrait de pilotage
+  manuel rAF (`recipes/verify-in-browser.md`, `documentation/development.md`,
+  `agents/workflow.md`) qui posaient `vp.moving = 1; vp.direction = …` — une API
+  qui n'existe plus.
 
 ### Vérification
 
--
+- [2026-07-29 09:56] `npm run verify` vert : **45 fichiers, 332 tests** (44 / 305
+  avant). +27 tests, dont 14 sur `DirectionalInput` (sans jsdom) et 13 sur le
+  `Viewport` (diagonales, glissement, câblage clavier réel via `KeyboardEvent`).
+- [2026-07-29 09:56] Les quatre tests d'indépendance au taux de rafraîchissement
+  passent **sans modification de leurs assertions** — c'est le filet demandé par
+  la spec. Trois tests ont en revanche été mis à jour délibérément (signature
+  `moveCharacter(dx, dy)` et `viewport.direction` qui n'existe plus).
+- [2026-07-29 09:55] `eslint.config.js` : ajout de `KeyboardEvent` aux globals de
+  `test/**` — le lint ne le connaissait que pour `src/**`.
+- [2026-07-29 09:58] **Validation navigateur** sur `http://localhost:5183/engine/demo/`,
+  boucle pilotée à la main (rAF est en pause hors premier plan — le piège s'est
+  d'ailleurs manifesté : une sonde qui `await` un rAF a bien timeouté). Sonde
+  `window.__vp` posée puis **retirée** (0 résidu, vérifié au grep) :
+  - **diagonale** : ArrowLeft + ArrowUp → (−153, −153), sprite tourné `up` ;
+  - **normalisation** : sur 640 ms à 300 px/s, ligne droite **191 px**, diagonale
+    **190,9 px** — écart **0,1 px** (avant : la diagonale n'existait pas) ;
+  - **arrêt fantôme** : ArrowLeft maintenue, appui + relâchement de `Shift` → le
+    personnage parcourt **192 px** sans broncher ;
+  - **relâchement partiel** : lâcher ArrowUp garde le mouvement à gauche et
+    **ramène** le sprite à `left` ;
+  - **glissement** : collé à la maison (mur à x = 297), poussée en diagonale
+    dedans → 6 frames à `dx = 0, dy = 3~4` (il longe le mur), puis il dépasse
+    l'angle et repart (`dx = −3`). Sans le fallback, il serait resté figé ;
+  - **D-pad tactile** : deux boutons pressés ensemble → diagonale ; relâcher l'un
+    garde l'autre. La démo n'a pas eu besoin d'être modifiée ;
+  - **aucune erreur console**.
 
 ### Validation
 

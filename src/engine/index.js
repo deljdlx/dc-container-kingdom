@@ -28,6 +28,9 @@ export { Geometry } from './map/Geometry.js';
 export { Coordinates } from './map/Coordinates.js';
 export { BoundingBox } from './map/BoundingBox.js';
 
+// --- Viewport subsystems (composed by Viewport) ---
+export { DirectionalInput } from './map/DirectionalInput.js';
+
 // --- Element subsystems (composed by Element) ---
 export { EventEmitter } from './map/EventEmitter.js';
 export { CollisionSystem } from './map/CollisionSystem.js';

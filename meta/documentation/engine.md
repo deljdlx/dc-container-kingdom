@@ -55,10 +55,10 @@ Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`
 ```mermaid
 flowchart TD
     U["update(timestamp)"] --> DT["dt = clamp(Δt, 0, 100 ms)<br/>pas de téléport après une pause"]
-    DT --> Q{"le joueur bouge ?"}
-    Q -->|oui| ACC["reste += dt × vitesse / 1000<br/>increment = partie entière"]
-    Q -->|non| RST["reste = 0"]
-    ACC --> MC["si increment ≥ 1 :<br/>moveCharacter · _streamAreas · character.update"]
+    DT --> Q{"input.isMoving() ?"}
+    Q -->|oui| ACC["vecteur unitaire = input.getVector()<br/>resteX/resteY += dt × vitesse / 1000 × composante"]
+    Q -->|non| RST["resteX = resteY = 0"]
+    ACC --> MC["si (dx, dy) ≠ (0, 0) :<br/>moveCharacter(dx, dy) · _streamAreas · character.update"]
     RST --> B
     MC --> B
     MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
@@ -71,15 +71,49 @@ Points clés :
 - **Une seule horloge.** Joueur et PNJ sont tickés par la même game loop avec le
   même `dt` (les behaviors s'enregistrent via `viewport.addBehavior`). Pas de
   `setTimeout` maison.
-- **Le sous-pixel est mis en banque, pas jeté.** Le déplacement se fait en pixels
-  entiers (les sprites pixel-art ne doivent pas atterrir sur un demi-pixel), mais
-  la fraction restante est **reportée sur la frame suivante**. Arrondir chaque
-  frame isolément liait la vitesse de marche à la fréquence d'écran — et sous un
-  pixel par frame (écran rapide ou personnage lent) chaque frame arrondissait à
-  zéro : le personnage ne partait **jamais**. La banque se remet à zéro à l'arrêt,
-  pour qu'un reste dormant ne ressorte pas en saut au pas suivant.
+- **Le sous-pixel est mis en banque, pas jeté — un reste par axe.** Le déplacement
+  se fait en pixels entiers (les sprites pixel-art ne doivent pas atterrir sur un
+  demi-pixel), mais la fraction restante est **reportée sur la frame suivante**.
+  Arrondir chaque frame isolément liait la vitesse de marche à la fréquence
+  d'écran — et sous un pixel par frame (écran rapide ou personnage lent) chaque
+  frame arrondissait à zéro : le personnage ne partait **jamais**. La banque se
+  remet à zéro à l'arrêt, pour qu'un reste dormant ne ressorte pas en saut au pas
+  suivant. Chaque axe a **sa** banque, alimentée par sa composante du vecteur
+  **unitaire** : c'est ce qui normalise la diagonale (0,7071 par axe) sans second
+  arrondi.
+- **Les entrées vivent dans `DirectionalInput`**, pas dans le `Viewport` (voir
+  §3.1) : la boucle lui demande seulement « ça bouge ? » et « dans quelle
+  direction ? ».
 - **rAF est en pause quand l'onglet est caché** → tout gèle (voir
   [development.md](development.md) pour tester en pilotage manuel).
+
+### 3.1 `DirectionalInput` : les touches enfoncées
+
+Le `Viewport` ne retient plus **une** direction mais l'**ensemble des directions
+tenues, dans l'ordre d'appui** — c'est ce qui rend les diagonales possibles et ce
+qui supprime l'« arrêt fantôme » (relâcher une touche quelconque stoppait le
+personnage, même une flèche encore enfoncée).
+
+`DirectionalInput` **ignore le DOM et les touches** : le `Viewport` traduit
+`ArrowUp` → `'up'` (table `Viewport.KEY_DIRECTIONS`) et l'alimente. Une autre
+source d'entrée (D-pad, manette) s'y branche de la même façon, et le sous-système
+se teste sans jsdom.
+
+| Question | Réponse |
+|---|---|
+| `isMoving()` | y a-t-il un déplacement ? Deux directions **opposées s'annulent** : quelque chose est enfoncé, rien ne bouge. |
+| `getVector()` | le vecteur **unitaire** du déplacement — la diagonale vaut (±0,7071, ±0,7071), pas (±1, ±1). |
+| `getFacing()` | la direction du sprite = **la dernière touche encore tenue**. Relâcher la plus récente **revient** à la précédente sans cas particulier. |
+
+Côté `Viewport` : `press(direction)` / `release(direction)` ajoutent et retirent
+une direction, `move(direction)` n'en tient qu'**une** (tout le reste relâché) et
+`stop()` relâche tout. Un arrêt **ne change pas** l'orientation : un personnage
+immobile regarde toujours quelque part.
+
+**Collision et diagonale** : `moveCharacter(dx, dy)` tente le vecteur complet,
+puis l'axe horizontal seul, puis le vertical (« slide along wall »). Sans cette
+dégradation, marcher en biais contre un mur bloque **tout** le déplacement au lieu
+de longer le mur.
 
 ## 4. Camera
 
@@ -287,6 +321,7 @@ sa boîte de debug (coût nul hors debug — la boîte n'existe pas).
 
 Tout passe par **`src/engine/index.js`** : `Application`, `Viewport`, `Camera`,
 `Board`, `Area`, `Element`, `SpriteElement`, `Character` ; les sous-systèmes
-(`CollisionSystem`, `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`,
-`PatrolBehavior`, `FleeBehavior`) ; les renderers ; les éléments intégrés et
-bases de personnages ; et la config (`setAssetsBase`, `applyDebugFlag`).
+(`DirectionalInput`, `CollisionSystem`, `SceneGraph`, `CharacterAnimator`,
+`CharacterBehavior`, `PatrolBehavior`, `FleeBehavior`) ; les renderers ; les
+éléments intégrés et bases de personnages ; et la config (`setAssetsBase`,
+`applyDebugFlag`).

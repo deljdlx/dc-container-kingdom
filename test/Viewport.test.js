@@ -44,7 +44,7 @@ describe('Viewport - frame clock', () => {
 
     viewport.update(1_500);
     expect(behavior.update).toHaveBeenNthCalledWith(2, 100);
-    expect(moveCharacter).toHaveBeenCalledWith(30);
+    expect(moveCharacter).toHaveBeenCalledWith(30, 0);
     expect(streamAreas).toHaveBeenCalledTimes(1);
     expect(characterUpdate).toHaveBeenCalledTimes(1);
   });
@@ -142,10 +142,10 @@ describe('Viewport - movement orchestration', () => {
     ['down', 0, 7],
     ['left', -7, 0],
     ['right', 7, 0],
-  ])('translates %s into (%i, %i)', (direction, expectedDx, expectedDy) => {
+  ])('moves %s through the collision dance', (direction, dx, dy) => {
     const { viewport, app } = createViewport();
     const character = {
-      moveBlocked: vi.fn((dx, dy, isBlocked) => {
+      moveBlocked: vi.fn((moveX, moveY, isBlocked) => {
         expect(isBlocked()).toBe(false);
         return false;
       }),
@@ -154,19 +154,34 @@ describe('Viewport - movement orchestration', () => {
       getTrigger: vi.fn(),
     };
     viewport.character = character;
-    viewport.direction = direction;
 
-    viewport.moveCharacter(7);
+    viewport.moveCharacter(dx, dy);
 
-    expect(character.moveBlocked).toHaveBeenCalledWith(
-      expectedDx,
-      expectedDy,
-      expect.any(Function),
-    );
+    expect(character.moveBlocked).toHaveBeenCalledWith(dx, dy, expect.any(Function));
     expect(app.handle).toHaveBeenCalledWith('map.update', {
       map: viewport,
       character,
     });
+  });
+
+  it.each([
+    ['up', 0, -1],
+    ['down', 0, 1],
+    ['left', -1, 0],
+    ['right', 1, 0],
+  ])('walks the character %s while that direction is held', (direction, signX, signY) => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(100, 100);
+    viewport.getCharacter().moveSpeed(300);
+    viewport.move(direction);
+
+    let t = 1_000;
+    viewport.update(t);          // first frame is dt = 0 by design
+    t += 100; viewport.update(t);  // 100ms at 300px/s → 30px
+
+    expect(viewport.getCharacter().x() - 100).toBe(30 * signX);
+    expect(viewport.getCharacter().y() - 100).toBe(30 * signY);
+    expect(viewport.getCharacter().getDirection()).toBe(direction);
   });
 
   it('reconciles trigger hits from the single-pass detection when the move succeeds', () => {
@@ -184,9 +199,8 @@ describe('Viewport - movement orchestration', () => {
       getTrigger: vi.fn(),
     };
     viewport.character = character;
-    viewport.direction = 'right';
 
-    viewport.moveCharacter(9);
+    viewport.moveCharacter(9, 0);
 
     expect(character.detectCollisionAndTrigger).toHaveBeenCalledWith(viewport.getBoard());
     expect(character.reconcileTrigger).toHaveBeenCalledWith(triggerHits);
@@ -207,13 +221,181 @@ describe('Viewport - movement orchestration', () => {
       getTrigger: vi.fn(),
     };
     viewport.character = character;
-    viewport.direction = 'up';
 
-    viewport.moveCharacter(5);
+    viewport.moveCharacter(0, -5);
 
     expect(character.detectCollisionAndTrigger).toHaveBeenCalledWith(viewport.getBoard());
     expect(character.getTrigger).toHaveBeenCalledWith(viewport.getBoard());
     expect(character.reconcileTrigger).not.toHaveBeenCalled();
+  });
+});
+
+describe('Viewport - diagonals', () => {
+  it('walks diagonally when two directions are held', () => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(100, 100);
+    viewport.getCharacter().moveSpeed(300);
+    viewport.move('right');
+    viewport.press('down');
+
+    let t = 1_000;
+    viewport.update(t);
+    for (let i = 0; i < 10; i++) {   // 10 × 100ms = 1s at 300px/s
+      t += 100;
+      viewport.update(t);
+    }
+
+    expect(viewport.getCharacter().x()).toBeGreaterThan(100);
+    expect(viewport.getCharacter().y()).toBeGreaterThan(100);
+  });
+
+  // A diagonal used to be impossible; the naive fix (dx = dy = increment) walks
+  // √2 ≈ 1.41× too fast in a straight line's time.
+  it('covers the same distance diagonally as in a straight line', () => {
+    const walk = (directions) => {
+      const { viewport } = createViewport();
+      viewport.enableMainCharacter(0, 0);
+      viewport.getCharacter().moveSpeed(300);
+      directions.forEach(direction => viewport.press(direction));
+
+      let t = 1_000;
+      viewport.update(t);
+      for (let i = 0; i < 10; i++) {
+        t += 100;
+        viewport.update(t);
+      }
+      return Math.hypot(viewport.getCharacter().x(), viewport.getCharacter().y());
+    };
+
+    const straight = walk(['right']);
+    const diagonal = walk(['right', 'down']);
+
+    expect(straight).toBeCloseTo(300, 0);
+    expect(Math.abs(diagonal - straight)).toBeLessThanOrEqual(1);
+  });
+
+  it('keeps walking on the remaining axis when one direction is released', () => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(100, 100);
+    viewport.getCharacter().moveSpeed(300);
+    viewport.press('right');
+    viewport.press('down');
+
+    let t = 1_000;
+    viewport.update(t);
+    t += 100; viewport.update(t);
+    const afterDiagonal = { x: viewport.getCharacter().x(), y: viewport.getCharacter().y() };
+
+    viewport.release('down');
+    t += 100; viewport.update(t);
+
+    expect(viewport.getCharacter().x()).toBe(afterDiagonal.x + 30); // full speed again
+    expect(viewport.getCharacter().y()).toBe(afterDiagonal.y);
+    expect(viewport.getCharacter().getDirection()).toBe('right');   // falls back
+  });
+
+  // Without the fallback, walking diagonally into a wall stops the character
+  // dead instead of letting it follow the wall.
+  it('slides along the wall when only one axis is blocked', () => {
+    const { viewport } = createViewport();
+    const attempts = [];
+    const character = {
+      moveBlocked: vi.fn((dx, dy, isBlocked) => {
+        attempts.push([dx, dy]);
+        isBlocked();
+        return dy !== 0;              // a horizontal wall: vertical moves fail
+      }),
+      detectCollisionAndTrigger: vi.fn(() => ({ collision: [], trigger: [] })),
+      reconcileTrigger: vi.fn(),
+      getTrigger: vi.fn(),
+    };
+    viewport.character = character;
+
+    const walked = viewport.moveCharacter(5, 5);
+
+    expect(attempts).toEqual([[5, 5], [5, 0]]);
+    expect(walked).toBe(5);
+    expect(character.reconcileTrigger).toHaveBeenCalled();
+    expect(character.getTrigger).not.toHaveBeenCalled();
+  });
+
+  it('reports no movement when every fallback is blocked', () => {
+    const { viewport } = createViewport();
+    const character = {
+      moveBlocked: vi.fn(() => true),
+      detectCollisionAndTrigger: vi.fn(() => ({ collision: [{}], trigger: [] })),
+      reconcileTrigger: vi.fn(),
+      getTrigger: vi.fn(),
+    };
+    viewport.character = character;
+
+    const walked = viewport.moveCharacter(5, 5);
+
+    expect(character.moveBlocked).toHaveBeenCalledTimes(3);  // full, then each axis
+    expect(walked).toBe(0);
+    expect(character.getTrigger).toHaveBeenCalledWith(viewport.getBoard());
+    expect(character.reconcileTrigger).not.toHaveBeenCalled();
+  });
+});
+
+describe('Viewport - keyboard wiring', () => {
+  function runWithKeyboard() {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(100, 100);
+    vi.spyOn(viewport, 'startLoop').mockImplementation(() => {});
+    viewport.run();
+    return viewport;
+  }
+
+  const keydown = (key, repeat = false) =>
+    document.body.dispatchEvent(new KeyboardEvent('keydown', { key, repeat, bubbles: true }));
+  const keyup = (key) =>
+    document.body.dispatchEvent(new KeyboardEvent('keyup', { key, bubbles: true }));
+
+  it('combines two arrows into a diagonal', () => {
+    const viewport = runWithKeyboard();
+
+    keydown('ArrowRight');
+    keydown('ArrowDown');
+
+    const vector = viewport.getInput().getVector();
+    expect(vector.x).toBeCloseTo(Math.SQRT1_2, 10);
+    expect(vector.y).toBeCloseTo(Math.SQRT1_2, 10);
+  });
+
+  // Regression: keyup stopped the character whatever key was released, so
+  // tapping any other key while walking froze it mid-stride.
+  it('is not stopped by a key that has nothing to do with movement', () => {
+    const viewport = runWithKeyboard();
+    keydown('ArrowRight');
+
+    keydown('Shift');
+    keyup('Shift');
+
+    expect(viewport.getInput().isMoving()).toBe(true);
+    expect(viewport.getInput().getVector()).toEqual({ x: 1, y: 0 });
+  });
+
+  it('stops only once the last arrow is released', () => {
+    const viewport = runWithKeyboard();
+    keydown('ArrowRight');
+    keydown('ArrowUp');
+
+    keyup('ArrowUp');
+    expect(viewport.getInput().isMoving()).toBe(true);
+
+    keyup('ArrowRight');
+    expect(viewport.getInput().isMoving()).toBe(false);
+  });
+
+  it('ignores auto-repeat, so holding a key does not steal the facing direction', () => {
+    const viewport = runWithKeyboard();
+    keydown('ArrowRight');
+    keydown('ArrowUp');
+
+    keydown('ArrowRight', true);   // OS auto-repeat of the still-held key
+
+    expect(viewport.getInput().getFacing()).toBe('up');
   });
 });
 
