@@ -2,10 +2,10 @@
 id: 2026-07-29_08-26
 title: Les logs d'un conteneur s'exécutent dans le navigateur
 type: fix
-branch:
+branch: claude/untrusted-data-rendering
 created: 2026-07-29 08:26
 ready: 2026-07-29 08:27
-doing:
+doing: 2026-07-29 08:31
 verify:
 done:
 ---
