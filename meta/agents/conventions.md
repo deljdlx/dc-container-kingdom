@@ -40,6 +40,8 @@
   été fait et n'est pas accepté.
 - **Jamais** de mention d'assistance IA (pas de `Co-Authored-By`, pas de
   « Generated with… »).
-- **Commiter / pusher uniquement sur demande.**
+- **Commiter / pusher uniquement sur demande**, sauf commits locaux de
+  bookkeeping du board (transitions de colonnes) décrits dans
+  [recipes/workflow/work-a-task.md](recipes/workflow/work-a-task.md).
 - **Jamais** `git add -A` / `git add .` — stager des chemins explicites.
 - Les PR suivent le template (`.github/pull_request_template.md`).

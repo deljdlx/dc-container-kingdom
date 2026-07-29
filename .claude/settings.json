@@ -82,6 +82,11 @@
             "type": "command",
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/allow-readonly-bash.sh\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/deny-primary-branch-switch.sh\"",
+            "timeout": 10
           }
         ]
       }

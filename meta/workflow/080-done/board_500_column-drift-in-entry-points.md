@@ -95,8 +95,8 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 ### Travail
 
 - [2026-07-29 15:01] Alignement des points d'entrée [CLAUDE.md](../../../CLAUDE.md), [AGENTS.md](../../../AGENTS.md) et [.github/copilot-instructions.md](../../../.github/copilot-instructions.md) : source de tâches clarifiée (`020-ready` prioritaire, sinon `000-backlog` avec *specify*) et séquence complète du pipeline.
-- [2026-07-29 15:01] Mise à jour de [meta/agents/workflow.md](../../../agents/workflow.md), [meta/agents/recipes/audit-workflow-consistency.md](../../../agents/recipes/audit-workflow-consistency.md) (ajout de `200-ideas` au contrôle dur) et [meta/agents/recipes/workflow/ticket-work.md](../../../agents/recipes/workflow/ticket-work.md) pour rendre le worktree dédié inconditionnel.
-- [2026-07-29 15:02] Correction opportuniste d'un lien cassé détecté par le contrôle 1 dans [meta/workflow/080-done/board_500_ticket-work-tests-needed.md](../../080-done/board_500_ticket-work-tests-needed.md) afin de restaurer un board vert.
+- [2026-07-29 15:01] Mise à jour de [meta/agents/workflow.md](../../agents/workflow.md), [meta/agents/recipes/audit-workflow-consistency.md](../../agents/recipes/audit-workflow-consistency.md) (ajout de `200-ideas` au contrôle dur) et [meta/agents/recipes/workflow/ticket-work.md](../../agents/recipes/workflow/ticket-work.md) pour rendre le worktree dédié inconditionnel.
+- [2026-07-29 15:02] Correction opportuniste d'un lien cassé détecté par le contrôle 1 dans [meta/workflow/080-done/board_500_ticket-work-tests-needed.md](board_500_ticket-work-tests-needed.md) afin de restaurer un board vert.
 
 ### Vérification
 
