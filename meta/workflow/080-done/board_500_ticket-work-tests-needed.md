@@ -47,7 +47,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
-- [2026-07-29 14:56] Mise à jour de [meta/agents/recipes/workflow/ticket-work.md](../../../agents/recipes/workflow/ticket-work.md) pour expliciter qu'il faut ajouter/mettre à jour les tests unitaires quand le ticket le nécessite, avec couverture adaptée au risque (nominal/limites/non-régression).
+- [2026-07-29 14:56] Mise à jour de [meta/agents/recipes/workflow/ticket-work.md](../../agents/recipes/workflow/ticket-work.md) pour expliciter qu'il faut ajouter/mettre à jour les tests unitaires quand le ticket le nécessite, avec couverture adaptée au risque (nominal/limites/non-régression).
 
 ### Vérification
 

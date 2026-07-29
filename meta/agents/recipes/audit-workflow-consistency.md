@@ -82,7 +82,7 @@ Contrôle **dur** (doit être vide) : une colonne se cite toujours
 `meta/workflow/<colonne>/`, jamais `meta/<colonne>/`.
 
 ```bash
-grep -rnE "meta/(000-backlog|020-ready|040-doing|060-verify|080-done|100-follow-up)/" \
+grep -rnE "meta/(000-backlog|020-ready|040-doing|060-verify|080-done|100-follow-up|200-ideas)/" \
   --include=*.md . CLAUDE.md AGENTS.md .github/*.md \
   | grep -vE "node_modules|/\.git/|/\.claude/" | grep -v "meta/workflow/"
 ```

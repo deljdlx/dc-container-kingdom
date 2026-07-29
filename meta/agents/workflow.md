@@ -2,9 +2,11 @@
 
 ## Source des tâches : le board `meta/`
 
-Le travail se pilote depuis le **kanban en fichiers** `meta/` (colonnes
-`000-backlog` → `040-doing` → `060-verify` → `080-done`). Prendre la tâche
-prioritaire, la faire avancer de colonne en colonne, et suivre le cycle décrit
+Le travail se pilote depuis le **kanban en fichiers** `meta/` (pipeline
+`000-backlog` → `020-ready` → `040-doing` → `060-verify` → `080-done`, avec
+`100-follow-up` et `200-ideas` hors pipeline). Prendre la tâche dans
+`020-ready` en priorité (sinon `000-backlog`, puis *specify*), la faire avancer
+de colonne en colonne, et suivre le cycle décrit
 par la recipe **[`recipes/workflow/work-a-task.md`](recipes/workflow/work-a-task.md)** (branche
 dédiée, `npm run verify`, merge, journal de tâche). Voir
 [`../README.md`](../README.md).
