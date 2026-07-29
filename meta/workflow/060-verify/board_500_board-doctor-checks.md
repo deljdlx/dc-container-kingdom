@@ -6,7 +6,7 @@ branch: claude/board-doctor-consolidation
 created: 2026-07-29 08:43
 ready: 2026-07-29 18:14
 doing: 2026-07-29 18:41
-verify:
+verify: 2026-07-29 18:56
 done:
 ---
 
@@ -91,17 +91,17 @@ pour satisfaire un contrôle, ce serait la falsifier.
 
 ## Definition of Done
 
-- [ ] `test/board.test.js` vérifie la monotonie des estampilles renseignées.
-- [ ] La timeline fautive de `board_500_git-hygiene-merges-and-branches` est
+- [x] `test/board.test.js` vérifie la monotonie des estampilles renseignées.
+- [x] La timeline fautive de `board_500_git-hygiene-merges-and-branches` est
       corrigée à partir de l'historique, et le nouveau contrôle passe.
 - [ ] Le test d'hygiène git ne prend plus un HEAD détaché pour une branche :
       `npm run verify` est **vert depuis le tree principal comme depuis un worktree
       au repos** (les deux exécutions notées au journal).
 - [ ] Aucun second contrôleur n'est introduit ; la branche `copilot/board-doctor-checks`
       est abandonnée, son worktree laissé propre et détaché sur `main`.
-- [ ] `meta/agents/recipes/audit-workflow-consistency.md` renvoie au garde-fou
+- [x] `meta/agents/recipes/audit-workflow-consistency.md` renvoie au garde-fou
       unique, sans mentionner d'outil qui n'existe pas.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -117,11 +117,41 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 18:45] Comparaison contrôle par contrôle des deux garde-fous : le
+  script de `copilot/board-doctor-checks` n'apporte que la **monotonie de la
+  timeline** ; nommage, id uniques, frontmatter, `Suite`, liens, colonnes et
+  `@imports` sont déjà dans `test/board.test.js`. Décision : ne rien reprendre
+  d'autre, ne pas introduire de second outil.
+- [2026-07-29 18:47] Ajout du contrôle « garde une timeline monotone » dans
+  `test/board.test.js` (`created ≤ ready ≤ doing ≤ verify ≤ done`, sur les
+  estampilles renseignées seulement). Helper `timestamp()` pour ne comparer que
+  l'horodatage : `done` porte son hash de merge à la suite. Pivot d'archive repris
+  de `SUITE_PIVOT` — au-delà, la vérité des estampilles n'est plus récupérable
+  dans l'historique, et réécrire l'archive pour verdir un test la falsifierait.
+- [2026-07-29 18:48] Correction du faux positif d'hygiène git : les entrées
+  commençant par `(` sont ignorées. Sonde dans un worktree détaché : git y écrit
+  `(no branch)` ou `(HEAD detached at refs/heads/main)` selon le cas — filtrer le
+  préfixe couvre les deux, là où une comparaison exacte n'en couvrirait qu'un.
+- [2026-07-29 18:50] Réparation de la timeline fautive de
+  `board_500_git-hygiene-merges-and-branches` : `verify` passe de 15:26 à **15:25**,
+  valeur lue dans l'historique (la transition *verify* est committée en `a7ad9b4`
+  à 15:25 — l'estampille postdatait son propre commit). Le `done` était juste.
+- [2026-07-29 18:54] `audit-workflow-consistency` mise à jour : la note annonçant
+  une migration vers `meta/agents/tools/` promettait un outil qui ne doit pas
+  exister ; elle dit maintenant que le garde-fou est unique et où ajouter un
+  contrôle. La liste des contrôles automatisés y est complétée.
 
 ### Vérification
 
--
+- [2026-07-29 18:56] `npm run verify` vert sur la branche : 45 fichiers,
+  **335 tests** (334 avant — +1, le contrôle de monotonie).
+- [2026-07-29 18:43] **Les deux contrôles ont été vus échouer** avant d'être
+  déclarés bons : anomalie de timeline réintroduite → `× board — frontmatter >
+  garde une timeline monotone` (1 failed / 22) ; réparée → 22 passed.
+- [2026-07-29 18:44] Faux positif reproduit dans son contexte : depuis un worktree
+  détaché créé pour l'occasion, `git branch --merged main --format='%(refname:short)'`
+  rend `(no branch)` en plus des branches ; après filtre, il ne reste que les vraies
+  branches. Worktree de sonde supprimé.
 
 ### Validation
 

@@ -6,7 +6,7 @@ branch: copilot/git-hygiene-merges-branches
 created: 2026-07-29 08:53
 ready: 2026-07-29 15:18
 doing: 2026-07-29 15:18
-verify: 2026-07-29 15:26
+verify: 2026-07-29 15:25
 done: 2026-07-29 15:25
 ---
 
