@@ -1,11 +1,3 @@
-# Container Kingdom — guide agent (Claude Code)
-
-> Résumé des règles ; **la source de vérité est [`meta/agents/`](meta/agents/)**. Points
-> d'entrée frères : [`AGENTS.md`](AGENTS.md),
-> [`.github/copilot-instructions.md`](.github/copilot-instructions.md).
-
-<!--<ENTRYPOINT_COMMON>-->
-
 ## Le projet
 
 Visualisation de conteneurs Docker rendue comme un **RPG**, sur un **moteur de
@@ -43,16 +35,10 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
 
 ## Détail (source de vérité)
 
-Lire le dossier **[`meta/agents/`](meta/agents/)** pour les règles complètes :
+Lire le dossier **[`{{META_PREFIX}}meta/agents/`]({{META_PREFIX}}meta/agents/)** pour les règles complètes :
 
-- [`meta/agents/conventions.md`](meta/agents/conventions.md) — langue, style/design, git.
-- [`meta/agents/workflow.md`](meta/agents/workflow.md) — vérification, doc à jour, piège rAF.
-- [`meta/agents/engine-boundary.md`](meta/agents/engine-boundary.md) — frontière + archi.
+- [`{{META_PREFIX}}meta/agents/conventions.md`]({{META_PREFIX}}meta/agents/conventions.md) — langue, style/design, git.
+- [`{{META_PREFIX}}meta/agents/workflow.md`]({{META_PREFIX}}meta/agents/workflow.md) — vérification, doc à jour, piège rAF.
+- [`{{META_PREFIX}}meta/agents/engine-boundary.md`]({{META_PREFIX}}meta/agents/engine-boundary.md) — frontière + archi.
 
-Pour comprendre le **code** : **[`meta/documentation/`](meta/documentation/)**.
-
-<!--</ENTRYPOINT_COMMON>-->
-
-@meta/agents/conventions.md
-@meta/agents/workflow.md
-@meta/agents/engine-boundary.md
+Pour comprendre le **code** : **[`{{META_PREFIX}}meta/documentation/`]({{META_PREFIX}}meta/documentation/)**.

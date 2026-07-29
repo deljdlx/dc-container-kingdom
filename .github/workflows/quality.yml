@@ -23,5 +23,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Check generated entry points
+        run: npm run check:agent-entry-points
+
       - name: Run full verification
         run: npm run verify

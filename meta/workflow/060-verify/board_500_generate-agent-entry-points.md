@@ -2,11 +2,11 @@
 id: 2026-07-29_08-51
 title: Générer AGENTS.md et copilot-instructions.md depuis une source unique
 type: chore
-branch:
+branch: copilot/generate-agent-entry-points
 created: 2026-07-29 08:51
-ready:
-doing:
-verify:
+ready: 2026-07-29 15:29
+doing: 2026-07-29 15:29
+verify: 2026-07-29 15:32
 done:
 ---
 
@@ -75,15 +75,15 @@ choses qu'une copie manuelle rate.
 
 ## Definition of Done
 
-- [ ] Une source unique décrit le tronc commun ; les trois entrées en dérivent.
-- [ ] Les spécificités de chaque entrée (préambule worktree Copilot, `@imports`
+- [x] Une source unique décrit le tronc commun ; les trois entrées en dérivent.
+- [x] Les spécificités de chaque entrée (préambule worktree Copilot, `@imports`
       de `CLAUDE.md`) sont préservées.
-- [ ] Les liens relatifs sont corrects **dans les trois** fichiers générés.
-- [ ] Un `--check` (ou équivalent) échoue si un fichier généré diverge de sa
+- [x] Les liens relatifs sont corrects **dans les trois** fichiers générés.
+- [x] Un `--check` (ou équivalent) échoue si un fichier généré diverge de sa
       source, et il est joué en CI.
-- [ ] Modifier une règle du tronc commun et régénérer met les trois entrées à
+- [x] Modifier une règle du tronc commun et régénérer met les trois entrées à
       jour — démontré au journal.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -99,11 +99,16 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 15:30] Création d'une source unique [meta/agents/entry-points/common.md](../../../agents/entry-points/common.md) pour le tronc commun (projet, commandes, règles, liens de détail) avec placeholder `{{META_PREFIX}}` pour les liens markdown.
+- [2026-07-29 15:30] Ajout des marqueurs `<!--<ENTRYPOINT_COMMON>-->` / `<!--</ENTRYPOINT_COMMON>-->` dans [AGENTS.md](../../../AGENTS.md), [CLAUDE.md](../../../CLAUDE.md) et [.github/copilot-instructions.md](../../../.github/copilot-instructions.md), en conservant les sections spécifiques (préambule Copilot et `@imports` Claude).
+- [2026-07-29 15:30] Ajout du générateur/check [scripts/generate-agent-entry-points.mjs](../../../scripts/generate-agent-entry-points.mjs), scripts npm [package.json](../../../package.json) et étape CI [quality.yml](../../../.github/workflows/quality.yml) via `npm run check:agent-entry-points`.
+- [2026-07-29 15:31] Ajustement d'une règle du tronc commun dans [meta/agents/entry-points/common.md](../../../agents/entry-points/common.md) (bloc `Règles essentielles` rendu identique entre entrées) puis régénération immédiate pour démontrer la propagation.
 
 ### Vérification
 
--
+- [2026-07-29 15:30] `npm run generate:agent-entry-points` exécuté : mise à jour des 3 entrées depuis la source unique.
+- [2026-07-29 15:30] `npm run check:agent-entry-points` vert après génération.
+- [2026-07-29 15:31] `npm run verify` vert (lint, build, 45 fichiers de test / 334 tests).
 
 ### Validation
 
