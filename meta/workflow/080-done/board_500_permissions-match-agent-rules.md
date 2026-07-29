@@ -7,7 +7,7 @@ created: 2026-07-29 08:52
 ready: 2026-07-29 15:05
 doing: 2026-07-29 15:05
 verify: 2026-07-29 15:14
-done:
+done: 2026-07-29 15:14
 ---
 
 ## Objectif
@@ -101,10 +101,7 @@ de branche doit rester fluide.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`)._
-
--
+aucune
 
 ## Journal
 
@@ -116,7 +113,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 - [2026-07-29 15:10] Ajout du hook [deny-primary-branch-switch.sh](../../../.claude/hooks/deny-primary-branch-switch.sh) et enregistrement dans [.claude/settings.json](../../../.claude/settings.json) pour refuser `git checkout <branche>` / `git switch <branche>` sur le tree principal, avec exemption des formes inoffensives (`--detach`, `checkout -- <fichier>`).
 - [2026-07-29 15:11] Mise à jour de [meta/agents/tools/README.md](../../../meta/agents/tools/README.md) pour documenter le hook *fail-closed* et clarifier la politique permissions (`git push` hors `allow`, `git commit` conservé pour le bookkeeping).
 - [2026-07-29 15:11] Mise à jour de [meta/agents/conventions.md](../../../meta/agents/conventions.md) pour expliciter l'exception de commits locaux de bookkeeping du board, alignée avec [meta/agents/recipes/workflow/work-a-task.md](../../../meta/agents/recipes/workflow/work-a-task.md).
-- [2026-07-29 15:13] Correction opportuniste de liens relatifs cassés dans [meta/workflow/080-done/board_500_column-drift-in-entry-points.md](../../080-done/board_500_column-drift-in-entry-points.md), détectés pendant `npm run verify`.
+- [2026-07-29 15:13] Correction opportuniste de liens relatifs cassés dans [meta/workflow/080-done/board_500_column-drift-in-entry-points.md](board_500_column-drift-in-entry-points.md), détectés pendant `npm run verify`.
 
 ### Vérification
 
@@ -129,4 +126,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-29 15:14] Merge sur `main` effectué : `e7acee2f7e244632558052589ff38c3d50842385`. Ticket déplacé en `080-done`.
