@@ -6,7 +6,7 @@ branch: copilot/permissions-match-agent-rules
 created: 2026-07-29 08:52
 ready: 2026-07-29 15:05
 doing: 2026-07-29 15:05
-verify:
+verify: 2026-07-29 15:14
 done:
 ---
 
