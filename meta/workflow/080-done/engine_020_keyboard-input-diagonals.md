@@ -7,7 +7,7 @@ created: 2026-07-26 14:22
 ready: 2026-07-29 09:29
 doing: 2026-07-29 09:36
 verify: 2026-07-29 09:55
-done:
+done: 2026-07-29 13:59 (merge 6285556)
 ---
 
 ## Objectif
@@ -117,10 +117,25 @@ Le ticket laissait trois points ouverts. Tranchés, avec leur raison :
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`)._
-
--
+- **Ce que ça ouvre** — `DirectionalInput` est déjà la bonne abstraction pour une
+  **autre source d'entrée** (manette, joystick à l'écran) : il ne connaît ni le DOM
+  ni les touches, une source n'a qu'à appeler `press`/`release`. Il lui manquerait
+  une **amplitude** pour un stick analogique — aujourd'hui une direction est tenue
+  ou pas, le vecteur est toujours unitaire.
+- **Ce qu'on laisse de côté** — (a) **pas de remapping** : seules les quatre
+  flèches sont câblées, ni ZQSD/WASD ni personnalisation (la table
+  `Viewport.KEY_DIRECTIONS` est le point d'accroche si ça vient un jour) ;
+  (b) le champ **`Viewport.interval = 4` est mort** — vérifié au grep, déclaré et
+  jamais lu ; hors périmètre de ce ticket, laissé en place plutôt que supprimé au
+  passage ; (c) **rien n'annule les touches sur `blur`** : quitter l'onglet avec
+  une flèche enfoncée laisse la direction tenue au retour — jamais observé en
+  pratique puisque rAF est aussi en pause, mais la logique le permet.
+- **Limite de la vérification** — la validation navigateur a été faite en pilotage
+  **manuel** de la boucle avec des `KeyboardEvent` **synthétiques** (rAF est en
+  pause hors premier plan). Le clavier physique et le rendu image par image du
+  cycle de marche en diagonale n'ont donc pas été observés directement.
+- **Déposé en `100-follow-up/`** — rien. Aucune des pistes ci-dessus ne demande
+  une décision maintenant.
 
 ## Journal
 
@@ -189,4 +204,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-29 13:58] Review du diff (`main..claude/keyboard-input-diagonals`) :
+  frontière moteur respectée (aucun import de `container-kingdom`, nouvelle classe
+  publique exportée par le baril), code et JSDoc en anglais, commits FR sans
+  mention d'assistance, branche dédiée, `git add` par chemins explicites. Les 8
+  critères de la DoD sont cochés avec leur preuve au journal de vérification.
+- [2026-07-29 13:59] Merge `--no-ff` sur `main` depuis le tree principal :
+  **6285556** — `merge: diagonales et fin de l'arrêt fantôme au clavier`
+  (12 fichiers, +675 / −105).
