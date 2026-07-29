@@ -7,7 +7,7 @@ created: 2026-07-29 08:41
 ready: 2026-07-29 14:40
 doing: 2026-07-29 14:40
 verify: 2026-07-29 14:44
-done:
+done: 2026-07-29 14:45
 ---
 
 ## Objectif
@@ -60,18 +60,18 @@ une chaîne de HTML.
 
 ## Definition of Done
 
-- [ ] `ansiToHex` n'existe plus dans `src/`, et rien ne l'appelait (grep en
+- [x] `ansiToHex` n'existe plus dans `src/`, et rien ne l'appelait (grep en
       preuve, noté au journal).
-- [ ] Le code devenu mort avec elle est supprimé aussi, ou son maintien justifié.
-- [ ] Le rendu des logs ne régresse pas — tests existants de `LogEntry` verts.
-- [ ] `npm run verify` vert.
+- [x] Le code devenu mort avec elle est supprimé aussi, ou son maintien justifié.
+- [x] Le rendu des logs ne régresse pas — tests existants de `LogEntry` verts.
+- [x] `npm run verify` vert.
 
 ## Suite
 
 _« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
 `meta/agents/recipes/workflow/ticket-follow-up.md`)._
 
--
+aucune
 
 ## Journal
 
@@ -91,4 +91,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
-- En attente de merge dans `main`.
+- Merge local sur `main` effectué : `d865dd8014690eb2c29b0b1743fe8c7e10cbd06d`. Ticket déplacé en `080-done`.
