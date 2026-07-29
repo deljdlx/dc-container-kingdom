@@ -2,11 +2,11 @@
 id: 2026-07-29_08-53
 title: Hygiène git — branches mergées qui traînent et merges au message par défaut
 type: chore
-branch:
+branch: copilot/git-hygiene-merges-branches
 created: 2026-07-29 08:53
-ready:
-doing:
-verify:
+ready: 2026-07-29 15:18
+doing: 2026-07-29 15:18
+verify: 2026-07-29 15:26
 done:
 ---
 
@@ -79,14 +79,14 @@ de référence).
 
 ## Definition of Done
 
-- [ ] `git branch --merged main` ne liste plus que `main` (ou uniquement des
+- [x] `git branch --merged main` ne liste plus que `main` (ou uniquement des
       branches dont la conservation est justifiée au journal).
-- [ ] Aucune branche non mergée n'a été supprimée (`-d` uniquement, jamais `-D`).
-- [ ] Un contrôle automatisé signale une branche mergée non supprimée.
-- [ ] Un contrôle automatisé signale un commit de merge sans préfixe `merge: `,
+- [x] Aucune branche non mergée n'a été supprimée (`-d` uniquement, jamais `-D`).
+- [x] Un contrôle automatisé signale une branche mergée non supprimée.
+- [x] Un contrôle automatisé signale un commit de merge sans préfixe `merge: `,
       avec une base de référence documentée (l'historique existant n'est pas
       réécrit).
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -102,11 +102,17 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 15:22] Nettoyage des branches déjà mergées via `git branch -d` uniquement : 13 branches supprimées (`copilot/*`, `docs/*`, `feat/*`, `refactor/*`) sans recours à `-D`.
+- [2026-07-29 15:22] Une branche mergée est conservée et justifiée : `codex/test-caracteriser-viewport-board`, car montée par un worktree actif (`/tmp/dc-container-kingdom-codex`) ; non suppression conforme à la règle de coordination inter-agents.
+- [2026-07-29 15:24] Ajout de deux contrôles automatisés dans [test/board.test.js](../../../test/board.test.js) :
+  1) détection des branches mergées restantes hors branches montées en worktree ;
+  2) vérification du préfixe `merge: ` sur les merges *first-parent* depuis la base `e7acee2` (base documentée pour ne pas réécrire l'historique antérieur).
 
 ### Vérification
 
--
+- [2026-07-29 15:22] `git branch --merged main --format='%(refname:short)'` après nettoyage : `main` + `codex/test-caracteriser-viewport-board` (branche montée, donc justifiée).
+- [2026-07-29 15:22] `git worktree list` confirme le montage actif de `codex/test-caracteriser-viewport-board` dans `/tmp/dc-container-kingdom-codex`.
+- [2026-07-29 15:25] `npm run verify` vert.
 
 ### Validation
 

@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { readFileSync, readdirSync, existsSync, statSync } from 'node:fs';
+import { execSync } from 'node:child_process';
 import { dirname, join, normalize, relative } from 'node:path';
 
 /**
@@ -24,6 +25,12 @@ const PROJECTS = ['engine', 'container-kingdom', 'infra', 'board'];
 const TYPES = ['feat', 'fix', 'refactor', 'docs', 'test', 'chore'];
 
 const ENTRY_POINTS = ['CLAUDE.md', 'AGENTS.md', '.github/copilot-instructions.md'];
+
+/**
+ * Prefix enforcement starts from this commit on main's first-parent history,
+ * after the hygiene hardening work landed. Older merges stay untouched.
+ */
+const MERGE_MESSAGE_BASELINE = 'e7acee2';
 
 /**
  * `## Suite` became mandatory with ticket 2026-07-26_18-14 — but measuring the
@@ -230,5 +237,46 @@ describe('board — points d\'entrée', () => {
     for (const other of others) {
       expect(other.block, `${other.file} diverge de ${reference.file}`).toBe(reference.block);
     }
+  });
+});
+
+describe('board — hygiène git', () => {
+  it('ne garde pas de branches mergées hors worktrees actifs', () => {
+    const merged = execSync("git branch --merged main --format='%(refname:short)'", {
+      cwd: REPO,
+      encoding: 'utf8'
+    })
+      .split('\n')
+      .map(name => name.trim())
+      .filter(Boolean)
+      .filter(name => name !== 'main');
+
+    const mounted = new Set(
+      execSync('git worktree list --porcelain', { cwd: REPO, encoding: 'utf8' })
+        .split('\n')
+        .filter(line => line.startsWith('branch refs/heads/'))
+        .map(line => line.replace('branch refs/heads/', '').trim())
+        .filter(Boolean)
+    );
+
+    const stale = merged.filter(name => !mounted.has(name));
+    expect(stale).toEqual([]);
+  });
+
+  it('impose le préfixe merge: pour les merges récents de main', () => {
+    const merges = execSync(
+      `git log --first-parent --merges --format=%h%x09%s ${MERGE_MESSAGE_BASELINE}..HEAD`,
+      { cwd: REPO, encoding: 'utf8' }
+    )
+      .split('\n')
+      .map(line => line.trim())
+      .filter(Boolean);
+
+    const offenders = merges.filter(line => {
+      const [, subject = ''] = line.split('\t');
+      return !subject.startsWith('merge: ');
+    });
+
+    expect(offenders).toEqual([]);
   });
 });
