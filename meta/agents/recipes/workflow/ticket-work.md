@@ -8,7 +8,10 @@
 2. Implémenter — s'appuyer sur la recipe de méthode adaptée :
    [implement-a-feature](../implement-a-feature.md), [refactor-safely](../refactor-safely.md),
    ou [debug-empirically](../debug-empirically.md).
-3. **Documenter chaque itération** de travail dans `## Journal > Travail`, datée
+3. **Ajouter / mettre à jour les tests unitaires si besoin** pour couvrir le
+   changement demandé par le ticket (cas nominal, cas limite et non-régression
+   selon le risque).
+4. **Documenter chaque itération** de travail dans `## Journal > Travail`, datée
    (`- [YYYY-MM-DD HH:MM] …` : décisions, obstacles, mesures).
 
 > Idéalement **une** tâche en `040-doing` à la fois. Une piste qui émerge → la
