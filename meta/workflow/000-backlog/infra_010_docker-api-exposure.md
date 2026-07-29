@@ -64,22 +64,41 @@ de l'hôte, et c'est le premier point à confirmer.
 
 ## Spécifications
 
-_Rempli en « specify » (voir la recipe)._
+### Découpé en deux : la convention de nommage l'a rendu visible
 
-Trois axes, à arbitrer et à doser en *specify* — **le ticket est volontairement
-gros ; s'il ne tient pas en une passe, le découper est la bonne réponse** :
+Le ticket annonçait qu'il était volontairement gros. En le spécifiant, le
+découpage saute aux yeux : **il couvre deux projets**. L'exposition et le CORS
+vivent dans `compose.yaml` / `compose/nginx.conf` — donc `infra`. Le rendu de
+données non fiables vit dans `src/container-kingdom/js/` — donc
+`container-kingdom`. Un ticket qui ne sait pas quel préfixe porter est un ticket
+qui en cache deux.
 
-- **Exposition** : faut-il que ce dashboard soit joignable depuis Internet ? Les
-  pistes vont de la plus radicale à la plus coûteuse : ne plus publier via
-  Traefik (accès LAN/VPN uniquement), auth basique au niveau du proxy, middleware
-  Traefik d'authentification, filtrage des routes autorisées dans nginx.
-- **Rendu** : `innerHTML` → `textContent` partout où la donnée vient de Docker.
-  Attention, `LogEntry` **s'appuie** sur `innerHTML` pour ses formatters (il
-  relit `entry.innerHTML` après les avoir appliqués) : le remplacement n'est pas
-  mécanique, il demande de revoir la chaîne de formatage.
-- **CORS** : `Access-Control-Allow-Origin *` sur une API de contrôle Docker n'a
-  pas de justification connue — vérifier si quelque chose en dépend avant de le
-  retirer.
+- **Ce ticket garde** l'exposition et le CORS.
+- **Le rendu part** dans `2026-07-29_08-26` (`container-kingdom_020_untrusted-data-rendering`),
+  qui peut avancer **sans décision d'infrastructure** — c'est ce qui justifie le
+  découpage plutôt qu'un simple dosage.
+
+Les deux restent liés : c'est leur **combinaison** qui transforme une fuite en
+exfiltration. Corriger le rendu seul laisse l'API lisible ; corriger l'exposition
+seule laisse une page qui exécute ce que les conteneurs journalisent.
+
+### ⚠️ Ce qui reste ici demande une décision qui n'appartient pas à l'agent
+
+« Faut-il que ce dashboard soit joignable depuis Internet ? » n'est pas une
+question technique : elle engage l'accès quotidien du propriétaire à son propre
+outil. Les pistes, de la plus radicale à la plus coûteuse :
+
+- ne plus publier via Traefik — accès LAN ou VPN uniquement ;
+- authentification basique au niveau du proxy ;
+- middleware Traefik d'authentification ;
+- filtrage des routes autorisées dans nginx (limite la casse sans fermer l'accès).
+
+Le CORS, lui, ne demande aucun arbitrage : `Access-Control-Allow-Origin *` sur une
+API de contrôle Docker n'a pas de justification connue. À vérifier qu'il ne sert
+à rien, puis à retirer.
+
+**Ce ticket ne doit pas démarrer sans cette réponse** — appliquer une des quatre
+pistes au jugé, c'est décider à la place du propriétaire quel accès il perd.
 
 ## Contexte / liens
 
@@ -98,12 +117,11 @@ gros ; s'il ne tient pas en une passe, le découper est la bonne réponse** :
 - [ ] **Confirmé sur l'instance** : ce que l'API répond réellement à un appel
       anonyme depuis Internet (lecture ? écriture ?), preuve à l'appui.
 - [ ] Plus aucun accès anonyme en lecture à l'API Docker depuis Internet.
-- [ ] Aucune donnée venue de Docker (logs, noms, labels) n'est interprétée comme
-      du HTML — preuve automatisée : un log contenant `<img src=x onerror=...>`
-      s'affiche en texte et ne déclenche rien.
 - [ ] Le CORS `*` est retiré ou justifié par écrit.
-- [ ] La décision sur l'exposition (publique / LAN / authentifiée) est tracée
-      dans le ticket, pas seulement appliquée.
+- [ ] La décision sur l'exposition (publique / LAN / authentifiée) est **prise par
+      le propriétaire** et tracée dans le ticket, pas seulement appliquée.
+- [ ] Le rendu est traité par `2026-07-29_08-26` — les deux doivent être clos pour
+      que la chaîne fuite → exfiltration soit rompue.
 - [ ] `npm run verify` vert.
 
 ## Suite
