@@ -110,4 +110,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 ### Validation
 
 - [2026-07-29 15:31] Merge sur `main` effectué : `17c07d230362c6811517ecaccb99918df2dc1fd3`. Ticket déplacé en `080-done`.
-- [2026-07-29 15:33] Correction post-déplacement des liens relatifs du ticket clos pour restaurer un board vert.
+- [2026-07-29 16:13] Correction post-déplacement des liens relatifs du ticket clos pour restaurer un board vert.
