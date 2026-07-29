@@ -2,10 +2,10 @@
 id: 2026-07-29_08-50
 title: Résorber le drift de colonnes — 020-ready et 200-ideas absents des règles
 type: docs
-branch:
+branch: copilot/column-drift-entry-points
 created: 2026-07-29 08:50
-ready:
-doing:
+ready: 2026-07-29 15:00
+doing: 2026-07-29 15:00
 verify:
 done:
 ---
