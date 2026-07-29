@@ -90,13 +90,16 @@ export class LogEntry
       let entry = document.createElement('div');
       let lineBuffer = line;
 
-      entry.innerHTML = lineBuffer;
+      // A log line is whatever a container decided to print — never markup.
+      // Interpreting it as HTML handed script execution to this page, which
+      // holds an unauthenticated Docker API session.
+      entry.textContent = lineBuffer;
 
       this.formatters.map((formatter) => {
         entry = formatter(entry);
       });
 
-      lineBuffer = entry.innerHTML;
+      lineBuffer = entry.textContent;
 
       lineBuffer = lineBuffer.replace(/\x00/g, '');
       lineBuffer = lineBuffer.replace(/\x01/g, '');
@@ -108,7 +111,7 @@ export class LogEntry
 
 
       if(lineBuffer.length) {
-        entry.innerHTML = lineBuffer;
+        entry.textContent = lineBuffer;
         children.push(entry);
       }
     });

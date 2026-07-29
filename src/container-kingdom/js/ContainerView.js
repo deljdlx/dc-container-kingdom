@@ -34,7 +34,7 @@ export class ContainerView {
   createEntry(caption, content) {
     let entry = document.createElement('div');
     entry.classList.add('container-info-entry');
-    entry.innerHTML = caption + ': ' + content;
+    entry.textContent = caption + ': ' + content;
     return entry;
   }
 
