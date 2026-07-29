@@ -6,7 +6,7 @@ branch: copilot/proofread-engine-doc
 created: 2026-07-25 16:48
 ready: 2026-07-29 14:29
 doing: 2026-07-29 14:29
-verify:
+verify: 2026-07-29 14:31
 done:
 ---
 
@@ -37,12 +37,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 14:31] Relecture légère de [meta/documentation/engine.md](meta/documentation/engine.md) : correction de formulations (français), précision du schéma de boucle (`character.update(walkedDistance)`), et mise à jour de la section API publique pour refléter les exports actuels (`Coordinates`, `BoundingBox`, `EventEmitter`, `GameConsole`, etc.).
 
 ### Vérification
 
--
+- [2026-07-29 14:31] `npm run verify` vert.
 
 ### Validation
 
--
+- En attente de merge dans `main`.

@@ -1,8 +1,8 @@
 # Le moteur de mini-RPG
 
 Un moteur **vanilla JS, sans framework**, qui rend une carte tuilée façon RPG
-dans un conteneur DOM : board scrollable, éléments positionnés, personnages
-animés, collisions, events. Il ne connaît **rien** de l'app qui l'embarque.
+dans un conteneur DOM : board défilable, éléments positionnés, personnages
+animés, collisions, événements. Il ne connaît **rien** de l'app qui l'embarque.
 
 > Usage rapide, frontière et configuration des chemins d'assets :
 > voir **[`src/engine/README.md`](../../src/engine/README.md)**. Ce document-ci
@@ -23,7 +23,7 @@ au-dessus d'eux :
 - **`SceneGraph`** — enfants, parent, `getChildByName`, et les **offsets absolus**
   (`offsetX/offsetY` = position dans le monde, en accumulant la chaîne de parents).
 - **`CollisionSystem`** — zones de collision/trigger, bounding boxes, détection.
-- **`EventEmitter`** — events locaux, qui **remontent** ensuite à l'`Application`.
+- **`EventEmitter`** — événements locaux, qui **remontent** ensuite à l'`Application`.
 - **`Renderer`** — le nœud DOM et sa mise à jour visuelle.
 
 Coordonnées : **locales** (`x()`, `y()`) vs **monde** (`offsetX()`, `offsetY()`).
@@ -58,7 +58,7 @@ flowchart TD
     DT --> Q{"input.isMoving() ?"}
     Q -->|oui| ACC["vecteur unitaire = input.getVector()<br/>resteX/resteY += dt × vitesse / 1000 × composante"]
     Q -->|non| RST["resteX = resteY = 0"]
-    ACC --> MC["si (dx, dy) ≠ (0, 0) :<br/>moveCharacter(dx, dy) · _streamAreas · character.update"]
+    ACC --> MC["si (dx, dy) ≠ (0, 0) :<br/>moveCharacter(dx, dy) · _streamAreas · character.update(walkedDistance)"]
     RST --> B
     MC --> B
     MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
@@ -211,8 +211,9 @@ stateDiagram-v2
     Fuite --> Idle : hors rayon (trigger.end / garde-fou de distance)
 ```
 
-L'animation est isolée dans **`CharacterAnimator`** (horloge de cycle de marche),
-et la **bulle de dialogue** passe par le renderer :
+L'animation est isolée dans **`CharacterAnimator`** (cycle de marche piloté par
+la distance parcourue, donc indépendant du framerate), et la **bulle de
+dialogue** passe par le renderer :
 `character.quickReaction(html)`, `clearQuickReaction()`, `isReacting()`, plus les
 events `element.reaction.show` / `element.reaction.hide`.
 
@@ -319,9 +320,11 @@ sa boîte de debug (coût nul hors debug — la boîte n'existe pas).
 
 ## 11. API publique
 
-Tout passe par **`src/engine/index.js`** : `Application`, `Viewport`, `Camera`,
-`Board`, `Area`, `Element`, `SpriteElement`, `Character` ; les sous-systèmes
-(`DirectionalInput`, `CollisionSystem`, `SceneGraph`, `CharacterAnimator`,
-`CharacterBehavior`, `PatrolBehavior`, `FleeBehavior`) ; les renderers ; les
-éléments intégrés et bases de personnages ; et la config (`setAssetsBase`,
-`applyDebugFlag`).
+Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
+`getAssetsBase`, `assetUrl`, `applyDebugFlag`, `isDebugEnabled`) ; le core
+(`Application`, `Viewport`, `Camera`, `Board`, `Area`, `Element`,
+`SpriteElement`, `Character`, `Geometry`, `Coordinates`, `BoundingBox`) ; les
+sous-systèmes (`DirectionalInput`, `EventEmitter`, `CollisionSystem`,
+`SceneGraph`, `CharacterAnimator`, `CharacterBehavior`, `PatrolBehavior`,
+`FleeBehavior`) ; les renderers ; les éléments intégrés et bases de
+personnages ; et les tools (`GameConsole`).
