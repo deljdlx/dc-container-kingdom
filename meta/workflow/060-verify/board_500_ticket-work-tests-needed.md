@@ -6,7 +6,7 @@ branch: copilot/ticket-work-tests-recipe
 created: 2026-07-29 14:53
 ready: 2026-07-29 14:55
 doing: 2026-07-29 14:55
-verify:
+verify: 2026-07-29 14:56
 done:
 ---
 
@@ -43,12 +43,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Travail
 
--
+- [2026-07-29 14:56] Mise à jour de [meta/agents/recipes/workflow/ticket-work.md](../../../agents/recipes/workflow/ticket-work.md) pour expliciter qu'il faut ajouter/mettre à jour les tests unitaires quand le ticket le nécessite, avec couverture adaptée au risque (nominal/limites/non-régression).
 
 ### Vérification
 
--
+- [2026-07-29 14:56] `npm run verify` vert.
 
 ### Validation
 
--
+- En attente de merge dans `main`.
