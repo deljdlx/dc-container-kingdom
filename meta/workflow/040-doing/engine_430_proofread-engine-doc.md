@@ -2,10 +2,10 @@
 id: 2026-07-25_16-48
 title: Relire meta/documentation/engine.md
 type: docs
-branch:
+branch: copilot/proofread-engine-doc
 created: 2026-07-25 16:48
-ready:
-doing:
+ready: 2026-07-29 14:29
+doing: 2026-07-29 14:29
 verify:
 done:
 ---
