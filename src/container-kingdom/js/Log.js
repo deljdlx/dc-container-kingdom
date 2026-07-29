@@ -24,8 +24,10 @@ export class Log
     });
   }
 
+  // Reads the rendered *text*, not the markup: deciding on `innerHTML` meant a
+  // line could be painted red by an attribute the reader never sees.
   highlightErrors(element) {
-    if(element.innerHTML.match(/error/gi)) {
+    if(element.textContent.match(/error/gi)) {
       element.classList.add('log-entry--error');
     }
     return element;

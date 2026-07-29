@@ -16,11 +16,11 @@ export class ContainersListEntry
 
     if(container.isRunning()) {
       this.element.classList.add('container-status-running');
-      caption.innerHTML = '▶️' + container.getName();
+      caption.textContent = '▶️' + container.getName();
     }
     else {
       this.element.classList.add('container-status-stopped');
-      caption.innerHTML = '⏹️' + container.getName();
+      caption.textContent = '⏹️' + container.getName();
     }
     this.element.appendChild(caption);
 

@@ -22,7 +22,7 @@ export class ContainersList {
         composeContainer.classList.add('compose-container');
         const caption = document.createElement('summary');
         caption.classList.add('compose-caption');
-        caption.innerHTML = composeName;
+        caption.textContent = composeName;
         composeContainer.append(caption);
 
         Object.values(this.composes[composeName].getContainers()).forEach(container => {

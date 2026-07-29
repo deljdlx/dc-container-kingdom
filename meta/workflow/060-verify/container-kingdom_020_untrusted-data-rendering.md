@@ -6,7 +6,7 @@ branch: claude/untrusted-data-rendering
 created: 2026-07-29 08:26
 ready: 2026-07-29 08:27
 doing: 2026-07-29 08:31
-verify:
+verify: 2026-07-29 08:40
 done:
 ---
 
@@ -62,14 +62,14 @@ même choix de représentation.
 
 ## Definition of Done
 
-- [ ] Aucune donnée venue de Docker — logs, noms, labels, projets compose — n'est
+- [x] Aucune donnée venue de Docker — logs, noms, labels, projets compose — n'est
       interprétée comme du HTML.
-- [ ] **Preuve automatisée qui échoue avant correction** : une ligne de log
+- [x] **Preuve automatisée qui échoue avant correction** : une ligne de log
       contenant `<img src=x onerror=…>` s'affiche **en texte** et ne crée aucun
       élément exécutable.
-- [ ] Les formatters de `LogEntry` fonctionnent toujours (couleurs ANSI, lignes
+- [x] Les formatters de `LogEntry` fonctionnent toujours (couleurs ANSI, lignes
       d'erreur) — le rendu visible ne régresse pas.
-- [ ] `npm run verify` vert.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -79,11 +79,40 @@ même choix de représentation.
 
 ### Travail
 
--
+- [2026-07-29 08:32] Le piège annoncé par le ticket **n'existe pas** : en lisant
+  le code, `ansiToHex()` — la seule fonction qui produisait du HTML à partir du
+  texte brut — n'est **jamais appelée**. Le seul formatter réellement branché est
+  `highlightErrors`, qui **lit** `innerHTML` sans jamais en écrire. Le pipeline
+  n'a donc aucun besoin de HTML : `textContent` suffit partout.
+- [2026-07-29 08:36] Cinq points corrigés : les deux affectations de `LogEntry`
+  (l. 93 et 111), la lecture intermédiaire (l. 99), et les noms venus de Docker
+  dans `ContainersListEntry` (×2), `ContainersList` et `ContainerView`.
+- [2026-07-29 08:37] `Log.highlightErrors` lit désormais `textContent`. La règle
+  est « la ligne mentionne une erreur » : elle doit se lire comme l'utilisateur la
+  lit, pas comme le DOM la stocke.
+- [2026-07-29 08:38] `ansiToHex` reste en place — code mort, mais qui fabrique du
+  HTML à partir de texte brut : rebranché un jour, il rouvrirait le trou.
+  Supprimer du code mort est un autre ticket ; déposé en candidat plutôt que
+  traité au passage.
 
 ### Vérification
 
--
+- [2026-07-29 08:34] Preuves posées avant correction : **5 rouges sur 6**, dont
+  quatre où l'élément `<img>` est réellement créé dans le DOM — l'injection n'est
+  pas supposée, elle est constatée.
+- [2026-07-29 08:39] Un de mes tests avait **tort**, pas le code : il attendait
+  qu'une ligne contenant `<span title="error">` ne soit pas surlignée. Une fois
+  rendue en texte, cette ligne affiche bien le mot « error » à l'écran — la
+  surligner est juste. Test réécrit au niveau du formatter, là où la différence
+  entre lire le texte et lire le balisage existe vraiment.
+- [2026-07-29 08:40] `git stash` du correctif : **5 tests repassent au rouge**,
+  puis vert une fois restauré. Les preuves portent bien sur le changement.
+- [2026-07-29 08:40] `npm run verify` **vert** : lint + build + **305 tests /
+  44 fichiers**. Aucune régression sur les suites existantes qui touchent au DOM
+  (`ContainerView.refresh`, `ContainerKingdomRenderer.sync`).
+- [2026-07-29 08:40] **Pas de validation navigateur** : l'extension Chrome n'est
+  toujours pas connectée. Le rendu des logs (repli `details/summary`, surlignage)
+  n'a donc pas été regardé à l'écran ; il est couvert sous jsdom.
 
 ### Validation
 
