@@ -7,7 +7,7 @@ created: 2026-07-30 12:08
 ready: 2026-07-30 15:50
 doing: 2026-07-30 15:50
 verify: 2026-07-30 15:55
-done:
+done: 2026-07-30 15:56 (merge edcd6d6)
 ---
 
 ## Objectif
