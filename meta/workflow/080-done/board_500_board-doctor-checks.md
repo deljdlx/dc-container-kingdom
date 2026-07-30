@@ -7,7 +7,7 @@ created: 2026-07-29 08:43
 ready: 2026-07-29 18:14
 doing: 2026-07-29 18:41
 verify: 2026-07-29 18:56
-done:
+done: 2026-07-30 09:54 (merge f8f9bfe)
 ---
 
 ## Objectif
@@ -94,10 +94,10 @@ pour satisfaire un contrôle, ce serait la falsifier.
 - [x] `test/board.test.js` vérifie la monotonie des estampilles renseignées.
 - [x] La timeline fautive de `board_500_git-hygiene-merges-and-branches` est
       corrigée à partir de l'historique, et le nouveau contrôle passe.
-- [ ] Le test d'hygiène git ne prend plus un HEAD détaché pour une branche :
+- [x] Le test d'hygiène git ne prend plus un HEAD détaché pour une branche :
       `npm run verify` est **vert depuis le tree principal comme depuis un worktree
       au repos** (les deux exécutions notées au journal).
-- [ ] Aucun second contrôleur n'est introduit ; la branche `copilot/board-doctor-checks`
+- [x] Aucun second contrôleur n'est introduit ; la branche `copilot/board-doctor-checks`
       est abandonnée, son worktree laissé propre et détaché sur `main`.
 - [x] `meta/agents/recipes/audit-workflow-consistency.md` renvoie au garde-fou
       unique, sans mentionner d'outil qui n'existe pas.
@@ -105,10 +105,26 @@ pour satisfaire un contrôle, ce serait la falsifier.
 
 ## Suite
 
-_« Et ensuite ? » — rempli à la **clôture** (follow-up, recipe
-`meta/agents/recipes/workflow/ticket-follow-up.md`)._
-
--
+- **Ce que ça ouvre** — le garde-fou couvre maintenant dix familles d'invariants et
+  il est **déterministe** : même verdict depuis le tree principal et depuis un
+  worktree au repos. Il reste un angle mort qu'aucun test ne fermera : **il ne peut
+  pas voir un ticket en doublon**. Celui-ci en était un, et rien ne l'a signalé —
+  seule la lecture de `080-done` prescrite par `audit-codebase` y aurait suffi.
+- **Ce qu'on laisse de côté** — l'archive **avant le pivot** (`2026-07-27 19:30`)
+  garde ses incohérences : 3 collisions d'`id`, 24 tickets clos sans rubrique
+  `Suite`, 3 `done:` vides. C'est un choix, pas un oubli : la vérité de ces
+  estampilles n'est plus récupérable dans l'historique, et réécrire l'archive pour
+  verdir un test la falsifierait. Les contrôles 4 à 8 de
+  `audit-workflow-consistency` (rejouer les commandes documentées dans leur
+  contexte, lectures croisées) restent **manuels** — ils ne s'automatisent pas.
+- **Ce qui a été déposé** — `2026-07-29_18-41` en `100-follow-up/` : le hook
+  `deny-primary-branch-switch.sh` refuse du travail légitime en worktree dès que la
+  commande n'a pas la forme `cd <dir> && git …`. Rencontré deux fois pendant ce
+  ticket. Il refuse au lieu d'autoriser, donc rien de dangereux — mais il apprend à
+  contourner par la syntaxe.
+- **Limite de la vérification** — `npm run verify` a été joué depuis les deux
+  contextes qui divergeaient ; il ne l'a pas été en CI, où rien n'est poussé depuis
+  le 2026-07-26.
 
 ## Journal
 
@@ -155,4 +171,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**, ex. `date '+%Y-%
 
 ### Validation
 
--
+- [2026-07-30 09:49] Review du diff : un seul garde-fou (aucun fichier ajouté dans
+  `meta/agents/tools/`), contrôles vus échouer avant d'être crus, réparation
+  d'estampille justifiée par un commit, doc alignée. Les 6 critères de la DoD sont
+  cochés.
+- [2026-07-30 09:48] Merge `--no-ff` sur `main` depuis le tree principal :
+  **f8f9bfe** — `merge: un seul board-doctor, déterministe où qu'on lance verify`.
+- [2026-07-30 09:52] **La preuve attendue par la DoD** : `npm run verify` vert
+  depuis le tree principal (335 tests) **et** depuis le worktree au repos, détaché
+  (335 tests) — c'est le second qui échouait avant ce ticket. Au premier essai le
+  worktree détaché a d'ailleurs signalé `claude/board-doctor-consolidation` : le
+  contrôle faisait son travail, la branche mergée n'était pas encore supprimée.
+- [2026-07-30 09:53] Doublon abandonné : `copilot/board-doctor-checks` supprimée
+  (était `a5c3a7c`, récupérable au reflog), son worktree laissé **propre et détaché
+  sur `main`** — l'état où la recipe l'attend. Le second contrôleur
+  (`check-workflow-consistency.mjs`) n'entre donc pas dans le dépôt.
