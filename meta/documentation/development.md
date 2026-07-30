@@ -66,20 +66,8 @@ direct à `_step()` / `update(dt)`.
 
 La game loop tourne sur `requestAnimationFrame`. **Un onglet en arrière-plan met
 rAF en pause** → joueur et PNJ gèlent, et une sonde qui `await` un rAF **timeout**.
-Pour vérifier de façon déterministe (indépendamment du focus/onglet), on **pilote
-la game loop à la main** en appelant `viewport.update(timestamp)` avec des
-timestamps croissants :
-
-```js
-// après avoir exposé le viewport (window.__vp = viewport) le temps du test
-const vp = window.__vp;
-let t = performance.now();
-vp.move('down');                          // ou vp.press('down'); vp.press('right'); en diagonale
-for (let i = 0; i < 40; i++) { t += 16; vp.update(t); }   // ~40 frames à 16 ms
-```
-
-C'est le **même chemin** que celui appelé par rAF, donc une vérification fidèle.
-(Penser à retirer tout hook `window.__vp` temporaire avant de committer.)
+Pour le mode opératoire déterministe, voir la recipe
+[`recipes/verify-in-browser.md`](../recipes/verify-in-browser.md).
 
 > Attention aussi au cache de **service worker** sur `localhost` : un SW en cache
 > peut servir la mauvaise app sur un port ; utiliser un port frais (`--strictPort`).

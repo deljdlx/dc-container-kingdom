@@ -46,15 +46,8 @@ jour la doc concernée **dans le même changement** :
 
 La game loop tourne sur `requestAnimationFrame` : **rAF est en pause quand
 l'onglet est en arrière-plan** → joueur et PNJ gèlent, et une sonde qui `await`
-un rAF **timeout**. Pour vérifier de façon déterministe, **piloter la boucle à la
-main** en appelant `viewport.update(timestamp)` avec des timestamps croissants :
+un rAF **timeout**. Le détail pratique pour piloter la boucle à la main est
+documenté dans [`recipes/verify-in-browser.md`](../recipes/verify-in-browser.md).
 
-```js
-const vp = window.__vp; // hook temporaire, à retirer avant de committer
-let t = performance.now();
-vp.move('down');                       // ou vp.press('down'); vp.press('right'); en diagonale
-for (let i = 0; i < 40; i++) { t += 16; vp.update(t); } // ~40 frames à 16 ms
-```
-
-C'est le **même chemin** que celui appelé par rAF (voir
+C'est le **même chemin** que celui appelé par rAF (voir aussi
 `documentation/development.md`).
