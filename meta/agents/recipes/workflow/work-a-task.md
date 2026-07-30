@@ -14,6 +14,24 @@ Le parcours d'un ticket sur le board `meta/` (voir
 
 Chaque transition = un `git mv` vers la colonne suivante.
 
+## Voie courte
+
+Pour les tickets minuscules, une voie courte est admise quand le ticket est un
+`docs` ou `chore`, que le diff attendu tient sous une vingtaine de lignes et
+qu'aucune décision de conception ne reste à prendre. Le ticket reste alors en
+`000-backlog` pendant le travail, puis va directement en `080-done` à la clôture.
+
+Cette voie allège uniquement la traçabilité de colonne. Elle **n'allège pas** :
+
+- la branche dédiée ;
+- `npm run verify` ;
+- le merge `merge:` sur `main` ;
+- la DoD cochée ;
+- la rubrique `## Suite`.
+
+Le ticket doit déclarer qu'il emprunte la voie courte, pour qu'on puisse la
+compter et la surveiller.
+
 **Avant de prendre une tâche** : si `meta/workflow/100-follow-up/` n'est pas vide,
 le **trier** d'abord — [follow-up-triage](follow-up-triage.md). C'est le seul moment
 qui revient forcément, donc le seul déclencheur fiable ; il garde la boîte quasi
