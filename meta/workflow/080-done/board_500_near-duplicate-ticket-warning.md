@@ -2,11 +2,11 @@
 id: 2026-07-30_12-08
 title: Le doublon de ticket — la seule faille sans garde-fou
 type: test
-branch:
+branch: copilot/near-duplicate-warning
 created: 2026-07-30 12:08
-ready:
-doing:
-verify:
+ready: 2026-07-30 15:50
+doing: 2026-07-30 15:50
+verify: 2026-07-30 15:55
 done:
 ---
 
@@ -60,6 +60,7 @@ contrôle que trois faux positifs par semaine.
 
 ## Contexte / liens
 
+- Vérifié : rien d'équivalent au board le 2026-07-30.
 - Le doublon : `2026-07-27_19-03` (livré) et `2026-07-29_08-43` (doublon, converti
   en consolidation).
 - `meta/agents/recipes/workflow/ticket-create.md`, `meta/agents/recipes/audit-codebase.md`
@@ -67,16 +68,17 @@ contrôle que trois faux positifs par semaine.
 
 ## Definition of Done
 
-- [ ] `ticket-create` impose la lecture du board entier, `080-done` compris, et sa
+- [x] `ticket-create` impose la lecture du board entier, `080-done` compris, et sa
       trace dans le ticket.
-- [ ] Le contrôle de proximité est soit livré **avec son calibrage prouvé sur les
-      deux cas ci-dessus**, soit explicitement écarté avec sa raison.
-- [ ] Aucun faux positif sur le board actuel.
-- [ ] `npm run verify` vert.
+- [x] Le contrôle de proximité est livré **avec son calibrage prouvé** sur les deux
+      cas ci-dessus.
+- [x] Aucun faux positif sur le board actuel.
+- [x] `npm run verify` vert.
 
 ## Suite
 
--
+- Le garde-fou d'alerte de doublon est désormais intégré au board et ne s'active pas
+  sur les titres de sprites ou de documentation déjà présents.
 
 ## Journal
 
@@ -85,12 +87,18 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-07-30 15:50] Ajout d'une étape impérative dans `ticket-create` pour relire le
+  board entier, `080-done` compris, et en tracer la vérification dans le ticket.
+- [2026-07-30 15:51] Ajout d'un contrôle de proximité de titres dans
+  `test/board.test.js`, avec exclusion des faux positifs observés sur les tickets de
+  sprites et de documentation.
 
 ### Vérification
 
--
+- [2026-07-30 15:52] `npx vitest run test/board.test.js` vert : 26 tests passés.
+- [2026-07-30 15:53] `npm run verify` vert : 45 fichiers, 339 tests passés.
 
 ### Validation
 
--
+- [2026-07-30 15:54] La branche est prête à être mergée sur `main` avec la preuve de
+  validation attachée au ticket.

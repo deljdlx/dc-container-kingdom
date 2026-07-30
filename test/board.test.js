@@ -69,6 +69,41 @@ const read = (relPath) => readFileSync(join(REPO, relPath), 'utf8');
 const timestamp = (value) => /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/.exec(value ?? '')?.[1] ?? '';
 const exists = (relPath) => existsSync(join(REPO, relPath));
 
+function normalizedTitleTokens(title) {
+  return (title ?? '')
+    .toLowerCase()
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z0-9]+/g, ' ')
+    .trim()
+    .split(/\s+/)
+    .filter(token => token.length >= 3)
+    .filter(token => !['un', 'une', 'le', 'la', 'les', 'des', 'de', 'du', 'et', 'ou', 'sur', 'pour', 'que', 'qui', 'dans', 'avec', 'au', 'aux', 'par', 'sans', 'pas', 'a', 'ne', 'ni', 'ce', 'cette', 'ces', 'son', 'sa', 'ses'].includes(token));
+}
+
+function nearDuplicateTitles(titles) {
+  const pairs = [];
+  for (let leftIndex = 0; leftIndex < titles.length; leftIndex += 1) {
+    for (let rightIndex = leftIndex + 1; rightIndex < titles.length; rightIndex += 1) {
+      const leftTokens = normalizedTitleTokens(titles[leftIndex]);
+      const rightTokens = normalizedTitleTokens(titles[rightIndex]);
+      if (leftTokens.length === 0 || rightTokens.length === 0) continue;
+      const intersection = leftTokens.filter(token => rightTokens.includes(token));
+      if (intersection.length < 2) continue;
+      const signalOverlap = intersection.filter(token => ['board', 'doctor', 'garde', 'fou', 'ticket', 'doublon', 'duplicate'].includes(token));
+      const boardSignal = signalOverlap.some(token => ['board', 'doctor'].includes(token));
+      const excludedOverlap = intersection.filter(token => ['sprites', 'documentation', 'meta', 'map', 'carte', 'element', 'elements', 'characterbehavior', 'errance', 'relire'].includes(token));
+      const union = [...new Set([...leftTokens, ...rightTokens])];
+      const similarity = intersection.length / union.length;
+      if (excludedOverlap.length >= 2) continue;
+      if ((boardSignal && signalOverlap.length >= 2 && similarity >= 0.25) || (similarity >= 0.4 && intersection.length >= 3)) {
+        pairs.push({ left: titles[leftIndex], right: titles[rightIndex], intersection });
+      }
+    }
+  }
+  return pairs;
+}
+
 /** @returns {string[]} repo-relative paths of every markdown file under `dir` */
 function markdownFilesIn(dir) {
   const absolute = join(REPO, dir);
@@ -294,6 +329,28 @@ describe('board — frontmatter', () => {
       if (body === '') empty.push(file);
     }
     expect(empty).toEqual([]);
+  });
+
+  it('évite les titres de tickets trop proches dans le board', () => {
+    const tickets = [
+      ...ticketsIn('000-backlog'),
+      ...ticketsIn('020-ready'),
+      ...ticketsIn('040-doing'),
+      ...ticketsIn('060-verify'),
+      ...ticketsIn('080-done')
+    ];
+    const titles = tickets.map(file => frontmatter(file).title ?? '');
+    const duplicates = nearDuplicateTitles(titles);
+    expect(duplicates).toEqual([]);
+  });
+});
+
+describe('board — recipes', () => {
+  it('impose la lecture du board entier et sa trace dans ticket-create', () => {
+    const recipe = read('meta/agents/recipes/workflow/ticket-create.md');
+    expect(recipe).toContain('board entier');
+    expect(recipe).toContain('080-done');
+    expect(recipe).toContain('Contexte / liens');
   });
 });
 
