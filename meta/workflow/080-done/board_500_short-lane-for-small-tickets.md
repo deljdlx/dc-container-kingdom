@@ -2,12 +2,12 @@
 id: 2026-07-30_12-06
 title: Une voie courte assumée pour les tickets minuscules
 type: refactor
-branch:
+branch: copilot/short-lane-for-small-tickets
 created: 2026-07-30 12:06
 ready:
 doing:
 verify:
-done:
+done: 2026-07-30 15:19 (merge 0f0aecb)
 ---
 
 ## Objectif
@@ -66,16 +66,16 @@ confiance.
 
 ## Definition of Done
 
-- [ ] Le seuil est écrit, chiffré, et ne demande pas de jugement subjectif.
-- [ ] `work-a-task` décrit la voie courte et **ce qu'elle n'allège pas**.
-- [ ] Le garde-fou accepte un ticket passé par la voie courte, et le prouve par un
+- [x] Le seuil est écrit, chiffré, et ne demande pas de jugement subjectif.
+- [x] `work-a-task` décrit la voie courte et **ce qu'elle n'allège pas**.
+- [x] Le garde-fou accepte un ticket passé par la voie courte, et le prouve par un
       cas réel (le premier ticket qui l'emprunte).
-- [ ] La voie courte est déclarée dans le ticket, donc comptable.
-- [ ] `npm run verify` vert.
+- [x] La voie courte est déclarée dans le ticket, donc comptable.
+- [x] `npm run verify` vert.
 
 ## Suite
 
--
+- Ticket voisin : [2026-07-30_12-05](../000-backlog/board_500_specify-as-gate-not-column.md).
 
 ## Journal
 
@@ -84,12 +84,12 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-07-30 15:16] Formalisation de la voie courte dans [meta/agents/recipes/workflow/work-a-task.md](../../agents/recipes/workflow/work-a-task.md), du README du board, et déclaration du ticket comme premier cas.
 
 ### Vérification
 
--
+
 
 ### Validation
 
--
+- [2026-07-30 15:19] `npm run verify` vert, merge `0f0aecb` sur `main`, ticket clos en `080-done`.
