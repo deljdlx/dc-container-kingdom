@@ -1,6 +1,6 @@
 ---
 id: 2026-07-29_08-43
-title: Un seul board-doctor — consolider le garde-fou et le rendre déterministe
+title: Un contrôleur board-doctor déterministe
 type: feat
 branch: claude/board-doctor-consolidation
 created: 2026-07-29 08:43

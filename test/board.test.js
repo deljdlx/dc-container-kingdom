@@ -90,9 +90,13 @@ function nearDuplicateTitles(titles) {
       if (leftTokens.length === 0 || rightTokens.length === 0) continue;
       const intersection = leftTokens.filter(token => rightTokens.includes(token));
       if (intersection.length < 2) continue;
+      const signalOverlap = intersection.filter(token => ['board', 'doctor', 'garde', 'fou', 'ticket', 'doublon', 'duplicate'].includes(token));
+      const boardSignal = signalOverlap.some(token => ['board', 'doctor'].includes(token));
+      const excludedOverlap = intersection.filter(token => ['sprites', 'documentation', 'meta', 'map', 'carte', 'element', 'elements', 'characterbehavior', 'errance', 'relire'].includes(token));
       const union = [...new Set([...leftTokens, ...rightTokens])];
       const similarity = intersection.length / union.length;
-      if (similarity >= 0.3) {
+      if (excludedOverlap.length >= 2) continue;
+      if ((boardSignal && signalOverlap.length >= 2 && similarity >= 0.25) || (similarity >= 0.4 && intersection.length >= 3)) {
         pairs.push({ left: titles[leftIndex], right: titles[rightIndex], intersection });
       }
     }
