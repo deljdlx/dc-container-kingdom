@@ -71,6 +71,11 @@ aucun ticket avant de la retirer, sinon un ticket disparaît du board.
       d'étape, source des points d'entrée, garde-fou.
 - [ ] Le garde-fou reste vert et ne référence plus une colonne qui n'existe pas.
 - [ ] Aucun ticket perdu au passage (`020-ready/` vide, vérifié avant suppression).
+- [ ] **La topologie de clôture est énoncée dans `meta/agents/entry-points/common.md`**,
+      en une phrase : `done:` se pose **sur `main`, après le merge**, et cite le hash
+      **du merge**. Écrit là parce qu'un ticket a été clos sur sa branche avec un hash
+      de **commit** (`2026-07-29_08-43`, corrigé depuis) : c'est une incompréhension
+      franche de la topologie, pas une négligence, et les entrées ne la disent pas.
 - [ ] `npm run verify` vert.
 
 ## Suite
