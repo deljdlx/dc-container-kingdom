@@ -4,8 +4,8 @@ title: Deux règles encore déclaratives — DoD cochée et hash du merge
 type: test
 branch:
 created: 2026-07-30 12:07
-ready:
-doing:
+ready: 2026-07-30 12:36
+doing: 2026-07-30 12:36
 verify:
 done:
 ---
@@ -89,7 +89,8 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-07-30 12:36] Ticket déplacé en `040-doing` sur la branche `copilot/guard-dod-merge-hash`.
+- [2026-07-30 12:36] `test/board.test.js` a été étendu pour contrôler le hash de merge des tickets clos récents et l'absence de DoD vide/partiellement cochée.
 
 ### Vérification
 
