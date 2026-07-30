@@ -6,8 +6,8 @@ branch:
 created: 2026-07-30 12:07
 ready: 2026-07-30 12:36
 doing: 2026-07-30 12:36
-verify:
-done:
+verify: 2026-07-30 12:39
+done: 2026-07-30 12:39 (merge 796d32c)
 ---
 
 ## Objectif
@@ -80,7 +80,7 @@ donc à concevoir avant, pas après.
 
 ## Suite
 
--
+aucune
 
 ## Journal
 
@@ -94,8 +94,8 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Vérification
 
--
+- [2026-07-30 12:39] `npm run verify` vert après l'ajout des contrôles `done:` et DoD sur le board.
 
 ### Validation
 
--
+- [2026-07-30 12:39] Merge `--no-ff` sur `main` : `796d32cae3cf352069a412ce370792f23789056d` (`merge: ajoute les contrôles hash et DoD du board`).
