@@ -15,9 +15,9 @@ relecture exhaustive.
 ## Contrôles mécaniques
 
 > **Ils tournent déjà.** `test/board.test.js` porte les contrôles automatisés du
-> board vivant : liens, colonnes, `@imports`, id uniques, frontmatter, `## Suite`,
-> nommage, monotonie de timeline et hygiène git. Ils s'exécutent dans
-> `npm run verify` ; le test fait foi.
+> board vivant : liens, colonnes, `@imports`, id uniques, frontmatter, hash de
+> merge, DoD clôturée, `## Suite`, nommage, monotonie de timeline et hygiène git.
+> Ils s'exécutent dans `npm run verify` ; le test fait foi.
 >
 > Limites assumées : **« titre en anglais » n'est pas testable** (proxy ASCII /
 > kebab-case) et l'archive antérieure aux pivots documentés reste hors réécriture.

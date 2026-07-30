@@ -33,6 +33,13 @@ const ENTRY_POINTS = ['CLAUDE.md', 'AGENTS.md', '.github/copilot-instructions.md
 const MERGE_MESSAGE_BASELINE = 'e7acee2';
 
 /**
+ * Closure-policy checks start here: tickets finished before this instant keep
+ * their historical stamps, but new closures must carry the merge hash and a
+ * checked DoD.
+ */
+const CLOSURE_RULE_PIVOT = '2026-07-30 12:36';
+
+/**
  * `## Suite` became mandatory with ticket 2026-07-26_18-14 — but measuring the
  * archive says it stayed decorative: **24** closed tickets have no such section,
  * 5 of them created *after* the rubric was born. Enforcing it backwards would
@@ -87,6 +94,17 @@ function frontmatter(relPath) {
       .filter(Boolean)
       .map(([, key, value]) => [key, value.replace(/\s+#.*$/, '').trim()])
   );
+}
+
+function closedTicketsSince(pivot) {
+  return ticketsIn('080-done').filter((file) => {
+    const done = timestamp(frontmatter(file).done);
+    return Boolean(done && done >= pivot);
+  });
+}
+
+function definitionOfDoneBody(file) {
+  return /## Definition of Done\n([\s\S]*?)\n## /.exec(read(file))?.[1] ?? '';
 }
 
 /** Every markdown file the audit covers: the board, the docs, the entry points. */
@@ -203,6 +221,23 @@ describe('board — frontmatter', () => {
       }
     }
     expect(incomplete).toEqual([]);
+  });
+
+  it('cite un hash de merge pour les tickets clos récents', () => {
+    const missing = [];
+    for (const file of closedTicketsSince(CLOSURE_RULE_PIVOT)) {
+      const done = frontmatter(file).done ?? '';
+      if (!/\(merge [0-9a-f]{7,40}\)/.test(done)) missing.push(file);
+    }
+    expect(missing).toEqual([]);
+  });
+
+  it('n\'accepte pas de DoD vide ou partiellement cochée sur les tickets clos récents', () => {
+    const offending = [];
+    for (const file of closedTicketsSince(CLOSURE_RULE_PIVOT)) {
+      if (/^- \[ \]/m.test(definitionOfDoneBody(file))) offending.push(file);
+    }
+    expect(offending).toEqual([]);
   });
 
   it('date les transitions déjà franchies, et seulement celles-là', () => {
