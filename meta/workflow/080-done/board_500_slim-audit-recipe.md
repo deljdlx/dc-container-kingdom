@@ -2,12 +2,12 @@
 id: 2026-07-30_12-11
 title: Dégraisser audit-workflow-consistency de ce que le garde-fou exécute
 type: docs
-branch:
+branch: copilot/slim-audit-recipe
 created: 2026-07-30 12:11
-ready:
-doing:
-verify:
-done:
+ready: 2026-07-30 12:33
+doing: 2026-07-30 12:33
+verify: 2026-07-30 12:35
+done: 2026-07-30 12:35
 ---
 
 ## Objectif
@@ -67,7 +67,7 @@ son `describe`, pas seulement le fichier.
 
 ## Suite
 
--
+aucune
 
 ## Journal
 
@@ -76,12 +76,13 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-07-30 12:33] Ticket déplacé en `040-doing` sur la branche `copilot/slim-audit-recipe`.
+- [2026-07-30 12:33] Recipe `meta/agents/recipes/audit-workflow-consistency.md` ramenée à 62 lignes en gardant les contrôles 4 à 8 et la note sur le garde-fou unique.
 
 ### Vérification
 
--
+- [2026-07-30 12:35] `npm run verify` vert après la coupe de la recipe à 62 lignes.
 
 ### Validation
 
--
+- [2026-07-30 12:35] `npm run verify` vert ; la recipe est tombée à 62 lignes.
