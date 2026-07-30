@@ -22,9 +22,11 @@ exhaustive. Sœur de [verify-a-change](verify-a-change.md) et
 ## Contrôles mécaniques — automatisés
 
 > **Ils tournent déjà.** `test/board.test.js` porte les contrôles 1 à 3 ci-dessous
-> plus le nommage, le frontmatter, les colonnes connues et l'identité des trois
-> points d'entrée. Ils s'exécutent dans **`npm run verify`** : casser le board
-> échoue comme un test rouge, sans attendre la CI ni une passe manuelle.
+> plus le nommage, le frontmatter, la **monotonie de la timeline**, la rubrique
+> `Suite` des tickets clos, les colonnes connues, l'identité des trois points
+> d'entrée et l'hygiène git (branches mergées, préfixe `merge:`). Ils s'exécutent
+> dans **`npm run verify`** : casser le board échoue comme un test rouge, sans
+> attendre la CI ni une passe manuelle.
 >
 > Les commandes qui suivent restent la **description de la procédure** — utiles
 > pour comprendre ce qui est vérifié, ou pour sonder un point précis à la main.
@@ -149,5 +151,9 @@ Rapport court, un item par contrôle : ✅ / ❌ + détail des écarts. **Doc ob
 bug** → corriger dans le même change. Un écart hors périmètre → déposer un ticket en
 `meta/workflow/000-backlog/` plutôt que dériver.
 
-> Les contrôles mécaniques (1–3) pourront migrer vers un script
-> `meta/agents/tools/` ; cette recipe reste la source de vérité de la procédure.
+> **Un seul garde-fou.** La migration annoncée ici a eu lieu : les contrôles
+> mécaniques vivent dans **`test/board.test.js`**, joué par `npm run verify` — pas
+> dans un script de `meta/agents/tools/`, qui serait un second outil à maintenir
+> pour les mêmes règles. Un contrôle à ajouter va donc **là**. Cette recipe reste
+> la source de vérité de la *procédure*, y compris des contrôles 4 à 8, qui ne
+> s'automatisent pas.

@@ -45,7 +45,21 @@ const MERGE_MESSAGE_BASELINE = 'e7acee2';
  */
 const SUITE_PIVOT = '2026-07-27 19:30';
 
+/**
+ * Same reasoning for the timeline: stamps older than this were written before
+ * anything checked them, and their truth is no longer recoverable from the
+ * history. The archive keeps them as they are.
+ */
+const TIMELINE_PIVOT = SUITE_PIVOT;
+
 const read = (relPath) => readFileSync(join(REPO, relPath), 'utf8');
+
+/**
+ * The timestamp at the head of a frontmatter value, dropping what follows —
+ * `done` carries its merge hash after the date.
+ * @returns {string} `YYYY-MM-DD HH:MM`, or '' when there is no stamp
+ */
+const timestamp = (value) => /^(\d{4}-\d{2}-\d{2} \d{2}:\d{2})/.exec(value ?? '')?.[1] ?? '';
 const exists = (relPath) => existsSync(join(REPO, relPath));
 
 /** @returns {string[]} repo-relative paths of every markdown file under `dir` */
@@ -208,6 +222,33 @@ describe('board — frontmatter', () => {
     expect(wrong).toEqual([]);
   });
 
+  it('garde une timeline monotone', () => {
+    // `created ≤ ready ≤ doing ≤ verify ≤ done`, over the stamps actually filled
+    // — an empty one is a step not taken, which the check above already covers.
+    // Comparing the strings is exact: the format is fixed and zero-padded.
+    const STEPS = ['created', 'ready', 'doing', 'verify', 'done'];
+    const wrong = [];
+    const tickets = [...ACTIVE_COLUMNS.flatMap(ticketsIn), ...ticketsIn('080-done')];
+
+    for (const file of tickets) {
+      const meta = frontmatter(file);
+      const closed = timestamp(meta.done);
+      if (closed && closed < TIMELINE_PIVOT) continue; // predates the check
+
+      const chain = STEPS
+        .map(step => ({ step, at: timestamp(meta[step]) }))
+        .filter(({ at }) => at);
+
+      for (let index = 1; index < chain.length; index += 1) {
+        const [before, after] = [chain[index - 1], chain[index]];
+        if (before.at > after.at) {
+          wrong.push(`${file}: ${before.step} (${before.at}) > ${after.step} (${after.at})`);
+        }
+      }
+    }
+    expect(wrong).toEqual([]);
+  });
+
   it('remplit la rubrique Suite des tickets clos depuis sa création', () => {
     const empty = [];
     for (const file of ticketsIn('080-done')) {
@@ -249,7 +290,11 @@ describe('board — hygiène git', () => {
       .split('\n')
       .map(name => name.trim())
       .filter(Boolean)
-      .filter(name => name !== 'main');
+      .filter(name => name !== 'main')
+      // git lists a worktree's detached HEAD as `(HEAD detached at …)` — not a
+      // branch, and precisely the resting state `parallel-worktrees` prescribes.
+      // Without this, the check turns red depending on where verify is run from.
+      .filter(name => !name.startsWith('('));
 
     const mounted = new Set(
       execSync('git worktree list --porcelain', { cwd: REPO, encoding: 'utf8' })
