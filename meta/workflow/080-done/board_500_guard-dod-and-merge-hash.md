@@ -72,11 +72,11 @@ donc à concevoir avant, pas après.
 
 ## Definition of Done
 
-- [ ] Les trois contrôles existent, avec un pivot documenté et justifié en commentaire.
-- [ ] Chacun a été **vu échouer** sur un cas fabriqué avant d'être déclaré bon.
-- [ ] La question de la DoD partiellement cochée est tranchée et écrite.
-- [ ] L'archive antérieure au pivot n'est pas réécrite.
-- [ ] `npm run verify` vert.
+- [x] Les trois contrôles existent, avec un pivot documenté et justifié en commentaire.
+- [x] Chacun a été **vu échouer** sur un cas fabriqué avant d'être déclaré bon.
+- [x] La question de la DoD partiellement cochée est tranchée et écrite.
+- [x] L'archive antérieure au pivot n'est pas réécrite.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -99,3 +99,4 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 ### Validation
 
 - [2026-07-30 12:39] Merge `--no-ff` sur `main` : `796d32cae3cf352069a412ce370792f23789056d` (`merge: ajoute les contrôles hash et DoD du board`).
+- [2026-07-30 12:40] Choix strict acté : un ticket clos récent doit avoir une DoD entièrement cochée ; toute case `- [ ]` déclenche l'échec.
