@@ -26,6 +26,9 @@ la procédure coûte visiblement plus que le travail, on la contourne en silence
 et c'est déjà arrivé (7 tickets ont sauté la colonne `020-ready` le 2026-07-29).
 Mieux vaut une voie courte **écrite** qu'une voie courte pratiquée en cachette.
 
+Voie courte déclarée pour ce ticket : `docs`, diff attendu sous ~20 lignes, aucune
+décision de conception à prendre.
+
 ## Spécifications
 
 _Amorce — à confirmer en « specify »._

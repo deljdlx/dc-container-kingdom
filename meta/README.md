@@ -74,6 +74,12 @@ Chaque transition **date** son passage (frontmatter) et **documente ses itérati
    candidats sont triés au **démarrage de la tâche suivante** —
    [follow-up-triage](agents/recipes/workflow/follow-up-triage.md).
 
+Les tickets minuscules peuvent emprunter une **voie courte** décrite dans
+[`work-a-task`](agents/recipes/workflow/work-a-task.md) : ils restent en
+`000-backlog/` pendant le travail, puis passent directement en `080-done/` à la
+clôture. Cette voie n'allège pas la branche, `npm run verify`, le merge ni la
+DoD.
+
 ## Nommer un ticket : `projet_priorité_titre`
 
 Le nom de fichier **est** la clé de lecture du board. Il porte trois choses, dans
