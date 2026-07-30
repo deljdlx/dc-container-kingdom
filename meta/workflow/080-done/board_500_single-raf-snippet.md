@@ -2,12 +2,12 @@
 id: 2026-07-30_12-09
 title: L'extrait de pilotage rAF vit en trois copies
 type: docs
-branch:
+branch: copilot/single-raf-snippet
 created: 2026-07-30 12:09
-ready:
-doing:
-verify:
-done:
+ready: 2026-07-30 12:20
+doing: 2026-07-30 12:20
+verify: 2026-07-30 12:22
+done: 2026-07-30 12:22
 ---
 
 ## Objectif
@@ -56,14 +56,14 @@ ne « découvre » le piège en perdant une heure sur une sonde qui timeoute.
 
 ## Definition of Done
 
-- [ ] Une seule copie de l'extrait dans tout le dépôt (grep en preuve au journal).
-- [ ] Les deux autres emplacements conservent l'avertissement et pointent la recipe.
-- [ ] Les liens résolvent (le garde-fou le vérifie).
-- [ ] `npm run verify` vert.
+- [x] Une seule copie de l'extrait dans tout le dépôt (grep en preuve au journal).
+- [x] Les deux autres emplacements conservent l'avertissement et pointent la recipe.
+- [x] Les liens résolvent (le garde-fou le vérifie).
+- [x] `npm run verify` vert.
 
 ## Suite
 
--
+aucune
 
 ## Journal
 
@@ -72,12 +72,13 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-07-30 12:20] Ticket déplacé en `040-doing` sur la branche `copilot/single-raf-snippet`.
+- [2026-07-30 12:20] Copie canonique de l'extrait rAF déplacée dans [meta/recipes/verify-in-browser.md](../../recipes/verify-in-browser.md) ; les deux autres emplacements gardent un pointeur vers cette recipe.
 
 ### Vérification
 
--
+- [2026-07-30 12:22] `rg -n "vp\.update\(|viewport\.update\(timestamp\)" meta/agents meta/documentation meta/recipes meta/workflow --glob '*.md'` ne laisse qu'une seule copie du bloc rAF, dans [meta/recipes/verify-in-browser.md](../../recipes/verify-in-browser.md).
 
 ### Validation
 
--
+- [2026-07-30 12:22] `npm run verify` vert après la centralisation du bloc rAF.
