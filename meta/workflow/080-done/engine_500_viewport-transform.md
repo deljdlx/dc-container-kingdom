@@ -7,7 +7,7 @@ created: 2026-08-01 21:51
 ready: 2026-08-01 21:56
 doing: 2026-08-01 21:57
 verify: 2026-08-01 22:19
-done:
+done: 2026-08-01 23:10 (merge c5c2014)
 ---
 
 ## Objectif
@@ -187,7 +187,28 @@ ci-dessous sont des conditions, pas des remarques.
 
 ## Suite
 
--
+- **Ce que ça ouvre** — `screenToWorld` existe enfin comme service : un clic
+  converti en position monde, une infobulle ancrée sur un élément, une minimap, un
+  second canvas FX sous les entités deviennent des branchements, plus des calculs
+  à réinventer. Le zoom devient aussi utilisable **dans la démo**, qui n'en avait
+  pas parce que le moteur ne savait pas mettre à l'échelle.
+- **Ce qu'on laisse de côté, et c'est délibéré** :
+  - le **`+48`** de `getCurrentAreaCoordinates` reste sans nom — c'est du monde →
+    **aire**, pas monde → écran, et ça touche le streaming ; sorti du périmètre en
+    *specify* pour ne pas élargir une refacto profonde en cours de route ;
+  - l'hypothèse **`clientX` = espace viewport** de l'app est **préservée**, pas
+    corrigée : elle ne tient que parce que `#viewport` commence à l'origine de la
+    page. La corriger en silence déplacerait la carte. Documentée telle quelle ;
+  - **`camera.isActive()` est conservé**, son rôle redéfini (la source qui
+    alimente, pas le propriétaire).
+- **Limite de la vérification** — le **glissé** a été testé à la vraie souris,
+  mais la **molette réelle n'a pas pu l'être** : une sonde d'écoute a reçu 0
+  événement `wheel` de l'outil de défilement (limite d'outillage, l'enregistrement
+  du listener n'ayant pas été touché). Le **pinch** reste vérifié en synthétique
+  seulement, faute d'entrée tactile — c'est pourtant le geste le plus subtil des
+  trois. À rejouer à la main : ouvrir l'app, zoomer à la molette, pincer sur
+  mobile.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -274,4 +295,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-01 23:09] Review du diff : la frontière moteur tient (`ViewportTransform`
+  vit dans `src/engine/`, ignore Docker, s'exporte par le baril), l'app ne porte
+  plus aucun calcul de transformation, et les tests de caractérisation passent
+  avec leurs assertions d'origine.
+- [2026-08-01 23:10] Merge `--no-ff` sur `main` depuis le tree principal :
+  **c5c2014** — `merge: un propriétaire unique pour la transformation monde/écran`
+  (13 fichiers, +742 / −104).
