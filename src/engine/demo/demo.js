@@ -211,6 +211,52 @@ viewport.run();
 viewport.renderDebug(); // draws zone boxes only when ?debug=1
 patrols.forEach(patrol => patrol.start());
 
+// ── Particles ────────────────────────────────────────────────────────────────
+// A canvas over the board. Emitters speak world coordinates like everything
+// else; the layer applies the camera itself.
+const fx = viewport.enableParticles();
+
+// The fountain spits upwards and lets gravity bring the drops back down. The
+// emitter is a behavior, so it rides the single game clock — no timer of its own.
+const FOUNTAIN = { x: 200 + 24, y: 430 + 8 };
+let sinceDrop = 0;
+viewport.addBehavior({
+  update(dt) {
+    sinceDrop += dt;
+    if (sinceDrop < 40) {
+      return;
+    }
+    sinceDrop = 0;
+    fx.emit({
+      x: FOUNTAIN.x, y: FOUNTAIN.y, count: 2,
+      direction: -Math.PI / 2, spread: 0.9,      // upwards, in a narrow cone
+      speed: 90, gravity: 220, life: 1200, size: 5, color: '#9fe4ff',
+    });
+  },
+});
+
+// Dust under the player's feet, only while walking: shows the layer tracking a
+// moving world position while the camera scrolls.
+const player = viewport.getCharacter();
+let sincePuff = 0;
+viewport.addBehavior({
+  update(dt) {
+    if (!viewport.getInput().isMoving()) {
+      return;
+    }
+    sincePuff += dt;
+    if (sincePuff < 120) {
+      return;
+    }
+    sincePuff = 0;
+    fx.emit({
+      x: player.x() + 24, y: player.y() + 44, count: 3,
+      direction: -Math.PI / 2, spread: Math.PI, speed: 18,
+      gravity: -10, life: 600, size: 7, color: '#e8dcc4',
+    });
+  },
+});
+
 // ── Touch D-pad ──────────────────────────────────────────────────────────────
 // Dispatch synthetic keyboard events so the viewport's existing keydown/keyup
 // handlers pick them up without touching the engine internals.
