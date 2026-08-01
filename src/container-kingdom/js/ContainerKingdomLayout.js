@@ -62,14 +62,14 @@ export class ContainerKingdomLayout
    */
   console = null;
 
-  /** @type {number} Current horizontal pan (px, applied via CSS transform). */
-  _panX = 0;
-
-  /** @type {number} Current vertical pan (px, applied via CSS transform). */
-  _panY = 0;
-
-  /** @type {number} Current zoom scale (1 = 100 %). */
-  _scale = 1;
+  /**
+   * Pan and zoom live in the engine's {@link ViewportTransform} — the single
+   * owner of world ↔ screen. Holding a second copy here is what let the FX
+   * canvas paint at the wrong place: it followed the camera while the map
+   * followed this pan.
+   * @type {ViewportTransform|null} resolved lazily, once the engine exists
+   */
+  _viewportTransform = null;
 
   constructor(application) {
     this.application = application;
@@ -87,6 +87,16 @@ export class ContainerKingdomLayout
     this.makeViewportDraggable();
   }
 
+  /**
+   * @returns {ViewportTransform} the shared world ↔ screen transform
+   */
+  getTransform() {
+    if (!this._viewportTransform) {
+      this._viewportTransform = this.getViewport().getTransform();
+    }
+    return this._viewportTransform;
+  }
+
   hideLoadingScreen() {
     document.querySelector('#loading-screen').classList.add('hidden');
   }
@@ -97,9 +107,12 @@ export class ContainerKingdomLayout
     const board = document.querySelector('#viewport').firstElementChild;
     if (!board) return;
 
-    this._scale = 1.5;
-    this._panX = window.innerWidth / 2 - absoluteX * this._scale;
-    this._panY = window.innerHeight / 2 - absoluteY * this._scale - container.getElement().height();
+    const transform = this.getTransform();
+    transform.scale(1.5);
+    transform.setOffset(
+      window.innerWidth / 2 - transform.scale() * absoluteX,
+      window.innerHeight / 2 - transform.scale() * absoluteY - container.getElement().height(),
+    );
     this._applyTransform(board);
   }
 
@@ -159,19 +172,19 @@ export class ContainerKingdomLayout
     const board = document.querySelector('#viewport').firstElementChild;
     if (!board) return;
 
-    this._scale = zoom;
+    this.getTransform().scale(zoom);
     this._applyTransform(board);
   }
 
   /**
    * Apply the current pan/scale state as a single CSS transform on the board.
-   * Uses transform-origin 0 0 so that _panX/_panY are viewport-space offsets.
+   * The origin and the CSS string come from the shared transform; clearing
+   * left/top stays here — it undoes what the element renderer may have written.
    *
    * @param {HTMLElement} board
    */
   _applyTransform(board) {
-    board.style.transformOrigin = '0 0';
-    board.style.transform = `translate(${this._panX}px, ${this._panY}px) scale(${this._scale})`;
+    this.getTransform().applyTo(board);
     board.style.left = '';
     board.style.top = '';
   }
@@ -293,15 +306,18 @@ export class ContainerKingdomLayout
       viewport.setPointerCapture(e.pointerId);
       activePointers.set(e.pointerId, { x: e.clientX, y: e.clientY });
 
+      const transform = this.getTransform();
       if (activePointers.size === 1) {
-        panStart = { x: e.clientX, y: e.clientY, panX: this._panX, panY: this._panY };
+        panStart = { x: e.clientX, y: e.clientY, panX: transform.offsetX(), panY: transform.offsetY() };
         gestureHasMoved = false;
       } else if (activePointers.size === 2) {
         const pts = [...activePointers.values()];
         const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
         const midX = (pts[0].x + pts[1].x) / 2;
         const midY = (pts[0].y + pts[1].y) / 2;
-        pinchStart = { dist, midX, midY, panX: this._panX, panY: this._panY, scale: this._scale };
+        // Frozen: the anchor is converted against the state the fingers landed
+        // on, while the live transform keeps moving under them.
+        pinchStart = { dist, midX, midY, at: transform.clone() };
         panStart = null;
       }
     });
@@ -312,18 +328,17 @@ export class ContainerKingdomLayout
       const board = viewport.firstElementChild;
       if (!board) return;
 
+      const transform = this.getTransform();
       if (activePointers.size >= 2 && pinchStart) {
         const pts = [...activePointers.values()];
         const dist = Math.hypot(pts[1].x - pts[0].x, pts[1].y - pts[0].y);
         const midX = (pts[0].x + pts[1].x) / 2;
         const midY = (pts[0].y + pts[1].y) / 2;
-        const newScale = Math.min(3, Math.max(0.1, pinchStart.scale * (dist / pinchStart.dist)));
-        // Keep the pinch midpoint fixed in world space while scaling
-        const worldMidX = (pinchStart.midX - pinchStart.panX) / pinchStart.scale;
-        const worldMidY = (pinchStart.midY - pinchStart.panY) / pinchStart.scale;
-        this._scale = newScale;
-        this._panX = midX - worldMidX * newScale;
-        this._panY = midY - worldMidY * newScale;
+        const newScale = Math.min(3, Math.max(0.1, pinchStart.at.scale() * (dist / pinchStart.dist)));
+        // Keep the pinch midpoint fixed in world space while scaling.
+        const worldMid = pinchStart.at.screenToWorld(pinchStart.midX, pinchStart.midY);
+        transform.scale(newScale);
+        transform.setOffset(midX - worldMid.x * newScale, midY - worldMid.y * newScale);
         this._applyTransform(board);
         gestureHasMoved = true;
       } else if (activePointers.size === 1 && panStart) {
@@ -333,8 +348,7 @@ export class ContainerKingdomLayout
           gestureHasMoved = true;
         }
         if (gestureHasMoved) {
-          this._panX = panStart.panX + dx;
-          this._panY = panStart.panY + dy;
+          transform.setOffset(panStart.panX + dx, panStart.panY + dy);
           this._applyTransform(board);
         }
       }
@@ -365,15 +379,16 @@ export class ContainerKingdomLayout
       const board = viewport.firstElementChild;
       if (!board) return;
 
+      const transform = this.getTransform();
       const delta = e.deltaY > 0 ? -0.05 : 0.05;
-      const newScale = Math.min(3, Math.max(0.1, this._scale + delta));
+      const newScale = Math.min(3, Math.max(0.1, transform.scale() + delta));
 
-      // Zoom centred on the cursor position in viewport space
-      const worldX = (e.clientX - this._panX) / this._scale;
-      const worldY = (e.clientY - this._panY) / this._scale;
-      this._scale = newScale;
-      this._panX = e.clientX - worldX * this._scale;
-      this._panY = e.clientY - worldY * this._scale;
+      // Zoom centred on the cursor. `clientX` is treated as viewport space,
+      // which holds only because #viewport starts at the page origin — an
+      // inherited assumption, preserved deliberately.
+      const world = transform.screenToWorld(e.clientX, e.clientY);
+      transform.scale(newScale);
+      transform.setOffset(e.clientX - world.x * newScale, e.clientY - world.y * newScale);
 
       this._applyTransform(board);
     }, { passive: false });

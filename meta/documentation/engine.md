@@ -126,9 +126,9 @@ un `<canvas>`, monté par `viewport.enableParticles()`.
   jsdom, comme `DirectionalInput`). `ParticleLayer` est le seul à toucher un
   contexte 2d.
 - **Monde à l'écriture, écran au dessin.** Les émetteurs parlent en coordonnées
-  monde comme le reste du moteur ; le layer applique la caméra une fois par
-  frame (`setTransform`). Le canvas garde la **taille du viewport**, jamais celle
-  du monde chargé.
+  monde comme le reste du moteur ; le layer **délègue la matrice** à la
+  `ViewportTransform` (§3.3), qui porte décalage, échelle et ratio de pixels. Le
+  canvas garde la **taille du viewport**, jamais celle du monde chargé.
 - **`FX_DEPTH`, et pourquoi il faut y penser.** Le canvas est un **frère du
   board** — mais cela ne suffit pas : le board est un `Element` comme un autre,
   donc il porte sa propre profondeur calculée (mesurée à **1 000 560**) et peint
@@ -148,6 +148,45 @@ un `<canvas>`, monté par `viewport.enableParticles()`.
 Une particule **ne peut pas passer derrière un arbre** : assumé. Le jour où ça
 compte, ce sera un second canvas *sous* les entités — jamais un canvas par
 profondeur.
+
+### 3.3 `ViewportTransform` : le propriétaire unique de monde ↔ écran
+
+La carte est dessinée une fois, puis **déplacée en bloc** : elle défile par
+translation, elle zoome par mise à l'échelle. Cette relation appartient à un seul
+objet.
+
+Avant lui, elle était écrite à deux endroits avec deux modèles — le moteur
+translatait selon la caméra, l'hôte translatait **et** mettait à l'échelle — et
+tout ce qui devait s'aligner sur la carte devait deviner dans quel régime il
+tournait. Le layer de particules s'est trompé : il suivait la caméra et ignorait
+le zoom de l'app.
+
+**Convention** : la transformation stocke la **translation CSS appliquée au
+board**. Une caméra en `(cx, cy)` alimente donc `offset = (-cx, -cy)` ; un hôte
+qui pane de `(px, py)` alimente `offset = (px, py)`. Avec
+`transform-origin: 0 0` :
+
+```
+écran = monde × échelle + décalage
+monde = (écran − décalage) / échelle
+```
+
+| Question | Réponse |
+|---|---|
+| `worldToScreenX/Y`, `screenToWorldX/Y` | scalaires, **sans allocation** — la boucle de dessin les appelle par particule |
+| `toCssTransform()` | la chaîne que porte le board ; le terme `scale()` est **toujours** émis, les gestes de l'hôte y sont épinglés |
+| `applyToContext(ctx)` | la matrice d'un canvas, ratio de pixels compris — appliqué **une seule fois** |
+| `clone()` | un état figé, pour un geste qui doit convertir contre l'instant où les doigts se sont posés |
+
+- **Deux sources, un propriétaire.** `Camera.isActive()` ne dit plus « qui possède
+  la transformation » mais « la caméra l'alimente-t-elle ». Un hôte qui pilote son
+  propre pan/zoom écrit dans la **même** transformation et laisse la caméra au
+  repos.
+- **Aucun arrondi ici.** Le pan est fractionnaire en pratique ; arrondir ferait
+  vibrer la carte au zoom fractionnaire. Le placement au pixel entier reste sur
+  les positions d'éléments (`Coordinates`).
+- **`transform-origin: 0 0` n'est pas cosmétique** : toute l'arithmétique de pan
+  suppose que l'échelle grandit depuis le coin haut-gauche.
 
 ## 4. Camera
 
@@ -358,7 +397,7 @@ Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
 `getAssetsBase`, `assetUrl`, `applyDebugFlag`, `isDebugEnabled`) ; le core
 (`Application`, `Viewport`, `Camera`, `Board`, `Area`, `Element`,
 `SpriteElement`, `Character`, `Geometry`, `Coordinates`, `BoundingBox`) ; les
-sous-systèmes (`DirectionalInput`, `ParticleSystem`, `ParticleLayer`,
+sous-systèmes (`DirectionalInput`, `ViewportTransform`, `ParticleSystem`, `ParticleLayer`,
 `EventEmitter`, `CollisionSystem`,
 `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`, `PatrolBehavior`,
 `FleeBehavior`) ; les renderers ; les éléments intégrés et bases de

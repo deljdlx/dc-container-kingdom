@@ -47,6 +47,8 @@ export default [
         window: 'readonly',
         document: 'readonly',
         KeyboardEvent: 'readonly',
+        PointerEvent: 'readonly',
+        WheelEvent: 'readonly',
       },
     },
   },

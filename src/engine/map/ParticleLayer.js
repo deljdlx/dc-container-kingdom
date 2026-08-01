@@ -95,10 +95,11 @@ export class ParticleLayer
   }
 
   /**
-   * Paint the live particles, translated by the camera.
-   * @param {import('./Camera.js').Camera} [camera]
+   * Paint the live particles in **world coordinates** — the transform is what
+   * puts them where the map is, zoom included.
+   * @param {import('./ViewportTransform.js').ViewportTransform} [transform]
    */
-  render(camera = null) {
+  render(transform = null) {
     if (!this._context) {
       return;
     }
@@ -112,7 +113,6 @@ export class ParticleLayer
     }
 
     const context = this._context;
-    const ratio = this._pixelRatio;
     context.setTransform(1, 0, 0, 1, 0, 0);
     context.clearRect(0, 0, this._canvas.width, this._canvas.height);
 
@@ -121,9 +121,14 @@ export class ParticleLayer
       return;
     }
 
-    const cameraX = camera ? camera.x() : 0;
-    const cameraY = camera ? camera.y() : 0;
-    context.setTransform(ratio, 0, 0, ratio, -cameraX * ratio, -cameraY * ratio);
+    // The transform owns scale, offset and pixel ratio — applying any of them
+    // here as well would count them twice.
+    if (transform) {
+      transform.applyToContext(context);
+    } else {
+      const ratio = this._pixelRatio;
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+    }
 
     for (const particle of particles) {
       const size = particle.size;

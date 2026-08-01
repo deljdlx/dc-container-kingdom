@@ -436,7 +436,7 @@ describe('Viewport - particle layer', () => {
     viewport.update(1_100);
 
     expect(update).toHaveBeenCalledTimes(2);
-    expect(render).toHaveBeenCalledWith(viewport.getCamera());
+    expect(render).toHaveBeenCalledWith(viewport.getTransform());
   });
 });
 
