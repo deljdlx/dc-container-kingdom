@@ -4,7 +4,7 @@ title: Un layer canvas pour les particules
 type: feat
 branch:
 created: 2026-08-01 21:07
-ready:
+ready: 2026-08-01 21:08
 doing:
 verify:
 done:
