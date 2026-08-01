@@ -8,6 +8,7 @@ import { ParticleLayer } from './ParticleLayer.js';
 import { FX_DEPTH } from './Renderer/Renderer.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
+import { ViewportTransform } from './ViewportTransform.js';
 
 /**
  * The rendered window onto the world: owns the {@link Board}, the {@link Camera}
@@ -110,6 +111,12 @@ export class Viewport
   _particles = null;
 
   /**
+   * @type {ViewportTransform} the single owner of world ↔ screen. The camera
+   * feeds it; a host driving its own pan/zoom feeds it instead.
+   */
+  _transform = new ViewportTransform({ pixelRatio: globalThis.devicePixelRatio ?? 1 });
+
+  /**
    * @type {EventEmitter}
    */
   _events = new EventEmitter();
@@ -140,6 +147,11 @@ export class Viewport
     this.renderer = new ViewportRenderer(this);
 
     this.board = new Board(this);
+  }
+
+  /** @returns {ViewportTransform} the world ↔ screen relation for this viewport */
+  getTransform() {
+    return this._transform;
   }
 
   /**
@@ -210,7 +222,7 @@ export class Viewport
     // enough to sit above it — see FX_DEPTH.
     canvas.style.zIndex = FX_DEPTH;
     this._particles = new ParticleLayer(canvas, {
-      pixelRatio: window.devicePixelRatio ?? 1,
+      pixelRatio: this._transform.pixelRatio(),
       ...options,
     });
     this._particles.resize(this.width(), this.height());
@@ -408,7 +420,7 @@ export class Viewport
     // one frame, and they must sit over what the renderer just placed.
     if(this._particles) {
       this._particles.update(dt);
-      this._particles.render(this._camera);
+      this._particles.render(this._transform);
     }
   }
 

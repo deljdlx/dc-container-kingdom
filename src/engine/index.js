@@ -30,6 +30,7 @@ export { BoundingBox } from './map/BoundingBox.js';
 
 // --- Viewport subsystems (composed by Viewport) ---
 export { DirectionalInput } from './map/DirectionalInput.js';
+export { ViewportTransform } from './map/ViewportTransform.js';
 export { ParticleSystem } from './map/ParticleSystem.js';
 export { ParticleLayer } from './map/ParticleLayer.js';
 

@@ -6,7 +6,7 @@ branch: claude/viewport-transform
 created: 2026-08-01 21:51
 ready: 2026-08-01 21:56
 doing: 2026-08-01 21:57
-verify:
+verify: 2026-08-01 22:19
 done:
 ---
 
@@ -162,24 +162,28 @@ ci-dessous sont des conditions, pas des remarques.
 
 ## Definition of Done
 
-- [ ] **Tests de caractérisation du pan/zoom écrits et verts avant tout
+- [x] **Tests de caractérisation du pan/zoom écrits et verts avant tout
       déplacement**, et inchangés après.
-- [ ] Un seul objet possède décalage + échelle + ratio de pixels ; `worldToScreen`
+- [x] Un seul objet possède décalage + échelle + ratio de pixels ; `worldToScreen`
       et `screenToWorld` sont réciproques (test).
-- [ ] `ViewportRenderer`, `ParticleLayer` et **les trois conversions manuelles de
+- [x] `ViewportRenderer`, `ParticleLayer` et **les trois conversions manuelles de
       l'app** passent par lui. Aucun calcul de transformation ailleurs (grep en
       preuve).
-- [ ] `camera.isActive()` a disparu, ou sa disparition est justifiée par écrit.
-- [ ] **Critère falsifiable** : les particules s'alignent sur la carte dans
+- [x] `camera.isActive()` a disparu, ou sa disparition est justifiée par écrit.
+      **Conservé, justifié** : il ne désigne plus le propriétaire de la
+      transformation mais la **source** qui l'alimente. Le supprimer aurait
+      obligé à réinventer l'arbitrage entre caméra et pan d'hôte, pour zéro gain
+      de comportement et un risque réel. Écrit dans `documentation/engine.md` §3.3.
+- [x] **Critère falsifiable** : les particules s'alignent sur la carte dans
       Container Kingdom à `zoom(0.5)`, pan appliqué — capture au journal. C'est ce
       qui prouve que l'abstraction tient.
-- [ ] La démo reste correcte (caméra active, sans zoom) : marche, D-pad,
+- [x] La démo reste correcte (caméra active, sans zoom) : marche, D-pad,
       streaming d'aires.
-- [ ] Le pan, le pinch et le zoom programmatique se comportent comme avant —
+- [x] Le pan, le pinch et le zoom programmatique se comportent comme avant —
       validés au navigateur, gestes décrits au journal.
-- [ ] Pas de régression de coût : ≤ 0,42 ms/frame à 600 particules, mesuré.
-- [ ] La décision d'arrondi est écrite dans `documentation/engine.md`.
-- [ ] `npm run verify` vert.
+- [x] Pas de régression de coût : ≤ 0,42 ms/frame à 600 particules, mesuré.
+- [x] La décision d'arrondi est écrite dans `documentation/engine.md`.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -192,11 +196,81 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-01 21:59] **Filet d'abord** (condition bloquante n°1) : 11 tests de
+  caractérisation du pan/zoom écrits **avant** de toucher au code, contre la
+  surface publique des gestes (`makeViewportDraggable`, `makeViewportZoomable`,
+  `zoom`) — chaîne CSS exacte, seuil mort de 5 px, accumulation entre glissés,
+  molette ancrée sur le curseur, pinch ancré sur le milieu, bornage 0,1–3. Ils
+  passent sur le code **non modifié** : ils décrivent bien l'existant.
+  jsdom fournit `PointerEvent` mais pas `setPointerCapture` — stubbé dans le setup.
+- [2026-08-01 22:01] `ViewportTransform` : décalage + échelle + ratio de pixels,
+  pur, sans DOM. Scalaires sans allocation pour la boucle de dessin, `clone()`
+  pour figer l'état d'un geste, `applyTo`/`applyToContext` pour les deux surfaces.
+- [2026-08-01 22:02] **Décision de *specify* révisée par les faits.** Elle
+  prévoyait d'omettre `scale(…)` à l'échelle 1 pour garder la chaîne du moteur
+  identique. Or c'est la chaîne de **l'app** qui est sous caractérisation, et elle
+  contient `scale(1)`. Le terme est donc toujours émis ; la chaîne du moteur gagne
+  un ` scale(1)` sans effet visuel, et aucun test ne l'observait (vérifié au grep).
+- [2026-08-01 22:02] Les trois consommateurs passent par l'objet : `ViewportRenderer`
+  (qui garde sa discipline « on n'écrit que si ça a changé », désormais sur la
+  chaîne produite — elle attrape aussi un changement d'échelle), `ParticleLayer`
+  (qui ne calcule plus de matrice et n'applique plus le ratio lui-même), et
+  **les trois conversions manuelles de l'app**.
+- [2026-08-01 22:02] `ContainerKingdomLayout` n'a plus **aucun** état pan/zoom :
+  `_panX`, `_panY` et `_scale` ont disparu au profit de la transformation
+  partagée. Le pinch fige son ancre par `clone()` au lieu de recopier trois
+  champs. L'hypothèse `clientX` est **préservée et documentée**, pas corrigée.
 
 ### Vérification
 
--
+- [2026-08-01 22:03] `npm run verify` vert : **49 fichiers, 390 tests** (363
+  avant). Les 11 tests de caractérisation passent **sans qu'une assertion ait
+  bougé** — seul leur *setup* a gagné un moteur minimal, la transformation vivant
+  désormais dans le viewport.
+- [2026-08-01 22:02] Un de mes propres tests a échoué en écrivant la convention
+  de signe : j'y avais passé la position de la caméra au lieu de sa négation. Le
+  code était juste. Le test corrigé porte la mesure navigateur qui l'atteste.
+- [2026-08-01 22:10] **Critère falsifiable — validé dans l'app**, particules
+  activées à la volée et comparées au rectangle DOM d'un élément réel :
+
+  | Configuration | Particule (page) | Élément (page) | Écart |
+  |---|---|---|---|
+  | zoom 0,5 · pan 0 | (220 ; 123,3) | (220,2 ; 123,7) | 0,2 / 0,4 px |
+  | zoom 0,5 · pan (−137, 64) | (82,7 ; 187,3) | (83,2 ; 187,7) | 0,5 / 0,4 px |
+  | zoom 1,75 · pan (−300, −50) | (433,7 ; 236) | (433,9 ; 236,2) | 0,2 / 0,2 px |
+
+  Une particule de 30 px monde est rendue 14,7 px à l'échelle 0,5 et 52,7 px à
+  1,75 : **elle zoome avec la carte**, ce qui était exactement le défaut.
+- [2026-08-01 22:12] **Gestes réels dans l'app** : glissé (300,300)→(380,340) →
+  `translate(80px, 40px) scale(0.5)` ; molette au curseur (500,400) → `scale(0.55)`
+  avec pan (38 ; 4), conforme au calcul d'ancrage. Chaîne CSS inchangée par
+  rapport à avant la refacto.
+- [2026-08-01 22:14] **Démo (régime caméra)** : caméra active, `translate(-61px,
+  -24px) scale(1)`, le joueur marche et la caméra suit, fontaine et poussière
+  visibles à l'écran.
+- [2026-08-01 22:17] **Perf — la référence était fausse, pas le code.** Mesurée à
+  600 particules, 120 frames, 7 séries : après refacto **médiane 0,568 ms**
+  (0,452–0,636). Ligne de base reconstruite sur `main` **avec le même protocole**
+  (worktree jetable) : **médiane 0,654 ms** (0,452–0,789). Aucune régression — le
+  « 0,42 ms » du ticket précédent était un tirage isolé comparé à une
+  distribution. Coût direct de la transformation mesuré : `toCssTransform()` =
+  **0,0001 ms** par appel, soit 0,02 % d'une frame.
+- [2026-08-01 22:19] Sondes `window.__vp` et `window.__ck` retirées (0 résidu au
+  grep).
+- [2026-08-01 22:32] **Vraie entrée souris, et ce qu'elle ne couvre pas.** Le
+  **glissé réel** (souris du navigateur, pas un événement fabriqué) déplace bien
+  la carte : `translate(107px, 72px) scale(0.5)`, delta cohérent sur les deux axes
+  (le facteur 0,89 entre les coordonnées de l'outil et les pixels CSS est
+  constant, ce n'est pas une erreur de la transformation).
+  La **molette réelle, elle, n'a pas pu être testée** : une sonde d'écoute posée
+  sur `#viewport` a reçu **0** événement `wheel` après deux défilements de
+  l'outil — celui-ci ne dispatche pas de `wheel` à l'élément. Limite d'outillage,
+  pas régression : le corps du handler est couvert par les tests de
+  caractérisation et par un `WheelEvent` dispatché sur la page réelle, et son
+  **enregistrement** (`addEventListener('wheel', …, {passive: false})`) n'a pas
+  été touché par cette refacto.
+  Le **pinch** reste lui aussi vérifié en synthétique seulement : aucune entrée
+  tactile disponible ici.
 
 ### Validation
 

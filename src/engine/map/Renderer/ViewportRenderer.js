@@ -22,16 +22,12 @@ export class ViewportRenderer
   domCharacter;
 
   /**
-   * Last camera position painted, so the board transform is only rewritten when
-   * the camera actually moved.
-   * @type {number|null}
+   * Last transform painted, so the board is only rewritten when it actually
+   * changed. Keyed on the produced CSS rather than on the camera position: it
+   * catches a scale change too.
+   * @type {string|null}
    */
-  _lastCameraX = null;
-
-  /**
-   * @type {number|null}
-   */
-  _lastCameraY = null;
+  _lastCss = null;
 
   /**
    * @param {import('../Viewport.js').Viewport} viewport
@@ -76,29 +72,30 @@ export class ViewportRenderer
     }
   }
 
-  /** Translate the board to follow the camera, only when it moved this frame. */
+  /** Feed the camera into the transform and wear it, only when it changed. */
   update() {
     const camera = this._viewport.getCamera();
 
-    // The camera stays out of the way unless it is actually driving the view
-    // (a host that translates the board itself — e.g. drag/zoom — keeps it
-    // inactive). Depth is world-space, so nothing here touches z-order.
+    // `isActive()` says whether the CAMERA feeds the transform — not who owns it.
+    // A host driving its own pan/zoom (drag, pinch) writes into the same
+    // transform and leaves the camera idle. Depth is world-space, so nothing
+    // here touches z-order.
     if(!camera.isActive()) {
       return;
     }
 
-    // Only rewrite the board transform when the camera actually moved. Left
-    // untouched, update() runs 60×/s and would otherwise re-emit an identical
-    // transform every frame while the camera is idle.
-    const x = camera.x();
-    const y = camera.y();
-    if(x === this._lastCameraX && y === this._lastCameraY) {
+    // The transform stores the CSS translation, hence the negated camera.
+    const transform = this._viewport.getTransform();
+    transform.setOffset(-camera.x(), -camera.y());
+
+    // update() runs 60×/s: without this guard it would re-emit an identical
+    // transform every frame while the camera stands still.
+    const css = transform.toCssTransform();
+    if(css === this._lastCss) {
       return;
     }
-    this._lastCameraX = x;
-    this._lastCameraY = y;
+    this._lastCss = css;
 
-    this._viewport.getBoard().getRenderer().getDom().style.transform =
-      `translate(${-x}px, ${-y}px)`;
+    transform.applyTo(this._viewport.getBoard().getRenderer().getDom());
   }
 }
