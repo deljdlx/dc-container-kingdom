@@ -4,7 +4,7 @@ title: Un propriétaire unique de la transformation monde ↔ écran
 type: refactor
 branch:
 created: 2026-08-01 21:51
-ready:
+ready: 2026-08-01 21:56
 doing:
 verify:
 done:
@@ -45,7 +45,38 @@ quel régime elle tourne, et se tromper comme le layer de particules.
 
 ## Spécifications
 
-_Amorce — à confirmer en « specify »._
+### Décisions prises en *specify* (2026-08-01)
+
+Sept points tranchés avant de toucher une ligne, avec leur raison :
+
+1. **Convention de signe unique** : la transformation stocke la **translation CSS
+   appliquée au board** (`offsetX/offsetY`). La caméra alimente donc
+   `offset = -camera.x()`, le pan de l'app alimente `offset = panX`. Une seule
+   convention, écrite, plutôt que deux signes à retenir.
+2. **`toCssTransform()` omet `scale(…)` quand l'échelle vaut exactement 1.** La
+   chaîne produite pour la démo reste **identique au byte près** — donc pas de
+   changement de rendu à prouver, et une écriture DOM plus courte.
+3. **Aucun arrondi dans la transformation.** Les flottants passent tels quels,
+   exactement comme aujourd'hui (le pan de l'app est déjà fractionnaire). Arrondir
+   ferait vibrer la carte au zoom fractionnaire ; l'arrondi reste où il est, sur
+   les positions d'éléments (`Coordinates`). Décision à documenter dans
+   `documentation/engine.md`.
+4. **`Camera.isActive()` est conservé**, et son rôle est **renommé dans la doc** :
+   il ne désigne plus « qui possède la transformation » mais « la caméra
+   alimente-t-elle la transformation ». Le supprimer obligerait à réinventer
+   l'arbitrage ailleurs, pour zéro gain de comportement et un risque réel sur le
+   pan/zoom. C'est la justification écrite que la DoD autorise.
+5. **Chemin chaud sans allocation** : `worldToScreenX(x)` / `worldToScreenY(y)`
+   scalaires pour la boucle de dessin, et des variantes rendant un objet pour les
+   appelants qui n'en sont pas.
+6. **L'hypothèse `clientX` est préservée, pas corrigée.** L'app traite `clientX`
+   comme un point en espace viewport, ce qui n'est vrai que parce que `#viewport`
+   commence à l'origine de la page. La corriger en silence **déplacerait la
+   carte**. Elle est documentée telle quelle ; si elle doit changer, c'est un
+   ticket avec sa propre validation.
+7. **Le `+48` de `getCurrentAreaCoordinates` sort du périmètre** : c'est une
+   conversion monde → **aire**, pas monde → écran, et elle touche le streaming.
+   Déplacée en `Suite`.
 
 ### Un `ViewportTransform`, pas un « moteur de coordonnées »
 
