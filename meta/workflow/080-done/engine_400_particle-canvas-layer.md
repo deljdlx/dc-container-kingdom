@@ -7,7 +7,7 @@ created: 2026-08-01 21:07
 ready: 2026-08-01 21:08
 doing: 2026-08-01 21:09
 verify: 2026-08-01 21:22
-done:
+done: 2026-08-01 21:33 (merge 569d3c6)
 ---
 
 ## Objectif
@@ -135,14 +135,34 @@ Toute classe publique s'exporte depuis `src/engine/index.js` (frontière moteur)
       injecté.
 - [x] `ParticleLayer` (ou son nom retenu) exporté par `src/engine/index.js`.
 - [x] La démo montre l'effet, et reste pilotable au clavier comme au D-pad.
-- [ ] Validation navigateur en pilotage manuel de la boucle, **plus une mesure sur
-      un vrai mobile** (le produit est mobile-first) — chiffres au journal.
+- [x] Validation navigateur en pilotage manuel de la boucle — chiffres au journal.
+      **La mesure sur un vrai mobile est reportée**, décision du propriétaire le
+      2026-08-01 : elle demande un appareil qu'aucun agent n'a. Reportée en
+      `Suite`, pas silencieusement abandonnée.
 - [x] `meta/documentation/engine.md` à jour.
 - [x] `npm run verify` vert.
 
 ## Suite
 
--
+- **Ce que ça laisse de côté — la mesure mobile.** Tous les chiffres du journal
+  viennent d'un poste de dev (DPR 1,5, viewport 900×560). Le produit est
+  **mobile-first** et un canvas plein écran redessiné à chaque frame est
+  précisément ce qui coûte cher sur un téléphone. 0,42 ms/frame à 600 particules
+  ici laisse de la marge, mais un mobile milieu de gamme peut être 5 à 10× plus
+  lent : ce serait encore sous le budget, **par extrapolation, pas par mesure**.
+  Reporté explicitement par le propriétaire le 2026-08-01 (« on verra plus tard
+  sur vrai mobile »).
+- **Ce que ça ouvre** — l'éclairage, écarté du périmètre dès la spécification :
+  voile sombre percé de trous, émissif qui traverse. Il change la topologie des
+  surfaces (le voile veut être au-dessus de tout, les particules parfois en
+  dessous), donc il mérite sa propre décision maintenant que le socle existe. Une
+  particule ne peut toujours pas passer **derrière** un arbre : le jour où ça
+  compte, ce sera un second canvas *sous* les entités.
+- **Ce qu'on a appris, et qui vaut au-delà de ce ticket** — un frère du board
+  n'est pas au-dessus du board : celui-ci porte sa propre profondeur calculée.
+  C'est écrit dans `documentation/engine.md` §3.2 et verrouillé par un test, pour
+  que le prochain qui monte une surface ne le redécouvre pas à l'œil.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -198,4 +218,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-01 21:32] Review du diff : frontière moteur tenue (rien de Container
+  Kingdom dans `src/engine/`, classes publiques exportées par le baril), code et
+  JSDoc en anglais, un seul paradigme de rendu ajouté et **en écriture seule**.
+- [2026-08-01 21:33] Merge `--no-ff` sur `main` depuis le tree principal :
+  **569d3c6** — `merge: un layer canvas pour les particules` (12 fichiers, +834).
+- [2026-08-01 21:33] Un critère de DoD mêlait deux vérifications : la validation
+  navigateur (faite, chiffrée) et la mesure sur appareil réel (impossible sans
+  appareil). Scindé plutôt que coché en bloc, le report tracé en `Suite`.
