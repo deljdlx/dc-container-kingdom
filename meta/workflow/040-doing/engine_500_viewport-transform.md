@@ -2,10 +2,10 @@
 id: 2026-08-01_21-51
 title: Un propriétaire unique de la transformation monde ↔ écran
 type: refactor
-branch:
+branch: claude/viewport-transform
 created: 2026-08-01 21:51
 ready: 2026-08-01 21:56
-doing:
+doing: 2026-08-01 21:57
 verify:
 done:
 ---
