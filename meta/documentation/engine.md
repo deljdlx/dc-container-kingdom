@@ -115,6 +115,40 @@ puis l'axe horizontal seul, puis le vertical (« slide along wall »). Sans cett
 dégradation, marcher en biais contre un mur bloque **tout** le déplacement au lieu
 de longer le mur.
 
+### 3.2 `ParticleLayer` : une surface canvas au-dessus de la carte
+
+Le rendu DOM est le bon choix pour des sprites persistants et collidables, le
+mauvais pour des **centaines d'objets éphémères**. Les particules vivent donc sur
+un `<canvas>`, monté par `viewport.enableParticles()`.
+
+- **Deux objets, deux rôles.** `ParticleSystem` est **pur** — il naît, vieillit
+  et meurt au rythme du `dt`, sans rien connaître du DOM (donc testable sans
+  jsdom, comme `DirectionalInput`). `ParticleLayer` est le seul à toucher un
+  contexte 2d.
+- **Monde à l'écriture, écran au dessin.** Les émetteurs parlent en coordonnées
+  monde comme le reste du moteur ; le layer applique la caméra une fois par
+  frame (`setTransform`). Le canvas garde la **taille du viewport**, jamais celle
+  du monde chargé.
+- **`FX_DEPTH`, et pourquoi il faut y penser.** Le canvas est un **frère du
+  board** — mais cela ne suffit pas : le board est un `Element` comme un autre,
+  donc il porte sa propre profondeur calculée (mesurée à **1 000 560**) et peint
+  *par-dessus* un frère laissé à `z-index: auto`. Les particules étaient
+  dessinées, correctes… et invisibles. La surface est donc élevée à `FX_DEPTH`
+  (10 000 000), avec l'invariant que rien n'atteint jamais cette profondeur en
+  monde.
+- **Le repos ne coûte rien.** Zéro particule vivante ⇒ pas même un `clearRect`,
+  exactement comme la transformation caméra qui n'est pas réécrite à l'arrêt. Le
+  `devicePixelRatio` est **plafonné à 2**, et la particule est un sprite
+  pré-rendu (pas un `arc()` par particule et par frame).
+- **Écriture seule.** Rien dans le moteur ne relit ce layer : ni collision, ni
+  clic, ni état de jeu. Un effet qui doit devenir collidable redevient un
+  `Element` du scene-graph. C'est cette règle qui garde le second paradigme de
+  rendu bon marché.
+
+Une particule **ne peut pas passer derrière un arbre** : assumé. Le jour où ça
+compte, ce sera un second canvas *sous* les entités — jamais un canvas par
+profondeur.
+
 ## 4. Camera
 
 `Camera` est un objet de première classe qui **suit une cible** (`follow(target)`)
@@ -324,7 +358,8 @@ Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
 `getAssetsBase`, `assetUrl`, `applyDebugFlag`, `isDebugEnabled`) ; le core
 (`Application`, `Viewport`, `Camera`, `Board`, `Area`, `Element`,
 `SpriteElement`, `Character`, `Geometry`, `Coordinates`, `BoundingBox`) ; les
-sous-systèmes (`DirectionalInput`, `EventEmitter`, `CollisionSystem`,
+sous-systèmes (`DirectionalInput`, `ParticleSystem`, `ParticleLayer`,
+`EventEmitter`, `CollisionSystem`,
 `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`, `PatrolBehavior`,
 `FleeBehavior`) ; les renderers ; les éléments intégrés et bases de
 personnages ; et les tools (`GameConsole`).

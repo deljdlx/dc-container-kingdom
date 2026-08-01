@@ -6,7 +6,21 @@
  * no reachable position brings the depth back down to the ground layer, while
  * the offset is uniform so relative painter ordering is untouched.
  */
-const DEPTH_BASE = 1_000_000;
+export const DEPTH_BASE = 1_000_000;
+
+/**
+ * Depth of the FX surfaces, an order of magnitude above {@link DEPTH_BASE}.
+ *
+ * The board is an element like any other, so it carries a computed z-index of
+ * its own (`DEPTH_BASE + offsetY + height`) and creates a stacking context with
+ * it: a sibling canvas at `z-index: auto` paints *under* the whole map, DOM
+ * order notwithstanding. Measured on 2026-08-01 — the board sat at 1 000 560
+ * and the particles were painted, correct, and invisible.
+ *
+ * The invariant this constant assumes: no element ever reaches a world depth of
+ * ten million, i.e. `offsetY + height < 9_000_000` pixels of world.
+ */
+export const FX_DEPTH = 10_000_000;
 
 /**
  * Base renderer for any map element: owns the element's root DOM node and the

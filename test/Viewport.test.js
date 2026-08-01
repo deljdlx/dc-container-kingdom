@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { Viewport } from '../src/engine/index.js';
+import { DEPTH_BASE, FX_DEPTH, Viewport } from '../src/engine/index.js';
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>';
@@ -396,6 +396,47 @@ describe('Viewport - keyboard wiring', () => {
     keydown('ArrowRight', true);   // OS auto-repeat of the still-held key
 
     expect(viewport.getInput().getFacing()).toBe('up');
+  });
+});
+
+describe('Viewport - particle layer', () => {
+  // Regression: the canvas was mounted as a later sibling of the board and left
+  // at `z-index: auto`. The board is an element like any other and carries a
+  // computed depth (measured at 1 000 560), so it painted *over* the canvas:
+  // particles were drawn, correct, and invisible. DOM order is not enough.
+  it('raises the canvas above the depth the board can reach', () => {
+    const { viewport } = createViewport();
+    viewport.enableParticles();
+
+    const canvas = document.querySelector('.map-fx-layer');
+    expect(canvas).not.toBeNull();
+    expect(canvas.parentElement).toBe(viewport.getContainer());
+    expect(Number(canvas.style.zIndex)).toBe(FX_DEPTH);
+    expect(FX_DEPTH).toBeGreaterThan(DEPTH_BASE);
+  });
+
+  it('survives jsdom answering null to getContext, and keeps simulating', () => {
+    const { viewport } = createViewport();
+    const layer = viewport.enableParticles();
+
+    layer.emit({ x: 10, y: 10, count: 4 });
+    viewport.update(1_000);
+    viewport.update(1_016);
+
+    expect(layer.getSystem().count()).toBe(4);
+  });
+
+  it('ticks and paints the layer from the game loop', () => {
+    const { viewport } = createViewport();
+    const layer = viewport.enableParticles();
+    const update = vi.spyOn(layer, 'update');
+    const render = vi.spyOn(layer, 'render');
+
+    viewport.update(1_000);
+    viewport.update(1_100);
+
+    expect(update).toHaveBeenCalledTimes(2);
+    expect(render).toHaveBeenCalledWith(viewport.getCamera());
   });
 });
 

@@ -12,6 +12,14 @@
   will-change: transform;
 }
 
+/* FX surface: sibling of the board, above it, and never a click target. */
+.map-fx-layer {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+}
+
 /* ===================================== */
 .map-element {
   position: absolute;

@@ -30,6 +30,8 @@ export { BoundingBox } from './map/BoundingBox.js';
 
 // --- Viewport subsystems (composed by Viewport) ---
 export { DirectionalInput } from './map/DirectionalInput.js';
+export { ParticleSystem } from './map/ParticleSystem.js';
+export { ParticleLayer } from './map/ParticleLayer.js';
 
 // --- Element subsystems (composed by Element) ---
 export { EventEmitter } from './map/EventEmitter.js';
@@ -43,7 +45,7 @@ export { PatrolBehavior } from './map/PatrolBehavior.js';
 export { FleeBehavior } from './map/FleeBehavior.js';
 
 // --- Renderers ---
-export { Renderer } from './map/Renderer/Renderer.js';
+export { Renderer, DEPTH_BASE, FX_DEPTH } from './map/Renderer/Renderer.js';
 export { SpriteRenderer } from './map/Renderer/SpriteRenderer.js';
 export { BoardRenderer } from './map/Renderer/BoardRenderer.js';
 export { AreaRenderer } from './map/Renderer/AreaRenderer.js';

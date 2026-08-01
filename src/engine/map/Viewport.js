@@ -4,6 +4,8 @@ import { Character } from './Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
+import { ParticleLayer } from './ParticleLayer.js';
+import { FX_DEPTH } from './Renderer/Renderer.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
 
@@ -103,6 +105,11 @@ export class Viewport
   character;
 
   /**
+   * @type {ParticleLayer|null} optional FX surface over the board
+   */
+  _particles = null;
+
+  /**
    * @type {EventEmitter}
    */
   _events = new EventEmitter();
@@ -184,6 +191,36 @@ export class Viewport
 
     // The camera keeps the player centred.
     this._camera.follow(this.character);
+  }
+
+  /**
+   * Mount a canvas over the board for particle effects, and return it.
+   *
+   * The canvas is a **sibling of the board**, raised to {@link FX_DEPTH}: the
+   * board is an element like any other and carries its own painter depth, so
+   * coming later in DOM order is *not* enough to sit above it. Emitters speak
+   * world coordinates; the layer applies the camera itself.
+   * @param {Object} [options] forwarded to {@link ParticleLayer}
+   * @returns {ParticleLayer}
+   */
+  enableParticles(options = {}) {
+    const canvas = document.createElement('canvas');
+    canvas.className = 'map-fx-layer';
+    // The board carries its own painter depth, so being a later sibling is not
+    // enough to sit above it — see FX_DEPTH.
+    canvas.style.zIndex = FX_DEPTH;
+    this._particles = new ParticleLayer(canvas, {
+      pixelRatio: window.devicePixelRatio ?? 1,
+      ...options,
+    });
+    this._particles.resize(this.width(), this.height());
+    this.container.append(canvas);
+    return this._particles;
+  }
+
+  /** @returns {ParticleLayer|null} the particle layer, once enabled */
+  getParticles() {
+    return this._particles;
   }
 
   /** Clear the viewport renderer and the board. */
@@ -366,6 +403,13 @@ export class Viewport
     // The camera follows its target; the viewport renderer applies the offset.
     this._camera.update();
     this.renderer.update();
+
+    // Particles paint LAST: drawing before the camera moved would offset them by
+    // one frame, and they must sit over what the renderer just placed.
+    if(this._particles) {
+      this._particles.update(dt);
+      this._particles.render(this._camera);
+    }
   }
 
   /**
