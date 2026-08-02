@@ -133,6 +133,10 @@ export class Board extends Element
       return false;
     }
     const area = this.areas[x][y];
+    // Drop the emitters this area carried BEFORE destroying it: `destroy()`
+    // detaches and tells nobody, so they would otherwise keep spawning at a dead
+    // element's position.
+    this._viewport?.getFxBinder?.()?.unbind(area);
     area.destroy();
     delete this.areas[x][y];
     if (Object.keys(this.areas[x]).length === 0) {

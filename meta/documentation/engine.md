@@ -179,6 +179,43 @@ viewport.addBehavior(new FootstepDust(fx, {
 lève que sous un personnage qui marche, sans que la classe de base connaisse quoi
 que ce soit aux personnages.
 
+#### Un élément porte son effet
+
+Mieux que de poser un émetteur à la main : un élément **déclare** le sien dans son
+descripteur, en coordonnées **locales**, exactement comme sa zone de collision et
+son ombre.
+
+```js
+static descriptor = {
+  width: 80, height: 64,
+  collision: [4, 5, 70, 59],
+  fx: [{ emitter: FountainSpray, at: { x: 24, y: 8 } }],   // local, jamais monde
+};
+```
+
+Posez dix fontaines : chacune crache depuis son propre bassin, sans une ligne
+côté hôte.
+
+L'élément **ne va pas chercher** la surface FX — le scene-graph dépendrait d'un
+rendu. C'est `FxBinder` qui lit les déclarations et câble, sur appel **explicite
+et idempotent** : `enableParticles()` lie ce qui existe, `_streamAreas` relie
+après chargement, un hôte qui ajoute des éléments plus tard rappelle `bind`. Ce
+choix vient de deux faits : aucun événement d'attachement n'existe (et en émettre
+un lèverait pour les 414 éléments que le catalogue construit sans application), et
+`_streamAreas` ne tourne jamais dans un hôte sans personnage.
+
+**Deux ceintures contre la fuite.** `Element.destroy()` détache et ne prévient
+personne : `Board.freeArea` délie donc avant de détruire, **et** un émetteur dont
+la cible n'a plus de parent s'arrête de lui-même. C'est la famille de défaut qui
+avait déjà mordu `freeArea` (`2026-07-26_14-18`) ; ici elle produirait des gouttes
+jaillissant d'un mort.
+
+**Le culling n'est pas du confort** : le budget de particules est partagé et
+plafonné, donc les gouttes hors écran **évincent les visibles**. Un émetteur hors
+champ se tait, avec une marge de **128 px monde** — une goutte vit 1,2 s à
+90 px/s, soit ~108 px de trajet, et couper au ras du bord empêcherait une
+particule née juste dehors d'entrer dans le cadre.
+
 ### 3.3 `ViewportTransform` : le propriétaire unique de monde ↔ écran
 
 La carte est dessinée une fois, puis **déplacée en bloc** : elle défile par
@@ -430,5 +467,6 @@ Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
 sous-systèmes (`DirectionalInput`, `ViewportTransform`, `EventEmitter`,
 `CollisionSystem`, `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`,
 `PatrolBehavior`, `FleeBehavior`) ; les **FX** (`ParticleSystem`,
-`ParticleLayer`, `Emitter`, `FountainSpray`, `FootstepDust`) ; les renderers ; les éléments intégrés et bases de
+`ParticleLayer`, `Emitter`, `FxBinder`, `FountainSpray`, `FootstepDust`) ; les
+renderers ; les éléments intégrés et bases de
 personnages ; et les tools (`GameConsole`).

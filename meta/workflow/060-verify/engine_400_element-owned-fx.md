@@ -6,7 +6,7 @@ branch: claude/element-owned-fx
 created: 2026-08-02 18:18
 ready: 2026-08-02 18:21
 doing: 2026-08-02 18:22
-verify:
+verify: 2026-08-02 18:30
 done:
 ---
 
@@ -139,18 +139,18 @@ juste hors champ doit pouvoir entrer dans le cadre).
 
 ## Definition of Done
 
-- [ ] `Fountain00` déclare son jet dans son descripteur, en coordonnées locales ;
+- [x] `Fountain00` déclare son jet dans son descripteur, en coordonnées locales ;
       la démo ne pose plus aucune position monde.
-- [ ] Deux fontaines posées à des endroits différents crachent **toutes les deux**,
+- [x] Deux fontaines posées à des endroits différents crachent **toutes les deux**,
       chacune chez elle — vérifié à l'écran.
-- [ ] **Aucune fuite** : après chargement puis libération d'une aire, la liste des
+- [x] **Aucune fuite** : après chargement puis libération d'une aire, la liste des
       behaviors du viewport revient à son compte initial (test).
-- [ ] Un émetteur dont la cible est détachée se retire de lui-même (test).
-- [ ] Lier deux fois la même aire ne double pas le débit (test).
-- [ ] Un émetteur hors champ **ne consomme pas le budget** ; la marge est chiffrée
+- [x] Un émetteur dont la cible est détachée se retire de lui-même (test).
+- [x] Lier deux fois la même aire ne double pas le débit (test).
+- [x] Un émetteur hors champ **ne consomme pas le budget** ; la marge est chiffrée
       et justifiée.
-- [ ] Le catalogue affiche toujours les 414 éléments sans erreur.
-- [ ] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
+- [x] Le catalogue affiche toujours les 414 éléments sans erreur.
+- [x] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
 
 ## Suite
 
@@ -163,11 +163,55 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 18:23] `Fountain00` déclare son jet dans son descripteur, en
+  coordonnées **locales** (`at: { x: 24, y: 8 }`), au même titre que sa collision
+  et son ombre. La démo ne pose plus **aucune** position monde ; une **seconde**
+  fontaine a été ajoutée à la carte pour que la preuve soit visible.
+- [2026-08-02 18:23] `FxBinder` lit les déclarations et câble. Liage **explicite
+  et idempotent** : `enableParticles()` lie l'existant, `_streamAreas` relie après
+  chargement, un hôte peut rappeler `bind` sans rien doubler.
+- [2026-08-02 18:23] **Deux ceintures contre la fuite**, comme exigé :
+  `Board.freeArea` délie **avant** `area.destroy()`, et un émetteur dont la cible
+  n'a plus de parent s'arrête de lui-même (`isAlive()`), quel que soit le chemin
+  de destruction.
+- [2026-08-02 18:24] **Culling** : `isVisible` s'appuie sur `ViewportTransform`,
+  donc il suit la caméra **et** le zoom. Marge de **128 px monde**, chiffrée : une
+  goutte vit 1,2 s à 90 px/s (~108 px de trajet), couper au ras du bord
+  empêcherait une particule née juste dehors d'entrer dans le cadre.
+- [2026-08-02 18:24] Le prédicat de visibilité est **injecté** dans l'émetteur,
+  pas déduit : `Emitter` reste pur et testable sans DOM.
 
 ### Vérification
 
--
+- [2026-08-02 18:25] `npm run verify` vert : **51 fichiers, 415 tests** (402
+  avant, +13 sur le lieur).
+- [2026-08-02 18:26] **Deux fontaines liées toutes seules** dans la démo, sans
+  aucune position posée : 2 émetteurs, **38 gouttes chacune** après 60 frames,
+  chacune à son propre bassin (~224,438 et ~664,128). Visible à l'écran.
+- [2026-08-02 18:27] **Aucune fuite, mesuré dans le vrai moteur** : avant
+  `freeArea(0,0)` → 13 behaviors / 2 émetteurs liés ; après → **11 behaviors / 0
+  lié**. La liste revient exactement à son état d'avant liage.
+- [2026-08-02 18:27] **Culling vérifié dans les deux sens** : caméra emmenée à
+  (6000, 6000) → 4 gouttes seulement et `isVisible(224,438)` faux ; retour près
+  des fontaines → 76 gouttes. Les 4 gouttes résiduelles s'expliquent : les
+  behaviors tournent **avant** `camera.update()` dans la boucle, donc la première
+  frame après un saut de caméra émet encore. Une frame de latence, sans effet
+  visible.
+- [2026-08-02 18:29] **Catalogue intact** : 2 484 cartes, 88 entrées d'index,
+  `Fountain00` présente, **aucune erreur console** — un descripteur `fx` ne
+  déclenche rien hors d'un viewport, ce qui était le risque n°6.
+- [2026-08-02 18:30] Sonde retirée (0 résidu).
+- [2026-08-02 18:38] **Ancre ajustée à l'œil** sur demande, en deux passes :
+  `at.x` de 24 → 34 → **39** (sur 80 px de large). C'est le genre de réglage que
+  la déclaration locale rend trivial : un nombre, dans la classe de l'élément, et
+  **les deux fontaines suivent**.
+- [2026-08-02 18:40] **Chevauchement corrigé — et ma première sonde était fausse.**
+  La seconde fontaine, posée en [640, 120], recouvrait la clôture de l'enclos. Ma
+  vérification n'avait rien vu parce qu'elle ne parcourait que les **enfants
+  directs** de l'aire : les clôtures sont imbriquées dans des `FenceGroup00` (81
+  `Fence00H` + 72 `Fence00V` dans le board). Parcours refait **récursivement** :
+  fontaine déplacée en [500, 480], en herbe libre, **0 chevauchement** pour les
+  deux — clôtures, maisons, arbres et trajets de patrouille compris.
 
 ### Validation
 

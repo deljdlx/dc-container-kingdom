@@ -43,14 +43,34 @@ export class Emitter
    * so dust can land at the feet rather than the top-left corner
    * @param {Object} [options.descriptor] overrides the class descriptor
    * @param {number} [options.interval] overrides the class cadence
+   * @param {(x: number, y: number) => boolean} [options.isVisible] world-space
+   * visibility gate; an emitter off screen must not spend the shared particle
+   * budget on droplets nobody can see
    */
-  constructor(layer, { at = null, follow = null, offset = null, descriptor = null, interval = null } = {}) {
+  constructor(layer, {
+    at = null, follow = null, offset = null, descriptor = null, interval = null, isVisible = null,
+  } = {}) {
     this._layer = layer;
     this._at = at;
     this._follow = follow;
     this._offset = offset ?? { x: 0, y: 0 };
     this._descriptor = { ...this.constructor.descriptor, ...(descriptor ?? {}) };
     this._interval = interval ?? this.constructor.interval;
+    this._isVisible = isVisible;
+  }
+
+  /**
+   * An emitter bound to an element dies with it. `Element.destroy()` detaches
+   * from the parent and tells nobody, so without this an emitter would outlive
+   * its area and keep spawning at a dead thing's position — the very leak that
+   * bit `freeArea` before (2026-07-26_14-18).
+   * @returns {boolean} whether the emitter still has a reason to run
+   */
+  isAlive() {
+    if (!this._follow) {
+      return true;
+    }
+    return typeof this._follow.getParent !== 'function' || this._follow.getParent() !== null;
   }
 
   /** @returns {this} */
@@ -100,6 +120,13 @@ export class Emitter
       return;
     }
 
+    // Second belt against the leak: whatever path destroyed the target, an
+    // orphaned emitter stops for good rather than haunting the loop.
+    if (!this.isAlive()) {
+      this.stop();
+      return;
+    }
+
     this._elapsed += dt;
     if (this._elapsed < this._interval) {
       return;
@@ -113,6 +140,11 @@ export class Emitter
     }
 
     const at = this.position();
+    // Off screen, the burst is skipped entirely: the particle budget is shared
+    // and capped, so invisible droplets would evict the ones being watched.
+    if (this._isVisible && !this._isVisible(at.x, at.y)) {
+      return;
+    }
     this._layer.emit({ ...this._descriptor, x: at.x, y: at.y });
   }
 }
