@@ -4,7 +4,7 @@ title: Ranger l'arborescence du moteur — map/ éclate, le contenu sort du noya
 type: refactor
 branch:
 created: 2026-08-02 20:00
-ready:
+ready: 2026-08-02 20:01
 doing:
 verify:
 done:
