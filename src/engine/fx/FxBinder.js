@@ -1,3 +1,5 @@
+import { EngineEvents } from '../events/EngineEvents.js';
+
 /** How far outside the view an emitter still counts as visible, in world pixels. */
 const CULL_MARGIN = 128;
 
@@ -9,17 +11,24 @@ const CULL_MARGIN = 128;
  * particle layer: the scene graph would then depend on a rendering surface. This
  * binder is what reads the declaration and wires it up.
  *
- * Binding is **explicit and idempotent**, for two reasons found in the code: no
- * attach event exists (and emitting one would throw for the elements the catalog
- * builds before attaching them), and `_streamAreas` never runs in a host without
- * a character. So a host binds when it is ready, and may bind again — an element
- * already bound is skipped.
+ * Binding is **explicit and idempotent**: no attach event exists yet, and
+ * `_streamAreas` never runs in a host without a character. So a host binds when
+ * it is ready, and may bind again — an element already bound is skipped.
+ *
+ * **Unbinding, on the other hand, is automatic**: the binder listens for
+ * {@link EngineEvents.ELEMENT_DESTROY} on the global bus and lets go of the
+ * subtree that is leaving. It used to be the Board's job to call `unbind()` by
+ * hand before freeing an area — a coupling that only existed because dying
+ * announced nothing.
  */
 export class FxBinder
 {
 
   /** @type {Map<Object, Array<Object>>} emitters created per element */
   _bound = new Map();
+
+  /** @type {(() => void)|null} undoes the lifecycle subscription */
+  _unsubscribe = null;
 
   /**
    * @param {Object} options
@@ -30,6 +39,23 @@ export class FxBinder
     this._layer = layer;
     this._groundLayer = groundLayer;
     this._viewport = viewport;
+
+    // Duck-typed on purpose: a host may drive the binder with a bare viewport
+    // stand-in, and losing the automatic unbind must not cost it the rest.
+    const application = viewport?.getApplication?.();
+    this._unsubscribe = application?.addEventListener?.(
+      EngineEvents.ELEMENT_DESTROY,
+      event => this.unbind(event.source),
+    ) ?? null;
+  }
+
+  /**
+   * Stop listening for departures. The emitters already bound are left alone —
+   * dropping them is {@link unbind}'s job.
+   */
+  dispose() {
+    this._unsubscribe?.();
+    this._unsubscribe = null;
   }
 
   /**
@@ -76,7 +102,7 @@ export class FxBinder
   }
 
   /**
-   * Drop every emitter of a subtree. Called when an area is freed — the first of
+   * Drop every emitter of a subtree. Runs on `element.destroy` — the first of
    * the two belts against emitters outliving their element.
    * @param {Object} root
    * @returns {number} how many emitters were removed

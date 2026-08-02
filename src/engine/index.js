@@ -41,8 +41,16 @@ export { FxBinder } from './fx/FxBinder.js';
 export { FountainSpray } from './fx/FountainSpray.js';
 export { FootstepDust } from './fx/FootstepDust.js';
 
+// --- Events: the bus, its catalogue and its envelope ---
+export { EventEmitter } from './events/EventEmitter.js';
+export {
+  EngineEvents,
+  collisionEventName,
+  engineEventNames,
+  makeEvent,
+} from './events/EngineEvents.js';
+
 // --- Element subsystems (composed by Element) ---
-export { EventEmitter } from './map/EventEmitter.js';
 export { CollisionSystem } from './map/CollisionSystem.js';
 export { SceneGraph } from './map/SceneGraph.js';
 
@@ -95,3 +103,4 @@ export { Woman02 } from './map/Elements/CharacterBases/Woman02.js';
 
 // --- Tools ---
 export { GameConsole } from './tools/GameConsole.js';
+export { EventConsole } from './tools/EventConsole.js';

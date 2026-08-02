@@ -2,7 +2,8 @@ import { Board } from './Board.js';
 import { Camera } from './Camera.js';
 import { Character } from './Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
-import { EventEmitter } from './EventEmitter.js';
+import { EngineEvents, makeEvent } from '../events/EngineEvents.js';
+import { EventEmitter } from '../events/EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { FxBinder } from '../fx/FxBinder.js';
 import { ParticleLayer } from '../fx/ParticleLayer.js';
@@ -300,22 +301,24 @@ export class Viewport
   // ===========================
   /**
    * Subscribe to a viewport-level event.
-   * @param {string} name
+   * @param {string} name one of {@link EngineEvents}
    * @param {Function} callback
-   * @returns {*} the subscription handle returned by the emitter
+   * @returns {() => void} unsubscribe
    */
   addEventListener(name, callback) {
     return this._events.on(name, callback);
   }
 
   /**
-   * Emit an event on the viewport bus and bubble it to the application bus.
-   * @param {string} name
+   * Stamp the envelope, emit on the viewport bus, then relay to the application
+   * bus. Stays silent rather than throwing when no application is wired.
+   * @param {string} name one of {@link EngineEvents}
    * @param {Object} [data]
    */
   handle(name, data = {}) {
-    this._events.emit(name, data);
-    this.getApplication().handle(name, data);
+    const event = makeEvent(name, this, data);
+    this._events.emit(name, event);
+    this.getApplication()?.handle(name, event);
   }
 
   // ===========================
@@ -549,7 +552,7 @@ export class Viewport
       }
     }
 
-    this.handle("map.update", {
+    this.handle(EngineEvents.MAP_UPDATE, {
       map: this,
       character: this.character,
     });
