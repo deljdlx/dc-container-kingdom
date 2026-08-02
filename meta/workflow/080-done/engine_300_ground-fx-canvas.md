@@ -7,7 +7,7 @@ created: 2026-08-02 18:56
 ready: 2026-08-02 18:57
 doing: 2026-08-02 18:58
 verify: 2026-08-02 19:05
-done:
+done: 2026-08-02 19:04 (merge f08e21d)
 ---
 
 ## Objectif
@@ -111,7 +111,27 @@ C'est le critère vérifiable de ce ticket.
 
 ## Suite
 
--
+- **Ce que ça ouvre** — la couche sol est un emplacement libre pour tout ce qui se
+  pose *sur* le terrain : ondes, décalques, traces de pas persistantes, et surtout
+  les **ombres**, aujourd'hui des `div` par élément (`map-element__shadow`) qui
+  pourraient s'y regrouper. Côté Container Kingdom, une nappe de chaleur au sol
+  sous les conteneurs chargés devient une ligne de descripteur.
+- **Ce qu'on laisse de côté** :
+  - **deux couches, pas N** : une particule ne peut toujours pas s'intercaler
+    entre *deux éléments précis* — il faudrait un canvas par profondeur, ce qui
+    reste hors de question ;
+  - la surface au sol **écrit dans le DOM quand la vue bouge** (position et
+    taille). C'est le prix d'être dans le board ; l'écriture est conditionnée au
+    changement, mais en défilement continu elle a lieu à chaque frame ;
+  - **la marge de culling reste calibrée pour la goutte de fontaine** (128 px) —
+    inchangé par ce ticket, et toujours à revoir le jour où un effet plus rapide
+    apparaît.
+- **Ce que la mesure a corrigé** — j'avais spécifié que la mémoire du canvas
+  devait suivre `échelle × dpr`. Elle est **indépendante du zoom** : la taille CSS
+  suit l'inverse de l'échelle, donc la densité reste constante (1,5 device pixel
+  par pixel écran mesuré aux échelles 0,5, 1 et 2). La spec était fausse, le code
+  est juste, et c'est la doc qui fait foi désormais.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -159,4 +179,9 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 19:04] Review : frontière moteur tenue, `GROUND_FX_DEPTH` exporté
+  avec son raisonnement, le contrat « un seul vieillissement par frame » porté par
+  un test, et le routage par couche vérifié dans le navigateur.
+- [2026-08-02 19:04] Merge `--no-ff` sur `main` depuis le tree principal :
+  **f08e21d** — `merge: un canvas au sol, sous les entités`
+  (11 fichiers, +246 / −36).
