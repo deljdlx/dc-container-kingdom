@@ -37,6 +37,7 @@ export { ViewportTransform } from './map/ViewportTransform.js';
 export { ParticleSystem } from './fx/ParticleSystem.js';
 export { ParticleLayer } from './fx/ParticleLayer.js';
 export { Emitter } from './fx/Emitter.js';
+export { FxBinder } from './fx/FxBinder.js';
 export { FountainSpray } from './fx/FountainSpray.js';
 export { FootstepDust } from './fx/FootstepDust.js';
 

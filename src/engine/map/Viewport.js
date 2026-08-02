@@ -4,6 +4,7 @@ import { Character } from './Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
+import { FxBinder } from '../fx/FxBinder.js';
 import { ParticleLayer } from '../fx/ParticleLayer.js';
 import { FX_DEPTH } from './Renderer/Renderer.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
@@ -109,6 +110,11 @@ export class Viewport
    * @type {ParticleLayer|null} optional FX surface over the board
    */
   _particles = null;
+
+  /**
+   * @type {FxBinder|null} wires the effects elements declare, once FX are on
+   */
+  _fxBinder = null;
 
   /**
    * @type {ViewportTransform} the single owner of world ↔ screen. The camera
@@ -227,12 +233,23 @@ export class Viewport
     });
     this._particles.resize(this.width(), this.height());
     this.container.append(canvas);
+
+    // Elements already in the world get their declared effects now; those that
+    // stream in later are bound by `_streamAreas`.
+    this._fxBinder = new FxBinder({ layer: this._particles, viewport: this });
+    this._fxBinder.bind(this.board);
+
     return this._particles;
   }
 
   /** @returns {ParticleLayer|null} the particle layer, once enabled */
   getParticles() {
     return this._particles;
+  }
+
+  /** @returns {FxBinder|null} the binder wiring element-declared effects */
+  getFxBinder() {
+    return this._fxBinder;
   }
 
   /** Clear the viewport renderer and the board. */
@@ -440,6 +457,12 @@ export class Viewport
     this.loadAreasFromCurrentPosition();
     this.freeAreasFromCurrentPosition();
     this.getBoard().update(); // render the newly-loaded areas
+
+    // Newly streamed elements declare effects too. Binding is idempotent, so
+    // re-walking the board costs nothing for what is already wired.
+    if(this._fxBinder) {
+      this._fxBinder.bind(this.board);
+    }
   }
 
   /**

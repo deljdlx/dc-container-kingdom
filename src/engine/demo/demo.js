@@ -40,7 +40,6 @@ import {
   Well00,
   PatrolBehavior,
   FleeBehavior,
-  FountainSpray,
   FootstepDust,
   setAssetsBase,
   applyDebugFlag,
@@ -85,6 +84,7 @@ populate(0, 0, [
   [300, 320, Tree00],
   [640, 380, Tree00],
   [200, 430, Fountain00],
+  [500, 480, Fountain00],   // a second one, in open grass: the effect travels with the element
   [760, 220, Tree00],
   [430, 470, Sunflower00],
 ]);
@@ -218,8 +218,8 @@ patrols.forEach(patrol => patrol.start());
 // ride the single game clock, so they freeze and resume with everything else.
 const fx = viewport.enableParticles();
 
-// Fixed world point — the fountain sits at [200, 430], its basin around (224, 438).
-viewport.addBehavior(new FountainSpray(fx, { at: { x: 224, y: 438 } }));
+// Nothing to place: `Fountain00` declares its own jet, so every fountain in the
+// world sprays from its own basin — `enableParticles()` wired them above.
 
 // Follows a moving element instead: dust tracks the player while the camera
 // scrolls, and only while they actually walk.
