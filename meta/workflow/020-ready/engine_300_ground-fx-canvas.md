@@ -4,7 +4,7 @@ title: Un canvas au sol, sous les entités
 type: feat
 branch:
 created: 2026-08-02 18:56
-ready:
+ready: 2026-08-02 18:57
 doing:
 verify:
 done:
