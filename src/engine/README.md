@@ -49,8 +49,10 @@ Load the engine styles once in the host page:
 ## Structure
 
 - `map/` — core: `Element` (scene node) and its composed subsystems
-  (`SceneGraph`, `CollisionSystem`, `EventEmitter`, `Geometry`), plus `Board`,
-  `Area`, `Viewport`, `Character`, `Application` and the `Renderer/` classes.
+  (`SceneGraph`, `CollisionSystem`, `Geometry`), plus `Board`, `Area`,
+  `Viewport`, `Character`, `Application` and the `Renderer/` classes.
+- `events/` — the bus: `EventEmitter` (revocable subscriptions, `onAny`) and
+  `EngineEvents` (the catalogue of names and the payload envelope).
 - `map/Elements/` — built-in sprites (houses, trees, fences, fountain),
   `MapSprites01/` (curated autonomous trees from `map-sprites-01`: conifers,
   leafy trees, dead trees, saplings),
@@ -59,7 +61,8 @@ Load the engine styles once in the host page:
   `Flowers/` (the whole `flowers-00` sheet: 219 plants, mushrooms, fields and
   props, named `<Family><NN>`) and `CharacterBases/` (eight ready-to-use bases
   from the shared `characters-00.png` sprite sheet).
-- `tools/` — helpers such as `GameConsole`.
+- `tools/` — helpers such as `GameConsole` and `EventConsole` (a live view of the
+  event bus, mounted by the demo under `?debug=1`).
 - `css/`, `images/` — engine styles and sprite sheets.
 
 ## Configuring asset paths
