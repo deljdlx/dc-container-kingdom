@@ -4,7 +4,7 @@ import { getCatalogEntries } from '../src/engine/catalog/catalog-registry.js';
 import {
   FLOWERS_00_ATLAS,
   FLOWERS_00_CELL,
-} from '../src/engine/map/Elements/Flowers/atlas.js';
+} from '../src/engine/content/Flowers/atlas.js';
 
 const SHEET_SIZE = 512;
 const SPRITE_COUNT = 219;

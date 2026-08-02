@@ -5,13 +5,13 @@
  */
 export class GameConsole
 {
-  /** @type {import('../map/Application.js').Application} owning application */
+  /** @type {import('../Application.js').Application} owning application */
   application;
   /** @type {HTMLElement} the panel's DOM container */
   container;
 
   /**
-   * @param {import('../map/Application.js').Application} application owning application
+   * @param {import('../Application.js').Application} application owning application
    * @param {string} selector CSS selector of the container element
    */
   constructor(application, selector) {

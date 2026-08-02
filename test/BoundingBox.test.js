@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { BoundingBox } from '../src/engine/map/BoundingBox.js';
+import { BoundingBox } from '../src/engine/scene/BoundingBox.js';
 
 function createElementStub({ x = 0, y = 0, width = 0, height = 0, offsetX = 0, offsetY = 0 } = {}) {
   return {

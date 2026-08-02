@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { BoundingBox } from '../src/engine/map/BoundingBox.js';
+import { BoundingBox } from '../src/engine/scene/BoundingBox.js';
 
 /**
  * `updateWithRelativeElement` must grow the box it is called on — and nothing
