@@ -2,10 +2,10 @@
 id: 2026-08-02_18-18
 title: Un élément porte son effet, en coordonnées locales
 type: feat
-branch:
+branch: claude/element-owned-fx
 created: 2026-08-02 18:18
 ready: 2026-08-02 18:21
-doing:
+doing: 2026-08-02 18:22
 verify:
 done:
 ---
