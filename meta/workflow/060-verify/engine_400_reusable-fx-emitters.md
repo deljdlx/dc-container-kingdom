@@ -2,11 +2,11 @@
 id: 2026-08-02_18-00
 title: Isoler les effets en émetteurs réutilisables, dans un dossier fx
 type: refactor
-branch:
+branch: claude/fx-emitters
 created: 2026-08-02 18:00
 ready: 2026-08-02 18:01
-doing:
-verify:
+doing: 2026-08-02 18:02
+verify: 2026-08-02 18:06
 done:
 ---
 
@@ -79,18 +79,18 @@ enregistrer.
 
 ## Definition of Done
 
-- [ ] `src/engine/fx/` contient le sous-système ; `map/` n'a plus de fichier de
+- [x] `src/engine/fx/` contient le sous-système ; `map/` n'a plus de fichier de
       particules.
-- [ ] `Emitter` tick par `dt`, cadence respectée, et suit **un point comme un
+- [x] `Emitter` tick par `dt`, cadence respectée, et suit **un point comme un
       élément mobile** — les deux cas testés.
-- [ ] `FountainSpray` et `FootstepDust` existent, déclaratifs, exportés par le
+- [x] `FountainSpray` et `FootstepDust` existent, déclaratifs, exportés par le
       baril.
-- [ ] La démo n'écrit plus de logique d'émission : elle instancie et enregistre.
-- [ ] Tests sans DOM sur la cadence, la cible mobile et `shouldEmit`.
-- [ ] Rendu inchangé à l'écran (jet de la fontaine et poussière), vérifié au
+- [x] La démo n'écrit plus de logique d'émission : elle instancie et enregistre.
+- [x] Tests sans DOM sur la cadence, la cible mobile et `shouldEmit`.
+- [x] Rendu inchangé à l'écran (jet de la fontaine et poussière), vérifié au
       navigateur.
-- [ ] `meta/documentation/engine.md` à jour ; liens du board verts.
-- [ ] `npm run verify` vert.
+- [x] `meta/documentation/engine.md` à jour ; liens du board verts.
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -103,11 +103,40 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 18:02] Déménagement `map/` → **`src/engine/fx/`** en `git mv`
+  (historique préservé) : `ParticleSystem` et `ParticleLayer` rejoignent le
+  nouveau dossier, imports internes et baril réparés. `map/` perd deux fichiers
+  qui n'avaient rien à y faire.
+- [2026-08-02 18:03] `Emitter` : un **behavior**, pas une minuterie. Il tient la
+  cadence et la cible — point monde fixe (`at`) **ou** élément qui bouge
+  (`follow`, duck-typé sur `offsetX()`/`offsetY()`), plus un `offset` pour viser
+  les pieds. La position est résolue **à chaque salve**, ce qui est précisément ce
+  qui permet de suivre un personnage qui marche.
+- [2026-08-02 18:03] Après un long gel (onglet en arrière-plan), le compteur est
+  **remis à zéro** plutôt que décrémenté : une frame à 10 s produit une salve, pas
+  cent. Verrouillé par un test.
+- [2026-08-02 18:03] `FountainSpray` et `FootstepDust` sont **déclaratifs** —
+  `static descriptor` + `static interval`, sur le modèle des `SpriteElement`. La
+  condition d'émission passe par `shouldEmit()` surchargeable : la poussière ne se
+  lève que sous un personnage qui marche, sans que la base connaisse les
+  personnages. Sans prédicat, elle reste **silencieuse** — épousseter une statue
+  serait le mauvais défaut.
+- [2026-08-02 18:04] La démo passe de **46 à 17 lignes** de FX, et n'écrit plus
+  aucune logique d'émission : elle instancie et enregistre. C'était le critère de
+  réussite de l'extraction.
 
 ### Vérification
 
--
+- [2026-08-02 18:04] `npm run verify` vert : **50 fichiers, 402 tests** (390
+  avant, +12 sur l'émetteur).
+- [2026-08-02 18:04] Les tests couvrent ce qui casse en silence : la cadence (une
+  salve par intervalle, pas une par frame), l'absence de rattrapage après un gel,
+  la cible **mobile** résolue à chaque salve, l'`offset`, `shouldEmit`, et le
+  silence par défaut de `FootstepDust`. Tous **sans DOM**.
+- [2026-08-02 18:06] **Rendu inchangé au navigateur** : jet bleu au-dessus du
+  bassin et poussière sous les pieds, les deux familles vivantes simultanément
+  (50 gouttes `#9fe4ff` + 15 poussières `#e8dcc4` après 110 frames de marche).
+  Sonde retirée (0 résidu).
 
 ### Validation
 

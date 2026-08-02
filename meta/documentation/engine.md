@@ -115,11 +115,14 @@ puis l'axe horizontal seul, puis le vertical (« slide along wall »). Sans cett
 dégradation, marcher en biais contre un mur bloque **tout** le déplacement au lieu
 de longer le mur.
 
-### 3.2 `ParticleLayer` : une surface canvas au-dessus de la carte
+### 3.2 `fx/` : particules et émetteurs
 
 Le rendu DOM est le bon choix pour des sprites persistants et collidables, le
 mauvais pour des **centaines d'objets éphémères**. Les particules vivent donc sur
 un `<canvas>`, monté par `viewport.enableParticles()`.
+
+Tout le sous-système vit dans **`src/engine/fx/`** — il n'a rien à voir avec la
+carte, et `map/` était déjà chargé.
 
 - **Deux objets, deux rôles.** `ParticleSystem` est **pur** — il naît, vieillit
   et meurt au rythme du `dt`, sans rien connaître du DOM (donc testable sans
@@ -148,6 +151,33 @@ un `<canvas>`, monté par `viewport.enableParticles()`.
 Une particule **ne peut pas passer derrière un arbre** : assumé. Le jour où ça
 compte, ce sera un second canvas *sous* les entités — jamais un canvas par
 profondeur.
+
+#### Les émetteurs sont des behaviors
+
+Un effet ne porte pas de minuterie : c'est un **behavior**, enregistré par
+`viewport.addBehavior(...)`, qui reçoit le `dt` de l'horloge unique — au même
+titre que `PatrolBehavior`. Il gèle et repart avec le jeu.
+
+`Emitter` tient la cadence et la **cible**, qui est soit un point monde fixe
+(`at`), soit un **élément qui bouge** (`follow`, duck-typé sur
+`offsetX()`/`offsetY()`), avec un `offset` pour viser les pieds plutôt que le coin
+haut-gauche. Après un long gel (onglet en arrière-plan), le retard n'est **pas
+rejoué** : une frame à 10 s produit une salve, pas cent.
+
+Les effets nommés sont **déclaratifs**, comme le `static descriptor` d'un
+`SpriteElement` — la donnée d'un côté, le comportement de l'autre :
+
+```js
+viewport.addBehavior(new FountainSpray(fx, { at: { x: 224, y: 438 } }));
+viewport.addBehavior(new FootstepDust(fx, {
+  follow: character, offset: { x: 24, y: 44 },
+  isMoving: () => viewport.getInput().isMoving(),
+}));
+```
+
+`shouldEmit()` est le point de surcharge : c'est ainsi que la poussière ne se
+lève que sous un personnage qui marche, sans que la classe de base connaisse quoi
+que ce soit aux personnages.
 
 ### 3.3 `ViewportTransform` : le propriétaire unique de monde ↔ écran
 
@@ -397,8 +427,8 @@ Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
 `getAssetsBase`, `assetUrl`, `applyDebugFlag`, `isDebugEnabled`) ; le core
 (`Application`, `Viewport`, `Camera`, `Board`, `Area`, `Element`,
 `SpriteElement`, `Character`, `Geometry`, `Coordinates`, `BoundingBox`) ; les
-sous-systèmes (`DirectionalInput`, `ViewportTransform`, `ParticleSystem`, `ParticleLayer`,
-`EventEmitter`, `CollisionSystem`,
-`SceneGraph`, `CharacterAnimator`, `CharacterBehavior`, `PatrolBehavior`,
-`FleeBehavior`) ; les renderers ; les éléments intégrés et bases de
+sous-systèmes (`DirectionalInput`, `ViewportTransform`, `EventEmitter`,
+`CollisionSystem`, `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`,
+`PatrolBehavior`, `FleeBehavior`) ; les **FX** (`ParticleSystem`,
+`ParticleLayer`, `Emitter`, `FountainSpray`, `FootstepDust`) ; les renderers ; les éléments intégrés et bases de
 personnages ; et les tools (`GameConsole`).
