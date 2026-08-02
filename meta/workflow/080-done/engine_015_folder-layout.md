@@ -7,7 +7,7 @@ created: 2026-08-02 20:00
 ready: 2026-08-02 20:01
 doing: 2026-08-02 20:03
 verify: 2026-08-02 20:17
-done:
+done: 2026-08-02 20:18 (merge 41632ae)
 ---
 
 ## Objectif
@@ -155,9 +155,30 @@ grande majorité dans des tickets **archivés**.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — la couche d'entités dynamiques a désormais un endroit
+  évident où atterrir (`scene/` pour le nœud, `world/` pour ce qui les héberge),
+  et les projectiles ne feront pas gonfler un dossier fourre-tout. Surtout,
+  `content/` **existe** : le jour où l'on veut prouver la réutilisabilité, un
+  hôte qui n'importe que le noyau est désormais un test qu'on peut écrire — il
+  suffirait d'un baril `core.js` à côté d'`index.js` pour le rendre mesurable.
+- **Ce qu'on laisse de côté** :
+  - **`index.js` reste un baril unique** : il exporte le noyau *et* les 219
+    fleurs. Le dossier sépare, la surface publique non — un jeu de tir importe
+    toujours un village. C'est le prolongement naturel, délibérément hors
+    périmètre ici ;
+  - **`world/` ne contient que deux fichiers.** Assumé : le nom porte une
+    responsabilité (le tuilage et son streaming), et la fusionner dans `scene/`
+    ou `view/` aurait mélangé le modèle du monde avec son affichage ;
+  - **pas d'extraction en package npm.** On range dans le même dépôt ; publier
+    le moteur est un autre sujet, non ouvert ;
+  - **les imports circulaires existants** (`Application` ↔ `Viewport`,
+    `Element` → `Application`) n'ont été ni créés ni résolus. Déplacer ne les
+    touche pas — ils restent à traiter ;
+  - **`080-done/` n'a pas été réécrit** : ~70 citations de `engine/map` y
+    subsistent, et c'est voulu. Un lecteur d'archive doit savoir que le chemin
+    était vrai à l'époque.
+- **Déposé en `100-follow-up/`** — un candidat :
+  `2026-08-02_20-18_core-only-barrel`.
 
 ## Journal
 
@@ -224,4 +245,11 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 20:18] Review : la règle dure a tenu — le diff des 58 fichiers
+  renommés ne contient que des lignes d'`import`, à une ligne de commentaire
+  près, citée au journal. Aucune classe renommée, aucun fichier renommé, aucun
+  test modifié autrement que son `import`.
+- [2026-08-02 20:18] Merge `--no-ff` sur `main` depuis le tree principal :
+  **41632ae** — `merge: range l'arborescence du moteur — map/ éclate, le contenu
+  sort du noyau` (75 fichiers, +232 / −140, dont **58 renommages** reconnus par
+  git).
