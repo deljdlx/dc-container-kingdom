@@ -4,7 +4,7 @@ title: Un bus d'events typé, avec cycle de vie et console
 type: feat
 branch:
 created: 2026-08-02 19:30
-ready:
+ready: 2026-08-02 19:32
 doing:
 verify:
 done:
