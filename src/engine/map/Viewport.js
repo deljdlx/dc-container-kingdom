@@ -234,6 +234,11 @@ export class Viewport
    * @returns {ParticleLayer}
    */
   enableParticles(options = {}) {
+    // Enabling twice replaces the binder; the one being dropped must let go of
+    // the bus, or its subscription outlives it — the very leak this bus is
+    // built to make impossible.
+    this._fxBinder?.dispose();
+
     // One system, two surfaces: the particle budget stays a single ceiling, and
     // each surface paints only the particles that named it.
     this._fxSystem = options.system ?? new ParticleSystem();
