@@ -490,13 +490,30 @@ describe('Viewport - area streaming', () => {
 
     expect(loadAreas).toHaveBeenCalledTimes(1);
     expect(freeAreas).toHaveBeenCalledTimes(1);
-    expect(boardUpdate).toHaveBeenCalledTimes(1);
 
     viewport.getCharacter().x(70);
     viewport._streamAreas();
 
     expect(loadAreas).toHaveBeenCalledTimes(2);
     expect(freeAreas).toHaveBeenCalledTimes(2);
+
+    // Streaming no longer mounts anything itself: loading an area raises the
+    // board's redraw flag, and the per-frame walk in update() reads it. One
+    // path, not two.
+    expect(boardUpdate).not.toHaveBeenCalled();
+  });
+
+  it('walks the board every frame, so anything attached gets mounted', () => {
+    const { viewport } = createViewport();
+    viewport.enableMainCharacter(10, 10);
+    const boardUpdate = vi.spyOn(viewport.getBoard(), 'update').mockImplementation(() => {});
+
+    viewport.update(16);
+    viewport.update(32);
+
+    // The defect this replaces: attaching an element raised a flag that nothing
+    // per-frame ever read, so it stayed invisible until the player happened to
+    // cross an area boundary.
     expect(boardUpdate).toHaveBeenCalledTimes(2);
   });
 
