@@ -7,7 +7,7 @@ created: 2026-08-02 18:45
 ready: 2026-08-02 18:46
 doing: 2026-08-02 18:46
 verify: 2026-08-02 18:51
-done:
+done: 2026-08-02 18:52 (merge 2dcd5ec)
 ---
 
 ## Objectif
@@ -71,7 +71,24 @@ du tout. C'est exactement la combinaison du personnage principal.
 
 ## Suite
 
--
+- **Ce que ça révèle, au-delà du correctif** — le personnage principal **vit hors
+  du scene-graph** : `enableMainCharacter()` le crée, le positionne et le fait
+  suivre par la caméra, sans jamais l'attacher. Ce n'est pas anodin : tout code
+  qui raisonne « je remonte les parents » (un futur binder, une recherche
+  d'ancêtre, un parcours de destruction) le manquera de la même façon. À garder en
+  tête plutôt qu'à découvrir une seconde fois.
+- **Ce qu'on laisse de côté — le trou qui a laissé passer le défaut.** Aucun test
+  ne vérifie que les effets **réellement câblés dans la démo** émettent : la
+  régression n'a été vue qu'à l'œil, par l'utilisateur. Les tests unitaires
+  couvraient chacun leur cas, aucun ne couvrait « la démo marche encore ». Un
+  test d'intégration léger (monter la démo sous jsdom, avancer la boucle, compter
+  les particules) fermerait ce trou — c'est un ticket, pas une note.
+- **La leçon de méthode** — mes doubles de test reproduisaient le **cas nominal**
+  (un élément proprement attaché), jamais celui du vrai moteur. Trois fois sur ces
+  tickets, une vérification a regardé moins loin que la réalité : sonde non
+  récursive sur les clôtures, mesure de perf à un seul échantillon, et ici un
+  double trop bien élevé.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -103,4 +120,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 18:52] Review : le correctif ne désarme pas la ceinture (son test
+  reste vert), et les deux cas ajoutés ont été **vus échouer** avant.
+- [2026-08-02 18:52] Merge `--no-ff` sur `main` : **2dcd5ec** — `merge: sans
+  parent ne veut pas dire détruit` (3 fichiers, +73 / −12).
