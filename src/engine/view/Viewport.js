@@ -476,6 +476,16 @@ export class Viewport
     // NPC behaviors run on the same clock as the player.
     this._behaviors.forEach(behavior => behavior.update(dt));
 
+    // The world settles before it is painted. Anything that joined the scene
+    // this frame — a streamed area, an entity spawned by a behavior — is mounted
+    // here, and nowhere else: attaching an element used to raise the redraw flag
+    // that nothing per-frame ever read, so it stayed invisible until the player
+    // happened to cross an area boundary.
+    //
+    // The walk is pruned by that same flag: with nothing dirty, the board's own
+    // check is the whole cost, and the tree is never descended.
+    this.getBoard().update();
+
     // The camera follows its target; the viewport renderer applies the offset.
     this._camera.update();
     this.renderer.update();
@@ -508,7 +518,8 @@ export class Viewport
 
     this.loadAreasFromCurrentPosition();
     this.freeAreasFromCurrentPosition();
-    this.getBoard().update(); // render the newly-loaded areas
+    // No board update here: loading an area flags the board, and the per-frame
+    // walk later in this very frame mounts it. One path, not two.
 
     // Newly streamed elements declare effects too. Binding is idempotent, so
     // re-walking the board costs nothing for what is already wired.

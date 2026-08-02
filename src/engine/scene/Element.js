@@ -319,7 +319,14 @@ export class Element
       parent.updateCollisionBoundingBox(this);
     }
 
-    if(this.needUpdate() || this.isMoving()) {
+    const pending = this.needUpdate() || this.isMoving();
+    // Cleared **before** the work, not after: anything flagged while this pass
+    // runs — a child attaching a sibling, a collision flipping — belongs to the
+    // next frame. Clearing afterwards would swallow those requests, since the
+    // flag would be wiped the instant after it was raised.
+    this.needUpdate(false);
+
+    if(pending) {
       if(
         Math.abs(this._targetX - this.x()) <= this._targetHitZone
         && Math.abs(this._targetY - this.y()) <= this._targetHitZone
@@ -334,7 +341,6 @@ export class Element
         element.update();
       });
     }
-    this.needUpdate(false);
   }
 
 
@@ -501,17 +507,25 @@ export class Element
 
   // ===========================
   /**
-   * Get, or set-and-propagate, the redraw-pending flag (also flags the parent).
+   * Get or set the redraw-pending flag.
+   *
+   * **Raising it climbs, clearing it does not.** `true` marks the whole path up
+   * to the root, which is what lets {@link update} prune: an ancestor that is
+   * not flagged has nothing dirty below it, so the walk stops there. `false`
+   * speaks **only for this node** — a node has no business declaring on behalf
+   * of its ancestors, and doing so used to lose redraws: a child finishing its
+   * update cleared its parent, so a sibling that had just asked to be redrawn
+   * was never visited again.
    * @param {?boolean} value
    * @returns {boolean}
    */
   needUpdate(value = null) {
-    if(value !== null) {
-      this._needUpdate = value;
-      const parent = this.getParent();
-      if(parent) {
-        parent.needUpdate(value);
-      }
+    if(value === true) {
+      this._needUpdate = true;
+      this.getParent()?.needUpdate(true);
+    }
+    else if(value === false) {
+      this._needUpdate = false;
     }
 
     return this._needUpdate;
