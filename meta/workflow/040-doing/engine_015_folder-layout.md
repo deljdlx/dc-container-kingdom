@@ -2,10 +2,10 @@
 id: 2026-08-02_20-00
 title: Ranger l'arborescence du moteur — map/ éclate, le contenu sort du noyau
 type: refactor
-branch:
+branch: claude/folder-layout
 created: 2026-08-02 20:00
 ready: 2026-08-02 20:01
-doing:
+doing: 2026-08-02 20:03
 verify:
 done:
 ---
