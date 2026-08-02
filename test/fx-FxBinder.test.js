@@ -171,6 +171,38 @@ describe('Emitter - the leak, belt two', () => {
     expect(emitter.isRunning()).toBe(false);
   });
 
+  // Regression 2026-08-02: the guard read "no parent" as "destroyed", and killed
+  // every effect following the viewport's own character — which is created by
+  // `enableMainCharacter` and never attached to the scene graph.
+  it('keeps emitting for a target that never had a parent', () => {
+    const layer = fakeLayer();
+    const loose = makeElement();                    // never added to anything
+    const emitter = new Spray(layer, { follow: loose });
+
+    emitter.update(Spray.interval);
+    emitter.update(Spray.interval);
+
+    expect(emitter.isAlive()).toBe(true);
+    expect(emitter.isRunning()).toBe(true);
+    expect(layer.bursts).toHaveLength(2);
+  });
+
+  it('still arms the belt for a target attached after construction', () => {
+    const layer = fakeLayer();
+    const area = makeElement();
+    const element = makeElement();
+    const emitter = new Spray(layer, { follow: element });   // built before attaching
+
+    emitter.update(Spray.interval);
+    area.add(element);
+    emitter.update(Spray.interval);
+    element.detach();
+    emitter.update(Spray.interval);
+
+    expect(emitter.isRunning()).toBe(false);
+    expect(layer.bursts).toHaveLength(2);
+  });
+
   it('leaves an emitter anchored to a fixed point alone', () => {
     const layer = fakeLayer();
     const emitter = new Spray(layer, { at: { x: 5, y: 5 } });

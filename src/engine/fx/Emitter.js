@@ -33,6 +33,9 @@ export class Emitter
   /** @type {boolean} */
   _running = true;
 
+  /** @type {boolean} whether the target was ever seen inside the scene graph */
+  _everAttached = false;
+
   /**
    * @param {import('./ParticleLayer.js').ParticleLayer} layer where to spawn
    * @param {Object} [options]
@@ -64,13 +67,24 @@ export class Emitter
    * from the parent and tells nobody, so without this an emitter would outlive
    * its area and keep spawning at a dead thing's position — the very leak that
    * bit `freeArea` before (2026-07-26_14-18).
+   *
+   * But **"no parent" is not "destroyed"**: `Viewport.enableMainCharacter()`
+   * builds its character and never attaches it to the scene graph, so an effect
+   * following the player was killed on its first frame (regression of
+   * 2026-08-02). What marks an orphan is having **had** a parent and lost it —
+   * remembered here rather than sampled at construction, since a host may build
+   * the emitter before attaching its target.
    * @returns {boolean} whether the emitter still has a reason to run
    */
   isAlive() {
-    if (!this._follow) {
+    if (!this._follow || typeof this._follow.getParent !== 'function') {
       return true;
     }
-    return typeof this._follow.getParent !== 'function' || this._follow.getParent() !== null;
+    if (this._follow.getParent() !== null) {
+      this._everAttached = true;
+      return true;
+    }
+    return !this._everAttached;
   }
 
   /** @returns {this} */
