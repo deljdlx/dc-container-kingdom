@@ -2,10 +2,10 @@
 id: 2026-08-02_20-45
 title: Un élément ajouté n'apparaît pas — le pipeline de redessin de l'arbre est cassé
 type: fix
-branch:
+branch: claude/spawn-does-not-render
 created: 2026-08-02 20:45
 ready: 2026-08-02 21:13
-doing:
+doing: 2026-08-02 21:25
 verify:
 done:
 ---
