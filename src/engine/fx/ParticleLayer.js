@@ -97,7 +97,7 @@ export class ParticleLayer
   /**
    * Paint the live particles in **world coordinates** — the transform is what
    * puts them where the map is, zoom included.
-   * @param {import('./ViewportTransform.js').ViewportTransform} [transform]
+   * @param {import('../map/ViewportTransform.js').ViewportTransform} [transform]
    */
   render(transform = null) {
     if (!this._context) {

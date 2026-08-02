@@ -31,8 +31,14 @@ export { BoundingBox } from './map/BoundingBox.js';
 // --- Viewport subsystems (composed by Viewport) ---
 export { DirectionalInput } from './map/DirectionalInput.js';
 export { ViewportTransform } from './map/ViewportTransform.js';
-export { ParticleSystem } from './map/ParticleSystem.js';
-export { ParticleLayer } from './map/ParticleLayer.js';
+
+
+// --- FX: particles and emitters ---
+export { ParticleSystem } from './fx/ParticleSystem.js';
+export { ParticleLayer } from './fx/ParticleLayer.js';
+export { Emitter } from './fx/Emitter.js';
+export { FountainSpray } from './fx/FountainSpray.js';
+export { FootstepDust } from './fx/FootstepDust.js';
 
 // --- Element subsystems (composed by Element) ---
 export { EventEmitter } from './map/EventEmitter.js';

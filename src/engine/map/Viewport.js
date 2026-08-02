@@ -4,7 +4,7 @@ import { Character } from './Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
 import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
-import { ParticleLayer } from './ParticleLayer.js';
+import { ParticleLayer } from '../fx/ParticleLayer.js';
 import { FX_DEPTH } from './Renderer/Renderer.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
