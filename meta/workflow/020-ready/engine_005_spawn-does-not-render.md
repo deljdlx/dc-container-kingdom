@@ -4,7 +4,7 @@ title: Un élément ajouté n'apparaît pas — le pipeline de redessin de l'arb
 type: fix
 branch:
 created: 2026-08-02 20:45
-ready: 2026-08-02 20:56
+ready: 2026-08-02 21:13
 doing:
 verify:
 done:
