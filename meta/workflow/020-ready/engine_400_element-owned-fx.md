@@ -4,7 +4,7 @@ title: Un élément porte son effet, en coordonnées locales
 type: feat
 branch:
 created: 2026-08-02 18:18
-ready:
+ready: 2026-08-02 18:21
 doing:
 verify:
 done:
@@ -33,7 +33,37 @@ la déclaration et le câblage.
 
 ## Spécifications
 
-_Amorce — à confirmer en « specify »._
+### Décisions prises en *specify* (2026-08-02)
+
+Deux constats de code ont tranché la question centrale — **quel est le point
+d'accroche du câblage ?**
+
+- **Aucun événement d'attachement n'existe.** `Element.addElement` ne notifie
+  personne, et `Element.handle()` appelle `getApplication().handle(...)` : émettre
+  un événement à l'attachement **lèverait** pour tout élément construit avant
+  d'être attaché — ce que fait le catalogue pour ses 414 éléments.
+- **`_streamAreas` ne tourne jamais dans l'app** : il n'est appelé que lorsqu'un
+  personnage se déplace, et Container Kingdom n'en a pas. Un câblage adossé au
+  streaming ne couvrirait donc qu'un régime sur deux.
+
+D'où :
+
+1. **Liage explicite et idempotent** : `bind(root)` parcourt un sous-arbre,
+   instancie un émetteur par déclaration et l'enregistre. Appelé automatiquement
+   par `enableParticles()` (sur le board existant) et par `_streamAreas()` après
+   chargement ; un hôte qui ajoute des éléments plus tard rappelle `bind` — c'est
+   sans risque, puisque relier deux fois ne double rien. C'est le goût du moteur :
+   `addBehavior`, `setRenderer`, `enableMainCharacter` sont tous explicites.
+2. **Deux ceintures contre la fuite**, comme exigé : le liage retire les émetteurs
+   d'un sous-arbre libéré, **et** l'émetteur se retire de lui-même quand sa cible
+   n'a plus de parent. La seconde couvre les chemins de destruction qu'on n'a pas
+   prévus.
+3. **La visibilité est injectée, pas devinée** : `Emitter` reçoit un prédicat
+   `isVisible(x, y)`, fourni par le lieur à partir du viewport et de la
+   `ViewportTransform`. L'émetteur reste pur et testable sans DOM.
+4. **Marge de culling : 128 px monde**, chiffrée — une goutte de fontaine vit
+   1,2 s à 90 px/s, soit ~108 px de trajet maximum. En dessous, une particule née
+   juste hors champ n'entrerait jamais dans le cadre.
 
 ### La déclaration, en coordonnées locales
 
