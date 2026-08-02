@@ -2,10 +2,10 @@
 id: 2026-08-02_18-00
 title: Isoler les effets en émetteurs réutilisables, dans un dossier fx
 type: refactor
-branch:
+branch: claude/fx-emitters
 created: 2026-08-02 18:00
 ready: 2026-08-02 18:01
-doing:
+doing: 2026-08-02 18:02
 verify:
 done:
 ---
