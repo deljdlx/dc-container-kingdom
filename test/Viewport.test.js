@@ -161,6 +161,9 @@ describe('Viewport - movement orchestration', () => {
     expect(app.handle).toHaveBeenCalledWith('map.update', {
       map: viewport,
       character,
+      type: 'map.update',
+      source: viewport,
+      at: expect.any(Number),
     });
   });
 
