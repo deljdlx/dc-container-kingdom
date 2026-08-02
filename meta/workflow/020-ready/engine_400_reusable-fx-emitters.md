@@ -4,7 +4,7 @@ title: Isoler les effets en émetteurs réutilisables, dans un dossier fx
 type: refactor
 branch:
 created: 2026-08-02 18:00
-ready:
+ready: 2026-08-02 18:01
 doing:
 verify:
 done:
