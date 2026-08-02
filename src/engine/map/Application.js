@@ -1,4 +1,5 @@
-import { EventEmitter } from './EventEmitter.js';
+import { makeEvent } from '../events/EngineEvents.js';
+import { EventEmitter } from '../events/EventEmitter.js';
 import { Viewport } from './Viewport.js';
 
 /**
@@ -71,22 +72,34 @@ export class Application
   }
 
   /**
-   * Subscribe to an application-level event.
-   * @param {string} name
+   * Subscribe to an application-level event — the global bus, where everything
+   * emitted anywhere in the world ends up.
+   * @param {string} name one of {@link EngineEvents}
    * @param {Function} callback
-   * @returns {*} the subscription handle returned by the emitter
+   * @returns {() => void} unsubscribe
    */
   addEventListener(name, callback) {
     return this._events.on(name, callback);
   }
 
   /**
-   * Emit an application-level event.
-   * @param {string} name
+   * Watch **every** event reaching the global bus, whatever its name — for
+   * observers (a console, a recorder) that cannot name what they wait for.
+   * @param {(data: Object, name: string) => void} callback
+   * @returns {() => void} unsubscribe
+   */
+  addAnyEventListener(callback) {
+    return this._events.onAny(callback);
+  }
+
+  /**
+   * Emit an application-level event. Relayed emissions arrive already stamped
+   * and are passed through, so `at` keeps dating the origin.
+   * @param {string} name one of {@link EngineEvents}
    * @param {Object} [data]
    */
   handle(name, data = {}) {
-    this._events.emit(name, data);
+    this._events.emit(name, makeEvent(name, this, data));
   }
 
   /**

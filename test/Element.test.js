@@ -69,8 +69,11 @@ describe('Element — events', () => {
 
     el.handle('ping', { value: 1 });
 
-    expect(listener).toHaveBeenCalledWith({ value: 1 });
-    expect(Application.mainInstance.handle).toHaveBeenCalledWith('ping', { value: 1 });
+    // The payload now travels inside the common envelope (type/source/at) that
+    // makes a generic observer possible — the caller's own keys ride along.
+    const expected = { value: 1, type: 'ping', source: el, at: expect.any(Number) };
+    expect(listener).toHaveBeenCalledWith(expected);
+    expect(Application.mainInstance.handle).toHaveBeenCalledWith('ping', expected);
   });
 
   it('emits element.click when its DOM node is clicked', () => {

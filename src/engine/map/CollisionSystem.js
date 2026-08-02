@@ -1,4 +1,5 @@
 import { BoundingBox } from './BoundingBox.js';
+import { collisionEventName } from '../events/EngineEvents.js';
 
 /**
  * Collision & bounding-box subsystem of an {@link Element}.
@@ -372,13 +373,19 @@ export class CollisionSystem {
     const hitSet = new Set(hits);
     const previousSet = new Set(previous);
 
+    // Looked up, never concatenated: the start name used to be built from a
+    // per-element prefix while the end name hard-coded 'element.', so the two
+    // halves of a pair could silently diverge.
+    const started = collisionEventName(type, 'start');
+    const ended = collisionEventName(type, 'end');
+
     hits.forEach(element => {
       if (!previousSet.has(element)) {
-        this._element.handle(this._element._eventPrefix + type, {
+        this._element.handle(started, {
           element: this._element,
           target: element,
         });
-        element.handle(this._element._eventPrefix + type, {
+        element.handle(started, {
           element: this._element,
           target: element,
         });
@@ -388,11 +395,11 @@ export class CollisionSystem {
 
     previous.forEach(element => {
       if (!hitSet.has(element)) {
-        this._element.handle('element.' + type + '.end', {
+        this._element.handle(ended, {
           element: this._element,
           target: element,
         });
-        element.handle('element.' + type + '.end', {
+        element.handle(ended, {
           element: element,
           target: this._element,
         });

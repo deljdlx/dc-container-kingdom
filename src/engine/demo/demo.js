@@ -43,6 +43,8 @@ import {
   FootstepDust,
   setAssetsBase,
   applyDebugFlag,
+  isDebugEnabled,
+  EventConsole,
 } from '../index.js';
 
 // Debug visualisation (outlines + collision/trigger zones) when the URL has
@@ -216,7 +218,7 @@ patrols.forEach(patrol => patrol.start());
 // ── Particles ────────────────────────────────────────────────────────────────
 // A canvas over the board, then two named effects registered as behaviors: they
 // ride the single game clock, so they freeze and resume with everything else.
-const fx = viewport.enableParticles();
+viewport.enableParticles();
 
 // Nothing to place: `Fountain00` declares its own jet, so every fountain in the
 // world sprays from its own basin — `enableParticles()` wired them above.
@@ -228,6 +230,14 @@ viewport.addBehavior(new FootstepDust(viewport.getGroundParticles(), {
   offset: { x: 24, y: 44 },
   isMoving: () => viewport.getInput().isMoving(),
 }));
+
+// ── Event console ────────────────────────────────────────────────────────────
+// Everything crossing the global bus, live. Only under ?debug=1: watching every
+// event means running a callback on every emission, which a shipped page has no
+// reason to pay for.
+if (isDebugEnabled()) {
+  new EventConsole(app, '#event-console').start();
+}
 
 // ── Touch D-pad ──────────────────────────────────────────────────────────────
 // Dispatch synthetic keyboard events so the viewport's existing keydown/keyup

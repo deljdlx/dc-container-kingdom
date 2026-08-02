@@ -2,6 +2,7 @@ import { CharacterAnimator } from './CharacterAnimator.js';
 import { CharacterBehavior } from './CharacterBehavior.js';
 import { CharacterRenderer } from './Renderer/CharacterRenderer.js';
 import { Element } from './Element.js';
+import { EngineEvents } from '../events/EngineEvents.js';
 
 /**
  * A character in the world: a 48×48 walking sprite. Owns only its world state
@@ -130,7 +131,7 @@ export class Character extends Element
    */
   quickReaction(content, autoClose = true, closeAfter = 10000) {
     this.getRenderer().showReaction(content);
-    this.handle(this._eventPrefix + 'reaction.show', { character: this, content });
+    this.handle(EngineEvents.ELEMENT_REACTION_SHOW, { character: this, content });
     clearTimeout(this._reactionTimeout);
     if (autoClose) {
       this._reactionTimeout = setTimeout(() => {
@@ -146,7 +147,7 @@ export class Character extends Element
     const wasReacting = this.isReacting();
     this.getRenderer().clearReaction();
     if (wasReacting) {
-      this.handle(this._eventPrefix + 'reaction.hide', { character: this });
+      this.handle(EngineEvents.ELEMENT_REACTION_HIDE, { character: this });
     }
     return this;
   }

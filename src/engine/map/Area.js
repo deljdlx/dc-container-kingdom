@@ -1,5 +1,6 @@
 import { AreaRenderer } from './Renderer/AreaRenderer.js';
 import { Element } from './Element.js';
+import { EngineEvents } from '../events/EngineEvents.js';
 
 /**
  * A single tile of the world grid: a fixed-size container of game elements,
@@ -38,7 +39,7 @@ export class Area extends Element
     this.setRenderer(new AreaRenderer(this));
 
     this.dom.addEventListener('click', (event) => {
-      this.handle('area.click', {
+      this.handle(EngineEvents.AREA_CLICK, {
         area: this,
         areaX: event.offsetX,
         areaY: event.offsetY,

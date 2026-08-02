@@ -23,7 +23,9 @@ au-dessus d'eux :
 - **`SceneGraph`** — enfants, parent, `getChildByName`, et les **offsets absolus**
   (`offsetX/offsetY` = position dans le monde, en accumulant la chaîne de parents).
 - **`CollisionSystem`** — zones de collision/trigger, bounding boxes, détection.
-- **`EventEmitter`** — événements locaux, qui **remontent** ensuite à l'`Application`.
+- **`EventEmitter`** (`events/`) — événements locaux, qui **remontent** ensuite à
+  l'`Application` ; abonnements révocables, buckets copy-on-write. Noms déclarés
+  dans `EngineEvents` — voir §9.
 - **`Renderer`** — le nœud DOM et sa mise à jour visuelle.
 
 Coordonnées : **locales** (`x()`, `y()`) vs **monde** (`offsetX()`, `offsetY()`).
@@ -470,10 +472,92 @@ Conventions de ce lot :
 
 ## 9. Events
 
-Tout remonte à l'`Application` via `handle()`. Principaux events (préfixe
-`element.`) : `element.click`, `element.collision(.end)`, `element.trigger(.end)`,
-`element.reaction.show/hide`, et `map.update` (émis par le Viewport à chaque
-déplacement du joueur).
+Le bus vit dans **`src/engine/events/`** : `EventEmitter` (le registre) et
+`EngineEvents` (le catalogue). Tout remonte à l'`Application` via `handle()`.
+
+### Le catalogue
+
+Les noms sont **déclarés**, jamais assemblés : `EngineEvents.ELEMENT_COLLISION`
+plutôt que `prefix + type`. La concaténation avait déjà divorcé — le début d'une
+paire collision se construisait depuis un préfixe par élément quand sa fin codait
+`'element.'` en dur.
+
+| Constante | Nom | Quand |
+|---|---|---|
+| `ELEMENT_CLICK` | `element.click` | le nœud DOM d'un élément est cliqué |
+| `ELEMENT_COLLISION` / `_END` | `element.collision(.end)` | un recouvrement solide commence / finit, **des deux côtés** |
+| `ELEMENT_TRIGGER` / `_END` | `element.trigger(.end)` | une zone trigger est entrée / quittée |
+| `ELEMENT_DESTROY` | `element.destroy` | un élément quitte le monde — **avant** de se détacher |
+| `ELEMENT_REACTION_SHOW` / `_HIDE` | `element.reaction.show/hide` | bulle de dialogue |
+| `AREA_CLICK` | `area.click` | le sol d'une area est cliqué |
+| `MAP_UPDATE` | `map.update` | le joueur s'est déplacé (à **chaque frame** de marche) |
+
+`engineEventNames()` les liste ; `collisionEventName(type, phase)` donne la paire
+début/fin d'un type de contact.
+
+### L'enveloppe
+
+Chaque event porte un tronc commun `{ type, source, at }` au-dessus de sa charge
+utile — `makeEvent()` l'appose. C'est ce tronc qui rend un observateur
+**générique** possible (une console qui affiche n'importe quel event sans un `if`
+par nom). Le relais ne réestampille pas : `at` date **l'origine**, et `source`
+nomme l'émetteur, pas le dernier relais.
+
+> ⚠️ Héritage conservé : sur un *début* de contact, les deux côtés reçoivent le
+> **détecteur** dans `element` ; sur une *fin*, chacun se reçoit lui-même.
+> Préférer `source`, toujours l'élément sur lequel l'event a été délivré.
+
+### Local puis global — pas de bubbling intermédiaire
+
+`Element.handle()` émet **localement**, puis relaie à l'`Application`. Il n'y a
+**rien entre les deux** : pas de remontée parent par parent. Choix assumé —
+parcourir la chaîne à chaque event de collision coûterait plus que ce que des
+écoutes intermédiaires rapportent. Un élément **sans application reste silencieux
+plutôt que de jeter** : le catalogue construit des éléments avant de les attacher,
+et toute entité créée en vol fera pareil.
+
+### S'abonner, se désabonner
+
+`addEventListener(name, cb)` rend une **fonction de désabonnement** (elle rendait
+un index, que le premier retrait aurait invalidé et que personne ne lisait).
+`Application.addAnyEventListener(cb)` observe **tout** — réservé aux observateurs
+(console, enregistreur), car il tourne à chaque émission.
+
+Les buckets sont **copy-on-write** : muter pendant une émission est sûr, et un
+callback qui se désabonne lui-même ne fait plus sauter le suivant. Sémantique de
+snapshot : un abonné ajouté *pendant* une émission n'en est pas averti, un abonné
+retiré pendant l'est encore.
+
+### Ce qui passe sur le bus
+
+**Les faits de jeu** (une entité est née, a été touchée, est morte) — **pas les
+pas de simulation** (un déplacement au pixel, une détection par frame). Un event
+alloué par frame et par entité coûte cher et noie tout observateur.
+`map.update` précède la règle et se trouve du mauvais côté : conservé pour les
+hôtes qui en dépendent, ce n'est pas un modèle à copier.
+
+### Le cycle de vie, et ce qu'il découple
+
+`Element.destroy()` émet `element.destroy` **avant** de se détacher : un abonné
+peut encore lire son parent, sa position et son sous-arbre — ce dont il a besoin
+pour lâcher ce qui y était accroché.
+
+C'est ce qui a supprimé un couplage : le `Board` appelait à la main
+`fxBinder.unbind(area)` avant de libérer une area, faute de quoi les emitters
+survivaient à leur élément. Le `FxBinder` **s'abonne** désormais (et `dispose()`
+le détache) ; le Board n'a plus à connaître son existence.
+
+### La console d'events (`EventConsole`)
+
+Un outil de `src/engine/tools/`, à monter sur le bus global — la démo le fait
+sous `?debug=1`. Ce n'est pas un confort : **si un fait de jeu n'y est pas
+lisible, c'est qu'il n'est pas modélisé**.
+
+Trois contraintes le tiennent : les répétitions sont **coalescées** en une ligne à
+compteur (sinon `map.update` noie tout en une seconde) ; les écritures DOM sont
+**groupées sur un timer** et non sur la boucle de jeu ; les entrées vivent dans un
+**tampon circulaire** plafonné. Clic sur une ligne → la source est surlignée dans
+la scène. Le texte est écrit en `textContent`, jamais en `innerHTML`.
 
 ## 10. Debug
 
@@ -489,9 +573,10 @@ Tout passe par **`src/engine/index.js`** : la config (`setAssetsBase`,
 `getAssetsBase`, `assetUrl`, `applyDebugFlag`, `isDebugEnabled`) ; le core
 (`Application`, `Viewport`, `Camera`, `Board`, `Area`, `Element`,
 `SpriteElement`, `Character`, `Geometry`, `Coordinates`, `BoundingBox`) ; les
-sous-systèmes (`DirectionalInput`, `ViewportTransform`, `EventEmitter`,
-`CollisionSystem`, `SceneGraph`, `CharacterAnimator`, `CharacterBehavior`,
-`PatrolBehavior`, `FleeBehavior`) ; les **FX** (`ParticleSystem`,
-`ParticleLayer`, `Emitter`, `FxBinder`, `FountainSpray`, `FootstepDust`) ; les
-renderers ; les éléments intégrés et bases de
-personnages ; et les tools (`GameConsole`).
+sous-systèmes (`DirectionalInput`, `ViewportTransform`, `CollisionSystem`,
+`SceneGraph`, `CharacterAnimator`, `CharacterBehavior`, `PatrolBehavior`,
+`FleeBehavior`) ; les **events** (`EventEmitter`, `EngineEvents`,
+`collisionEventName`, `engineEventNames`, `makeEvent`) ; les **FX**
+(`ParticleSystem`, `ParticleLayer`, `Emitter`, `FxBinder`, `FountainSpray`,
+`FootstepDust`) ; les renderers ; les éléments intégrés et bases de
+personnages ; et les tools (`GameConsole`, `EventConsole`).

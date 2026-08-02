@@ -48,7 +48,7 @@ sous-systèmes dédiés plutôt que de tout faire lui-même.
 | `Geometry`       | position/taille locales                                   |
 | `SceneGraph`     | parent/enfants, offsets absolus, lookup par nom          |
 | `CollisionSystem`| zones collision/trigger, broad+narrow phase, événements   |
-| `EventEmitter`   | events locaux qui remontent à l'`Application`            |
+| `EventEmitter`   | events locaux qui remontent à l'`Application` (noms déclarés par `EngineEvents`) |
 | `Renderer`       | nœud DOM, position monde, profondeur (algorithme du peintre) |
 
 ```mermaid
@@ -75,6 +75,12 @@ du personnage), et les
 Les personnages (`Character`) sont des `Element`s animés. Leur IA est déléguée
 à des **behaviors** interchangeables (`PatrolBehavior`, `FleeBehavior`,
 `CharacterBehavior`), tickés par la game loop.
+
+Le **bus d'events** (`events/`) est ce qui relie tout ça sans couplage : chaque
+`Element` émet localement puis relaie à l'`Application`, où un abonné global
+écoute. Les noms sont déclarés (`EngineEvents`), les abonnements révocables, et
+`element.destroy` permet à un sous-système de lâcher ce qu'il tenait sans que
+personne ait à l'appeler — voir [engine.md §9](engine.md).
 
 Détails : **[engine.md](engine.md)**. Détails app : **[container-kingdom.md](container-kingdom.md)**.
 

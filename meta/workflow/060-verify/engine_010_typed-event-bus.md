@@ -2,11 +2,11 @@
 id: 2026-08-02_19-30
 title: Un bus d'events typé, avec cycle de vie et console
 type: feat
-branch:
+branch: claude/typed-event-bus
 created: 2026-08-02 19:30
 ready: 2026-08-02 19:32
-doing:
-verify:
+doing: 2026-08-02 19:34
+verify: 2026-08-02 19:51
 done:
 ---
 
@@ -153,28 +153,28 @@ outil frère. Dans les deux cas, **pas d'`innerHTML`** pour du contenu d'event.
 
 ## Definition of Done
 
-- [ ] `off()` / désabonnement : `on()` **retourne une fonction** qui retire le
+- [x] `off()` / désabonnement : `on()` **retourne une fonction** qui retire le
       callback, et un test prouve qu'un abonné retiré n'est plus appelé.
-- [ ] Un test prouve qu'un **callback qui se désabonne pendant l'émission** ne
+- [x] Un test prouve qu'un **callback qui se désabonne pendant l'émission** ne
       fait pas sauter le suivant.
-- [ ] Un **catalogue de noms** est exporté depuis `src/engine/index.js`, avec les
+- [x] Un **catalogue de noms** est exporté depuis `src/engine/index.js`, avec les
       **valeurs actuelles inchangées**.
-- [ ] **Plus aucun nom d'event assemblé par concaténation** dans le moteur —
+- [x] **Plus aucun nom d'event assemblé par concaténation** dans le moteur —
       l'incohérence `CollisionSystem.js:377` / `:391` a disparu.
-- [ ] Les events portent une **enveloppe commune** documentée, et chacun a son
+- [x] Les events portent une **enveloppe commune** documentée, et chacun a son
       `@typedef` JSDoc.
-- [ ] `Element.destroy()` **émet** un event de cycle de vie.
-- [ ] **La couture disparaît** : `FxBinder` s'abonne, et l'appel manuel à
+- [x] `Element.destroy()` **émet** un event de cycle de vie.
+- [x] **La couture disparaît** : `FxBinder` s'abonne, et l'appel manuel à
       `unbind` dans `Board.freeArea()` est supprimé — sans régression des
       emitters (démo à l'appui).
-- [ ] Émettre depuis un élément **sans application ne jette pas** (test).
-- [ ] `onAny()` existe et **ne coûte rien** quand personne n'est abonné.
-- [ ] **La console est dans la démo**, sous `?debug=1` : coalescence, filtre,
+- [x] Émettre depuis un élément **sans application ne jette pas** (test).
+- [x] `onAny()` existe et **ne coûte rien** quand personne n'est abonné.
+- [x] **La console est dans la démo**, sous `?debug=1` : coalescence, filtre,
       plafond d'entrées, clic → surlignage de la source. **Capture au journal —
       c'est le critère qui fait foi.**
-- [ ] Aucun `innerHTML` pour du contenu d'event.
-- [ ] Aucun event émis **par frame et par entité** sur le chemin chaud.
-- [ ] `meta/documentation/engine.md` à jour (le bus, le catalogue, la règle
+- [x] Aucun `innerHTML` pour du contenu d'event.
+- [x] Aucun event émis **par frame et par entité** sur le chemin chaud.
+- [x] `meta/documentation/engine.md` à jour (le bus, le catalogue, la règle
       « faits de jeu, pas pas de simulation », le choix assumé local + global) ;
       `npm run verify` vert.
 
@@ -191,11 +191,71 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 19:36] **Un dossier `events/`** : `EventEmitter` quitte `map/` pour
+  rejoindre `EngineEvents`. Le bus n'est pas une préoccupation de carte, et le
+  sous-système devient repérable — un `git mv` et deux imports.
+- [2026-08-02 19:38] **Copy-on-write plutôt que copie à l'émission.** `on()` et
+  `off()` remplacent le tableau au lieu de le muter ; la boucle d'`emit()` itère
+  donc un instantané *sans rien allouer*. C'est ce qui rend sûr le retrait
+  pendant l'émission — le bug que la DoD demandait de prouver — sans payer une
+  allocation par event. Sémantique de snapshot assumée et documentée.
+- [2026-08-02 19:38] **Un `Map` à la place de l'objet nu.** Défaut trouvé en
+  réécrivant : `typeof this._listeners['constructor'] === 'undefined'` est
+  **faux** sur un objet nu — un event nommé `constructor` ou `toString` serait
+  allé chercher `Object.prototype`. Test à l'appui.
+- [2026-08-02 19:40] **L'enveloppe est estampillée à l'origine, pas au relais.**
+  `makeEvent()` laisse passer un payload déjà estampillé pour le même nom : `at`
+  date donc l'origine et `source` nomme l'émetteur, pas le dernier relais. Sans
+  ça, `Element → Application` réécrivait les deux.
+- [2026-08-02 19:41] **`_eventPrefix` supprimé.** Le mécanisme existait, n'était
+  jamais surchargé, et `CollisionSystem` le contournait déjà en dur pour les
+  `.end`. Remplacé par `collisionEventName(type, phase)`, qui **jette** sur un
+  type inconnu plutôt que d'émettre dans le vide.
+- [2026-08-02 19:42] **La couture retirée.** `Element.destroy()` émet **avant**
+  de se détacher — un abonné doit encore pouvoir parcourir le sous-arbre qu'il
+  lâche. Le `FxBinder` s'abonne (et `dispose()` le détache) ; les trois lignes de
+  `Board.freeArea()` qui appelaient `unbind` à la main ont disparu.
+- [2026-08-02 19:43] **La console n'écrit pas sur l'horloge du jeu.** Les events
+  sont mis en file et le DOM est écrit sur un timer à 100 ms : un observateur de
+  la boucle ne doit pas devenir lui-même un écrivain DOM par frame. Coalescence,
+  tampon circulaire, `textContent` partout.
+- [2026-08-02 19:43] **`GameConsole` laissé intact** — décision qui restait
+  ouverte au ticket. Il est **utilisé par Container Kingdom**
+  (`ContainerKingdomLayout.js:121`) : le durcir aurait fait bouger le contrat
+  d'un consommateur vivant pour un besoin qui n'est pas le sien. `EventConsole`
+  est donc un outil frère.
+- [2026-08-02 19:44] Deux tests de caractérisation mis à jour (`Element`,
+  `Viewport`) : ils comparaient le payload à l'identique, il porte désormais
+  l'enveloppe. Changement de contrat voulu, écrit dans la doc.
+- [2026-08-02 19:44] Au passage : `setInterval`/`clearInterval`/`performance`
+  ajoutés aux globals ESLint, et un `const fx` inutilisé retiré de la démo
+  (avertissement qui préexistait).
 
 ### Vérification
 
--
+- [2026-08-02 19:45] `npm run verify` **vert** : **54 fichiers, 468 tests**
+  (contre 51 / 418 avant — +50 tests).
+- [2026-08-02 19:46] **Critère qui fait foi — le découplage, mesuré au
+  navigateur** : `binder.count()` passe de **2 à 0** sur `board.freeArea(0, 0)`,
+  alors que `freeArea` **ne contient plus aucun `unbind`** (vérifié en lisant la
+  source de la fonction dans la page). La console affiche `element.destroy Area`
+  au même instant. Le Board ne connaît plus le FxBinder.
+- [2026-08-02 19:46] **Coalescence** : 90 frames de marche pilotées à la main
+  (piège rAF) → **16 lignes** au lieu de ~130 ; une marche continue de 45 frames
+  tient en **une** ligne `map.update ×45`. Capture au dossier.
+- [2026-08-02 19:47] **Plafond** : 250 events de noms distincts → **200 lignes**
+  à l'écran, de `probe.50` à `probe.249`. Le tampon circulaire tient.
+- [2026-08-02 19:47] **Filtre** : `collision` masque 7 entrées sur 21 et les
+  restaure toutes au vidage du champ, piloté par le vrai `<input>`.
+- [2026-08-02 19:48] **Clic → surlignage** : la ligne cliquée surligne bien un
+  `map-element` **dans le viewport**, et le retire après 1,2 s. Ma première sonde
+  disait le contraire : elle cherchait `"2px solid"` là où le navigateur
+  normalise en `"rgb(255, 62, 165) solid 2px"` — le code était juste, l'assertion
+  fausse.
+- [2026-08-02 19:48] **Hors `?debug=1`** : aucune console montée, l'emplacement
+  hôte reste à 0 px de haut, et le personnage marche normalement.
+- [2026-08-02 19:48] **0 erreur console** au chargement comme après pilotage.
+- [2026-08-02 19:49] Sonde `window.__vp` retirée (0 résidu, `grep` à l'appui).
 
 ### Validation
 

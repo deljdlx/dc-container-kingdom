@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { Emitter, FxBinder } from '../src/engine/index.js';
+import { EngineEvents, Emitter, EventEmitter, FxBinder } from '../src/engine/index.js';
 
 /** A layer double: records bursts, no canvas anywhere. */
 const fakeLayer = () => ({ bursts: [], emit(d) { this.bursts.push(d); } });
@@ -149,6 +149,76 @@ describe('FxBinder - the leak, belt one', () => {
     binder.unbind(area);
 
     expect(binder.bind(area)).toBe(1);
+  });
+});
+
+describe('FxBinder - letting go on its own', () => {
+  /** The slice of Application the binder uses: a bus, nothing else. */
+  class FakeBus {
+    _events = new EventEmitter();
+    addEventListener(name, callback) { return this._events.on(name, callback); }
+    handle(name, data = {}) { this._events.emit(name, data); }
+  }
+
+  /** A viewport double that also carries a global bus. */
+  function wiredViewport() {
+    const application = new FakeBus();
+    const viewport = fakeViewport();
+    viewport.getApplication = () => application;
+    return { viewport, application };
+  }
+
+  it('drops a subtree\'s emitters when it announces its destruction', () => {
+    const { viewport, application } = wiredViewport();
+    const binder = new FxBinder({ layer: fakeLayer(), viewport });
+    const area = makeElement();
+    area.add(withSpray({ x: 0, y: 0 }, { x: 1, y: 1 }));
+
+    binder.bind(area);
+    expect(binder.count()).toBe(1);
+
+    // What `Element.destroy()` emits — no Board involved, and no call to
+    // unbind() by hand: that coupling is what this replaces.
+    application.handle(EngineEvents.ELEMENT_DESTROY, { source: area, element: area });
+
+    expect(binder.count()).toBe(0);
+    expect(viewport.behaviors).toHaveLength(0);
+  });
+
+  it('ignores the destruction of something it never bound', () => {
+    const { viewport, application } = wiredViewport();
+    const binder = new FxBinder({ layer: fakeLayer(), viewport });
+    const area = makeElement();
+    area.add(withSpray({ x: 0, y: 0 }, { x: 1, y: 1 }));
+    binder.bind(area);
+
+    application.handle(EngineEvents.ELEMENT_DESTROY, { source: makeElement() });
+
+    expect(binder.count()).toBe(1);
+  });
+
+  it('stops listening once disposed', () => {
+    const { viewport, application } = wiredViewport();
+    const binder = new FxBinder({ layer: fakeLayer(), viewport });
+    const area = makeElement();
+    area.add(withSpray({ x: 0, y: 0 }, { x: 1, y: 1 }));
+    binder.bind(area);
+
+    binder.dispose();
+    application.handle(EngineEvents.ELEMENT_DESTROY, { source: area });
+
+    expect(binder.count()).toBe(1);
+    expect(() => binder.dispose()).not.toThrow();
+  });
+
+  it('works without a bus at all — a bare viewport double keeps the rest', () => {
+    const viewport = fakeViewport();   // no getApplication
+    const binder = new FxBinder({ layer: fakeLayer(), viewport });
+    const area = makeElement();
+    area.add(withSpray({ x: 0, y: 0 }, { x: 1, y: 1 }));
+
+    expect(binder.bind(area)).toBe(1);
+    expect(() => binder.dispose()).not.toThrow();
   });
 });
 

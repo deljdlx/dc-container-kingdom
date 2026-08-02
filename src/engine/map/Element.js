@@ -1,6 +1,7 @@
 import { Application } from './Application.js';
 import { CollisionSystem } from './CollisionSystem.js';
-import { EventEmitter } from './EventEmitter.js';
+import { EngineEvents, makeEvent } from '../events/EngineEvents.js';
+import { EventEmitter } from '../events/EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { Renderer } from './Renderer/Renderer.js';
 import { SceneGraph } from './SceneGraph.js';
@@ -76,9 +77,6 @@ export class Element
   _moveSpeed = 100;
 
 
-  /** @type {string} prefix prepended to collision/trigger event names */
-  _eventPrefix = 'element.';
-
   /**
    * @type {EventEmitter}
    */
@@ -128,8 +126,18 @@ export class Element
     });
   }
 
-  /** Detach from the parent, reset the scene tree and clear the rendering. */
+  /**
+   * Announce the departure, then detach from the parent, reset the scene tree
+   * and clear the rendering.
+   *
+   * The event fires **first**, while the element still has its parent, its
+   * position and its children: a listener that has to let go of something
+   * attached to this subtree — an FX emitter, a HUD entry — needs to be able to
+   * walk it. Emitting after `scene.reset()` would hand it an empty node.
+   */
   destroy() {
+    this.handle(EngineEvents.ELEMENT_DESTROY, { element: this });
+
     const parent = this.getParent();
     if(parent) {
       parent.removeChild(this);
@@ -192,7 +200,7 @@ export class Element
   /** Bind DOM listeners that re-dispatch as engine events (e.g. click). */
   registerEvents() {
     this.dom.addEventListener('click', (event) => {
-      this.handle('element.click', {
+      this.handle(EngineEvents.ELEMENT_CLICK, {
         element: this,
         areaX: event.offsetX,
         areaY: event.offsetY,
@@ -206,22 +214,32 @@ export class Element
 
   /**
    * Subscribe to a local event.
-   * @param {string} name
+   * @param {string} name one of {@link EngineEvents}
    * @param {(data: object) => void} callback
-   * @returns {number} the listener index within its name bucket
+   * @returns {() => void} unsubscribe
    */
   addEventListener(name, callback) {
     return this._events.on(name, callback);
   }
 
   /**
-   * Emit locally, then bubble the event up to the application.
-   * @param {string} name
-   * @param {object} [data]
+   * Stamp the envelope, emit locally, then relay to the application bus.
+   *
+   * There is **no bubbling through the scene tree** — local, then global, and
+   * nothing in between. Assumed: walking the parent chain on every collision
+   * event would cost more than the intermediate listeners are worth, and no
+   * caller has needed one yet.
+   *
+   * An element with no application stays **silent rather than throwing**: the
+   * catalogue builds elements before attaching them, and so will anything that
+   * spawns an entity before it joins the world.
+   * @param {string} name one of {@link EngineEvents}
+   * @param {object} [data] the event's own payload
    */
   handle(name, data = {}) {
-    this._events.emit(name, data);
-    this.getApplication().handle(name, data);
+    const event = makeEvent(name, this, data);
+    this._events.emit(name, event);
+    this.getApplication()?.handle(name, event);
   }
 
   // ===========================
