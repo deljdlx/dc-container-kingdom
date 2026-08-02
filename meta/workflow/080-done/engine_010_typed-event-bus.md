@@ -7,7 +7,7 @@ created: 2026-08-02 19:30
 ready: 2026-08-02 19:32
 doing: 2026-08-02 19:34
 verify: 2026-08-02 19:51
-done:
+done: 2026-08-02 19:52 (merge d02da0a)
 ---
 
 ## Objectif
@@ -180,9 +180,31 @@ outil frère. Dans les deux cas, **pas d'`innerHTML`** pour du contenu d'event.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — le socle du moteur de jeu est posé. Une entité qui naît,
+  touche et meurt a désormais où l'annoncer, et son abonnement se révoque quand
+  elle disparaît. La **couche d'entités dynamiques** (ticket suivant de la série)
+  peut s'appuyer sur `element.destroy` plutôt que de réinventer un cycle de vie ;
+  un HUD, un système de dégâts ou un enregistreur de partie se branchent sur
+  `addAnyEventListener` sans que le moteur les connaisse. La console est l'outil
+  qui dira si le modèle tient : ce qui n'y est pas lisible n'est pas modélisé.
+- **Ce qu'on laisse de côté** :
+  - **seule la racine d'un sous-arbre détruit émet.** `destroy()` d'un parent ne
+    fait pas émettre ses enfants — un abonné qui suit un élément précis n'apprend
+    rien quand son ancêtre meurt. Le `FxBinder` s'en sort en parcourant le
+    sous-arbre ; le prochain abonné devra faire pareil, ou on émettra en cascade ;
+  - **pas de bubbling intermédiaire** : local puis global, rien entre les deux.
+    Choix assumé, pas un oubli ;
+  - **`map.update` reste sur le bus** alors qu'il viole la règle qu'on vient
+    d'écrire — un event par frame de marche. Conservé parce que
+    `ContainerKingdomLayout` en dépend ; déposé en candidat ;
+  - **la console n'est pas un enregistreur** : pas d'export, pas de rejeu, pas de
+    pause. Elle observe le présent ;
+  - `GameConsole` **n'a pas bougé** — il sert Container Kingdom, ce n'est pas le
+    même besoin.
+- **Déposé en `100-follow-up/`** — trois candidats :
+  `2026-08-02_19-53_map-update-off-the-bus`,
+  `2026-08-02_19-53_element-attach-event`,
+  `2026-08-02_19-53_collision-payload-asymmetry`.
 
 ## Journal
 
@@ -259,4 +281,13 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 19:52] Review : frontière moteur tenue (aucune notion applicative
+  dans `events/` ni dans `EventConsole`), aucun nom d'event assemblé subsistant
+  (`grep` sur `_eventPrefix` / `+ type` → 0), aucun `innerHTML` dans la console.
+- [2026-08-02 19:52] **Défaut trouvé en review** : `enableParticles()` appelé deux
+  fois remplaçait le `FxBinder` sans détacher l'ancien — son abonnement au bus
+  survivait, exactement la fuite que ce bus existe pour rendre impossible.
+  Corrigé (`31c5f09`), `verify` rejoué vert.
+- [2026-08-02 19:52] Merge `--no-ff` sur `main` depuis le tree principal :
+  **d02da0a** — `merge: un bus d'events typé, avec cycle de vie et console`
+  (28 fichiers, +1627 / −126).
