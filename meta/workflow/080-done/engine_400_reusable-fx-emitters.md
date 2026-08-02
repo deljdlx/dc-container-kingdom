@@ -7,7 +7,7 @@ created: 2026-08-02 18:00
 ready: 2026-08-02 18:01
 doing: 2026-08-02 18:02
 verify: 2026-08-02 18:06
-done:
+done: 2026-08-02 18:12 (merge a579068)
 ---
 
 ## Objectif
@@ -94,7 +94,22 @@ enregistrer.
 
 ## Suite
 
--
+- **Ce que ça ouvre, et qui est déjà demandé** — que l'effet soit **porté par
+  l'élément** plutôt que posé à la main dans la démo : `Fountain00` déclarerait son
+  jet dans son descripteur, en coordonnées **locales**, et poser une fontaine
+  n'importe où donnerait le jet gratuitement. Le mécanisme est à moitié là :
+  `Emitter` sait déjà suivre un élément et résout sa position à chaque salve. Il
+  manque la déclaration et le câblage. Ticket ouvert dans la foulée.
+- **Ce qu'on laisse de côté** — l'émetteur **tourne hors écran**. Sans conséquence
+  aujourd'hui (une fontaine posée à la main), mais dès que chaque `Fountain00` de
+  la fenêtre 7×7 émettra, les gouttes invisibles **évinceront les visibles** : le
+  budget de particules est partagé et plafonné. Le culling cesse alors d'être un
+  confort ; il devient une condition, et il est porté par le ticket suivant.
+  `ViewportTransform` rend d'ailleurs la question triviale — « suis-je visible ? »
+  est une soustraction.
+- **Ce qu'il ne faut pas faire trop tôt** — figer l'API sur deux effets. Le
+  descripteur reste volontairement étroit ; on l'élargira au troisième, pas avant.
+- **Déposé en `100-follow-up/`** — rien : la suite est un ticket, pas un candidat.
 
 ## Journal
 
@@ -140,4 +155,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 18:11] Review du diff : frontière moteur tenue (les FX ignorent
+  Docker et l'app, tout s'exporte par le baril), le déménagement conserve
+  l'historique (`git mv`), et la démo — la preuve d'usage — est plus courte
+  qu'avant, ce qui était le critère.
+- [2026-08-02 18:12] Merge `--no-ff` sur `main` depuis le tree principal :
+  **a579068** — `merge: des effets réutilisables dans un dossier fx`
+  (13 fichiers, +452 / −63).
