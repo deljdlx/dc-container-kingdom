@@ -91,11 +91,19 @@ src/
   index.html                 point d'entrée de l'app (charge bootstrap.js)
   engine/
     index.js                 baril d'exports — unique surface publique du moteur
-    map/                     Element + sous-systèmes, Board/Area, Viewport/Camera…
-      Elements/              éléments intégrés (maisons, arbres, clôtures, PNJ…)
-        Flowers/             la planche flowers-00 : 219 éléments de décor
-      Renderer/              renderers spécialisés
-    Renderer? (non) ; css/, images/   styles et sprite-sheets du moteur
+    Application.js           point d'entrée du moteur
+    scene/                   Element + ses sous-systèmes (SceneGraph, collisions, géométrie)
+    world/                   Board / Area — le tuilage et son streaming
+    view/                    Viewport (game loop), ViewportTransform, Camera, entrées
+    character/               Character, son animateur et ses behaviors
+    render/                  renderers spécialisés (élément, sprite, board, area, perso)
+    events/                  le bus : EventEmitter + catalogue EngineEvents
+    fx/                      particules, émetteurs, surfaces canvas
+    content/                 éléments intégrés (maisons, arbres, clôtures, PNJ…)
+      Flowers/               la planche flowers-00 : 219 éléments de décor
+    css/, images/            styles et sprite-sheets du moteur
+    catalog/                 catalogue navigable des éléments (`/engine/catalog/`)
+    tools/                   GameConsole, EventConsole
     demo/                    vitrine autonome du moteur (`/engine/demo/`)
     debug.js                 flag ?debug=1 → classe body.debug
   container-kingdom/

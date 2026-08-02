@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { describe, it, expect } from 'vitest';
-import { Geometry } from '../src/engine/map/Geometry.js';
+import { Geometry } from '../src/engine/scene/Geometry.js';
 
 describe('Geometry — construction & defaults', () => {
   it('initializes with default width/height of 16', () => {

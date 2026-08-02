@@ -121,7 +121,7 @@ export class ParticleLayer
    * Nothing is written when nothing moved — the same discipline as the board
    * transform. Resizing in particular **wipes the canvas**, so it must not
    * happen on every frame of a pinch.
-   * @param {import('../map/ViewportTransform.js').ViewportTransform} transform
+   * @param {import('../view/ViewportTransform.js').ViewportTransform} transform
    * @param {number} viewWidth viewport width in CSS pixels
    * @param {number} viewHeight viewport height in CSS pixels
    */
@@ -160,7 +160,7 @@ export class ParticleLayer
   /**
    * Paint the live particles in **world coordinates** — the transform is what
    * puts them where the map is, zoom included.
-   * @param {import('../map/ViewportTransform.js').ViewportTransform} [transform]
+   * @param {import('../view/ViewportTransform.js').ViewportTransform} [transform]
    */
   render(transform = null) {
     if (!this._context) {

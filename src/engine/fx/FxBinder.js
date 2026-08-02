@@ -33,7 +33,7 @@ export class FxBinder
   /**
    * @param {Object} options
    * @param {import('./ParticleLayer.js').ParticleLayer} options.layer
-   * @param {import('../map/Viewport.js').Viewport} options.viewport
+   * @param {import('../view/Viewport.js').Viewport} options.viewport
    */
   constructor({ layer, viewport, groundLayer = null }) {
     this._layer = layer;

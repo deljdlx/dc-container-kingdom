@@ -38,7 +38,7 @@ d'implémentation.
 
 - S'appuyer sur l'API publique exportée via `src/engine/index.js` et
   l'inventaire `src/engine/catalog/`.
-- Croiser avec les modules existants sous `src/engine/map/Elements/` et les
+- Croiser avec les modules existants sous `src/engine/content/` et les
   atlas de carte sous `src/engine/images/map/`.
 - Ajouter au moins un test de caractérisation/documentation exécutable si utile
   pour figer le constat (ex: présence/absence attendue de certaines familles).
@@ -56,7 +56,7 @@ d'implémentation.
 
 - Catalogue: `src/engine/catalog/`
 - Exports publics moteur: `src/engine/index.js`
-- Éléments carte: `src/engine/map/Elements/`
+- Éléments carte: `src/engine/content/`
 - Atlas carte: `src/engine/images/map/`
 - Docs: `meta/documentation/engine.md`
 - Recette liée: `meta/recipes/add-map-element.md`

@@ -6,7 +6,7 @@ game loop** (pas de `setTimeout` maison). Modèles : `PatrolBehavior`,
 
 ## Étapes
 
-1. **Créer** `src/engine/map/MonBehavior.js` sur ce squelette :
+1. **Créer** `src/engine/character/MonBehavior.js` sur ce squelette :
    - constructeur `(character, { ...options } = {})` ;
    - `start()` / `stop()` qui **(dé)s'enregistrent** auprès du viewport via un
      helper `_viewport()` (`character.getApplication().getViewport()`), puis
