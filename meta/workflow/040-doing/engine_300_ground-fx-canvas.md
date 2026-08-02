@@ -2,10 +2,10 @@
 id: 2026-08-02_18-56
 title: Un canvas au sol, sous les entités
 type: feat
-branch:
+branch: claude/ground-fx-canvas
 created: 2026-08-02 18:56
 ready: 2026-08-02 18:57
-doing:
+doing: 2026-08-02 18:58
 verify:
 done:
 ---
