@@ -42,8 +42,8 @@ prérequis à des tests d'intégration propres.
 
 ## Contexte / liens
 
-- `src/engine/map/Viewport.js` (`startLoop`, `tick`, `run`, `clear`)
-- `src/engine/map/Application.js`
+- `src/engine/view/Viewport.js` (`startLoop`, `tick`, `run`, `clear`)
+- `src/engine/Application.js`
 - `src/container-kingdom/js/ContainerKingdom.js` (`clear`, `stopLoop` — modèle)
 - Docs : `meta/documentation/engine.md` (cycle de vie), `src/engine/README.md`
 

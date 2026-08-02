@@ -5,7 +5,7 @@ pas de code de rendu, juste un `static descriptor`.
 
 ## Étapes
 
-1. **Créer la classe** dans `src/engine/map/Elements/` (ou un sous-dossier
+1. **Créer la classe** dans `src/engine/content/` (ou un sous-dossier
    thématique), qui étend `SpriteElement` avec un `static descriptor` :
    - `width` / `height`, `atlas` (chemin sprite-sheet), `frame` (offset `[x, y]`) ;
    - `collision: [x, y, w, h]` si l'élément **bloque** (optionnel) ;
@@ -29,7 +29,7 @@ pas de code de rendu, juste un `static descriptor`.
 ## Élément tiré d'une planche régulière (`flowers-00`)
 
 Sur une planche découpée en cellules de taille fixe, on ne réécrit pas le
-descripteur : `src/engine/map/Elements/Flowers/atlas.js` fournit `cell(col, row,
+descripteur : `src/engine/content/Flowers/atlas.js` fournit `cell(col, row,
 extra?)`, qui le dérive de la position dans la grille 32 px. Un élément tient
 alors en **une ligne**, dans le fichier de thème correspondant
 (`Blossoms.js`, `Mushrooms.js`, `Props.js`…) :

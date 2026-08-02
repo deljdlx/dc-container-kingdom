@@ -52,9 +52,9 @@ identifié — un `PatrolBehavior` existe déjà pour les personnages.
 
 ## Contexte / liens
 
-- `src/engine/map/Element.js` (champs `_target*`, `_onMoveEnd`, `update`)
-- `src/engine/map/Character.js` (`moveBlocked`), `src/engine/map/PatrolBehavior.js`
-- `src/engine/map/Viewport.js` (modèle `dt`-based)
+- `src/engine/scene/Element.js` (champs `_target*`, `_onMoveEnd`, `update`)
+- `src/engine/character/Character.js` (`moveBlocked`), `src/engine/character/PatrolBehavior.js`
+- `src/engine/view/Viewport.js` (modèle `dt`-based)
 - Docs : `meta/documentation/engine.md`
 
 ## Definition of Done

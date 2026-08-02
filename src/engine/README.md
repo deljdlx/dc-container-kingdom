@@ -48,12 +48,22 @@ Load the engine styles once in the host page:
 
 ## Structure
 
-- `map/` — core: `Element` (scene node) and its composed subsystems
-  (`SceneGraph`, `CollisionSystem`, `Geometry`), plus `Board`, `Area`,
-  `Viewport`, `Character`, `Application` and the `Renderer/` classes.
+The engine is split by **responsibility**, and its **content** is kept out of the
+core — a game built on it should be able to ignore the village.
+
+- `Application.js` — the top-level entry point, next to the barrel.
+- `scene/` — `Element` (scene node) and what composes it: `SceneGraph`,
+  `CollisionSystem`, `Geometry`, `Coordinates`, `BoundingBox`, `SpriteElement`.
+- `world/` — `Board` and `Area`: the tiling and its streaming.
+- `view/` — `Viewport` (the game loop), `ViewportTransform`, `Camera`,
+  `DirectionalInput`.
+- `character/` — `Character`, its `CharacterAnimator`, and the interchangeable
+  behaviors (`CharacterBehavior`, `PatrolBehavior`, `FleeBehavior`).
+- `render/` — the DOM renderers (element, sprite, board, area, character).
 - `events/` — the bus: `EventEmitter` (revocable subscriptions, `onAny`) and
   `EngineEvents` (the catalogue of names and the payload envelope).
-- `map/Elements/` — built-in sprites (houses, trees, fences, fountain),
+- `fx/` — particles, emitters and their canvas surfaces.
+- `content/` — built-in sprites (houses, trees, fences, fountain),
   `MapSprites01/` (curated autonomous trees from `map-sprites-01`: conifers,
   leafy trees, dead trees, saplings),
   `MapSprites02/` (first vegetation lot from `map-sprites-02`: upper-left tree

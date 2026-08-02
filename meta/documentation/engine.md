@@ -13,6 +13,29 @@ Le catalogue moteur (`/engine/catalog/`) propose désormais une navigation par
 familles (index cliquable), des filtres combinables (texte/type/zones), un tri,
 et un état partageable dans l'URL (`q`, `kind`, `zone`, `sort`).
 
+## 0. Où vivent les choses
+
+L'arborescence est découpée **par responsabilité**, et le **contenu est sorti du
+noyau** — un jeu bâti sur ce moteur doit pouvoir ignorer le village.
+
+| Dossier | Ce qu'il porte |
+|---|---|
+| `Application.js` | le point d'entrée, à la racine avec le baril `index.js` |
+| `scene/` | `Element` et ce qui le compose : `SceneGraph`, `CollisionSystem`, `Geometry`, `Coordinates`, `BoundingBox`, `SpriteElement` |
+| `world/` | `Board`, `Area` — le tuilage et son streaming |
+| `view/` | `Viewport` (la game loop), `ViewportTransform`, `Camera`, `DirectionalInput` |
+| `character/` | `Character`, `CharacterAnimator` et les behaviors interchangeables |
+| `render/` | les renderers DOM (élément, sprite, board, area, personnage) |
+| `events/` | le bus : `EventEmitter`, `EngineEvents` (§9) |
+| `fx/` | particules, émetteurs, surfaces canvas (§3.2) |
+| `content/` | les éléments intégrés : décors, sprites, bases de personnages |
+| `catalog/`, `tools/`, `demo/` | outillage et vitrines, hors moteur proprement dit |
+
+Ces dossiers remplacent un `map/` unique qui portait 19 fichiers à plat — dont
+l'`Application`, la boucle de jeu et les personnages, qui ne parlaient pas de
+carte. **Seuls `Board` et `Area` l'étaient vraiment**, et ce sont eux qui ont
+gardé le rôle sous le nom `world/`.
+
 ## 1. Scene graph : `Element` et ses sous-systèmes
 
 `Element` est le nœud de base de l'arbre de scène. Plutôt qu'une god-class, il
@@ -124,7 +147,8 @@ mauvais pour des **centaines d'objets éphémères**. Les particules vivent donc
 un `<canvas>`, monté par `viewport.enableParticles()`.
 
 Tout le sous-système vit dans **`src/engine/fx/`** — il n'a rien à voir avec la
-carte, et `map/` était déjà chargé.
+carte. C'était le premier dossier extrait de l'ancien `map/`, avant que celui-ci
+n'éclate (§0).
 
 - **Deux objets, deux rôles.** `ParticleSystem` est **pur** — il naît, vieillit
   et meurt au rythme du `dt`, sans rien connaître du DOM (donc testable sans
@@ -397,7 +421,7 @@ moteur expose aujourd'hui les 8 bases présentes sur `images/characters/characte
 `images/map/flowers-00.png` est une grille régulière de **16×16 cellules de
 32 px**. Ses 219 sprites (fleurs, champignons, feuillages, nénuphars, champs,
 puits, souche, troncs, dalles, rochers) vivent sous
-`map/Elements/Flowers/`, découpés par thème (`Blossoms`, `Clusters`, `Fields`,
+`content/Flowers/`, découpés par thème (`Blossoms`, `Clusters`, `Fields`,
 `Foliage`, `Mushrooms`, `Props`, `Water`) et ré-exportés en bloc par
 `Flowers/index.js` puis par le baril du moteur.
 
@@ -432,7 +456,7 @@ d'assemblage (autotiles, coins, bandes de façade, morceaux de routes/arches).
 Le moteur n'ayant pas de tuilage automatique, le lot public retient seulement
 les sprites autonomes, nommables et posables tels quels.
 
-Premier lot exposé sous `map/Elements/MapSprites01/` :
+Premier lot exposé sous `content/MapSprites01/` :
 
 - `Conifer00..35`
 - `LeafTree00..26`
