@@ -2,10 +2,10 @@
 id: 2026-08-02_18-45
 title: La garde anti-fuite tue les effets attachés au personnage
 type: fix
-branch:
+branch: claude/orphan-check-fix
 created: 2026-08-02 18:45
 ready: 2026-08-02 18:46
-doing:
+doing: 2026-08-02 18:46
 verify:
 done:
 ---

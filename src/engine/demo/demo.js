@@ -210,6 +210,7 @@ viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
 viewport.render();
 viewport.run();
+window.__vp = viewport; // TEMPORAIRE
 viewport.renderDebug(); // draws zone boxes only when ?debug=1
 patrols.forEach(patrol => patrol.start());
 
