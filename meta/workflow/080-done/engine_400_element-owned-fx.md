@@ -7,7 +7,7 @@ created: 2026-08-02 18:18
 ready: 2026-08-02 18:21
 doing: 2026-08-02 18:22
 verify: 2026-08-02 18:30
-done:
+done: 2026-08-02 18:38 (merge 83ce2f5)
 ---
 
 ## Objectif
@@ -154,7 +154,27 @@ juste hors champ doit pouvoir entrer dans le cadre).
 
 ## Suite
 
--
+- **Ce que ça ouvre** — le mécanisme vaut pour **n'importe quel élément** : une
+  cheminée qui fume, une torche qui crépite, un conteneur qui chauffe selon sa
+  charge CPU dans Container Kingdom. Ce n'est plus du code, c'est **une ligne de
+  descripteur**. Le culling et le liage suivent gratuitement.
+- **Ce qu'on laisse de côté** :
+  - **une frame de latence** après un saut de caméra : les behaviors tournent
+    *avant* `camera.update()` dans la boucle, donc un émetteur qui vient de sortir
+    du champ émet encore une fois (4 gouttes mesurées sur un téléport de 6 000 px).
+    Invisible à l'œil, mais c'est un ordre de boucle, pas une fatalité ;
+  - **le budget reste global** : dix fontaines visibles se partagent 600
+    particules, et l'éviction sacrifie les plus vieilles sans regarder de qui
+    elles viennent. Acceptable tant que les effets sont rares ; à revoir le jour
+    où un hôte en pose des dizaines ;
+  - **`FootstepDust` reste câblée à la main** dans la démo : elle suit le joueur,
+    qui n'est pas un élément déclarant un effet mais une création du viewport.
+- **Limite de la vérification** — la marge de culling (128 px) est chiffrée **pour
+  la goutte de fontaine** (1,2 s à 90 px/s). Un effet plus rapide ou plus
+  long-vivant pourrait la dépasser et disparaître au bord de l'écran. Le jour où
+  un tel effet existe, la marge devra se déduire du descripteur plutôt que d'être
+  une constante.
+- **Déposé en `100-follow-up/`** — rien.
 
 ## Journal
 
@@ -215,4 +235,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-02 18:37] Review du diff : la frontière tient (les FX ignorent l'app,
+  `FxBinder` s'exporte par le baril), l'élément **déclare** sans jamais aller
+  chercher la surface de rendu, et les deux ceintures anti-fuite sont chacune
+  couvertes par un test.
+- [2026-08-02 18:38] Merge `--no-ff` sur `main` depuis le tree principal :
+  **83ce2f5** — `merge: un élément porte son effet, en coordonnées locales`
+  (10 fichiers, +545 / −19).
