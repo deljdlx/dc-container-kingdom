@@ -6,7 +6,7 @@ branch: claude/folder-layout
 created: 2026-08-02 20:00
 ready: 2026-08-02 20:01
 doing: 2026-08-02 20:03
-verify:
+verify: 2026-08-02 20:17
 done:
 ---
 
@@ -138,19 +138,19 @@ grande majorité dans des tickets **archivés**.
 
 ## Definition of Done
 
-- [ ] `src/engine/map/` **n'existe plus** ; l'arborescence cible est en place.
-- [ ] `git log --follow` **traverse le renommage** sur au moins un fichier
+- [x] `src/engine/map/` **n'existe plus** ; l'arborescence cible est en place.
+- [x] `git log --follow` **traverse le renommage** sur au moins un fichier
       déplacé de chaque nouveau dossier (le `git mv` a bien été enregistré).
-- [ ] **`src/engine/index.js` exporte exactement les mêmes noms qu'avant** —
+- [x] **`src/engine/index.js` exporte exactement les mêmes noms qu'avant** —
       comparaison des deux listes au journal, pas une affirmation.
-- [ ] **Aucun changement hors déplacement / import** : `git diff` filtré sur les
+- [x] **Aucun changement hors déplacement / import** : `git diff` filtré sur les
       fichiers déplacés ne montre que des lignes d'`import`.
-- [ ] Les **classes CSS et chemins d'assets sont inchangés** (`grep` sur
+- [x] Les **classes CSS et chemins d'assets sont inchangés** (`grep` sur
       `map-element`, `map-area`, `map-fx-layer` → mêmes occurrences qu'avant).
-- [ ] `src/container-kingdom/` **n'a pas été modifié** (0 fichier au diff).
-- [ ] Docs **vivantes** à jour (engine.md, architecture.md, les deux recipes,
+- [x] `src/container-kingdom/` **n'a pas été modifié** (0 fichier au diff).
+- [x] Docs **vivantes** à jour (engine.md, architecture.md, les deux recipes,
       README moteur, les 3 tickets du backlog) ; **`080-done/` intact**.
-- [ ] `npm run verify` vert **et** les trois hôtes ouverts sans erreur console :
+- [x] `npm run verify` vert **et** les trois hôtes ouverts sans erreur console :
       l'app, `/engine/demo/`, `/engine/catalog/`.
 
 ## Suite
@@ -166,11 +166,61 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 20:04] **Empreintes prises avant de bouger quoi que ce soit** : la
+  liste des **461 exports** de `index.js` (obtenue par import dynamique en Node)
+  et le décompte des occurrences de classes CSS `map-*`. Sans référence prise
+  avant, « la surface publique n'a pas bougé » ne serait qu'une affirmation.
+- [2026-08-02 20:05] Déplacements en **`git mv`** uniquement : 58 renommages
+  détectés par git, dont les sous-arbres `Renderer/ → render/` et
+  `Elements/ → content/` d'un seul geste.
+- [2026-08-02 20:06] **Les imports réécrits par script**, pas à la main : chaque
+  spécificateur relatif est résolu depuis l'**ancien** dossier du fichier, mappé
+  vers sa nouvelle cible, puis recalculé depuis le **nouveau**. 101 imports dans
+  43 fichiers. Le faire au `sed` aurait cassé les chemins des fichiers qui
+  bougent *et* dont la cible bouge.
+- [2026-08-02 20:07] **Deux angles morts du script, rattrapés à la main** :
+  1. il a réécrit deux `@example` de JSDoc qui montrent un **hôte** important le
+     moteur — `'../engine/index.js'` y était correct, `'./index.js'` faux ;
+  2. il a **manqué** les annotations de type `import('../map/X.js')`, dont la
+     forme n'a pas d'espace après `import`. Cinq occurrences dans `fx/` et
+     `tools/`, corrigées.
+  Les deux ne se voyaient ni au build ni aux tests — seulement à la relecture.
+- [2026-08-02 20:12] **`080-done/` volontairement laissé intact.** Sur 80
+  citations de `engine/map` dans le dépôt, la majorité sont dans des tickets
+  archivés : les réécrire falsifierait ce qui était vrai à leur date. Même
+  raisonnement que « `080-done` n'est pas renommé » dans `meta/README.md`.
+- [2026-08-02 20:13] Deux corrections de doc au passage, dans le périmètre :
+  `architecture.md` listait encore une ligne morte (`Renderer? (non)`) et ne
+  mentionnait ni `events/` ni `fx/` ; `engine.md` gagne une section **§0 « où
+  vivent les choses »**.
 
 ### Vérification
 
--
+- [2026-08-02 20:10] `npm run verify` **vert** : 54 fichiers, **468 tests** —
+  strictement le même compte qu'avant le refactor, ce qui est le résultat
+  attendu d'un déplacement.
+- [2026-08-02 20:08] **Surface publique identique** : `diff` des deux listes
+  d'exports → **aucune différence**, 461 noms de part et d'autre.
+- [2026-08-02 20:08] **Classes CSS identiques** : `diff` des décomptes `map-*`
+  → aucune différence (21 `map-element`, 3 `map-area`, 3 `map-fx-layer`…).
+  Le préfixe `map-` du DOM n'a pas suivi le dossier, comme spécifié.
+- [2026-08-02 20:08] **`src/container-kingdom/` : 0 fichier au diff.** C'est la
+  frontière moteur qui rend l'opération contenue.
+- [2026-08-02 20:09] **Le diff des fichiers déplacés ne contient que des
+  imports** — une seule ligne hors import dans tout `src/`, un chemin cité en
+  commentaire (`map/Elements/Flowers` → `content/Flowers`), volontaire.
+- [2026-08-02 20:09] **`git log --follow` traverse le renommage** pour un fichier
+  de chaque nouveau dossier (`scene/Element`, `world/Board`, `view/Viewport`,
+  `character/Character`, `render/Renderer`, `content/Tree00`, `Application`) :
+  tous remontent au commit initial `e173ca9`. Le blame est préservé.
+- [2026-08-02 20:15] **Les trois hôtes ouverts**, aucun avec d'erreur console :
+  - `/engine/demo/?debug=1` — 49 areas, 305 éléments, 2 canvas FX, console
+    d'events montée, 0 image cassée ;
+  - `/engine/catalog/` — 533 sprites rendus, 0 image cassée ;
+  - l'app — 49 areas, 538 éléments, 219 conteneurs, 0 image cassée.
+  C'était le vrai risque : Vite résout à la demande, un chemin mort dans une
+  branche rarement prise ne se voit pas au build.
+- [2026-08-02 20:16] Aucune référence à `engine/map` ne subsiste hors archive.
 
 ### Validation
 
