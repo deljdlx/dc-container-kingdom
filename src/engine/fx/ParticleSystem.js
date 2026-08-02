@@ -28,6 +28,8 @@ export class ParticleSystem
     direction: 0,
     /** pixels per second², positive pulls down */
     gravity: 0,
+    /** which surface paints it: 'above' the map, or on the 'ground' under it */
+    layer: 'above',
   };
 
   /** @type {Array<Object>} live particles, oldest first */
@@ -63,6 +65,7 @@ export class ParticleSystem
         life: spec.life,
         size: spec.size,
         color: spec.color,
+        layer: spec.layer,
       });
     }
 

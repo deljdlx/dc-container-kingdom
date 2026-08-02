@@ -26,9 +26,18 @@ export class FxBinder
    * @param {import('./ParticleLayer.js').ParticleLayer} options.layer
    * @param {import('../map/Viewport.js').Viewport} options.viewport
    */
-  constructor({ layer, viewport }) {
+  constructor({ layer, viewport, groundLayer = null }) {
     this._layer = layer;
+    this._groundLayer = groundLayer;
     this._viewport = viewport;
+  }
+
+  /**
+   * @param {string} name 'ground' or 'above'
+   * @returns {import('./ParticleLayer.js').ParticleLayer} the surface to spawn on
+   */
+  _layerFor(name) {
+    return name === 'ground' && this._groundLayer ? this._groundLayer : this._layer;
   }
 
   /**
@@ -110,9 +119,12 @@ export class FxBinder
       return 0;
     }
 
-    const emitters = declarations.map(({ emitter: EmitterClass, at = null, ...options }) =>
-      new EmitterClass(this._layer, {
+    const emitters = declarations.map(({ emitter: EmitterClass, at = null, layer = 'above', ...options }) =>
+      new EmitterClass(this._layerFor(layer), {
         ...options,
+        // After the spread, so a declaration carrying its own `descriptor` still
+        // gets the layer tag the particles are sorted by.
+        descriptor: { ...(options.descriptor ?? {}), layer },
         follow: element,
         // `at` is local to the element — that is what makes the effect travel
         // with it, and what lets the same class be dropped anywhere.

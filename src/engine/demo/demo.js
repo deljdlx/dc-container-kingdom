@@ -223,7 +223,7 @@ const fx = viewport.enableParticles();
 
 // Follows a moving element instead: dust tracks the player while the camera
 // scrolls, and only while they actually walk.
-viewport.addBehavior(new FootstepDust(fx, {
+viewport.addBehavior(new FootstepDust(viewport.getGroundParticles(), {
   follow: viewport.getCharacter(),
   offset: { x: 24, y: 44 },
   isMoving: () => viewport.getInput().isMoving(),

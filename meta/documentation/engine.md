@@ -148,9 +148,34 @@ carte, et `map/` était déjà chargé.
   `Element` du scene-graph. C'est cette règle qui garde le second paradigme de
   rendu bon marché.
 
-Une particule **ne peut pas passer derrière un arbre** : assumé. Le jour où ça
-compte, ce sera un second canvas *sous* les entités — jamais un canvas par
-profondeur.
+#### Deux surfaces : `above` et `ground`
+
+Un effet de sol (poussière, ombre, onde) doit passer **derrière** ce qui se
+trouve devant ; un jet d'eau, lui, monte au-dessus du bassin. D'où deux surfaces,
+choisies par effet dans le descripteur (`layer: 'ground' | 'above'`, `above` par
+défaut).
+
+Pourquoi ce n'est pas qu'une affaire de z-index : le board **porte un z-index**
+(mesuré à 1 000 560), donc il crée un contexte d'empilement. Un canvas frère est
+soit au-dessus de toute la carte, soit sous son herbe — jamais entre les deux.
+S'intercaler exige d'être **enfant du board**, dans le créneau libre entre l'herbe
+(`auto`) et les éléments (`DEPTH_BASE + offsetY + height`) : c'est
+`GROUND_FX_DEPTH`.
+
+Étant dans le board, la surface au sol **subit sa transformation CSS**. Elle est
+donc posée en coordonnées **monde** — origine au point qui tombe à l'écran en
+(0, 0), taille = viewport ÷ échelle — et repositionnée seulement **quand la vue
+bouge**. Heureuse conséquence : `applyToContext` sert les deux surfaces sans
+changement, cette origine étant exactement celle que la transformation attend.
+
+Sa mémoire vaut **viewport × devicePixelRatio**, indépendamment du zoom : la
+taille CSS suivant l'inverse de l'échelle, la densité reste constante (mesuré à
+1,5 device pixel par pixel écran aux échelles 0,5, 1 et 2).
+
+**Un seul `ParticleSystem` alimente les deux** — le budget reste un plafond
+global, et chaque particule porte le nom de sa surface. Corollaire à ne pas
+manquer : le système est vieilli **une seule fois par frame**, par le `Viewport`
+et non par chaque surface, sans quoi chaque durée de vie serait divisée par deux.
 
 #### Les émetteurs sont des behaviors
 

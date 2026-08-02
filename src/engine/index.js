@@ -53,7 +53,7 @@ export { PatrolBehavior } from './map/PatrolBehavior.js';
 export { FleeBehavior } from './map/FleeBehavior.js';
 
 // --- Renderers ---
-export { Renderer, DEPTH_BASE, FX_DEPTH } from './map/Renderer/Renderer.js';
+export { Renderer, DEPTH_BASE, FX_DEPTH, GROUND_FX_DEPTH } from './map/Renderer/Renderer.js';
 export { SpriteRenderer } from './map/Renderer/SpriteRenderer.js';
 export { BoardRenderer } from './map/Renderer/BoardRenderer.js';
 export { AreaRenderer } from './map/Renderer/AreaRenderer.js';
