@@ -35,15 +35,21 @@ export class ParticleLayer
   /** @type {Map<string, Object>} pre-rendered sprite per colour */
   _sprites = new Map();
 
+  /** @type {string|null} last placement written, so an idle view writes nothing */
+  _placement = null;
+
   /**
    * @param {HTMLCanvasElement|Object} canvas the surface to paint on; duck-typed
    * so tests can pass a recorder instead of a real canvas
    * @param {Object} [options]
-   * @param {ParticleSystem} [options.system]
+   * @param {ParticleSystem} [options.system] shared between surfaces, so the
+   * particle budget stays a single global ceiling
    * @param {number} [options.pixelRatio] usually `window.devicePixelRatio`
+   * @param {string} [options.layer] which particles this surface paints
    */
-  constructor(canvas, { system, pixelRatio = 1 } = {}) {
+  constructor(canvas, { system, pixelRatio = 1, layer = 'above' } = {}) {
     this._canvas = canvas;
+    this._layer = layer;
     this._system = system ?? new ParticleSystem();
     this._pixelRatio = Math.max(1, Math.min(pixelRatio, ParticleLayer.MAX_PIXEL_RATIO));
 
@@ -88,10 +94,67 @@ export class ParticleLayer
   /**
    * Advance the simulation. Separate from {@link render} because drawing must
    * happen after the camera has moved, while ageing does not care.
+   *
+   * ⚠️ With two surfaces sharing one system, this must be called **once per
+   * frame**, not once per surface — ageing twice would halve every lifetime.
+   * `Viewport` owns that call.
    * @param {number} dt elapsed milliseconds
    */
   update(dt) {
     this._system.update(dt);
+  }
+
+  /** @returns {Array<Object>} the particles this surface is responsible for */
+  _mine() {
+    return this._system.particles().filter(particle => particle.layer === this._layer);
+  }
+
+  /**
+   * Lay the surface over the view **from inside the board**.
+   *
+   * A ground layer is a child of the board, so it wears the board's CSS
+   * transform: it is positioned in **world** units, and the browser translates
+   * and scales it. Its origin is the world point that lands at screen (0, 0),
+   * which is exactly what makes {@link ViewportTransform#applyToContext} work
+   * unchanged for both surfaces.
+   *
+   * Nothing is written when nothing moved — the same discipline as the board
+   * transform. Resizing in particular **wipes the canvas**, so it must not
+   * happen on every frame of a pinch.
+   * @param {import('../map/ViewportTransform.js').ViewportTransform} transform
+   * @param {number} viewWidth viewport width in CSS pixels
+   * @param {number} viewHeight viewport height in CSS pixels
+   */
+  placeInWorld(transform, viewWidth, viewHeight) {
+    const scale = transform.scale();
+    const originX = transform.screenToWorldX(0);
+    const originY = transform.screenToWorldY(0);
+    const worldWidth = viewWidth / scale;
+    const worldHeight = viewHeight / scale;
+
+    // The backing store follows scale × ratio, or the surface blurs as soon as
+    // the host zooms in.
+    const backingWidth = Math.round(viewWidth * this._pixelRatio);
+    const backingHeight = Math.round(viewHeight * this._pixelRatio);
+    if (this._canvas.width !== backingWidth || this._canvas.height !== backingHeight) {
+      this._canvas.width = backingWidth;
+      this._canvas.height = backingHeight;
+      this._painted = false;   // resizing cleared it
+    }
+
+    const style = this._canvas.style;
+    if (!style) {
+      return;
+    }
+    const placement = `${originX}|${originY}|${worldWidth}|${worldHeight}`;
+    if (placement === this._placement) {
+      return;
+    }
+    this._placement = placement;
+    style.left = `${originX}px`;
+    style.top = `${originY}px`;
+    style.width = `${worldWidth}px`;
+    style.height = `${worldHeight}px`;
   }
 
   /**
@@ -104,7 +167,7 @@ export class ParticleLayer
       return;
     }
 
-    const particles = this._system.particles();
+    const particles = this._mine();
     // Idle costs nothing: with nothing alive and nothing left over from the
     // previous frame, we do not even clear. Same discipline as the camera
     // transform, which is not rewritten while the camera stands still.

@@ -1,6 +1,6 @@
 // @vitest-environment jsdom
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { DEPTH_BASE, FX_DEPTH, Viewport } from '../src/engine/index.js';
+import { DEPTH_BASE, FX_DEPTH, GROUND_FX_DEPTH, Viewport } from '../src/engine/index.js';
 
 beforeEach(() => {
   document.body.innerHTML = '<div id="app"></div>';
@@ -426,17 +426,36 @@ describe('Viewport - particle layer', () => {
     expect(layer.getSystem().count()).toBe(4);
   });
 
-  it('ticks and paints the layer from the game loop', () => {
+  // Both surfaces share one system, so it must be aged ONCE per frame — ageing
+  // per surface would halve every particle's life.
+  it('ages the shared system once a frame and paints both surfaces', () => {
     const { viewport } = createViewport();
-    const layer = viewport.enableParticles();
-    const update = vi.spyOn(layer, 'update');
-    const render = vi.spyOn(layer, 'render');
+    const above = viewport.enableParticles();
+    const ground = viewport.getGroundParticles();
+    const system = above.getSystem();
+    const aged = vi.spyOn(system, 'update');
+    const paintAbove = vi.spyOn(above, 'render');
+    const paintGround = vi.spyOn(ground, 'render');
 
     viewport.update(1_000);
     viewport.update(1_100);
 
-    expect(update).toHaveBeenCalledTimes(2);
-    expect(render).toHaveBeenCalledWith(viewport.getTransform());
+    expect(aged).toHaveBeenCalledTimes(2);
+    expect(paintAbove).toHaveBeenCalledWith(viewport.getTransform());
+    expect(paintGround).toHaveBeenCalledWith(viewport.getTransform());
+    expect(ground.getSystem()).toBe(system);
+  });
+
+  it('mounts the ground surface inside the board, under the elements', () => {
+    const { viewport } = createViewport();
+    viewport.render();
+    viewport.enableParticles();
+
+    const ground = document.querySelector('.map-fx-layer--ground');
+    expect(ground).not.toBeNull();
+    expect(ground.parentElement).toBe(viewport.getBoard().getRenderer().getDom());
+    expect(Number(ground.style.zIndex)).toBe(GROUND_FX_DEPTH);
+    expect(GROUND_FX_DEPTH).toBeLessThan(DEPTH_BASE);
   });
 });
 

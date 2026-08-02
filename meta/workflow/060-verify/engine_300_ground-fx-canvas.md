@@ -6,7 +6,7 @@ branch: claude/ground-fx-canvas
 created: 2026-08-02 18:56
 ready: 2026-08-02 18:57
 doing: 2026-08-02 18:58
-verify:
+verify: 2026-08-02 19:05
 done:
 ---
 
@@ -96,18 +96,18 @@ C'est le critère vérifiable de ce ticket.
 
 ## Definition of Done
 
-- [ ] Une couche `ground` existe, enfant du board, entre l'herbe et les éléments.
-- [ ] `layer: 'ground' | 'above'` dans le descripteur, `above` par défaut.
-- [ ] **La poussière passe derrière un arbre** — vérifié à l'écran, capture au
+- [x] Une couche `ground` existe, enfant du board, entre l'herbe et les éléments.
+- [x] `layer: 'ground' | 'above'` dans le descripteur, `above` par défaut.
+- [x] **La poussière passe derrière un arbre** — vérifié à l'écran, capture au
       journal. C'est le critère qui fait foi.
-- [ ] Le jet de fontaine reste **au-dessus**, sans régression.
-- [ ] **Netteté sous zoom** : la mémoire du canvas suit `échelle × dpr`, mesuré à
+- [x] Le jet de fontaine reste **au-dessus**, sans régression.
+- [x] **Netteté sous zoom** : la mémoire du canvas suit `échelle × dpr`, mesuré à
       au moins deux niveaux de zoom.
-- [ ] Aucune écriture DOM ni redimensionnement quand la vue ne bouge pas (test ou
+- [x] Aucune écriture DOM ni redimensionnement quand la vue ne bouge pas (test ou
       mesure).
-- [ ] Le sort du budget partagé est tranché **et écrit**.
-- [ ] Culling, liage et anti-fuite fonctionnent sur les deux couches.
-- [ ] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
+- [x] Le sort du budget partagé est tranché **et écrit**.
+- [x] Culling, liage et anti-fuite fonctionnent sur les deux couches.
+- [x] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
 
 ## Suite
 
@@ -120,11 +120,42 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 18:58] **Un seul système, deux surfaces** : chaque particule porte
+  le nom de sa couche, chaque canvas ne peint que les siennes. Le budget reste un
+  plafond global, comme tranché en *specify*.
+- [2026-08-02 18:59] **Le piège du système partagé** : vieillir le système depuis
+  chaque surface aurait divisé par deux toutes les durées de vie. Le `Viewport`
+  l'âge **une fois par frame** et les surfaces ne font plus que dessiner. Le test
+  correspondant a été réécrit pour porter ce contrat.
+- [2026-08-02 18:59] `GROUND_FX_DEPTH = DEPTH_BASE − 1`, exporté à côté de
+  `FX_DEPTH` avec son raisonnement : le créneau entre l'herbe (`auto`) et les
+  éléments existe **dans** le board, pas à côté.
+- [2026-08-02 18:59] `placeInWorld` pose la surface au sol en coordonnées monde et
+  n'écrit **que si le placement change** — un redimensionnement efface le canvas,
+  il ne doit pas arriver à chaque frame de pinch.
+- [2026-08-02 19:00] Bug attrapé en relisant : l'ordre du spread écrasait le
+  descripteur porteur de la couche quand une déclaration apportait le sien. Le
+  `descriptor` est désormais appliqué **après** `...options`.
 
 ### Vérification
 
--
+- [2026-08-02 19:00] `npm run verify` vert : **51 fichiers, 418 tests**.
+- [2026-08-02 19:02] **Structure mesurée dans le navigateur** : la surface au sol
+  est bien **enfant du board**, à z **999 999**, sous un arbre à **1 000 214**, et
+  la surface du dessus à **10 000 000**.
+- [2026-08-02 19:03] **Critère qui fait foi** : une même tache émise au centre
+  d'un arbre est **masquée par l'arbre** sur la couche sol (seul son halo
+  déborde), et **peinte par-dessus tout** sur la couche du dessus. Capture au
+  dossier.
+- [2026-08-02 19:04] **Netteté sous zoom** — et une hypothèse du ticket corrigée :
+  je pensais que la mémoire devait suivre `échelle × dpr`. Elle est en fait
+  **indépendante du zoom** (1350×840 constant), la taille CSS suivant l'inverse de
+  l'échelle. Mesuré : **1,500 device pixel par pixel écran aux échelles 0,5, 1 et
+  2** — densité constante, donc aucun flou.
+- [2026-08-02 19:04] Poussière (15, couche sol) et gouttes (96, couche du dessus)
+  coexistent : le routage par descripteur fonctionne, le culling et les ceintures
+  anti-fuite restent en place.
+- [2026-08-02 19:05] Sonde retirée (0 résidu).
 
 ### Validation
 

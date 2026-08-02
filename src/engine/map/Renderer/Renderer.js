@@ -23,6 +23,17 @@ export const DEPTH_BASE = 1_000_000;
 export const FX_DEPTH = 10_000_000;
 
 /**
+ * Depth of the ground FX surface, **inside** the board.
+ *
+ * The board carries a z-index, so it is a stacking context: a sibling canvas is
+ * either above the whole map or below its grass. Sliding between the two means
+ * being a child of the board — where areas paint their grass at `auto` (≈ 0) and
+ * elements sit at `DEPTH_BASE + offsetY + height`. Anything strictly between the
+ * two lands on the ground and under everything standing on it.
+ */
+export const GROUND_FX_DEPTH = DEPTH_BASE - 1;
+
+/**
  * Base renderer for any map element: owns the element's root DOM node and the
  * inner/sprite sub-nodes, and keeps world-space position, size and painter
  * depth in sync with the model. Subclasses specialise the paint step (areas,

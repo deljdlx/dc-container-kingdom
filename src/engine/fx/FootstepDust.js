@@ -25,6 +25,8 @@ export class FootstepDust extends Emitter
     life: 600,
     size: 7,
     color: '#e8dcc4',
+    // Dust belongs on the ground: a tree in front of the walker must hide it.
+    layer: 'ground',
   };
 
   /** @type {number} */

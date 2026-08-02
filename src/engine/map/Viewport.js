@@ -6,7 +6,8 @@ import { EventEmitter } from './EventEmitter.js';
 import { Geometry } from './Geometry.js';
 import { FxBinder } from '../fx/FxBinder.js';
 import { ParticleLayer } from '../fx/ParticleLayer.js';
-import { FX_DEPTH } from './Renderer/Renderer.js';
+import { ParticleSystem } from '../fx/ParticleSystem.js';
+import { FX_DEPTH, GROUND_FX_DEPTH } from './Renderer/Renderer.js';
 import { MainCharacterRenderer } from './Renderer/MainCharacterRenderer.js';
 import { ViewportRenderer } from './Renderer/ViewportRenderer.js';
 import { ViewportTransform } from './ViewportTransform.js';
@@ -110,6 +111,16 @@ export class Viewport
    * @type {ParticleLayer|null} optional FX surface over the board
    */
   _particles = null;
+
+  /**
+   * @type {ParticleLayer|null} FX surface **under** the entities, inside the board
+   */
+  _groundParticles = null;
+
+  /**
+   * @type {ParticleSystem|null} shared by both surfaces: one global budget
+   */
+  _fxSystem = null;
 
   /**
    * @type {FxBinder|null} wires the effects elements declare, once FX are on
@@ -222,6 +233,10 @@ export class Viewport
    * @returns {ParticleLayer}
    */
   enableParticles(options = {}) {
+    // One system, two surfaces: the particle budget stays a single ceiling, and
+    // each surface paints only the particles that named it.
+    this._fxSystem = options.system ?? new ParticleSystem();
+
     const canvas = document.createElement('canvas');
     canvas.className = 'map-fx-layer';
     // The board carries its own painter depth, so being a later sibling is not
@@ -230,21 +245,45 @@ export class Viewport
     this._particles = new ParticleLayer(canvas, {
       pixelRatio: this._transform.pixelRatio(),
       ...options,
+      system: this._fxSystem,
+      layer: 'above',
     });
     this._particles.resize(this.width(), this.height());
     this.container.append(canvas);
 
+    // The ground surface lives INSIDE the board: a sibling could only be above
+    // the whole map or below its grass (the board is a stacking context).
+    const groundCanvas = document.createElement('canvas');
+    groundCanvas.className = 'map-fx-layer map-fx-layer--ground';
+    groundCanvas.style.zIndex = GROUND_FX_DEPTH;
+    this._groundParticles = new ParticleLayer(groundCanvas, {
+      pixelRatio: this._transform.pixelRatio(),
+      ...options,
+      system: this._fxSystem,
+      layer: 'ground',
+    });
+    this.board.getRenderer().getDom().append(groundCanvas);
+
     // Elements already in the world get their declared effects now; those that
     // stream in later are bound by `_streamAreas`.
-    this._fxBinder = new FxBinder({ layer: this._particles, viewport: this });
+    this._fxBinder = new FxBinder({
+      layer: this._particles,
+      groundLayer: this._groundParticles,
+      viewport: this,
+    });
     this._fxBinder.bind(this.board);
 
     return this._particles;
   }
 
-  /** @returns {ParticleLayer|null} the particle layer, once enabled */
+  /** @returns {ParticleLayer|null} the surface painting over the map */
   getParticles() {
     return this._particles;
+  }
+
+  /** @returns {ParticleLayer|null} the surface painting on the ground, under the entities */
+  getGroundParticles() {
+    return this._groundParticles;
   }
 
   /** @returns {FxBinder|null} the binder wiring element-declared effects */
@@ -436,8 +475,13 @@ export class Viewport
     // Particles paint LAST: drawing before the camera moved would offset them by
     // one frame, and they must sit over what the renderer just placed.
     if(this._particles) {
-      this._particles.update(dt);
+      // Aged ONCE: both surfaces share the system, so a second update() here
+      // would halve every particle's life.
+      this._fxSystem.update(dt);
       this._particles.render(this._transform);
+
+      this._groundParticles.placeInWorld(this._transform, this.width(), this.height());
+      this._groundParticles.render(this._transform);
     }
   }
 
