@@ -89,6 +89,22 @@ body {
   box-sizing: border-box;
 }
 
+/* ── Event console ──────────────────────────────────────────────────────────
+   Host slot only: the EventConsole styles itself, so it stays usable in any
+   page. Empty (and therefore invisible) unless ?debug=1 mounted it. */
+
+.demo-event-console {
+  width: 100%;
+  max-width: 900px;   /* the demo viewport's width */
+  margin: 0 auto;
+  padding: 0 16px 16px;
+  box-sizing: border-box;
+}
+
+.demo-event-console:empty {
+  padding: 0;
+}
+
 #viewport {
   overflow: hidden;
   border: 2px solid #1c2733;
