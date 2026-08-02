@@ -2,10 +2,10 @@
 id: 2026-08-02_19-30
 title: Un bus d'events typé, avec cycle de vie et console
 type: feat
-branch:
+branch: claude/typed-event-bus
 created: 2026-08-02 19:30
 ready: 2026-08-02 19:32
-doing:
+doing: 2026-08-02 19:34
 verify:
 done:
 ---
