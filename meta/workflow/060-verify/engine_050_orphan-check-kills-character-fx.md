@@ -6,7 +6,7 @@ branch: claude/orphan-check-fix
 created: 2026-08-02 18:45
 ready: 2026-08-02 18:46
 doing: 2026-08-02 18:46
-verify:
+verify: 2026-08-02 18:51
 done:
 ---
 
@@ -62,12 +62,12 @@ du tout. C'est exactement la combinaison du personnage principal.
 
 ## Definition of Done
 
-- [ ] La poussière ressort en marchant, **mesurée** dans la démo (particules > 0).
-- [ ] Un émetteur qui suit un élément **jamais attaché** continue d'émettre (test).
-- [ ] Un émetteur dont la cible **a perdu** son parent s'arrête toujours (test de
+- [x] La poussière ressort en marchant, **mesurée** dans la démo (particules > 0).
+- [x] Un émetteur qui suit un élément **jamais attaché** continue d'émettre (test).
+- [x] Un émetteur dont la cible **a perdu** son parent s'arrête toujours (test de
       non-régression de la ceinture, qui doit rester verte).
-- [ ] Le déliage par `Board.freeArea` reste opérant (test existant vert).
-- [ ] `npm run verify` vert.
+- [x] Le déliage par `Board.freeArea` reste opérant (test existant vert).
+- [x] `npm run verify` vert.
 
 ## Suite
 
@@ -80,11 +80,26 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 18:47] **Test d'abord** : deux cas ajoutés, tous deux **vus
+  échouer** sur le code fautif — un émetteur suivant une cible jamais attachée, et
+  un émetteur construit *avant* que sa cible ne rejoigne l'arbre.
+- [2026-08-02 18:48] Correctif : `isAlive()` ne lit plus « sans parent » comme
+  « détruit ». Il **mémorise** qu'un parent a été vu au moins une fois
+  (`_everAttached`) et ne conclut à l'orphelin que dans ce cas. Mémoriser plutôt
+  qu'échantillonner à la construction couvre l'hôte qui câble avant d'attacher —
+  la ceinture s'arme alors quand même.
 
 ### Vérification
 
--
+- [2026-08-02 18:49] `npm run verify` vert : **51 fichiers, 417 tests** (415
+  avant, +2 de non-régression).
+- [2026-08-02 18:50] **Mesuré dans la démo** : la poussière ressort — **15
+  particules après 90 frames de marche**, contre **0** avant le correctif ; et
+  **0 à l'arrêt**, donc `shouldEmit` fonctionne toujours. Les fontaines restent à
+  100 gouttes, la ceinture n'a pas été désarmée.
+- [2026-08-02 18:50] Le test de la ceinture (cible détachée → arrêt définitif)
+  reste vert : le correctif ne rouvre pas la fuite qu'il protège.
+- [2026-08-02 18:51] Sonde retirée (0 résidu).
 
 ### Validation
 
