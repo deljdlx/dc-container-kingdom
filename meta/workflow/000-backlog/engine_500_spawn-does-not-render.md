@@ -73,6 +73,23 @@ qu'un nœud sale finisse repeint. Les corriger séparément n'a pas de sens.
   `addElement`), ce que fait déjà `Character` en se repeignant directement
   (`Character.js:99`). Plus simple, mais ne règle pas le drapeau perdu.
 
+### Un event d'attache — candidat fusionné ici le 2026-08-02
+
+Le `FxBinder` documente que la liaison reste **manuelle** faute d'event d'attache,
+et invoquait deux raisons dont l'une a disparu : « émettre en jetterait pour les
+éléments que le catalogue construit avant de les attacher » — `Element.handle()`
+est désormais silencieux sans application (`2026-08-02_19-30`).
+
+D'où une asymétrie : la **libération** des emitters est automatique
+(`element.destroy`), leur **liaison** reste à la charge de l'hôte. Or c'est le
+même besoin que ce ticket : *quelque chose doit se produire quand un élément
+rejoint le monde*. Un `element.attach` servirait les deux — le rendu **et** le
+liage FX — plutôt que d'inventer deux mécanismes.
+
+À évaluer en *specify* comme **une des pistes**, pas comme un ajout : si le
+pipeline de redessin se règle autrement, l'event d'attache redevient un sujet
+séparé et repart en candidat.
+
 ## Firewalls / risques
 
 1. **Ne pas transformer ça en re-rendu par frame.** L'élagage par drapeau est ce
