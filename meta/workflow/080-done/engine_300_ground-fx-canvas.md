@@ -6,7 +6,7 @@ branch: claude/ground-fx-canvas
 created: 2026-08-02 18:56
 ready: 2026-08-02 18:57
 doing: 2026-08-02 18:58
-verify: 2026-08-02 19:05
+verify: 2026-08-02 19:03
 done: 2026-08-02 19:04 (merge f08e21d)
 ---
 
@@ -175,7 +175,7 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 - [2026-08-02 19:04] Poussière (15, couche sol) et gouttes (96, couche du dessus)
   coexistent : le routage par descripteur fonctionne, le culling et les ceintures
   anti-fuite restent en place.
-- [2026-08-02 19:05] Sonde retirée (0 résidu).
+- [2026-08-02 19:03] Sonde retirée (0 résidu).
 
 ### Validation
 
