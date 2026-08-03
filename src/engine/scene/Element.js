@@ -139,7 +139,7 @@ export class Element
    * 2. **The DOM goes next, for the whole subtree** ({@link clear} recurses).
    *    Clearing only this node used to strand every descendant's node in the
    *    page: children are mounted in the **board root**, not inside their
-   *    parent's node (see `BoardRenderer.renderAreas`), so removing a node takes
+   *    parent's node (see `BoardRenderer.mountPending`), so removing a node takes
    *    nothing with it. Measured before the fix: an area streamed out left its
    *    21 element nodes in the document for the rest of the session.
    * 3. **The tree is emptied last** — `scene.reset()` drops the children, so
