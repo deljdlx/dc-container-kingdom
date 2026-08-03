@@ -100,17 +100,17 @@ qu'à laisser croire résolue.
 
 ## Definition of Done
 
-- [ ] **Aucun élément de la carte n'a un z inférieur à celui du canvas au sol** —
+- [x] **Aucun élément de la carte n'a un z inférieur à celui du canvas au sol** —
       mesuré sur la démo, areas nord chargées.
-- [ ] La poussière passe **derrière** un élément situé au nord de l'origine —
+- [x] La poussière passe **derrière** un élément situé au nord de l'origine —
       vérifié à l'écran, capture au journal. C'est le critère qui fait foi.
-- [ ] Elle passe toujours **au-dessus** des décalques au sol (`manualZ`).
-- [ ] Le jet de fontaine reste **au-dessus** de tout (`FX_DEPTH` intact).
-- [ ] Un **test** couvre un élément au nord de l'origine : son z est supérieur à
+- [x] Elle passe toujours **au-dessus** des décalques au sol (`manualZ`).
+- [x] Le jet de fontaine reste **au-dessus** de tout (`FX_DEPTH` intact).
+- [x] Un **test** couvre un élément au nord de l'origine : son z est supérieur à
       `GROUND_FX_DEPTH`. C'est le trou qui a laissé passer le défaut.
-- [ ] Les deux commentaires faux de `Renderer.js` sont corrigés, et la **limite
+- [x] Les deux commentaires faux de `Renderer.js` sont corrigés, et la **limite
       assumée** (~1 785 areas au nord) est écrite.
-- [ ] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
+- [x] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
 
 ## Suite
 
@@ -122,11 +122,49 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-03 16:52] **Une seule constante bouge** : `GROUND_FX_DEPTH` passe de
+  `DEPTH_BASE − 1` à **1**. J'avais d'abord proposé de donner un z explicite à
+  l'herbe — c'était plus lourd **et** faux : les décalques `manualZ` seraient
+  restés à `auto`, donc passés **sous** l'herbe. Prendre le créneau par le bas ne
+  déplace rien d'autre : herbe et décalques gardent leur `auto` et leur ordre
+  relatif d'aujourd'hui.
+- [2026-08-03 16:53] **Deux commentaires faux corrigés.** `Renderer.js` affirmait
+  que « DEPTH_BASE keeps the value above the ground layer **even north of the
+  origin** » — l'exact contraire du réel. Le JSDoc de `DEPTH_BASE` dit désormais
+  qu'il achète *de la marge, pas de l'immunité*, et interdit explicitement de
+  s'en servir comme plancher.
+- [2026-08-03 16:54] **La limite est écrite** plutôt que sous-entendue :
+  l'invariant tient jusqu'à ~1 785 areas au nord, contre la **première**
+  auparavant.
 
 ### Vérification
 
--
+- [2026-08-03 16:57] `npm run verify` **vert** : **58 fichiers, 496 tests** (+5).
+- [2026-08-03 16:55] **Z mesurés sur la démo** : **0 élément** sous le canvas au
+  sol, contre **2** avant (la maison à 999 990 et l'arbre à 999 804 de l'area
+  (0,−1)). L'élément le plus bas est maintenant à 999 804 pour un canvas à **1**.
+- [2026-08-03 16:56] **Critère qui fait foi — l'A/B dans la même page**, deux
+  nuages de particules émis dans la même frame sur la couche sol :
+
+  | | témoin cyan (sur l'herbe) | sujet rose (sur la maison nord) |
+  |---|---|---|
+  | canvas à **1** (corrigé) | visible | **masqué par la maison** |
+  | canvas à **999 999** (ancien) | visible | **peint sur le toit** |
+
+  Une seule propriété change entre les deux captures. C'est le défaut signalé,
+  reproduit puis corrigé.
+- [2026-08-03 16:55] Décalques au sol (`manualZ`, 62 dans la démo) et herbe
+  restent à `auto` : la poussière passe bien **au-dessus** d'eux.
+- [2026-08-03 16:55] `FX_DEPTH` intact à 10 000 000 — le jet de fontaine reste
+  au-dessus de tout.
+- [2026-08-03 16:56] **Deux sondes fausses écartées en route** : (1)
+  `elementFromPoint` ne voit **pas** le canvas (il est en `pointer-events: none`),
+  donc mon « test objectif d'empilement » ne testait rien — l'A/B avec l'ancienne
+  valeur donnait le même résultat que la nouvelle, ce qui m'a mis la puce à
+  l'oreille ; (2) mes premières captures ne montraient aucune particule faute de
+  témoin — impossible de distinguer « masqué » de « pas peint ». Le témoin cyan
+  a été ajouté pour ça.
+- [2026-08-03 16:57] Sonde `window.__vp` retirée (0 résidu).
 
 ### Validation
 
