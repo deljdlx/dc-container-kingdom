@@ -2,10 +2,10 @@
 id: 2026-08-03_19-10
 title: La bbox agrégée ne suit pas un enfant qui bouge — le PNJ devient intraversable puis traversable
 type: fix
-branch:
+branch: claude/aggregate-follows-movement
 created: 2026-08-03 19:10
 ready: 2026-08-03 19:12
-doing:
+doing: 2026-08-03 19:13
 verify:
 done:
 ---
