@@ -7,7 +7,7 @@ created: 2026-08-03 16:49
 ready: 2026-08-03 16:50
 doing: 2026-08-03 16:51
 verify: 2026-08-03 16:58
-done:
+done: 2026-08-03 16:58 (merge 51aa0bf)
 ---
 
 ## Objectif
@@ -114,9 +114,23 @@ qu'à laisser croire résolue.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — le créneau « au sol » est désormais pris par le bas, donc
+  utilisable par tout ce qui viendra s'y poser : ombres regroupées, ondes,
+  décalques, traces de pas persistantes. Aucun d'eux n'aura à re-négocier avec
+  `DEPTH_BASE`.
+- **Ce qu'on laisse de côté** :
+  - **la limite reste réelle** : ~1 785 areas au nord de l'origine et la carte
+    repasse sous sa propre couche de sol. Écrite, testée, non résolue — la
+    résoudre demanderait de borner la profondeur autrement qu'avec une constante ;
+  - **`FX_DEPTH` porte la même hypothèse en miroir** (« aucun élément n'atteint
+    dix millions », soit ~16 000 areas au sud). Même famille de défaut, pas
+    déclenchée à ce jour, laissée telle quelle ;
+  - **aucun test ne regarde le nord ailleurs que sur la profondeur** : la démo
+    peuple `(0,−1)` et `(−1,0)`, mais rien d'autre n'y est vérifié
+    systématiquement. C'est ce trou de couverture qui a laissé passer le défaut.
+- **Déposé en `100-follow-up/`** — aucun. La limite et le miroir `FX_DEPTH` sont
+  décrits ici et dans le JSDoc ; en faire des candidats reviendrait à demander une
+  décision que rien ne presse.
 
 ## Journal
 
@@ -168,4 +182,10 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-03 16:58] Review : une constante, deux commentaires et un test. Rien
+  d'autre n'a bougé — c'est ce qui rend la correction relisable, et c'est le
+  contraire de ma première proposition (donner un z à l'herbe), qui aurait
+  déplacé les décalques sans nécessité.
+- [2026-08-03 16:58] Merge `--no-ff` sur `main` depuis le tree principal :
+  **51aa0bf** — `merge: la poussière au sol repasse derrière les éléments au nord
+  de l'origine` (4 fichiers, +157 / −21).
