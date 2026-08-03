@@ -4,7 +4,7 @@ title: Détruire une area laisse les nœuds DOM de ses éléments dans la page
 type: fix
 branch:
 created: 2026-08-03 09:32
-ready:
+ready: 2026-08-03 09:37
 doing:
 verify:
 done:
