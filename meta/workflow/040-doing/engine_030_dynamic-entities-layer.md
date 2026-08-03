@@ -2,10 +2,10 @@
 id: 2026-08-03_16-30
 title: Une couche d'entités dynamiques, détachée du tuilage
 type: feat
-branch:
+branch: claude/dynamic-entities-layer
 created: 2026-08-03 16:30
 ready: 2026-08-03 16:31
-doing:
+doing: 2026-08-03 16:32
 verify:
 done:
 ---
