@@ -2,10 +2,10 @@
 id: 2026-08-03_09-32
 title: Détruire une area laisse les nœuds DOM de ses éléments dans la page
 type: fix
-branch:
+branch: claude/area-children-dom-leak
 created: 2026-08-03 09:32
 ready: 2026-08-03 09:37
-doing:
+doing: 2026-08-03 09:38
 verify:
 done:
 ---
