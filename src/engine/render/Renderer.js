@@ -2,9 +2,14 @@
  * Positive base added to every world-space depth z-index. Areas paint their
  * ground (grass) background at z-index `auto` (≈ 0); without this base an
  * element north of the origin — where absolute Y is negative — would get a
- * negative z-index and sink *behind* the ground. The base is large enough that
- * no reachable position brings the depth back down to the ground layer, while
- * the offset is uniform so relative painter ordering is untouched.
+ * negative z-index and sink *behind* the ground. The offset is uniform, so
+ * relative painter ordering is untouched.
+ *
+ * It buys **headroom, not immunity**: an element at world y = −1 000 000 still
+ * lands at zero. Everything that has to stay under the map must therefore sit
+ * just above the ground (see {@link GROUND_FX_DEPTH}), never «just below this
+ * base» — that reading is what put the ground FX surface over the first area
+ * north of the origin.
  */
 export const DEPTH_BASE = 1_000_000;
 
@@ -27,11 +32,23 @@ export const FX_DEPTH = 10_000_000;
  *
  * The board carries a z-index, so it is a stacking context: a sibling canvas is
  * either above the whole map or below its grass. Sliding between the two means
- * being a child of the board — where areas paint their grass at `auto` (≈ 0) and
- * elements sit at `DEPTH_BASE + offsetY + height`. Anything strictly between the
- * two lands on the ground and under everything standing on it.
+ * being a child of the board — where the grass and the flat ground decals
+ * (`manualZ`) stay at `auto` (≈ 0) and anything standing sits at
+ * `DEPTH_BASE + offsetY + height`.
+ *
+ * **It has to sit just above the ground, not just below `DEPTH_BASE`.** It was
+ * `DEPTH_BASE - 1`, on the assumption that no element ever falls below
+ * `DEPTH_BASE`. That assumption is false the moment an element stands **north of
+ * the world origin**, where `offsetY` is negative: measured on 2026-08-03, a
+ * house at world y = −140 sat at 999 990 and a tree at y = −260 at 999 804 —
+ * both *under* a surface at 999 999, so the player's dust painted over them.
+ *
+ * At 1 the invariant becomes «anything standing has a depth above 1», which
+ * holds while `DEPTH_BASE + offsetY + height > 1` — about **1 785 areas north of
+ * the origin**. Not infinite, and deliberately written down: the previous
+ * version broke at the **first** one.
  */
-export const GROUND_FX_DEPTH = DEPTH_BASE - 1;
+export const GROUND_FX_DEPTH = 1;
 
 /**
  * Base renderer for any map element: owns the element's root DOM node and the
@@ -150,8 +167,9 @@ export class Renderer
 
     if(this._element.manualZ === false) {
       // World-space depth: sort by absolute Y so painter's ordering stays
-      // consistent across areas (the camera never affects z). DEPTH_BASE keeps
-      // the value above the ground layer even north of the origin.
+      // consistent across areas (the camera never affects z). North of the
+      // origin this goes *below* DEPTH_BASE — which is why nothing may assume
+      // that constant as a floor (see GROUND_FX_DEPTH).
       const z = DEPTH_BASE + this._element.offsetY() + height;
       if(z !== this._lastZ) {
         this.dom.style.zIndex = z;
