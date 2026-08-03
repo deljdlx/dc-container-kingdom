@@ -7,7 +7,7 @@ created: 2026-08-03 16:30
 ready: 2026-08-03 16:31
 doing: 2026-08-03 16:32
 verify: 2026-08-03 16:41
-done:
+done: 2026-08-03 16:42 (merge a915a6e)
 ---
 
 ## Objectif
@@ -139,9 +139,29 @@ mesure de non-accumulation en DoD.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — les trois verrous de la série sont tombés : une entité
+  **apparaît** (`2026-08-02_20-45`), **s'en va vraiment** (`2026-08-03_09-32`) et
+  a maintenant **un endroit où vivre** qui ne dépend d'aucune tuile. Elle
+  collisionne et s'ordonne en profondeur sans rien câbler. La suite de la feuille
+  de route (horloge fixe, collision par paires, projectiles) peut s'appuyer
+  dessus.
+- **Ce qu'on laisse de côté** :
+  - **déplacer une entité ne la repeint pas** — `Renderer.update()` est vide sur
+    l'élément de base, le positionnement vit dans `render()`. C'est le **chaînon
+    manquant avant les projectiles**, mesuré et documenté, **déposé en
+    candidat** ;
+  - **lier un effet reste manuel** : une entité qui déclare un `fx` n'émettra
+    rien tant que l'hôte n'appelle pas `bind()` — c'est le ticket
+    `2026-08-03_09-24` (event d'attache) ;
+  - **pas de culling** : choix écrit, l'appelant possède la durée de vie. Un hôte
+    négligent peut réaccumuler ce que `2026-08-03_09-32` vient de nettoyer ;
+  - **une seule couche**, pas de calques d'entités (sol / air / au-dessus). La
+    profondeur suit le Y monde comme pour le décor, ce qui suffit tant qu'aucune
+    entité ne vole ;
+  - **rien n'a été mesuré côté Container Kingdom** : il ne spawn pas, sa carte est
+    faite d'areas. Vérifié qu'il ne régresse pas, pas qu'il en profite.
+- **Déposé en `100-follow-up/`** — un candidat :
+  `2026-08-03_16-42_moving-an-element-does-not-repaint-it`.
 
 ## Journal
 
@@ -204,4 +224,11 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-03 16:42] Review : le changement tient en deux endroits — la couche
+  (`Board`) et son montage (`BoardRenderer`). Le renommage `renderAreas` →
+  `mountPending` évite un cas particulier de plus dans une méthode qui en avait
+  déjà un ; `mountChildrenOf` est le morceau commun, pas une duplication.
+  Frontière moteur tenue : rien de Container Kingdom n'entre dans le board.
+- [2026-08-03 16:42] Merge `--no-ff` sur `main` depuis le tree principal :
+  **a915a6e** — `merge: une couche d'entités dynamiques, détachée du tuilage`
+  (8 fichiers, +335 / −40).
