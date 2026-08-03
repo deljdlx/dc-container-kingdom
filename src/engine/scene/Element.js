@@ -127,16 +127,33 @@ export class Element
   }
 
   /**
-   * Announce the departure, then detach from the parent, reset the scene tree
-   * and clear the rendering.
+   * Announce the departure, take the whole subtree off the page, then detach
+   * from the parent and reset the scene tree.
    *
-   * The event fires **first**, while the element still has its parent, its
-   * position and its children: a listener that has to let go of something
-   * attached to this subtree — an FX emitter, a HUD entry — needs to be able to
-   * walk it. Emitting after `scene.reset()` would hand it an empty node.
+   * The three steps are ordered, and each order matters:
+   *
+   * 1. **The event fires first**, while the element still has its parent, its
+   *    position and its children: a listener that has to let go of something
+   *    attached to this subtree — an FX emitter, a HUD entry — needs to be able
+   *    to walk it. Emitting after `scene.reset()` would hand it an empty node.
+   * 2. **The DOM goes next, for the whole subtree** ({@link clear} recurses).
+   *    Clearing only this node used to strand every descendant's node in the
+   *    page: children are mounted in the **board root**, not inside their
+   *    parent's node (see `BoardRenderer.renderAreas`), so removing a node takes
+   *    nothing with it. Measured before the fix: an area streamed out left its
+   *    21 element nodes in the document for the rest of the session.
+   * 3. **The tree is emptied last** — `scene.reset()` drops the children, so
+   *    doing it earlier would leave the walk in step 2 nothing to visit.
+   *
+   * Mounting elements inside their area's node would be the other way to fix
+   * this, and it is the wrong one: the board is a stacking context, so an
+   * element locked inside its area could no longer be ordered against elements
+   * of neighbouring areas. The painter's algorithm needs them to be siblings.
    */
   destroy() {
     this.handle(EngineEvents.ELEMENT_DESTROY, { element: this });
+
+    this.clear();
 
     const parent = this.getParent();
     if(parent) {
@@ -144,8 +161,6 @@ export class Element
     }
 
     this.scene.reset();
-
-    this.getRenderer().clear();
   }
 
   /**
