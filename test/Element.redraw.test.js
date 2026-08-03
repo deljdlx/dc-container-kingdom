@@ -129,7 +129,7 @@ describe('Element - pruning', () => {
 
     // What a spawned entity depends on: joining the tree is enough for the walk
     // to come to it. Putting its node in the DOM is the renderer's job from
-    // there (BoardRenderer.renderAreas), covered at integration level.
+    // there (BoardRenderer.mountPending), covered at integration level.
     expect(walked).toHaveBeenCalledTimes(1);
   });
 });

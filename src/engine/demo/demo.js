@@ -207,6 +207,13 @@ const wanderer = new Woman00();
 originArea.addElement(180, 60, wanderer);
 wanderer.live(3000);
 
+// ── An entity that belongs to no tile ────────────────────────────────────────
+// Spawned on the board's entity layer in WORLD coordinates, not into an area.
+// Walk four areas away and back: the areas around it are streamed out and
+// rebuilt, this well is still standing. Anything that has to outlive the tile it
+// sits over — a projectile, a dropped item — lives here.
+board.spawn(new Well00(), 980, 300);
+
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 

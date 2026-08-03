@@ -73,6 +73,41 @@ matrice `board.areas` est nettoyée. Le board recalcule aussi ses bounding boxes
 agrégées après retrait d'enfants : elles ne grossissent donc plus indéfiniment
 au fil du streaming (coût collision et update bornés par la fenêtre active).
 
+### 2.1 La couche d'entités : ce qui n'appartient à aucune tuile
+
+Un projectile, une explosion, un butin lâché ne peuvent pas être enfants d'une
+`Area` : celle d'où ils sont partis peut se libérer sous eux. Le board porte donc
+une **couche d'entités**, à côté de la grille :
+
+| | enfants d'`Area` | entités |
+|---|---|---|
+| coordonnées | **locales** à l'area | **monde** |
+| survivent au streaming | non — détruites avec l'area | **oui** |
+| dans `board.areas` | oui | **non**, donc `freeArea` ne les voit pas |
+| profondeur, collision | via le sous-arbre du board | **identiques** — même sous-arbre |
+
+```js
+const arrow = board.spawn(new Arrow(), 1500, 2200);   // coordonnées monde
+board.getEntities();                                   // la liste
+board.despawn(arrow);                                  // hors de l'arbre ET de la page
+```
+
+La couche est un `Element` posé à l'**origine** du board (`manualZ`, elle n'est
+pas dessinée) : ses enfants ont donc pour offsets leurs coordonnées monde. Elle
+est créée au premier `spawn`, et `Board.clear()` l'emporte avec le reste — remise
+à zéro du monde, entités comprises.
+
+**L'appelant possède la durée de vie.** Le moteur ne *cull* pas : un projectile
+meurt de lui-même, un objet au sol est censé rester. `despawn()` est fourni, rien
+ne l'appelle à votre place — et `Element.destroy()` nettoie désormais le DOM du
+sous-arbre, donc despawner ne fuit pas.
+
+> ⚠️ **Déplacer une entité ne la repeint pas.** `Renderer.update()` est vide sur
+> l'élément de base : le positionnement vit dans `render()`. Un `Character` se
+> repeint via son propre `update()` ; un `Element` nu, non. Mesuré : `e.y(900)`
+> laisse le nœud à `top: 400px`, `e.render()` le porte à `900px`. C'est le
+> chaînon manquant avant les projectiles.
+
 ## 3. Viewport : la game loop
 
 Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`) :

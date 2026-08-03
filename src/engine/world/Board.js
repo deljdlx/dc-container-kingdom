@@ -5,12 +5,19 @@ import { Element } from '../scene/Element.js';
 /**
  * The infinite tiled world: a lazily-populated grid of {@link Area}s indexed by
  * integer map coordinates (`areas[x][y]`). Owns creation, streaming (load/free)
- * and rendering of areas around the viewport.
+ * and rendering of areas around the viewport — and, beside the grid, the
+ * **entity layer** where what does not belong to a tile lives.
  */
 export class Board extends Element
 {
   /** @type {Object<number, Object<number, import('./Area.js').Area>>} sparse [x][y] area grid */
   areas = {};
+
+  /**
+   * @type {Element|null} the entity layer, created on first {@link spawn}
+   * @see getEntityLayer
+   */
+  _entities = null;
 
   /**
    * @param {import('./Viewport.js').Viewport} viewport
@@ -38,9 +45,70 @@ export class Board extends Element
       area.destroy();
     });
     this.areas = {};
+    // The entity layer is a child like the others, so it has just been
+    // destroyed: forget it, or the next spawn would attach to a dead node.
+    // Wiping the world takes its entities with it — that is the intent.
+    this._entities = null;
     this.recomputeAggregates();
     this.renderer.clear();
     this.render();
+  }
+
+  // ===========================
+
+  /**
+   * The layer holding everything that belongs to the **world** rather than to a
+   * tile: projectiles, explosions, dropped loot, anything that outlives the area
+   * it appeared over.
+   *
+   * It sits at the board's origin, so its children are positioned in **world
+   * coordinates** — an area's children live in area-local ones, which is exactly
+   * what breaks for something that crosses areas.
+   *
+   * It is deliberately **not** in `this.areas`: {@link freeArea} only ever
+   * destroys tracked areas, so streaming never touches it.
+   * @returns {Element} the layer, created on first use
+   */
+  getEntityLayer() {
+    if(!this._entities) {
+      this._entities = new Element(0, 0, 0, 0);
+      // No painter depth of its own: it is a container, not something drawn.
+      // Its children carry their own depth from their world Y.
+      this._entities.manualZ = true;
+      this.addElement(0, 0, this._entities, 'entities');
+    }
+
+    return this._entities;
+  }
+
+  /**
+   * Put an element into the world, in **world coordinates**.
+   *
+   * The counterpart of {@link despawn}. The engine does **not** cull: a
+   * projectile ends its own life, a dropped item is meant to stay. The caller
+   * owns the lifetime — see `despawn`, and `meta/documentation/engine.md`.
+   * @param {Element} element
+   * @param {number} x world
+   * @param {number} y world
+   * @returns {Element} the element, attached and due to be mounted next frame
+   */
+  spawn(element, x = 0, y = 0) {
+    return this.getEntityLayer().addElement(x, y, element);
+  }
+
+  /**
+   * Take an element out of the world — off the scene graph and off the page.
+   * @param {Element} element
+   * @returns {Element} the same element, now detached
+   */
+  despawn(element) {
+    element.destroy();
+    return element;
+  }
+
+  /** @returns {Element[]} the entities currently in the world */
+  getEntities() {
+    return this._entities ? this._entities.getChildren() : [];
   }
 
   /**
