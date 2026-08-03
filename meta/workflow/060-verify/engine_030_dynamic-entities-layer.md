@@ -6,7 +6,7 @@ branch: claude/dynamic-entities-layer
 created: 2026-08-03 16:30
 ready: 2026-08-03 16:31
 doing: 2026-08-03 16:32
-verify:
+verify: 2026-08-03 16:41
 done:
 ---
 
@@ -118,23 +118,23 @@ mesure de non-accumulation en DoD.
 
 ## Definition of Done
 
-- [ ] `board.spawn(element, x, y)` **monte l'entité** en coordonnées monde, sans
+- [x] `board.spawn(element, x, y)` **monte l'entité** en coordonnées monde, sans
       geste supplémentaire de l'hôte.
-- [ ] **Le critère qui fait foi** : une entité posée au-dessus de l'area (0,0)
+- [x] **Le critère qui fait foi** : une entité posée au-dessus de l'area (0,0)
       **survit** à la libération de cette area — le joueur s'éloigne, l'area est
       déchargée, l'entité est toujours là et toujours montée. Mesuré.
-- [ ] Elle **collisionne** : le joueur bute dessus (démo à l'appui).
-- [ ] Sa **profondeur s'ordonne** avec le décor : elle passe derrière un élément
+- [x] Elle **collisionne** : le joueur bute dessus (démo à l'appui).
+- [x] Sa **profondeur s'ordonne** avec le décor : elle passe derrière un élément
       plus au sud, devant un plus au nord (vérifié à l'écran).
-- [ ] `despawn()` la retire de l'arbre **et** de la page.
-- [ ] **Le coût par frame ne régresse pas** : `Element.update()` par frame mesuré
+- [x] `despawn()` la retire de l'arbre **et** de la page.
+- [x] **Le coût par frame ne régresse pas** : `Element.update()` par frame mesuré
       avec 0 et avec N entités mobiles — l'élagage doit tenir.
-- [ ] La bbox agrégée du board **ne dérive pas** quand une entité s'éloigne
+- [x] La bbox agrégée du board **ne dérive pas** quand une entité s'éloigne
       (mesure ou décision écrite).
-- [ ] `Board.clear()` puis `spawn()` refonctionne.
-- [ ] La démo montre une entité qui n'appartient à aucune tuile ; les trois hôtes
+- [x] `Board.clear()` puis `spawn()` refonctionne.
+- [x] La démo montre une entité qui n'appartient à aucune tuile ; les trois hôtes
       sans erreur console.
-- [ ] `meta/documentation/engine.md` décrit la couche et le choix « l'appelant
+- [x] `meta/documentation/engine.md` décrit la couche et le choix « l'appelant
       possède la durée de vie » ; `npm run verify` vert.
 
 ## Suite
@@ -147,11 +147,60 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-03 16:34] **La couche est un `Element` à l'origine du board**, créée au
+  premier `spawn`, `manualZ` (elle n'est pas dessinée). Ses enfants ont donc pour
+  offsets leurs coordonnées monde, sans conversion. Elle n'entre pas dans
+  `board.areas`, donc `freeArea()` ne la voit pas.
+- [2026-08-03 16:35] **Le montage était la moitié manquante.**
+  `BoardRenderer.renderAreas()` ne montait que les areas et leurs enfants — c'est
+  pour ça qu'un enfant direct du board n'était jamais rendu. Renommée
+  **`mountPending()`**, avec `mountChildrenOf(container)` extrait : areas et
+  couche d'entités passent par les **mêmes** règles, ce qui est la condition pour
+  que leurs profondeurs restent comparables.
+- [2026-08-03 16:35] `Board.clear()` remet `_entities` à `null` : la couche est un
+  enfant comme un autre, donc détruite avec le reste ; sans ça le `spawn` suivant
+  se serait accroché à un nœud mort.
+- [2026-08-03 16:36] **Pas de culling automatique**, écrit comme un choix :
+  l'appelant possède la durée de vie. `despawn()` délègue à `destroy()`, propre
+  depuis `2026-08-03_09-32`.
+- [2026-08-03 16:39] **Trouvaille en cours de route** : déplacer une entité ne la
+  repeint pas. `Renderer.update()` est **vide** sur l'élément de base — le
+  positionnement vit dans `render()`. Un `Character` s'en sort parce qu'il
+  repeint lui-même dans son `update()`. Hors DoD, mais c'est le chaînon manquant
+  avant les projectiles : documenté en ⚠️ et déposé en candidat.
 
 ### Vérification
 
--
+- [2026-08-03 16:40] `npm run verify` **vert** : **57 fichiers, 491 tests** (+9).
+- [2026-08-03 16:37] **Critère qui fait foi** : entité posée en monde (980, 300),
+  joueur marché jusqu'à l'**area (0,13)** → l'area (1, 0) qui la portait est
+  **déchargée**, et l'entité est **toujours là, toujours montée, aux mêmes
+  coordonnées**. Avant ce ticket, la même entité attachée à une area mourait avec
+  elle, et attachée au board n'était **jamais montée**.
+- [2026-08-03 16:38] **Collision** : entité solide posée devant le joueur →
+  **95 px parcourus sur 1440 possibles**. Une fois despawnée : **1439 / 1440**.
+  Le sous-arbre du board suffit, rien à câbler.
+- [2026-08-03 16:38] **Profondeur** : `z = DEPTH_BASE + offsetY + height` vérifié
+  pour l'entité **et** le décor voisin, tous **frères dans la même racine DOM**.
+- [2026-08-03 16:38] **`despawn()`** : hors de la liste **et** hors du document.
+- [2026-08-03 16:39] **Le coût ne régresse pas** — 120 frames de marche :
+
+  | | `Element.update()` / frame | ms / frame | bbox du board |
+  |---|---|---|---|
+  | 1 entité | 1,7 | 0,329 | 2244 × 1645 |
+  | 51 entités immobiles | 1,0 | 0,314 | 2244 × 1645 |
+  | 51 entités **qui bougent chaque frame** | 2,7 | 0,299 | 2244 × 1645 |
+
+  L'élagage tient, et la **bbox agrégée du board ne dérive pas** — le risque n°2
+  du ticket ne s'est pas matérialisé.
+- [2026-08-03 16:39] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 529 éléments, 219 conteneurs) et le catalogue (536 sprites).
+- [2026-08-03 16:36] **Deux mesures fausses écartées avant de conclure** :
+  (1) j'ai cru à une régression du déplacement — le personnage partait à
+  `y = -32966` ; c'était ma sonde qui pilotait la boucle avec `performance.now()`
+  pendant que rAF tournait, d'où des `dt` incohérents. Avec une horloge à moi :
+  **479 px pour 480 attendus**, aucun défaut. (2) « collision non bloquante » :
+  mon seuil comptait 67 px comme un échec alors que c'était l'arrêt lui-même.
 
 ### Validation
 
