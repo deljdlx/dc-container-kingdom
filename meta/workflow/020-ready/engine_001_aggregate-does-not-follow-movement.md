@@ -4,7 +4,7 @@ title: La bbox agrégée ne suit pas un enfant qui bouge — le PNJ devient intr
 type: fix
 branch:
 created: 2026-08-03 19:10
-ready:
+ready: 2026-08-03 19:12
 doing:
 verify:
 done:
