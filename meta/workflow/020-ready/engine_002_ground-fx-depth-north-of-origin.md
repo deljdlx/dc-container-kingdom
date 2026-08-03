@@ -4,7 +4,7 @@ title: La poussière au sol passe par-dessus les éléments au nord de l'origine
 type: fix
 branch:
 created: 2026-08-03 16:49
-ready:
+ready: 2026-08-03 16:50
 doing:
 verify:
 done:
