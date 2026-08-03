@@ -2,10 +2,10 @@
 id: 2026-08-03_16-49
 title: La poussière au sol passe par-dessus les éléments au nord de l'origine
 type: fix
-branch:
+branch: claude/ground-fx-depth
 created: 2026-08-03 16:49
 ready: 2026-08-03 16:50
-doing:
+doing: 2026-08-03 16:51
 verify:
 done:
 ---
