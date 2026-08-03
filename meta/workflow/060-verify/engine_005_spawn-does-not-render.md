@@ -6,7 +6,7 @@ branch: claude/spawn-does-not-render
 created: 2026-08-02 20:45
 ready: 2026-08-02 21:13
 doing: 2026-08-02 21:25
-verify:
+verify: 2026-08-02 21:40
 done:
 ---
 
@@ -116,15 +116,15 @@ séparé et repart en candidat.
 
 ## Definition of Done
 
-- [ ] Un élément attaché en cours de partie **apparaît sans geste de l'hôte** —
+- [x] Un élément attaché en cours de partie **apparaît sans geste de l'hôte** —
       mesuré au navigateur, compte de nœuds DOM avant/après, sans `board.update()`
       ni `viewport.render()` manuel.
-- [ ] `needUpdate(false)` **n'éteint plus les ancêtres** — les deux sondes de
+- [x] `needUpdate(false)` **n'éteint plus les ancêtres** — les deux sondes de
       l'audit deviennent des tests de non-régression et passent.
-- [ ] **Aucune régression de coût à monde immobile** : nœuds visités par frame
+- [x] **Aucune régression de coût à monde immobile** : nœuds visités par frame
       mesurés avant/après, l'élagage tient.
-- [ ] `Character` n'est pas repeint deux fois par frame (mesure ou test).
-- [ ] `meta/documentation/engine.md` décrit le pipeline de redessin réel ;
+- [x] `Character` n'est pas repeint deux fois par frame (mesure ou test).
+- [x] `meta/documentation/engine.md` décrit le pipeline de redessin réel ;
       `npm run verify` vert.
 
 ## Suite
@@ -140,11 +140,62 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Travail
 
--
+- [2026-08-02 21:28] **Le drapeau monte, il ne descend plus.** `needUpdate(true)`
+  continue de marquer le chemin jusqu'à la racine — c'est ce qui rend l'élagage
+  possible ; `needUpdate(false)` ne vaut désormais **que pour soi**.
+- [2026-08-02 21:29] **Éteint avant le travail, pas après.** Ce qui est marqué
+  *pendant* la passe appartient à la frame suivante. Éteindre en fin d'`update()`
+  aurait effacé la demande à l'instant où elle était levée — un test porte ce
+  contrat.
+- [2026-08-02 21:30] **Le parcours devient une étape de frame** :
+  `this.getBoard().update()` dans `Viewport.update()`, entre les behaviors et la
+  caméra. Le monde se pose avant d'être peint.
+- [2026-08-02 21:31] **Un seul chemin, pas deux** : le `board.update()` que
+  `_streamAreas` appelait à la main est retiré. Charger une area lève le drapeau
+  du board, et le parcours de la même frame la monte. Le test de streaming portait
+  ce couplage, il porte maintenant son absence.
+- [2026-08-02 21:33] **L'event d'attache n'a pas été nécessaire** — le candidat
+  fusionné dans ce ticket proposait `element.attach` comme piste. Le parcours
+  élagué règle le rendu sans nouvel event ; le besoin du `FxBinder` (lier
+  automatiquement) reste entier et repart en candidat, comme le ticket le
+  prévoyait.
+- [2026-08-02 21:34] Deux de mes propres tests étaient faux et la mesure a gagné :
+  je supposais qu'un parent repeint ses enfants (il n'en fait rien, chaque nœud
+  lit **son** drapeau), et qu'une demande levée avant que le parcours n'atteigne
+  le nœud survivrait à la passe (elle est servie dans la passe, c'est correct).
 
 ### Vérification
 
--
+- [2026-08-02 21:38] `npm run verify` **vert** : **55 fichiers, 477 tests**
+  (+9 : le pipeline de redessin et le parcours par frame).
+- [2026-08-02 21:35] **Critère qui fait foi** : 20 entités attachées au milieu
+  d'une area, **aucun** geste de l'hôte (ni `board.update()` ni
+  `viewport.render()`) → **301 nœuds DOM avant, 301 après l'attache, 321 après
+  UNE seule frame**. Avant le correctif, la même mesure donnait 0 nouveau nœud
+  tant que le joueur ne changeait pas de tuile.
+- [2026-08-02 21:37] **L'élagage tient** — mesuré sur 120 frames, démo à 313
+  éléments rendus et 63 areas :
+
+  | Scénario | `Element.update()` / frame | Balayage du board / frame | ms / frame |
+  |---|---|---|---|
+  | immobile | 3,4 | 0,01 | 0,196 |
+  | marche | 2,5 | 0,03 | 0,156 |
+  | marche + collisions | 12,1 | 0,13 | 0,102 |
+
+  Quelques nœuds sur 376, jamais l'arbre entier. Le coût total par frame reste du
+  même ordre qu'avant le changement (0,17–0,20 ms mesurés à l'audit). Dit
+  honnêtement : le parcours coûte 2 à 12 visites de nœuds là où il en coûtait 0 —
+  et c'est ce prix-là qui fait apparaître les entités.
+- [2026-08-02 21:37] **Pas de double repaint** : 150 frames de marche dans la
+  foule → **150 peintures du joueur, pire frame à 1**.
+- [2026-08-02 21:36] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 535 éléments, 219 conteneurs) et le catalogue (535 sprites).
+- [2026-08-02 21:34] Une sonde m'a menti en cours de route : en restaurant un
+  prototype par affectation, j'avais laissé une propriété propre sur
+  `Board.prototype` qui masquait `Element.prototype` — d'où un compteur à 0
+  incohérent. Mesure refaite sur page rechargée, avec un contrôle explicite que
+  le board ne porte pas d'`update()` propre.
+- [2026-08-02 21:38] Sonde `window.__vp` retirée (0 résidu).
 
 ### Validation
 
