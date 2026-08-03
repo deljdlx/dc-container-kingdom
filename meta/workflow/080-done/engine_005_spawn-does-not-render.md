@@ -6,8 +6,8 @@ branch: claude/spawn-does-not-render
 created: 2026-08-02 20:45
 ready: 2026-08-02 21:13
 doing: 2026-08-02 21:25
-verify: 2026-08-02 21:40
-done:
+verify: 2026-08-03 09:09
+done: 2026-08-03 09:09 (merge 6f6ab7e)
 ---
 
 ## Objectif
@@ -129,9 +129,30 @@ séparé et repart en candidat.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — la couche d'entités dynamiques (étape 2) peut commencer :
+  faire naître une entité, c'est désormais l'attacher, point. Un projectile, une
+  explosion, un butin lâché apparaissent à la frame suivante sans que l'hôte ait
+  rien à appeler. Le drapeau de redessin devient aussi le levier naturel d'un
+  futur budget de rendu (« ne repeins que N nœuds par frame »), si le besoin
+  vient.
+- **Ce qu'on laisse de côté** :
+  - **le montage DOM reste l'affaire du `BoardRenderer`** (`renderAreas()`, sur
+    `isRendered()`), pas de l'élément lui-même. Le parcours *atteint* le nouvel
+    élément ; c'est le renderer du board qui le pose. Un élément attaché hors
+    d'une area n'est donc toujours pas monté — personne n'en attache aujourd'hui,
+    mais ça se saura le jour venu ;
+  - **`Container Kingdom` appelle toujours `viewport.render()` en entier** à
+    chaque rafraîchissement. C'est désormais du gaspillage, pas une nécessité —
+    déposé en candidat ;
+  - **le coût passe de 0 à 2–12 visites de nœuds par frame.** Assumé : c'est le
+    prix de la correction, et l'élagage l'empêche d'être 376 ;
+  - **le déplacement mort de `Element.update()`** (`_targetX`/`_targetY`, biais
+    down/right) a été *traversé* sans être touché — il reste au ticket
+    `2026-07-26_14-25`.
+- **Déposé en `100-follow-up/`** — deux candidats :
+  `2026-08-03_09-10_element-attach-event` (repris tel que ce ticket le prévoyait,
+  le rendu s'étant réglé autrement) et
+  `2026-08-03_09-10_kingdom-full-render-now-useless`.
 
 ## Journal
 
@@ -199,4 +220,10 @@ Entrées datées `- [YYYY-MM-DD HH:MM] …` (heure **réelle**), par étape ; ti
 
 ### Validation
 
--
+- [2026-08-03 09:09] Review : le changement tient en deux endroits — le drapeau
+  (`Element.needUpdate` / `update`) et l'appel par frame (`Viewport.update`). Rien
+  d'autre n'a bougé ; le `board.update()` retiré de `_streamAreas` supprime un
+  chemin au lieu d'en ajouter un.
+- [2026-08-03 09:09] Merge `--no-ff` sur `main` depuis le tree principal :
+  **6f6ab7e** — `merge: un élément attaché apparaît — le parcours de redessin
+  passe par frame` (6 fichiers, +288 / −22).
