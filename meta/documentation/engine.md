@@ -87,7 +87,8 @@ flowchart TD
     RST --> B
     MC --> B
     MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
-    B --> C["camera.update"]
+    B --> W["board.update()<br/>parcours élagué : monte ce qui a rejoint la scène"]
+    W --> C["camera.update"]
     C --> R["renderer.update"]
 ```
 
@@ -96,6 +97,10 @@ Points clés :
 - **Une seule horloge.** Joueur et PNJ sont tickés par la même game loop avec le
   même `dt` (les behaviors s'enregistrent via `viewport.addBehavior`). Pas de
   `setTimeout` maison.
+- **Le monde se pose avant d'être peint** — `board.update()` chaque frame. C'est
+  ce parcours, et lui seul, qui **monte ce qui a rejoint la scène** : une area
+  streamée, une entité apparue en cours de partie. Attacher un élément suffit ;
+  l'hôte n'a rien à appeler. Voir §3.4 pour le drapeau qui l'élague.
 - **Le sous-pixel est mis en banque, pas jeté — un reste par axe.** Le déplacement
   se fait en pixels entiers (les sprites pixel-art ne doivent pas atterrir sur un
   demi-pixel), mais la fraction restante est **reportée sur la frame suivante**.
@@ -305,6 +310,39 @@ monde = (écran − décalage) / échelle
   les positions d'éléments (`Coordinates`).
 - **`transform-origin: 0 0` n'est pas cosmétique** : toute l'arithmétique de pan
   suppose que l'échelle grandit depuis le coin haut-gauche.
+
+### 3.4 Le pipeline de redessin : un drapeau qui monte, un parcours qui descend
+
+`Element.needUpdate` est le drapeau « il y a quelque chose à repeindre ici ».
+
+- **Le lever monte.** `needUpdate(true)` marque tout le chemin jusqu'à la racine.
+  C'est ce qui rend le parcours **élagable** : un nœud non marqué n'a rien de sale
+  en dessous, la descente s'arrête là.
+- **L'éteindre ne monte pas.** `needUpdate(false)` ne vaut que **pour soi**. Un
+  nœud ne parle pas au nom de ses ancêtres — quand il le faisait, un enfant qui
+  terminait sa mise à jour éteignait son parent, et un frère qui venait de
+  demander un redessin n'était **plus jamais visité**.
+- **Le drapeau est éteint avant le travail, pas après.** Ce qui est marqué
+  *pendant* la passe appartient à la frame suivante ; éteindre après aurait effacé
+  la demande à l'instant où elle était levée.
+
+`Viewport.update()` fait descendre ce parcours **à chaque frame**, entre les
+behaviors et la caméra. Avant, il n'avait lieu qu'au franchissement d'une area :
+attacher un élément levait un drapeau que rien ne lisait, et l'élément restait
+invisible jusqu'à ce que le joueur change de tuile par hasard.
+
+Mesuré sur la démo (313 éléments rendus, 63 areas), le 2026-08-02 :
+
+| Scénario | `Element.update()` / frame | Balayage du board / frame |
+|---|---|---|
+| monde immobile | 3,4 | 0,01 |
+| joueur en marche | 2,5 | 0,03 |
+| marche + collisions | 12,1 | 0,13 |
+
+Autrement dit : quelques nœuds sur 376, jamais l'arbre entier — l'élagage porte
+tout le coût. Le personnage principal reste peint **exactement une fois par
+frame** (150 frames mesurées, pire cas 1) : il se repeint lui-même en marchant,
+et le parcours ne repasse pas derrière lui.
 
 ## 4. Camera
 
