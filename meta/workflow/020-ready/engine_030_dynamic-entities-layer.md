@@ -4,7 +4,7 @@ title: Une couche d'entités dynamiques, détachée du tuilage
 type: feat
 branch:
 created: 2026-08-03 16:30
-ready:
+ready: 2026-08-03 16:31
 doing:
 verify:
 done:
