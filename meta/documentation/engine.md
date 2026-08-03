@@ -228,6 +228,19 @@ S'intercaler exige d'être **enfant du board**, dans le créneau libre entre l'h
 (`auto`) et les éléments (`DEPTH_BASE + offsetY + height`) : c'est
 `GROUND_FX_DEPTH`.
 
+**Ce créneau se prend par le bas, pas par le haut.** `GROUND_FX_DEPTH` valait
+`DEPTH_BASE − 1`, en supposant qu'aucun élément ne descende sous `DEPTH_BASE`.
+C'est faux dès qu'un élément se tient **au nord de l'origine du monde**, où
+`offsetY` est négatif : mesuré le 2026-08-03, une maison en y = −140 tombait à
+999 990 et un arbre en y = −260 à 999 804 — tous deux **sous** une surface à
+999 999, d'où la poussière peinte par-dessus eux dès qu'on montait d'une area.
+
+La constante vaut donc **1** : juste au-dessus de l'herbe et des décalques plats
+(`manualZ`, restés à `auto`), sous tout ce qui se tient debout. L'invariant tient
+tant que `DEPTH_BASE + offsetY + height > 1`, soit environ **1 785 areas au nord**
+de l'origine — limite assumée et écrite, là où la version précédente cassait dès
+la **première**.
+
 Étant dans le board, la surface au sol **subit sa transformation CSS**. Elle est
 donc posée en coordonnées **monde** — origine au point qui tombe à l'écran en
 (0, 0), taille = viewport ÷ échelle — et repositionnée seulement **quand la vue
