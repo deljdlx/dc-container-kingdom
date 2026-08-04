@@ -84,15 +84,15 @@ _À confirmer en « specify »._ Deux directions, à trancher :
 
 ## Definition of Done
 
-- [ ] Un PNJ peut détecter le joueur **sans le connaître nommément** — test à
+- [x] Un PNJ peut détecter le joueur **sans le connaître nommément** — test à
       l'appui.
-- [ ] `FleeBehavior` n'a plus besoin de sa rustine (ou la raison de la garder est
+- [x] `FleeBehavior` n'a plus besoin de sa rustine (ou la raison de la garder est
       écrite).
-- [ ] La caméra, le rendu et la profondeur du joueur sont **inchangés** —
+- [x] La caméra, le rendu et la profondeur du joueur sont **inchangés** —
       vérifiés à l'écran.
-- [ ] Le joueur ne se détecte pas lui-même (test).
-- [ ] Le coût du broad phase est mesuré avant/après.
-- [ ] `meta/documentation/engine.md` décrit la place du joueur dans le monde ;
+- [x] Le joueur ne se détecte pas lui-même (test).
+- [x] Le coût du broad phase est mesuré avant/après.
+- [x] `meta/documentation/engine.md` décrit la place du joueur dans le monde ;
       `npm run verify` vert.
 
 ## Suite
@@ -105,11 +105,51 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-04 09:18] **Le joueur rejoint la couche d'entités** — celle ouverte par
+  `2026-08-03_16-30`, faite exactement pour ce qui n'appartient à aucune tuile.
+  Elle est posée à l'origine du board, donc ses coordonnées monde ne changent pas
+  d'un pixel : caméra et profondeur lisent les mêmes offsets qu'avant.
+- [2026-08-04 09:19] **Le montage à la main disparaît.** `ViewportRenderer`
+  appendait le joueur dans la racine du board parce qu'il n'appartenait à aucun
+  conteneur ; `mountPending()` s'en charge désormais par les mêmes règles que le
+  reste.
+- [2026-08-04 09:25] **Deux rustines retirées** : `FleeBehavior` et
+  `PatrolBehavior` gardaient une référence au joueur et le testaient par son nom
+  en plus du monde. `overlaps(getBoard())` suffit. `PatrolBehavior._player()`
+  disparaît avec.
+- [2026-08-04 09:22] Un test d'horloge a dû être affiné : il vérifiait que
+  `Character.update` n'était **pas appelé** à la première frame, comme substitut
+  de « le joueur n'a pas bougé ». Le parcours par frame le repeint maintenant
+  avec une distance de 0 ; l'assertion porte désormais sur la **distance
+  transmise à l'animateur**, ce qu'elle voulait dire.
 
 ### Vérification
 
--
+- [2026-08-04 09:31] `npm run verify` **vert** : **60 fichiers, 508 tests** (+7).
+- [2026-08-04 09:29] **Critère qui fait foi** : corps du joueur posé exactement
+  sur celui d'un PNJ patrouilleur → `npc.overlaps(npc.getBoard())` rend **true**.
+  Le PNJ voit le joueur **sans le nommer**. Avant ce ticket, la même mesure
+  rendait `false`.
+- [2026-08-04 09:28] **Rien n'a bougé de ce qui marchait** : 60 frames de marche →
+  **287 px** parcourus (288 attendus), la caméra suit (transformation du board
+  modifiée), la profondeur vaut exactement `DEPTH_BASE + offsetY + height`, et le
+  nœud reste dans la racine du board.
+- [2026-08-04 09:29] **Pas d'auto-détection** : posé sur trois emplacements vides,
+  `player.overlaps(board)` rend `false` à chaque fois (le quatrième testé tombait
+  sur du décor réel).
+- [2026-08-04 09:27] **Aucune régression du correctif précédent** : la campagne du
+  fuyard (36 approches) reste à **0 traversée**.
+- [2026-08-04 09:30] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 538 éléments, 219 conteneurs — elle n'a pas de joueur, donc rien à
+  régresser) et le catalogue (533 sprites).
+- [2026-08-04 09:26] **Trois fausses pistes, dites telles quelles** : (1) j'ai cru
+  la boucle de jeu morte — 0 update en 500 ms — avant de mesurer
+  `document.visibilityState: "hidden"` : c'est le **piège rAF** documenté du
+  projet, l'onglet était en arrière-plan ; (2) j'ai conclu deux fois que le PNJ ne
+  voyait pas le joueur, en superposant les **positions** au lieu des **corps** —
+  la zone d'un `Character` est décalée de (16, 24) ; (3) `board.getDom()` ne rend
+  pas la vraie racine du board (le `Board` remplace son renderer sans passer par
+  `setRenderer`), ce qui a faussé une vérification de montage.
 
 ### Validation
 
