@@ -7,7 +7,7 @@ created: 2026-08-04 18:32
 ready: 2026-08-04 18:33
 doing: 2026-08-04 18:34
 verify: 2026-08-04 18:55
-done:
+done: 2026-08-04 18:56 (merge 2048589)
 ---
 
 ## Objectif
@@ -123,9 +123,27 @@ Coût : `distance / pas` requêtes — pour un projectile de 6 px à 64 px/frame
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — la série de blindage est **complète**. Une entité naît,
+  apparaît, se déplace à l'écran, est vue du monde, meurt proprement, et l'on peut
+  demander au monde ce qu'elle croise. La démo tire déjà : l'étape 5 n'est plus un
+  chantier moteur mais un travail de **jeu** (types de projectiles, dégâts,
+  effets), qui se pose au-dessus sans rien redemander au noyau.
+- **Ce qu'on laisse de côté** :
+  - **pas d'index spatial.** Le parcours élagué suffit aux échelles mesurées
+    (40 projectiles = 0,64 ms/frame). Une grille se justifiera quand une mesure le
+    dira — pas avant, et surtout pas « au cas où » ;
+  - **le coût du balayage croît avec la vitesse** : `distance / pas` échantillons.
+    Un projectile très rapide en fait beaucoup. Écrit dans le JSDoc et la doc ;
+  - **`sweep()` rend le premier contact, pas la liste** : un projectile perforant
+    ou une explosion en ligne demanderont autre chose. `query()` est là pour les
+    formes ; le trajet complet n'est pas exposé ;
+  - **rien ne résout la collision** — pas de rebond, pas de glissement, pas de
+    dégâts. Les primitives répondent, l'appelant décide. `moveBlocked` reste le
+    chemin du personnage, inchangé ;
+  - **le mobile est un rectangle** : pas de rotation, pas de cercle.
+- **Déposé en `100-follow-up/`** — aucun. Les limites ci-dessus sont des choix
+  écrits, pas des décisions en attente ; les faire remonter en candidats
+  demanderait un arbitrage que rien ne presse.
 
 ## Journal
 
@@ -176,4 +194,9 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-04 18:56] Review : deux fonctions pures, deux façades, aucune classe
+  ajoutée au moteur. Le fait que la démo tire **sans** classe `Projectile` est le
+  meilleur contrôle qu'on pouvait avoir sur la complétude des primitives.
+- [2026-08-04 18:56] Merge `--no-ff` sur `main` depuis le tree principal :
+  **2048589** — `merge: interroger le monde, et le balayer — la collision par
+  paires` (9 fichiers, +478 / −13).
