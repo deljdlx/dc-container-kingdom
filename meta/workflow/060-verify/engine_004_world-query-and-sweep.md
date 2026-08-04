@@ -6,7 +6,7 @@ branch: claude/world-query-and-sweep
 created: 2026-08-04 18:32
 ready: 2026-08-04 18:33
 doing: 2026-08-04 18:34
-verify:
+verify: 2026-08-04 18:55
 done:
 ---
 
