@@ -4,7 +4,7 @@ title: Le joueur n'est pas dans le scene-graph — la collision est à sens uniq
 type: refactor
 branch:
 created: 2026-08-03 19:11
-ready: 2026-08-04 08:40
+ready: 2026-08-04 09:16
 doing:
 verify:
 done:
