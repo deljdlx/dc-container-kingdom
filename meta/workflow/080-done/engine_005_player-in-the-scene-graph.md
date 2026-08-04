@@ -7,7 +7,7 @@ created: 2026-08-03 19:11
 ready: 2026-08-04 09:16
 doing: 2026-08-04 09:17
 verify: 2026-08-04 09:32
-done:
+done: 2026-08-04 09:33 (merge 70bdc62)
 ---
 
 ## Objectif
@@ -97,9 +97,27 @@ _À confirmer en « specify »._ Deux directions, à trancher :
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — « qui a touché qui » devient une question qu'on peut poser
+  au monde. La **collision par paires** (étape 4) n'a plus de participant hors
+  champ, et un projectile tiré par un PNJ pourra toucher le joueur sans le
+  connaître nommément. Accessoirement, le `CharacterBehavior` (le vagabond) cesse
+  de traverser le joueur — il n'avait jamais eu la rustine que les deux autres
+  behaviors portaient.
+- **Ce qu'on laisse de côté** :
+  - **le joueur reste un cas particulier ailleurs** : `Viewport.character` est un
+    champ dédié, `moveCharacter()` un chemin dédié, `MainCharacterRenderer` une
+    classe dédiée. Seule son **appartenance au monde** a été corrigée ;
+  - **`board.getDom()` ne rend pas la vraie racine du board** — le `Board`
+    remplace son renderer sans passer par `setRenderer()`, si bien que `dom`
+    pointe sur le nœud du renderer générique. Trouvé en vérifiant, hors périmètre,
+    **déposé en candidat** ;
+  - **rien n'a été mesuré côté coût** : le joueur ajoute un nœud au sous-arbre que
+    le broad phase parcourt, ce qui est marginal, mais je n'ai pas chiffré
+    l'avant/après ;
+  - **Container Kingdom n'a pas de joueur** : le changement y est inerte, vérifié
+    sans régression, pas éprouvé.
+- **Déposé en `100-follow-up/`** — un candidat :
+  `2026-08-04_09-33_board-getdom-is-not-the-board-root`.
 
 ## Journal
 
@@ -153,4 +171,10 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-04 09:33] Review : le changement tient en une ligne d'attache et un
+  montage retiré ; le reste est du **retrait** — deux rustines et une méthode
+  privée. C'est le signe qu'on a corrigé la cause et pas ajouté un contournement
+  de plus.
+- [2026-08-04 09:33] Merge `--no-ff` sur `main` depuis le tree principal :
+  **70bdc62** — `merge: le joueur rejoint le monde qu'il traverse`
+  (8 fichiers, +220 / −46).
