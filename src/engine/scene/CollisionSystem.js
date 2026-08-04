@@ -152,6 +152,31 @@ export class CollisionSystem {
    * cover.
    */
   recomputeAggregates() {
+    this.recomputeCollisionAggregate();
+
+    const boundingBox = new BoundingBox(this._element);
+    this._element.getChildren().forEach((child) => {
+      const childBoundingBox = new BoundingBox();
+      childBoundingBox.x0(child.x());
+      childBoundingBox.y0(child.y());
+      childBoundingBox.x1(child.x() + child.getBoundingBox().width());
+      childBoundingBox.y1(child.y() + child.getBoundingBox().height());
+      boundingBox.updateWithBoundingBox(childBoundingBox);
+    });
+    this._boundingBox = boundingBox;
+  }
+
+  /**
+   * Rebuild **only** the collision envelope, from this element's zones and its
+   * children's envelopes.
+   *
+   * Split out because it is the one an element that **moves** must refresh: the
+   * broad phase prunes on this box and nothing else. The rendering box is left
+   * alone on purpose — it is not consulted by the detection, and recomputing it
+   * per move would be work nobody reads.
+   * @returns {BoundingBox} the rebuilt envelope
+   */
+  recomputeCollisionAggregate() {
     const collisionBoundingBox = new BoundingBox(this._element, false);
     this._zones.collision.forEach((zone) => {
       collisionBoundingBox.updateWithBoundingBox(zone);
@@ -165,16 +190,7 @@ export class CollisionSystem {
     });
     this._collisionBoundingBox = collisionBoundingBox;
 
-    const boundingBox = new BoundingBox(this._element);
-    this._element.getChildren().forEach((child) => {
-      const childBoundingBox = new BoundingBox();
-      childBoundingBox.x0(child.x());
-      childBoundingBox.y0(child.y());
-      childBoundingBox.x1(child.x() + child.getBoundingBox().width());
-      childBoundingBox.y1(child.y() + child.getBoundingBox().height());
-      boundingBox.updateWithBoundingBox(childBoundingBox);
-    });
-    this._boundingBox = boundingBox;
+    return collisionBoundingBox;
   }
 
   /**
