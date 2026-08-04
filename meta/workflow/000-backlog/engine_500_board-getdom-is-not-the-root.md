@@ -1,6 +1,6 @@
 ---
 id: 2026-08-04_17-16
-title: board.getDom() ne rend pas la vraie racine du board
+title: getDom() du Board ne rend pas le nœud racine réellement monté
 type: fix
 branch:
 created: 2026-08-04 17:16
