@@ -2,11 +2,11 @@
 id: 2026-08-04_17-15
 title: Déplacer un élément ne le repeint pas — le dernier verrou avant les projectiles
 type: fix
-branch:
+branch: claude/moving-repaints
 created: 2026-08-04 17:15
 ready: 2026-08-04 17:17
-doing:
-verify:
+doing: 2026-08-04 17:18
+verify: 2026-08-04 18:22
 done:
 ---
 
@@ -76,17 +76,17 @@ d'empiler les appels.
 
 ## Definition of Done
 
-- [ ] **Le critère qui fait foi** : une entité déplacée par du code se retrouve
+- [x] **Le critère qui fait foi** : une entité déplacée par du code se retrouve
       dessinée **à sa nouvelle position** à la frame suivante, sans appel de
       l'hôte — mesuré au navigateur, `top`/`left` avant/après.
-- [ ] Un test couvre « bouger un élément puis avancer d'une frame le repositionne ».
-- [ ] **Le montage du board ne tourne qu'une fois par frame** (mesure).
-- [ ] **Le personnage n'est pas repeint deux fois** — ou le second appel n'écrit
+- [x] Un test couvre « bouger un élément puis avancer d'une frame le repositionne ».
+- [x] **Le montage du board ne tourne qu'une fois par frame** (mesure).
+- [x] **Le personnage n'est pas repeint deux fois** — ou le second appel n'écrit
       rien dans le DOM (mesure des écritures, pas du nombre d'appels).
-- [ ] **Coût mesuré** : nœuds visités par le parcours et ms/frame, monde immobile
+- [x] **Coût mesuré** : nœuds visités par le parcours et ms/frame, monde immobile
       et joueur en marche, avant/après.
-- [ ] La démo montre une entité qui traverse l'écran (preuve visible).
-- [ ] `meta/documentation/engine.md` retire l'avertissement ⚠️ du §2.1 ;
+- [x] La démo montre une entité qui traverse l'écran (preuve visible).
+- [x] `meta/documentation/engine.md` retire l'avertissement ⚠️ du §2.1 ;
       `npm run verify` vert.
 
 ## Suite
@@ -99,11 +99,49 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-04 17:20] **Le test d'abord** : cinq cas, quatre rouges. Le cinquième —
+  « n'écrit rien quand la position n'a pas changé » — vert dès le départ, ce qui
+  garantit qu'on ne « corrige » pas en écrivant tout à chaque frame.
+- [2026-08-04 17:22] **Les deux moitiés.** `Renderer.update()` appelle `render()`
+  (qui *est* la synchronisation position/taille/profondeur, gardée par `_last*`),
+  et `Element.x()`/`y()` lèvent le drapeau de redessin. Sans la seconde, la
+  première ne sert à rien : le parcours élagué ne descend jamais jusqu'au nœud
+  déplacé.
+- [2026-08-04 17:23] **La surcharge du board retirée** : `BoardRenderer.update()`
+  appelait `mountPending()`, et `render()` l'appelle déjà — la garder aurait fait
+  tourner le balayage de montage deux fois par frame.
+- [2026-08-04 18:05] **La mesure a imposé un troisième geste.** Le premier jet
+  triplait le coût : **55 nœuds visités par frame** en marche (contre 2,5 avant),
+  parce que le board sale visitait *tous* ses enfants. La descente ne visite plus
+  que les enfants marqués — correct, puisque lever le drapeau marque tout le
+  chemin jusqu'à la racine.
+- [2026-08-04 17:45] **Un faux positif du board doctor** rencontré en chemin : le
+  titre du ticket voisin que je venais de déposer contenait deux fois le mot
+  « board », ce que le garde-fou des doublons lit comme un signal. `main` en était
+  rouge ; corrigé là-bas d'abord (`1b55774`), puis rattrapé ici.
 
 ### Vérification
 
--
+- [2026-08-04 18:21] `npm run verify` **vert** : **61 fichiers, 513 tests** (+5).
+- [2026-08-04 18:15] **Critère qui fait foi** : le bloc rocheux de la démo,
+  déplacé par un behavior, avance de **200 px à 320 px** en 120 frames — et le
+  DOM suit **exactement** (`left: 200px` → `320px`, égal au modèle). Avant le
+  correctif, le nœud restait à `200px`.
+- [2026-08-04 18:10] **Le coût, avant / après le filtrage de la descente** :
+
+  | | nœuds visités / frame | montages / frame | écritures DOM / frame | ms / frame |
+  |---|---|---|---|---|
+  | premier jet, immobile | 22,8 | 0,38 | 3,5 | 0,315 |
+  | premier jet, en marche | 55,3 | 1,00 | 3,5 | 0,457 |
+  | **retenu, immobile** | **1,4** | 0,38 | 3,5 | **0,168** |
+  | **retenu, en marche** | **2,4** | **1,00** | 3,5 | **0,336** |
+
+  Le montage tourne bien **une seule fois** par frame (critère de la DoD), et les
+  gardes `_last*` absorbent le reste : 2,4 nœuds visités pour **3,5 écritures
+  DOM**, soit la position et la profondeur du joueur, rien de plus.
+- [2026-08-04 18:20] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 539 éléments, 219 conteneurs) et le catalogue (535 sprites).
+- [2026-08-04 18:12] Sonde `window.__vp` retirée (0 résidu).
 
 ### Validation
 

@@ -352,8 +352,15 @@ export class Element
       }
 
       this.getRenderer().update();
+      // Descend only where something is actually pending. Raising the flag marks
+      // the whole path to the root, so a clean child cannot hide a dirty
+      // descendant — visiting it anyway just walks the whole board every frame
+      // the player takes a step (measured: 55 nodes per frame instead of the
+      // handful on the marked path).
       this.getChildren().forEach(element => {
-        element.update();
+        if(element.needUpdate() || element.isMoving()) {
+          element.update();
+        }
       });
     }
   }
@@ -413,7 +420,7 @@ export class Element
   x(value = null) {
     const result = this.geometry.x(value);
     if(value !== null) {
-      this._aggregateFollowsMove();
+      this._moved();
     }
 
     return result;
@@ -428,7 +435,7 @@ export class Element
   y(value = null) {
     const result = this.geometry.y(value);
     if(value !== null) {
-      this._aggregateFollowsMove();
+      this._moved();
     }
 
     return result;
@@ -455,7 +462,12 @@ export class Element
    * recomputing kept it at the true union of its children (**+37 %**, i.e. what
    * they actually occupy) — at the **same 60 fps**.
    */
-  _aggregateFollowsMove() {
+  _moved() {
+    // Ask to be repainted. Without it the pruned walk never descends this far,
+    // and the node stays where it was drawn — a projectile crossing the map
+    // without leaving its starting pixel.
+    this.needUpdate(true);
+
     const parent = this.getParent();
     if(parent) {
       parent.recomputeCollisionAggregate();
