@@ -120,6 +120,51 @@ trouve comme le reste, et les rustines ont été retirées. C'est aussi ce dont 
 **collision par paires** aura besoin — « qui a touché qui » n'a pas de réponse
 tant qu'un des participants est hors du monde.
 
+### 2.2 Interroger le monde, et le balayer
+
+La détection historique est **pilotée par le déplaceur** : `element.overlaps(root)`.
+Pour demander « qu'y a-t-il ici ? », il fallait donc **être** un `Element` attaché
+portant des zones — ce qu'un système de dégâts, une IA qui sonde ou un effet de
+zone n'ont aucune raison de fabriquer. Deux primitives répondent sans cette
+condition :
+
+```js
+board.query({ x0, y0, x1, y1 }, { type, exclude })  // → Element[]
+board.sweep(from, to, size, { type, exclude })      // → { element, at } | null
+```
+
+Elles parlent en **rectangles monde bruts**, pas en `BoundingBox` : cette classe
+porte deux conventions de coordonnées selon ce qu'elle décrit, et une API
+d'interrogation est le dernier endroit où cette ambiguïté a sa place. Elles
+réutilisent l'élagage du scene-graph — un sous-arbre dont l'enveloppe rate le
+rectangle est sauté entier — donc **aucun index spatial** n'est introduit ; il le
+sera quand une mesure le réclamera.
+
+**Pourquoi balayer, et pas seulement tester des positions.** L'enveloppe suit le
+mouvement mais ne l'anticipe pas. Mesuré le 2026-08-04, un projectile de 6 px
+contre un corps de 14 px, toutes les phases de départ essayées :
+
+| pas / frame | vitesse (60 fps) | tirs qui traversent sans être vus |
+|---|---|---|
+| 20 px | 1 200 px/s | 0 % |
+| 24 px | 1 440 px/s | **13 %** |
+| 32 px | 1 920 px/s | 34 % |
+| 64 px | 3 840 px/s | 67 % |
+
+La fenêtre de capture vaut « largeur du mobile + largeur de la cible » : au-delà,
+le résultat dépend de la **phase** — donc ça rate *parfois*. `sweep()` échantillonne
+la boîte le long du segment avec un pas **≤ sa plus petite dimension** : deux
+échantillons consécutifs se recouvrent, leur union couvre le couloir, rien ne
+passe entre deux. La même campagne repasse à **0 %**.
+
+Le coût est proportionnel à la vitesse (`distance / pas` échantillons). Mesuré sur
+la démo : **1 projectile → 3 échantillons et 0,22 ms/frame ; 40 projectiles
+simultanés → 142 échantillons et 0,64 ms/frame.**
+
+> La démo tire avec `espace`. Il n'y a **pas** de classe `Projectile` dans le
+> moteur : une entité sur la couche, un behavior qui la déplace, et `sweep()` pour
+> savoir ce qu'elle croise. C'est la preuve que les primitives suffisent.
+
 ## 3. Viewport : la game loop
 
 Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`) :

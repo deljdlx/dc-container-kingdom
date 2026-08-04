@@ -38,6 +38,7 @@ import {
   Toadstool01,
   WaterLily00,
   Well00,
+  Element,
   PatrolBehavior,
   FleeBehavior,
   FootstepDust,
@@ -261,6 +262,55 @@ viewport.addBehavior(new FootstepDust(viewport.getGroundParticles(), {
 if (isDebugEnabled()) {
   new EventConsole(app, '#event-console').start();
 }
+
+// ── A projectile, wired from engine primitives ───────────────────────────────
+// Press space. There is no `Projectile` class in the engine, and that is the
+// point: an entity on the board's layer, moved by a behavior, asking the world
+// `sweep()` what it crosses. At 900 px/s it covers 15 px a frame — more than the
+// capture window of the bodies it flies at, so testing positions alone would
+// miss them intermittently. Sweeping asks about the path, not the endpoints.
+const BOLT_SPEED = 900;
+const BOLT_RANGE = 1000;
+const BOLT_SIZE = { width: 8, height: 8 };
+const AIM = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
+
+function fire() {
+  const player = viewport.getCharacter();
+  const [aimX, aimY] = AIM[player.getDirection()] ?? AIM.down;
+
+  const bolt = new Element(0, 0, BOLT_SIZE.width, BOLT_SIZE.height);
+  bolt.addClass('demo-bolt');
+  board.spawn(bolt, player.offsetX() + 20, player.offsetY() + 26);
+
+  let travelled = 0;
+  const flight = {
+    update(dt) {
+      const stepX = aimX * BOLT_SPEED * dt / 1000;
+      const stepY = aimY * BOLT_SPEED * dt / 1000;
+      const from = { x: bolt.offsetX(), y: bolt.offsetY() };
+      const to = { x: from.x + stepX, y: from.y + stepY };
+
+      const hit = board.sweep(from, to, BOLT_SIZE, { exclude: [bolt, player] });
+      travelled += Math.hypot(stepX, stepY);
+
+      if (hit || travelled > BOLT_RANGE) {
+        viewport.removeBehavior(flight);
+        board.despawn(bolt);
+        return;
+      }
+      bolt.x(Math.round(to.x));
+      bolt.y(Math.round(to.y));
+    },
+  };
+  viewport.addBehavior(flight);
+}
+
+document.body.addEventListener('keydown', (event) => {
+  if (event.code === 'Space' && !event.repeat) {
+    event.preventDefault();
+    fire();
+  }
+});
 
 // ── Touch D-pad ──────────────────────────────────────────────────────────────
 // Dispatch synthetic keyboard events so the viewport's existing keydown/keyup
