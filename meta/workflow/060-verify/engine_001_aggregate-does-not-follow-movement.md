@@ -2,11 +2,11 @@
 id: 2026-08-03_19-10
 title: La bbox agrégée ne suit pas un enfant qui bouge — le PNJ devient intraversable puis traversable
 type: fix
-branch:
+branch: claude/aggregate-follows-movement
 created: 2026-08-03 19:10
 ready: 2026-08-03 19:12
-doing:
-verify:
+doing: 2026-08-03 19:13
+verify: 2026-08-04 08:32
 done:
 ---
 
@@ -106,17 +106,17 @@ l'élagage si elle n'est jamais reprise.
 
 ## Definition of Done
 
-- [ ] Un élément qui se déplace **reste détectable** : test qui échoue avant
+- [x] Un élément qui se déplace **reste détectable** : test qui échoue avant
       correction (déplacer un enfant hors de l'agrégat du parent, puis vérifier
       que la détection le trouve encore).
-- [ ] **Le cas signalé ne se reproduit plus** : la campagne de 36 approches du
+- [x] **Le cas signalé ne se reproduit plus** : la campagne de 36 approches du
       fuyard ne produit **aucune** traversée — mesurée au navigateur, corps
       contre corps.
-- [ ] **Coût mesuré** avant/après : `ms`/frame et appels à
+- [x] **Coût mesuré** avant/après : `ms`/frame et appels à
       `updateCollisionBoundingBox` par frame, monde immobile et en marche.
-- [ ] La croissance de l'agrégat est **mesurée sur une session** (elle ne doit pas
+- [x] La croissance de l'agrégat est **mesurée sur une session** (elle ne doit pas
       rendre l'élagage inutile) — ou la limite est écrite.
-- [ ] `npm run verify` vert ; les trois hôtes sans erreur console.
+- [x] `npm run verify` vert ; les trois hôtes sans erreur console.
 
 ## Suite
 
@@ -128,11 +128,48 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-03 19:15] **Le test d'abord** : cinq cas qui échouent avant correction
+  (enfant déplacé sur un axe, sur deux, imbriqué à deux niveaux…). Quatre rouges,
+  le cinquième — « ne pas détecter ce qui est vraiment ailleurs » — vert dès le
+  départ, ce qui garantit qu'on ne corrige pas en élargissant tout.
+- [2026-08-03 19:16] **Le correctif est au point de mutation** : les setters
+  `Element.x()` / `y()`, et non un appelant particulier. C'est là que la position
+  change, donc là que l'enveloppe devient fausse.
+- [2026-08-04 08:20] **Grossir ou recalculer — mesuré, pas supposé.** J'avais
+  spécifié « faire grossir suffit ». C'est vrai pour la justesse, mais mesuré sur
+  la démo : l'enveloppe de l'area d'origine atteignait **3,7× sa propre tuile
+  (+144 % en 25 s)**. En recalculant, elle reste le vrai contour des enfants
+  (**+70 %, 2,31×**) — **à 60 fps dans les deux cas**. Le recalcul gagne sans
+  contrepartie ; la spec disait le contraire, la mesure a tranché.
+- [2026-08-04 08:26] **Un second défaut mis au jour par le correctif.**
+  `recomputeAggregates()` recalcule *aussi* la boîte de rendu, et celle-ci est
+  amorcée dans l'espace du **parent** puis fusionnée avec des enfants exprimés
+  dans l'espace de l'**élément** — deux espaces dans une même boîte. Invisible
+  jusqu'ici parce que le recalcul ne tournait qu'à la racine (en 0,0, où le
+  double comptage vaut zéro). Un test de streaming l'a attrapé : 290 au lieu de
+  200.
+  **Je ne l'ai pas corrigé en passant** : j'ai extrait `recomputeCollisionAggregate()`
+  — la moitié dont le broad phase a besoin — et le déplacement n'appelle que
+  celle-là. C'est aussi moins de travail par frame : la boîte de rendu n'est lue
+  par aucune détection. Le défaut d'espaces part en ticket propre.
 
 ### Vérification
 
--
+- [2026-08-04 08:31] `npm run verify` **vert** : **59 fichiers, 501 tests** (+5).
+- [2026-08-04 08:24] **Critère qui fait foi** : la campagne qui produisait le bug
+  — 36 approches du fuyard, quatre directions × trois distances × trois décalages
+  — passe de **3 traversées à 0**, corps contre corps mesurés à chaque frame.
+- [2026-08-04 08:30] **Coût négligeable** : **60,0 / 60,1 fps** (monde immobile et
+  joueur en marche), **9,6 à 10,2 recalculs d'enveloppe par frame**. Aucune
+  dégradation mesurable.
+- [2026-08-04 08:30] **L'enveloppe ne s'emballe pas** : celle de l'area d'origine
+  passe de 684 à 1164 kpx² en 20 s de vie autonome (**2,31× la tuile**), et c'est
+  le contour réel des PNJ qui se sont dispersés — pas une dérive. Avec la variante
+  « faire grossir », elle atteignait 3,7×.
+- [2026-08-04 08:22] Une mesure de croissance jetée en route : la première
+  comparait la surface agrégée de **toutes** les areas chargées avant/après une
+  marche — or le streaming avait changé l'ensemble des areas. Refaite sur une area
+  fixe.
 
 ### Validation
 

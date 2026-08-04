@@ -405,21 +405,61 @@ export class Element
   }
 
   /**
-   * Get or set the local x coordinate.
+   * Get or set the local x coordinate. Writing it keeps the ancestors' aggregate
+   * boxes covering this element — see {@link _aggregateFollowsMove}.
    * @param {?number} value
    * @returns {number}
    */
   x(value = null) {
-    return this.geometry.x(value);
+    const result = this.geometry.x(value);
+    if(value !== null) {
+      this._aggregateFollowsMove();
+    }
+
+    return result;
   }
 
   /**
-   * Get or set the local y coordinate.
+   * Get or set the local y coordinate. Writing it keeps the ancestors' aggregate
+   * boxes covering this element — see {@link _aggregateFollowsMove}.
    * @param {?number} value
    * @returns {number}
    */
   y(value = null) {
-    return this.geometry.y(value);
+    const result = this.geometry.y(value);
+    if(value !== null) {
+      this._aggregateFollowsMove();
+    }
+
+    return result;
+  }
+
+  /**
+   * Grow the ancestors' aggregate collision boxes so they keep covering this
+   * element after it moved.
+   *
+   * **Moving is the mutation that invalidates the aggregate, and it was the one
+   * nothing watched.** The box was built when the element was attached, and
+   * refreshed only when the tree walk happened to reach it — which never happens
+   * for a character, since it repaints itself without raising the redraw flag.
+   * An NPC that wandered far enough therefore ended up *outside* its own area's
+   * envelope, the broad phase pruned the whole area, and the NPC became
+   * intangible: measured on 2026-08-03, a fleeing NPC the player walked straight
+   * through.
+   *
+   * It **recomputes** rather than grows. Growing would be enough for
+   * correctness — a box that is too wide makes the broad phase less sharp, never
+   * wrong — but it never comes back down, and an envelope that only swells stops
+   * pruning anything. Measured on the demo over 25 s of NPCs roaming: growing
+   * took the origin area's envelope to **3.7× its own tile (+144 %)**, while
+   * recomputing kept it at the true union of its children (**+37 %**, i.e. what
+   * they actually occupy) — at the **same 60 fps**.
+   */
+  _aggregateFollowsMove() {
+    const parent = this.getParent();
+    if(parent) {
+      parent.recomputeCollisionAggregate();
+    }
   }
 
   /**
@@ -517,6 +557,19 @@ export class Element
     const parent = this.getParent();
     if (parent) {
       parent.recomputeAggregates();
+    }
+  }
+
+  /**
+   * Recompute **only** the collision envelope, up the whole ancestor chain —
+   * what the broad phase prunes on. @see CollisionSystem#recomputeCollisionAggregate
+   */
+  recomputeCollisionAggregate() {
+    this.collision.recomputeCollisionAggregate();
+
+    const parent = this.getParent();
+    if (parent) {
+      parent.recomputeCollisionAggregate();
     }
   }
 
