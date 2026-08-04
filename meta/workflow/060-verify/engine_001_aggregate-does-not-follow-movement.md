@@ -6,7 +6,7 @@ branch: claude/aggregate-follows-movement
 created: 2026-08-03 19:10
 ready: 2026-08-03 19:12
 doing: 2026-08-03 19:13
-verify:
+verify: 2026-08-04 08:32
 done:
 ---
 
