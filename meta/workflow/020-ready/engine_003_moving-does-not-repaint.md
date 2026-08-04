@@ -4,7 +4,7 @@ title: Déplacer un élément ne le repeint pas — le dernier verrou avant les 
 type: fix
 branch:
 created: 2026-08-04 17:15
-ready:
+ready: 2026-08-04 17:17
 doing:
 verify:
 done:
