@@ -2,10 +2,10 @@
 id: 2026-08-04_17-15
 title: Déplacer un élément ne le repeint pas — le dernier verrou avant les projectiles
 type: fix
-branch:
+branch: claude/moving-repaints
 created: 2026-08-04 17:15
 ready: 2026-08-04 17:17
-doing:
+doing: 2026-08-04 17:18
 verify:
 done:
 ---
