@@ -6,7 +6,7 @@ branch: claude/player-in-the-scene-graph
 created: 2026-08-03 19:11
 ready: 2026-08-04 09:16
 doing: 2026-08-04 09:17
-verify:
+verify: 2026-08-04 09:32
 done:
 ---
 
