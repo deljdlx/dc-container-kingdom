@@ -102,11 +102,11 @@ meurt de lui-même, un objet au sol est censé rester. `despawn()` est fourni, r
 ne l'appelle à votre place — et `Element.destroy()` nettoie désormais le DOM du
 sous-arbre, donc despawner ne fuit pas.
 
-> ⚠️ **Déplacer une entité ne la repeint pas.** `Renderer.update()` est vide sur
-> l'élément de base : le positionnement vit dans `render()`. Un `Character` se
-> repeint via son propre `update()` ; un `Element` nu, non. Mesuré : `e.y(900)`
-> laisse le nœud à `top: 400px`, `e.render()` le porte à `900px`. C'est le
-> chaînon manquant avant les projectiles.
+**Déplacer une entité la repeint.** Écrire `x()` ou `y()` lève le drapeau de
+redessin ; `Renderer.update()` appelle `render()`, qui synchronise position,
+taille et profondeur en n'écrivant que ce qui a changé. Un `Element` nu suffit
+donc à bouger à l'écran — auparavant seul un `Character` y arrivait, en se
+repeignant lui-même, et le parcours venait jusqu'au nœud sale sans rien en faire.
 
 **Le joueur y vit aussi.** `enableMainCharacter()` le pose sur cette couche, comme
 n'importe quelle entité. Il n'était auparavant attaché à **rien** : un détecteur
@@ -385,6 +385,12 @@ monde = (écran − décalage) / échelle
 - **Le drapeau est éteint avant le travail, pas après.** Ce qui est marqué
   *pendant* la passe appartient à la frame suivante ; éteindre après aurait effacé
   la demande à l'instant où elle était levée.
+- **Bouger, c'est demander un redessin.** Écrire `x()` ou `y()` lève le drapeau —
+  sinon le parcours ne descend jamais jusqu'à l'élément déplacé.
+- **La descente ne visite que les enfants marqués.** Le drapeau marquant tout le
+  chemin jusqu'à la racine, un enfant propre ne peut pas cacher un descendant
+  sale. Visiter les autres coûtait tout le board à chaque pas du joueur : mesuré
+  **55 nœuds par frame contre 2,4** une fois la descente filtrée.
 
 `Viewport.update()` fait descendre ce parcours **à chaque frame**, entre les
 behaviors et la caméra. Avant, il n'avait lieu qu'au franchissement d'une area :
@@ -400,9 +406,13 @@ Mesuré sur la démo (313 éléments rendus, 63 areas), le 2026-08-02 :
 | marche + collisions | 12,1 | 0,13 |
 
 Autrement dit : quelques nœuds sur 376, jamais l'arbre entier — l'élagage porte
-tout le coût. Le personnage principal reste peint **exactement une fois par
-frame** (150 frames mesurées, pire cas 1) : il se repeint lui-même en marchant,
-et le parcours ne repasse pas derrière lui.
+tout le coût.
+
+Remesuré le 2026-08-04, une fois que bouger repeint et que la descente est
+filtrée : **1,4 nœud par frame** monde immobile, **2,4** joueur en marche, pour
+**3,5 écritures DOM** (la position et la profondeur du joueur) et 0,17 à 0,34 ms
+par frame. Le balayage de montage du board tourne **exactement une fois** par
+frame de marche — c'est lui, désormais, le poste principal.
 
 ## 4. Camera
 

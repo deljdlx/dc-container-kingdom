@@ -214,6 +214,22 @@ wanderer.live(3000);
 // sits over — a projectile, a dropped item — lives here.
 board.spawn(new Well00(), 980, 300);
 
+// And one that MOVES: a boulder drifting east–west across the village. Moving an
+// element is enough for it to be redrawn where it is — the base renderer used to
+// do nothing on update, so anything but a Character stayed painted at its
+// starting pixel. Walk into it: it is solid, and it belongs to no tile.
+const drifter = board.spawn(new Rock00(), 200, 380);
+let drift = 1;
+viewport.addBehavior({
+  update(dt) {
+    const x = drifter.x() + drift * dt * 70 / 1000;
+    if (x > 820 || x < 160) {
+      drift = -drift;
+    }
+    drifter.x(Math.round(x));
+  },
+});
+
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
