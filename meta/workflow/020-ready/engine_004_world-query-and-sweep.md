@@ -4,7 +4,7 @@ title: Interroger le monde, et le balayer — la collision par paires
 type: feat
 branch:
 created: 2026-08-04 18:32
-ready:
+ready: 2026-08-04 18:33
 doing:
 verify:
 done:
