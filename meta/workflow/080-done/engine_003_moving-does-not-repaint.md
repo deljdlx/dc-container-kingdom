@@ -7,7 +7,7 @@ created: 2026-08-04 17:15
 ready: 2026-08-04 17:17
 doing: 2026-08-04 17:18
 verify: 2026-08-04 18:22
-done:
+done: 2026-08-04 18:23 (merge bbff374)
 ---
 
 ## Objectif
@@ -91,9 +91,25 @@ d'empiler les appels.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — le dernier obstacle mécanique avant les **projectiles**
+  tombe : une entité qui bouge est dessinée là où elle est. Le pipeline de
+  redessin est enfin complet — un nœud sale est visité **et** repeint. La démo le
+  montre avec un rocher qui dérive d'un bout à l'autre du village.
+- **Ce qu'on laisse de côté** :
+  - **le balayage de montage est devenu le poste principal** : `mountPending()`
+    parcourt toutes les areas et leurs enfants à la recherche de ce qui n'est pas
+    encore rendu, et il tourne une fois par frame de marche (le joueur salit la
+    racine à chaque pas). Une liste de nœuds en attente coûterait O(1) au lieu de
+    O(areas × enfants) — **candidat déposé** ;
+  - **`SpriteRenderer.render()` réécrit `backgroundImage` et
+    `backgroundPosition` sans garde** : devenu appelable par frame, il écrit deux
+    propriétés à chaque repaint d'un sprite sale. Pas mesuré comme un problème
+    (3,5 écritures DOM par frame au total), noté ;
+  - **le déplacement mort d'`Element.update()`** (`_targetX`/`_targetY`) reste au
+    ticket `2026-07-26_14-25` ;
+  - **mesuré sur la démo seulement** : Container Kingdom n'a pas d'entité mobile.
+- **Déposé en `100-follow-up/`** — un candidat :
+  `2026-08-04_18-23_mount-sweep-is-o-areas-per-frame`.
 
 ## Journal
 
@@ -145,4 +161,10 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-04 18:23] Review : deux lignes de correctif, une surcharge retirée, et
+  un filtre de descente que **la mesure a imposé** — pas l'intuition. C'est ce
+  troisième geste qui fait la différence entre « ça marche » et « ça marche sans
+  tripler le coût ».
+- [2026-08-04 18:23] Merge `--no-ff` sur `main` depuis le tree principal :
+  **bbff374** — `merge: déplacer un élément le repeint`
+  (7 fichiers, +201 / −29).
