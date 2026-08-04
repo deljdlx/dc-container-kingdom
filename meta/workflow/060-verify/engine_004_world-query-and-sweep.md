@@ -2,11 +2,11 @@
 id: 2026-08-04_18-32
 title: Interroger le monde, et le balayer — la collision par paires
 type: feat
-branch:
+branch: claude/world-query-and-sweep
 created: 2026-08-04 18:32
 ready: 2026-08-04 18:33
-doing:
-verify:
+doing: 2026-08-04 18:34
+verify: 2026-08-04 18:55
 done:
 ---
 
@@ -106,19 +106,19 @@ Coût : `distance / pas` requêtes — pour un projectile de 6 px à 64 px/frame
 
 ## Definition of Done
 
-- [ ] `board.query(rect)` rend les éléments dont une zone coupe le rectangle,
+- [x] `board.query(rect)` rend les éléments dont une zone coupe le rectangle,
       **sans** que l'appelant soit dans l'arbre — test à l'appui.
-- [ ] `board.sweep(from, to, size)` rend le **premier** élément croisé, et rien
+- [x] `board.sweep(from, to, size)` rend le **premier** élément croisé, et rien
       quand le trajet est libre.
-- [ ] **Le critère qui fait foi** : la campagne de tunneling ci-dessus repasse à
+- [x] **Le critère qui fait foi** : la campagne de tunneling ci-dessus repasse à
       **0 % de tirs manqués** jusqu'à 64 px/frame, toutes phases confondues.
-- [ ] Un test en **diagonale** montre qu'on ne signale pas une cible hors couloir.
-- [ ] L'appelant peut **exclure une source** (le tireur ne se touche pas).
-- [ ] **Coût mesuré** : échantillons et ms par balayage, aux vitesses du tableau.
-- [ ] **La démo tire un projectile** : il part du joueur, vole vite, disparaît au
+- [x] Un test en **diagonale** montre qu'on ne signale pas une cible hors couloir.
+- [x] L'appelant peut **exclure une source** (le tireur ne se touche pas).
+- [x] **Coût mesuré** : échantillons et ms par balayage, aux vitesses du tableau.
+- [x] **La démo tire un projectile** : il part du joueur, vole vite, disparaît au
       contact — preuve visible que les primitives suffisent, sans classe dédiée
       dans le moteur.
-- [ ] `meta/documentation/engine.md` décrit les deux primitives et la limite du
+- [x] `meta/documentation/engine.md` décrit les deux primitives et la limite du
       balayage ; `npm run verify` vert.
 
 ## Suite
@@ -131,11 +131,48 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-04 18:36] **Deux fonctions, pas une classe** : `queryRect` et
+  `sweepRect` dans `scene/WorldQuery.js`, plus deux façades sur le `Board`. Elles
+  prennent des **rectangles monde bruts** — surtout pas des `BoundingBox`, dont
+  les deux conventions de coordonnées (`2026-08-04_08-33`) n'ont rien à faire
+  dans une API d'interrogation.
+- [2026-08-04 18:38] **Le pas du balayage est ≤ la plus petite dimension du
+  mobile.** C'est ce qui garantit que deux échantillons consécutifs se recouvrent
+  et que leur union couvre le couloir : rien d'intersectant ne peut passer entre
+  deux. Approximer le trajet par l'AABB départ→arrivée aurait été plus simple et
+  faux — un test en diagonale le montre.
+- [2026-08-04 18:39] **`exclude` plutôt qu'un « ne pas se voir soi-même »
+  implicite** : sans élément détecteur, il n'y a personne à sauter d'office. Le
+  tireur est la seule information que l'appelant possède.
+- [2026-08-04 18:45] **La démo tire, sans classe `Projectile` dans le moteur** :
+  une entité sur la couche, un behavior qui la déplace, `sweep()` pour savoir ce
+  qu'elle croise. C'est la preuve que les primitives suffisent — si elles avaient
+  demandé une classe dédiée, c'est qu'elles étaient incomplètes.
 
 ### Vérification
 
--
+- [2026-08-04 18:54] `npm run verify` **vert** : **62 fichiers, 527 tests** (+14).
+- [2026-08-04 18:42] **Critère qui fait foi** : la campagne de tunneling qui a
+  ouvert le ticket — 6 vitesses × toutes les phases de départ — repasse de
+  **13 à 67 % de tirs manqués** à **0 %**, jusqu'à 64 px/frame (3 840 px/s).
+- [2026-08-04 18:48] **Les deux branches prouvées dans la vraie démo** : tir vers
+  un PNJ → contact sur un `Man02` après **58 px** ; tir vers le vide → **994 px**
+  parcourus puis disparition par épuisement de portée (1 000 px).
+- [2026-08-04 18:51] **Coût mesuré**, projectiles à 900 px/s :
+
+  | | balayages / frame | échantillons / frame | ms / frame |
+  |---|---|---|---|
+  | 1 projectile | 1,0 | 3,0 | 0,220 |
+  | 10 projectiles | 10,7 | 32,1 | 0,250 |
+  | 40 projectiles | 47,2 | 141,6 | **0,637** |
+
+  Linéaire, et 40 projectiles simultanés tiennent dans 4 % du budget d'une frame.
+- [2026-08-04 18:41] **La diagonale ne sur-signale pas** : une cible posée dans le
+  coin de la boîte englobante départ→arrivée, hors du couloir, n'est pas
+  rapportée — test dédié.
+- [2026-08-04 18:53] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 537 éléments, 219 conteneurs) et le catalogue (535 sprites).
+- [2026-08-04 18:52] Sondes retirées (0 résidu).
 
 ### Validation
 
