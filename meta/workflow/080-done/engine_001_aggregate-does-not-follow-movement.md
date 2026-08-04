@@ -7,7 +7,7 @@ created: 2026-08-03 19:10
 ready: 2026-08-03 19:12
 doing: 2026-08-03 19:13
 verify: 2026-08-04 08:32
-done:
+done: 2026-08-04 08:34 (merge 8e696bf)
 ---
 
 ## Objectif
@@ -120,9 +120,25 @@ l'élagage si elle n'est jamais reprise.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — l'invariant « enveloppe ⊇ enfants » tient enfin sous le
+  mouvement, ce dont dépendent la collision par paires (étape 4) et les
+  projectiles (étape 5) : une entité qui traverse la carte reste détectable tout
+  du long.
+- **Ce qu'on laisse de côté** :
+  - **`BoundingBox` mélange deux espaces de coordonnées** — trouvé en corrigeant,
+    évité plutôt que traité (le déplacement ne recalcule que l'enveloppe de
+    collision, saine). **Ticket ouvert** : `2026-08-04_08-33` ;
+  - **le joueur reste hors du scene-graph** — le défaut d'architecture derrière ce
+    bug, ticket `2026-08-03_19-11`. Tant qu'il tient, un PNJ ne peut pas détecter
+    le joueur sans le connaître nommément ;
+  - **l'enveloppe suit, elle n'anticipe pas** : le recalcul a lieu *après* le
+    déplacement. Une entité assez rapide pour traverser une zone entre deux
+    frames restera invisible au broad phase — c'est le tunneling, et il relève de
+    la collision continue (étape 4) ;
+  - **mesuré sur la démo seulement** : Container Kingdom n'a pas d'entité mobile,
+    le coût y est donc a priori moindre, mais je ne l'ai pas chiffré.
+- **Déposé en `100-follow-up/`** — aucun : les deux pistes qui méritaient une
+  décision sont déjà des tickets.
 
 ## Journal
 
@@ -173,4 +189,10 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-04 08:34] Review : le correctif tient dans les setters `x()`/`y()` et
+  une méthode extraite. Le geste qui compte est le **choix de ne pas** corriger le
+  défaut d'espaces de coordonnées au passage : il est isolé, ticketé, et le
+  chemin chaud l'évite.
+- [2026-08-04 08:34] Merge `--no-ff` sur `main` depuis le tree principal :
+  **8e696bf** — `merge: l'enveloppe de collision suit l'élément qui bouge`
+  (4 fichiers, +219 / −24).
