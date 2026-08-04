@@ -35,18 +35,24 @@ describe('Viewport - frame clock', () => {
     const moveCharacter = vi.spyOn(viewport, 'moveCharacter');
     const streamAreas = vi.spyOn(viewport, '_streamAreas');
     const characterUpdate = vi.spyOn(viewport.getCharacter(), 'update');
+    // The player is on the entity layer, so the per-frame tree walk repaints it
+    // with a walked distance of 0. What the clock governs is the distance FED to
+    // the animator — that is what these assertions look at.
+    const walkedDistances = () => characterUpdate.mock.calls
+      .map(([distance]) => distance)
+      .filter(distance => distance > 0);
 
     viewport.update(1_000);
     expect(behavior.update).toHaveBeenNthCalledWith(1, 0);
     expect(moveCharacter).not.toHaveBeenCalled();
     expect(streamAreas).not.toHaveBeenCalled();
-    expect(characterUpdate).not.toHaveBeenCalled();
+    expect(walkedDistances()).toEqual([]);
 
     viewport.update(1_500);
     expect(behavior.update).toHaveBeenNthCalledWith(2, 100);
     expect(moveCharacter).toHaveBeenCalledWith(30, 0);
     expect(streamAreas).toHaveBeenCalledTimes(1);
-    expect(characterUpdate).toHaveBeenCalledTimes(1);
+    expect(walkedDistances()).toEqual([30]);
   });
 });
 
