@@ -1,6 +1,7 @@
 import { Area } from './Area.js';
 import { BoardRenderer } from '../render/BoardRenderer.js';
 import { Element } from '../scene/Element.js';
+import { queryRect, sweepRect } from '../scene/WorldQuery.js';
 
 /**
  * The infinite tiled world: a lazily-populated grid of {@link Area}s indexed by
@@ -109,6 +110,31 @@ export class Board extends Element
   /** @returns {Element[]} the entities currently in the world */
   getEntities() {
     return this._entities ? this._entities.getChildren() : [];
+  }
+
+  // ===========================
+
+  /**
+   * Ask the world what sits in a region — **without being part of it**.
+   * @param {import('../scene/WorldQuery.js').WorldRect} rect world coordinates
+   * @param {Object} [options] see {@link queryRect}
+   * @returns {Element[]}
+   */
+  query(rect, options = {}) {
+    return queryRect(this, rect, options);
+  }
+
+  /**
+   * Ask the world what a moving box runs into between two points — the answer a
+   * projectile needs, and the one testing positions alone cannot give.
+   * @param {{x: number, y: number}} from
+   * @param {{x: number, y: number}} to
+   * @param {{width: number, height: number}} size
+   * @param {Object} [options] see {@link sweepRect}
+   * @returns {{element: Element, at: {x: number, y: number}}|null}
+   */
+  sweep(from, to, size, options = {}) {
+    return sweepRect(this, from, to, size, options);
   }
 
   /**

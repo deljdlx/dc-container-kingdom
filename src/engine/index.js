@@ -54,6 +54,9 @@ export {
 export { CollisionSystem } from './scene/CollisionSystem.js';
 export { SceneGraph } from './scene/SceneGraph.js';
 
+// --- Asking the world what is where (no need to be part of it) ---
+export { queryRect, sweepRect } from './scene/WorldQuery.js';
+
 // --- Character subsystems (composed by Character) ---
 export { CharacterAnimator } from './character/CharacterAnimator.js';
 export { CharacterBehavior } from './character/CharacterBehavior.js';
