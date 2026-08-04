@@ -108,6 +108,18 @@ sous-arbre, donc despawner ne fuit pas.
 > laisse le nœud à `top: 400px`, `e.render()` le porte à `900px`. C'est le
 > chaînon manquant avant les projectiles.
 
+**Le joueur y vit aussi.** `enableMainCharacter()` le pose sur cette couche, comme
+n'importe quelle entité. Il n'était auparavant attaché à **rien** : un détecteur
+que personne ne pouvait détecter. Le joueur voyait le monde, le monde ne voyait
+pas le joueur — d'où des behaviors qui gardaient une référence explicite au
+joueur et le testaient **par son nom** (`FleeBehavior`, `PatrolBehavior`), ou qui
+oubliaient de le faire et le traversaient (`CharacterBehavior`).
+
+Depuis, `character.overlaps(character.getBoard())` suffit : le broad phase le
+trouve comme le reste, et les rustines ont été retirées. C'est aussi ce dont la
+**collision par paires** aura besoin — « qui a touché qui » n'a pas de réponse
+tant qu'un des participants est hors du monde.
+
 ## 3. Viewport : la game loop
 
 Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`) :

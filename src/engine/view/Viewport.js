@@ -214,10 +214,20 @@ export class Viewport
     if(mainCharacterY == null) {
       mainCharacterY = this.height() / 2;
     }
-    this.character.x(mainCharacterX);
-    this.character.y(mainCharacterY);
     this.character.moveSpeed(300);
     this.character.setApplication(this.getApplication());
+
+    // The player joins the world like any other entity: on the board's entity
+    // layer, in world coordinates, belonging to no tile.
+    //
+    // It used to be attached to **nothing** — a detector that no one could
+    // detect. The player saw the world; the world did not see the player, so
+    // every NPC that had to react to it kept an explicit reference and tested
+    // against it by name (`FleeBehavior`, `PatrolBehavior`) — or forgot to, and
+    // walked straight through (`CharacterBehavior`). Being in the tree makes the
+    // broad phase find it like anything else, which is also what «who hit whom»
+    // will need.
+    this.getBoard().spawn(this.character, mainCharacterX, mainCharacterY);
 
     // The camera keeps the player centred.
     this._camera.follow(this.character);

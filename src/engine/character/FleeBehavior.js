@@ -136,14 +136,14 @@ export class FleeBehavior {
 
   /**
    * Blocked by the static world, another NPC, or the threat itself.
+   *
+   * Asking the board covers all three: the player is on its entity layer, so the
+   * broad phase reaches it. This used to test the threat by name as well — the
+   * workaround for a player that lived outside the tree.
    * @returns {boolean}
    */
   _isBlocked() {
-    const character = this._character;
-    if (character.overlaps(character.getBoard())) {
-      return true;
-    }
-    return this._threat != null && character.overlaps(this._threat);
+    return this._character.overlaps(this._character.getBoard());
   }
 
   /**

@@ -108,27 +108,16 @@ export class PatrolBehavior {
   }
 
   /**
-   * Would the character's current position collide with anything solid? Checks
-   * the static board AND the player, which lives outside the board tree — so an
-   * NPC turns around at the player instead of walking through it.
+   * Would the character's current position collide with anything solid?
+   *
+   * Asking the board is enough: the player is on its entity layer, so the broad
+   * phase finds it like any other element. This used to name the player
+   * explicitly — a workaround for a player attached to nothing, which every
+   * behaviour had to repeat or forget.
    * @returns {boolean}
    */
   _isBlocked() {
-    const character = this._character;
-    if (character.overlaps(character.getBoard())) {
-      return true;
-    }
-    const player = this._player();
-    return player != null && player !== character && character.overlaps(player);
-  }
-
-  /**
-   * @returns {import('./Character.js').Character|null} the player character, if
-   * this NPC is attached to a running viewport
-   */
-  _player() {
-    const viewport = this._viewport();
-    return viewport && viewport.getCharacter ? viewport.getCharacter() : null;
+    return this._character.overlaps(this._character.getBoard());
   }
 
   /**

@@ -43,18 +43,19 @@ export class ViewportRenderer
     this._container.innerHTML = '';
   }
 
-  /** Size the container, mount the board, then mount the character over it. */
+  /**
+   * Size the container and mount the board.
+   *
+   * The player is **not** mounted here any more: it lives on the board's entity
+   * layer, so `BoardRenderer.mountPending()` puts it in the board root by the
+   * same rules as everything else. It used to be appended by hand precisely
+   * because it belonged to no container.
+   */
   render() {
     this._container.style.width = this._viewport.getGeometry().width() + 'px';
     this._container.style.height = this._viewport.getGeometry().height() + 'px';
     this._container.append(this._viewport.getBoard().render());
-
-
-    if(this._viewport.getCharacter()) {
-      this.domCharacter = this._viewport.getCharacter().getRenderer().render();
-      this._viewport.getBoard().getRenderer().getDom().append(this.domCharacter);
-    }
-
+    this.domCharacter = this._viewport.getCharacter()?.getDom() ?? null;
   }
 
   /** Draw board/character debug overlays; no-op unless debug mode is on. */
