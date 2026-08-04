@@ -30,11 +30,8 @@ export class BoardRenderer extends Renderer
     return this.dom;
   }
 
-  /** Mount any areas/elements that appeared since the last frame. */
-  update() {
-    super.update();
-    this.mountPending();
-  }
+  // No `update()` override: the base one calls `render()`, which already mounts
+  // what is pending. Overriding here would run the mounting sweep twice a frame.
 
   /** Draw collision-zone and bounding-box overlays for the board and its areas. */
   renderDebug() {

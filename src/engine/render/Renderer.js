@@ -210,7 +210,21 @@ export class Renderer
   }
 
   /** Per-frame update hook; overridden by subclasses, a no-op on the base. */
+  /**
+   * Repaint: put the node where the model is.
+   *
+   * {@link render} **is** that job — it syncs size, world position and painter
+   * depth, and writes only what changed since the last paint. So updating is
+   * rendering again, and the `_last*` guards make it free when nothing moved.
+   *
+   * It used to be empty, which meant a moving element was never redrawn: the
+   * per-frame walk came all the way to the dirty node and did nothing.
+   * `CharacterRenderer` escaped it by repainting itself — the exception that hid
+   * the rule.
+   * @returns {DomElement} the element's root DOM node
+   */
   update() {
+    return this.render();
   }
 
   /** @returns {DomElement} the element's root DOM node */
