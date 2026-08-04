@@ -2,10 +2,10 @@
 id: 2026-08-03_19-11
 title: Le joueur n'est pas dans le scene-graph — la collision est à sens unique
 type: refactor
-branch:
+branch: claude/player-in-the-scene-graph
 created: 2026-08-03 19:11
 ready: 2026-08-04 09:16
-doing:
+doing: 2026-08-04 09:17
 verify:
 done:
 ---
