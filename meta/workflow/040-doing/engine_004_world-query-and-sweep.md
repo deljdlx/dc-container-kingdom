@@ -2,10 +2,10 @@
 id: 2026-08-04_18-32
 title: Interroger le monde, et le balayer — la collision par paires
 type: feat
-branch:
+branch: claude/world-query-and-sweep
 created: 2026-08-04 18:32
 ready: 2026-08-04 18:33
-doing:
+doing: 2026-08-04 18:34
 verify:
 done:
 ---
