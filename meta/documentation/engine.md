@@ -247,6 +247,21 @@ Tout le sous-système vit dans **`src/engine/fx/`** — il n'a rien à voir avec
 carte. C'était le premier dossier extrait de l'ancien `map/`, avant que celui-ci
 n'éclate (§0).
 
+- **Un effet se déclare, comme un sprite.** Une classe d'élément porte
+  `static descriptor = { fx: [{ emitter: FootstepDust, at: { x: 24, y: 44 } }] }`
+  et le `FxBinder` le relie où que l'élément soit posé, areas streamées comprises.
+  La déclaration qui **ne dit rien** de sa couche hérite désormais de celle de
+  l'effet (`FootstepDust` → `ground`) : avant, le binder imposait `above` par
+  défaut et la poussière déclarée passait **au-dessus** du décor sous lequel elle
+  devait se poser.
+- **`FootstepDust` demande à ce qu'il suit.** Sans prédicat explicite, il appelle
+  `isWalking()` sur son élément — vrai pendant la marche, faux dès la première
+  frame sans distance parcourue. Un élément qui ne sait pas répondre reste muet :
+  mieux vaut ça que de la poussière sous une statue. La réponse est **mémorisée
+  entre deux salves**, pas échantillonnée : la cadence d'un PNJ (un pas toutes les
+  60 ms) et celle de l'effet (une salve toutes les 120 ms) ne coïncident pas, et
+  l'échantillonnage ne produisait **aucune particule** en deux secondes de
+  patrouille.
 - **Deux objets, deux rôles.** `ParticleSystem` est **pur** — il naît, vieillit
   et meurt au rythme du `dt`, sans rien connaître du DOM (donc testable sans
   jsdom, comme `DirectionalInput`). `ParticleLayer` est le seul à toucher un

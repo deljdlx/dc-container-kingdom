@@ -81,17 +81,17 @@ _Amorce — à confirmer en « specify »._
 
 ## Definition of Done
 
-- [ ] `Character.isWalking()` existe, vrai pendant la marche, **faux dès la
+- [x] `Character.isWalking()` existe, vrai pendant la marche, **faux dès la
       première frame sans distance parcourue** — test à l'appui.
-- [ ] `FootstepDust` sans `isMoving` explicite lit l'élément suivi ; suivre un
+- [x] `FootstepDust` sans `isMoving` explicite lit l'élément suivi ; suivre un
       élément qui ne sait pas répondre reste **silencieux** (test).
-- [ ] **Le critère qui fait foi** : un PNJ de la démo lève de la poussière en
+- [x] **Le critère qui fait foi** : un PNJ de la démo lève de la poussière en
       marchant, **déclarée** et non câblée à la main — vérifié à l'écran.
-- [ ] Le joueur continue de lever la sienne, sans régression.
-- [ ] Le JSDoc d'`Emitter.isAlive()` ne s'appuie plus sur une affirmation fausse.
-- [ ] Budget de particules mesuré avec les PNJ équipés (rien ne doit étouffer la
+- [x] Le joueur continue de lever la sienne, sans régression.
+- [x] Le JSDoc d'`Emitter.isAlive()` ne s'appuie plus sur une affirmation fausse.
+- [x] Budget de particules mesuré avec les PNJ équipés (rien ne doit étouffer la
       fontaine).
-- [ ] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
+- [x] `meta/documentation/engine.md` à jour ; `npm run verify` vert.
 
 ## Suite
 
@@ -103,11 +103,51 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-05 14:46] **`Character.isWalking()`** : la distance parcourue traversait
+  `update()` sans être retenue, elle est mémorisée. Une frame de large — faux dès
+  qu'une mise à jour ne rapporte aucune distance — pour que la poussière s'arrête
+  avec les pieds.
+- [2026-08-05 14:47] **`FootstepDust` interroge ce qu'il suit** quand aucun
+  prédicat n'est donné. Suivre quelque chose qui ne sait pas répondre reste muet :
+  mieux vaut ça que de la poussière sous une statue.
+- [2026-08-05 14:48] JSDoc d'`Emitter.isAlive()` corrigé : il justifiait sa
+  logique par « `enableMainCharacter()` n'attache jamais son personnage », ce qui
+  a cessé d'être vrai avec `2026-08-03_19-11`. La règle reste bonne, son exemple
+  a changé — et je l'avais laissé mentir hier.
+- [2026-08-05 14:52] **La mesure a imposé deux corrections que je n'avais pas
+  prévues** :
+  1. **Mémoriser au lieu d'échantillonner.** Les cadences ne coïncident pas — un
+     pas de patrouille toutes les 60 ms, une salve toutes les 120 ms, et un
+     `isWalking()` large d'une frame. Interroger au moment de la salve donnait
+     **zéro particule en deux secondes** de patrouille. `FootstepDust` retient
+     désormais « a marché depuis la dernière salve ». L'ancien prédicat s'en
+     tirait parce qu'il lisait le **clavier**, vrai tant qu'une touche est tenue.
+  2. **Le binder écrasait la couche de l'effet.** `layer = 'above'` par défaut
+     dans la déclaration, appliqué **après** le descripteur de la classe : une
+     poussière déclarée passait donc *au-dessus* du décor. Personne ne l'avait vu
+     parce que le seul effet déclaré jusqu'ici (le jet de fontaine) est
+     effectivement `above`. Le défaut par défaut est maintenant **la couche de
+     l'effet** ; seule une déclaration explicite l'emporte.
 
 ### Vérification
 
--
+- [2026-08-05 14:58] `npm run verify` **vert** : **63 fichiers, 536 tests** (+9).
+- [2026-08-05 14:55] **Critère qui fait foi** : un PNJ de la démo (`DustyWalker`,
+  qui **déclare** son effet au lieu de le câbler) lève **15 particules au sol** en
+  150 frames de patrouille, **sans que personne touche au clavier**. Avant, aucune
+  ligne du moteur ne permettait à un PNJ de savoir qu'il marchait.
+- [2026-08-05 14:55] **Pas de régression du joueur** : 21 particules au sol quand
+  le joueur marche en plus, et son câblage a **perdu** son prédicat
+  (`isMoving: () => input.isMoving()` supprimé de la démo).
+- [2026-08-05 14:55] **Le budget de particules tient** : 115 vivantes au total sur
+  600, dont 100 pour les deux fontaines — rien n'étouffe rien.
+- [2026-08-05 14:57] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 537 éléments, 219 conteneurs) et le catalogue (533 sprites).
+- [2026-08-05 14:53] Une fausse conclusion en route : j'ai d'abord cru que
+  l'émetteur ne partait pas. Instrumenté, il **émettait bien** 15 fois — mais sur
+  la couche `above`, invisible à mon compteur qui ne regardait que `ground`. C'est
+  ce qui a mis au jour l'écrasement de couche par le binder.
+- [2026-08-05 14:57] Sonde `window.__vp` retirée (0 résidu).
 
 ### Validation
 
