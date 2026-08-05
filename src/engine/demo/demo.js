@@ -178,7 +178,14 @@ function spawnNpc(Base, x, y, patrolOpts = null) {
  */
 class DustyWalker extends Man01 {
   static descriptor = {
-    fx: [{ emitter: FootstepDust, at: { x: 24, y: 44 } }],
+    fx: [{
+      emitter: FootstepDust,
+      at: { x: 24, y: 44 },
+      // Overriding only what differs: this one walks on grass, so its dust is
+      // green. Everything else — cadence, size, ground layer — is inherited from
+      // the effect's own descriptor.
+      descriptor: { color: ['#8fbf6a', '#6fa04d', '#a8cf85'], fade: 2 },
+    }],
   };
 }
 

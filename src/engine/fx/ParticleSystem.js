@@ -30,6 +30,12 @@ export class ParticleSystem
     gravity: 0,
     /** which surface paints it: 'above' the map, or on the 'ground' under it */
     layer: 'above',
+    /**
+     * How opacity decays over a particle's life: `1` is the linear fade the
+     * layer has always applied, a higher number keeps a particle opaque longer
+     * and drops it late, a lower one fades it out at once.
+     */
+    fade: 1,
   };
 
   /** @type {Array<Object>} live particles, oldest first */
@@ -55,6 +61,7 @@ export class ParticleSystem
     const spec = { ...ParticleSystem.DEFAULTS, ...descriptor };
     for (let index = 0; index < spec.count; index += 1) {
       const angle = spec.direction + (this._random() - 0.5) * spec.spread;
+      const color = this._pickColor(spec.color);
       this._particles.push({
         x: spec.x ?? 0,
         y: spec.y ?? 0,
@@ -64,7 +71,8 @@ export class ParticleSystem
         age: 0,
         life: spec.life,
         size: spec.size,
-        color: spec.color,
+        color,
+        fade: spec.fade,
         layer: spec.layer,
       });
     }
@@ -76,6 +84,31 @@ export class ParticleSystem
       this._particles.splice(0, excess);
     }
     return this;
+  }
+
+  /**
+   * One colour for one particle.
+   *
+   * A descriptor may carry a **palette** rather than a single value: dust that
+   * comes out all the same shade reads as a flat blob, and scattering it over a
+   * few tones is what makes it look like matter. A plain string is the
+   * degenerate case of a one-entry palette, so nothing that worked stops
+   * working.
+   *
+   * The draw goes through the injected RNG, not `Math.random`, so a test can
+   * pin it down.
+   * @param {string|string[]} color a colour, or a palette to draw from
+   * @returns {string}
+   */
+  _pickColor(color) {
+    if (!Array.isArray(color)) {
+      return color;
+    }
+    if (color.length === 0) {
+      return ParticleSystem.DEFAULTS.color;
+    }
+
+    return color[Math.min(color.length - 1, Math.floor(this._random() * color.length))];
   }
 
   /**

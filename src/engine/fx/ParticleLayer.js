@@ -32,7 +32,7 @@ export class ParticleLayer
   /** @type {boolean} whether the last frame left anything painted */
   _painted = false;
 
-  /** @type {Map<string, Object>} pre-rendered sprite per colour */
+  /** @type {Map<string, Object>} pre-rendered sprite per colour **and** size */
   _sprites = new Map();
 
   /** @type {string|null} last placement written, so an idle view writes nothing */
@@ -195,7 +195,11 @@ export class ParticleLayer
 
     for (const particle of particles) {
       const size = particle.size;
-      context.globalAlpha = 1 - ParticleSystem.progressOf(particle);
+      // `fade` shapes the decay: 1 is the plain linear fade, higher keeps a
+      // particle opaque longer and drops it late, lower dissolves it at once.
+      const progress = ParticleSystem.progressOf(particle);
+      const fade = particle.fade ?? 1;
+      context.globalAlpha = fade === 1 ? 1 - progress : Math.max(0, 1 - progress ** fade);
       const sprite = this._spriteFor(particle.color, size);
       if (sprite) {
         context.drawImage(sprite, particle.x - size / 2, particle.y - size / 2, size, size);
@@ -218,14 +222,19 @@ export class ParticleLayer
    * @returns {Object|null} a drawable surface, or null when none can be created
    */
   _spriteFor(color, size) {
-    if (this._sprites.has(color)) {
-      return this._sprites.get(color);
+    // Keyed on colour **and** size: the sprite is baked at one resolution, so
+    // two effects sharing a colour but not a size would otherwise share the one
+    // baked first and get it stretched — blurry. Harmless while every effect had
+    // its own colour; not once palettes are encouraged.
+    const key = `${color}@${Math.ceil(size)}`;
+    if (this._sprites.has(key)) {
+      return this._sprites.get(key);
     }
 
     const surface = this._createSurface(Math.max(8, Math.ceil(size) * 4));
     const context = surface?.getContext?.('2d') ?? null;
     if (!context) {
-      this._sprites.set(color, null);
+      this._sprites.set(key, null);
       return null;
     }
 
@@ -239,7 +248,7 @@ export class ParticleLayer
     context.fillStyle = gradient;
     context.fillRect(0, 0, surface.width, surface.height);
 
-    this._sprites.set(color, surface);
+    this._sprites.set(key, surface);
     return surface;
   }
 

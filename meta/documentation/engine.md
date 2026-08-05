@@ -262,6 +262,28 @@ n'éclate (§0).
   60 ms) et celle de l'effet (une salve toutes les 120 ms) ne coïncident pas, et
   l'échantillonnage ne produisait **aucune particule** en deux secondes de
   patrouille.
+- **Un descripteur se surcharge sur trois niveaux** : défauts du moteur
+  (`ParticleSystem.DEFAULTS`) → descripteur de la classe d'effet → surcharge à
+  l'usage. Cela vaut pour **toutes** ses clés, à la main comme en déclaration :
+
+  ```js
+  new FootstepDust(layer, { follow: npc, descriptor: { color: '#ff0000', size: 20 } })
+
+  static descriptor = { fx: [{ emitter: FootstepDust, at: { x: 24, y: 44 },
+                               descriptor: { color: ['#8fbf6a', '#6fa04d'], fade: 2 } }] };
+  ```
+
+- **`color` accepte une palette.** Un tableau : chaque particule y tire sa teinte,
+  via le RNG injectable (donc les tests restent déterministes). Une chaîne reste
+  acceptée — c'est le cas dégénéré du tableau à un élément. Une salve monochrome
+  se lit comme une tache plate ; deux ou trois tons voisins suffisent à lui donner
+  de la matière, et `FootstepDust` en propose désormais par défaut.
+- **`fade` courbe l'opacité.** `1` est le fondu linéaire historique, plus haut
+  garde la particule opaque plus longtemps, plus bas la dissout aussitôt.
+- **Le cache de sprites est indexé sur couleur *et* taille.** Il ne l'était que
+  sur la couleur, et servait le sprite cuit en premier, étiré — invisible tant que
+  chaque effet avait sa teinte, gênant dès qu'on encourage les palettes. Compter
+  les entrées reste utile : une palette de 3 teintes sur 2 tailles fait 6 sprites.
 - **Deux objets, deux rôles.** `ParticleSystem` est **pur** — il naît, vieillit
   et meurt au rythme du `dt`, sans rien connaître du DOM (donc testable sans
   jsdom, comme `DirectionalInput`). `ParticleLayer` est le seul à toucher un

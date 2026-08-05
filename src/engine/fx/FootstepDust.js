@@ -24,7 +24,10 @@ export class FootstepDust extends Emitter
     gravity: -10,
     life: 600,
     size: 7,
-    color: '#e8dcc4',
+    // A palette, not a single tone: dust that comes out all the same shade reads
+    // as a flat blob. Three neighbouring sands are enough to make it look like
+    // matter — and a host that wants one colour just passes a string.
+    color: ['#e8dcc4', '#d9c9a8', '#f2e8d5'],
     // Dust belongs on the ground: a tree in front of the walker must hide it.
     layer: 'ground',
   };
