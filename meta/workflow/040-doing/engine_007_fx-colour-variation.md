@@ -2,10 +2,10 @@
 id: 2026-08-05_15-39
 title: Une couleur unique ne suffit pas aux effets
 type: feat
-branch:
+branch: claude/fx-colour-variation
 created: 2026-08-05 15:39
 ready: 2026-08-05 15:40
-doing:
+doing: 2026-08-05 15:41
 verify:
 done:
 ---
