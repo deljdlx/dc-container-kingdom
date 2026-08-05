@@ -32,6 +32,9 @@ export class FootstepDust extends Emitter
   /** @type {number} */
   static interval = 120;
 
+  /** @type {boolean} whether the target walked at all since the last burst */
+  _walkedSinceBurst = false;
+
   /**
    * @param {import('./ParticleLayer.js').ParticleLayer} layer
    * @param {Object} [options] see {@link Emitter}, plus:
@@ -40,9 +43,6 @@ export class FootstepDust extends Emitter
    * reusable: the same dust works under the player and under an NPC, and can be
    * declared on a character class rather than wired by hand.
    */
-  /** @type {boolean} whether the target walked at all since the last burst */
-  _walkedSinceBurst = false;
-
   constructor(layer, options = {}) {
     super(layer, options);
     this._isMoving = options.isMoving ?? null;
