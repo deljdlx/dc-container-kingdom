@@ -2,10 +2,10 @@
 id: 2026-08-05_14-43
 title: La poussière de pas ne se réutilise pas — il manque le signal « je marche »
 type: feat
-branch:
+branch: claude/walking-signal-for-fx
 created: 2026-08-05 14:43
 ready: 2026-08-05 14:44
-doing:
+doing: 2026-08-05 14:45
 verify:
 done:
 ---
