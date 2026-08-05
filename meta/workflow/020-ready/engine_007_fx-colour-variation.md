@@ -4,7 +4,7 @@ title: Une couleur unique ne suffit pas aux effets
 type: feat
 branch:
 created: 2026-08-05 15:39
-ready:
+ready: 2026-08-05 15:40
 doing:
 verify:
 done:
