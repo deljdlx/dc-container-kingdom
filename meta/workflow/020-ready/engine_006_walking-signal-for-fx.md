@@ -4,7 +4,7 @@ title: La poussière de pas ne se réutilise pas — il manque le signal « je m
 type: feat
 branch:
 created: 2026-08-05 14:43
-ready:
+ready: 2026-08-05 14:44
 doing:
 verify:
 done:
