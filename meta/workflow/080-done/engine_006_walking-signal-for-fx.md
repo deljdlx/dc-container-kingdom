@@ -7,7 +7,7 @@ created: 2026-08-05 14:43
 ready: 2026-08-05 14:44
 doing: 2026-08-05 14:45
 verify: 2026-08-05 14:59
-done:
+done: 2026-08-05 15:02 (merge 97b6f94)
 ---
 
 ## Objectif
@@ -95,9 +95,27 @@ _Amorce — à confirmer en « specify »._
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — un effet peut désormais **se déclarer sur une classe** et
+  dépendre de l'état de l'élément qu'il suit. C'est le patron pour la suite :
+  traces de pas persistantes, éclaboussures dans l'eau, aura d'un PNJ blessé —
+  aucun n'aura besoin d'un prédicat câblé par l'hôte. Et `isWalking()` est le
+  premier d'une famille d'états lisibles sur un personnage, dont un système de
+  dégâts aura besoin.
+- **Ce qu'on laisse de côté** :
+  - **`isWalking()` est large d'une frame et se fait effacer par le parcours de
+    redessin** : celui-ci appelle `Character.update()` sans argument, ce qui
+    remet la distance à zéro. Sans conséquence ici — l'effet mémorise — mais tout
+    consommateur qui échantillonnerait *après* la frame lirait faux. À écrire, ou
+    à corriger le jour où un second consommateur apparaît ;
+  - **la poussière peut traîner d'une salve** : le verrou « a marché depuis la
+    dernière salve » autorise une dernière bouffée jusqu'à 120 ms après l'arrêt.
+    Assumé, c'est plutôt joli ;
+  - **une seule déclaration testée** (`DustyWalker`) : le chemin déclaratif n'a
+    pas été éprouvé sur un PNJ **streamé**, seulement sur l'area d'origine ;
+  - **le prédicat explicite reste possible** et prioritaire — rien n'oblige à
+    passer par `isWalking()`.
+- **Déposé en `100-follow-up/`** — un candidat :
+  `2026-08-05_15-02_walk-signal-wiped-by-the-redraw-pass`.
 
 ## Journal
 
@@ -151,4 +169,10 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-05 15:02] Review : trois gestes prévus, **deux imposés par la mesure**
+  (mémoriser au lieu d'échantillonner, et rendre au binder la couche de l'effet).
+  Aucun des deux n'était dans la spec — et sans le PNJ de démo, aucun ne se serait
+  vu, puisque les tests unitaires passaient déjà.
+- [2026-08-05 15:02] Merge `--no-ff` sur `main` : **97b6f94** — `merge: la
+  poussière de pas devient réutilisable` (8 fichiers, +282 / −31), suivi de
+  **d71ac2d** pour un JSDoc que mon édition avait décroché de son constructeur.
