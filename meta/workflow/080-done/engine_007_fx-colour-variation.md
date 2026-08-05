@@ -7,7 +7,7 @@ created: 2026-08-05 15:39
 ready: 2026-08-05 15:40
 doing: 2026-08-05 15:41
 verify: 2026-08-05 15:53
-done:
+done: 2026-08-05 15:54 (merge 54d28d9)
 ---
 
 ## Objectif
@@ -109,9 +109,25 @@ cache. À reprendre si l'usage le réclame — pas avant.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Ce que ça ouvre** — un effet se règle désormais entièrement par descripteur,
+  palette comprise, sans toucher au moteur : poussière de sable ou d'herbe,
+  étincelles, fumée, éclaboussures ne sont plus que des valeurs. Et la surcharge
+  est **documentée**, ce qui était peut-être le vrai manque derrière la demande.
+- **Ce qu'on laisse de côté** :
+  - **pas de rampe de couleur sur la durée de vie** (jaune → rouge → noir) : il
+    faudrait interpoler par particule et par frame, et multiplier les sprites en
+    cache. Le geste le plus lourd des trois, et le seul dont l'usage ne réclamait
+    rien ;
+  - **le cache croît avec les palettes** : 3 teintes × 2 tailles = 6 sprites.
+    Borné et mesuré (6 entrées dans la démo), mais c'est une multiplication qu'il
+    faudra surveiller si les palettes s'allongent ;
+  - **`fade` est une puissance**, pas une courbe libre : suffisant pour retarder
+    ou précipiter un fondu, insuffisant pour un clignotement. Choisi pour rester
+    hors du chemin chaud ;
+  - **la taille reste unique par salve** : on peut varier la couleur, pas encore
+    le calibre des particules d'un même effet.
+- **Déposé en `100-follow-up/`** — aucun : les trois limites ci-dessus sont des
+  choix écrits, et rien ne presse d'arbitrer.
 
 ## Journal
 
@@ -158,4 +174,11 @@ _Rempli à la clôture._
 
 ### Validation
 
--
+- [2026-08-05 15:54] Review : la demande portait sur la personnalisation, et la
+  moitié de la réponse était que **ça marchait déjà** — la mécanique de surcharge
+  était complète, seulement muette dans la doc. Le travail réel portait donc sur
+  l'expressivité (palette, fondu) et sur un piège que la personnalisation allait
+  réveiller (le cache indexé par couleur seule).
+- [2026-08-05 15:54] Merge `--no-ff` sur `main` depuis le tree principal :
+  **54d28d9** — `merge: une palette plutôt qu'une couleur unique`
+  (7 fichiers, +237 / −21).
