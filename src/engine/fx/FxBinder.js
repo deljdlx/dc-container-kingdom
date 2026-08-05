@@ -145,18 +145,25 @@ export class FxBinder
       return 0;
     }
 
-    const emitters = declarations.map(({ emitter: EmitterClass, at = null, layer = 'above', ...options }) =>
-      new EmitterClass(this._layerFor(layer), {
+    const emitters = declarations.map(({ emitter: EmitterClass, at = null, layer = null, ...options }) => {
+      // The effect knows where it belongs — dust on the ground, a jet above — so
+      // a declaration that says nothing must not overrule it. Defaulting to
+      // 'above' here silently lifted declared footstep dust over the scenery it
+      // was meant to settle under; only a declaration that states a layer wins.
+      const surface = layer ?? EmitterClass.descriptor?.layer ?? 'above';
+
+      return new EmitterClass(this._layerFor(surface), {
         ...options,
         // After the spread, so a declaration carrying its own `descriptor` still
         // gets the layer tag the particles are sorted by.
-        descriptor: { ...(options.descriptor ?? {}), layer },
+        descriptor: { ...(options.descriptor ?? {}), layer: surface },
         follow: element,
         // `at` is local to the element — that is what makes the effect travel
         // with it, and what lets the same class be dropped anywhere.
         offset: at ?? { x: 0, y: 0 },
         isVisible: (x, y) => this.isVisible(x, y),
-      }));
+      });
+    });
 
     emitters.forEach(emitter => this._viewport.addBehavior(emitter));
     this._bound.set(element, emitters);

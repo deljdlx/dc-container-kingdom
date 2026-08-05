@@ -35,16 +35,62 @@ export class FootstepDust extends Emitter
   /**
    * @param {import('./ParticleLayer.js').ParticleLayer} layer
    * @param {Object} [options] see {@link Emitter}, plus:
-   * @param {() => boolean} [options.isMoving] predicate gating the emission;
-   * without it the dust never shows, which is safer than dusting a statue
+   * @param {() => boolean} [options.isMoving] predicate gating the emission.
+   * Omit it and the effect **asks whatever it follows** — which is what makes it
+   * reusable: the same dust works under the player and under an NPC, and can be
+   * declared on a character class rather than wired by hand.
    */
+  /** @type {boolean} whether the target walked at all since the last burst */
+  _walkedSinceBurst = false;
+
   constructor(layer, options = {}) {
     super(layer, options);
-    this._isMoving = options.isMoving ?? (() => false);
+    this._isMoving = options.isMoving ?? null;
   }
 
-  /** @returns {boolean} dust only rises under a moving character */
+  /**
+   * Watch every frame, burst on the emitter's own cadence.
+   *
+   * The two clocks do not line up: an NPC patrol steps every 60 ms while the
+   * dust bursts every 120 ms, and `Character.isWalking()` is **one frame wide**
+   * by design. Sampling it at burst time therefore asked «are you walking right
+   * now?» on a frame where the NPC happened to be between steps — measured: not
+   * a single particle in two seconds of patrolling.
+   *
+   * So the answer is remembered rather than sampled. The old predicate got away
+   * with sampling because it read the *keyboard*, which stays true for as long
+   * as a key is held.
+   * @param {number} dt elapsed milliseconds
+   */
+  update(dt) {
+    this._walkedSinceBurst = this._walkedSinceBurst || this._isTargetWalking();
+    super.update(dt);
+  }
+
+  /**
+   * Dust rises if the target walked since the last burst, and the answer is
+   * consumed — standing still for a full window stops it.
+   * @returns {boolean}
+   */
   shouldEmit() {
-    return this._isMoving();
+    const walked = this._walkedSinceBurst;
+    this._walkedSinceBurst = false;
+
+    return walked;
+  }
+
+  /**
+   * With no predicate given, the followed element is asked. Something that
+   * cannot answer — a rock, a house, a bare `Element` — stays **silent**: better
+   * mute than dust under a statue, and the caller keeps the last word by passing
+   * its own predicate.
+   * @returns {boolean}
+   */
+  _isTargetWalking() {
+    if (this._isMoving) {
+      return this._isMoving();
+    }
+
+    return typeof this._follow?.isWalking === 'function' && this._follow.isWalking();
   }
 }

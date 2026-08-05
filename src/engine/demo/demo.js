@@ -169,9 +169,22 @@ function spawnNpc(Base, x, y, patrolOpts = null) {
   }
 }
 
+/**
+ * A patrolling NPC that raises dust, **declared** rather than wired: the effect
+ * travels with the class, exactly as `Fountain00` declares its jet. The binder
+ * picks it up wherever the NPC is dropped, streamed areas included — and the
+ * dust asks the character whether it is walking, so nothing here mentions the
+ * player or the keyboard.
+ */
+class DustyWalker extends Man01 {
+  static descriptor = {
+    fx: [{ emitter: FootstepDust, at: { x: 24, y: 44 } }],
+  };
+}
+
 // 8 moving NPCs — one per built-in base from the shared character sheet.
 spawnNpc(Man00,   340, 170, { axis: 'horizontal', distance: 200, speed: 3 });
-spawnNpc(Man01,   380, 90,  { axis: 'horizontal', distance: 220, speed: 4 });
+spawnNpc(DustyWalker, 380, 90, { axis: 'horizontal', distance: 220, speed: 4 });
 spawnNpc(Man02,   120, 300, { axis: 'vertical',   distance: 160, speed: 2 });
 spawnNpc(Man03,   610, 470, { axis: 'horizontal', distance: 200, speed: 3 });
 spawnNpc(Man04,   850, 360, { axis: 'vertical',   distance: 130, speed: 3 });
@@ -248,11 +261,11 @@ viewport.enableParticles();
 // world sprays from its own basin — `enableParticles()` wired them above.
 
 // Follows a moving element instead: dust tracks the player while the camera
-// scrolls, and only while they actually walk.
+// scrolls, and only while they actually walk. No predicate to pass — the effect
+// asks the character it follows, which is what makes the same one work for NPCs.
 viewport.addBehavior(new FootstepDust(viewport.getGroundParticles(), {
   follow: viewport.getCharacter(),
   offset: { x: 24, y: 44 },
-  isMoving: () => viewport.getInput().isMoving(),
 }));
 
 // ── Event console ────────────────────────────────────────────────────────────
