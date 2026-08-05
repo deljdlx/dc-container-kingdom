@@ -30,6 +30,9 @@ export class Character extends Element
   /** @type {ReturnType<typeof setTimeout>|undefined} speech-bubble auto-close timer */
   _reactionTimeout;
 
+  /** @type {number} pixels covered on the last update — see {@link isWalking} */
+  _walkedDistance = 0;
+
   /**
    * @param {number|null} [x] world x, or null to leave unpositioned
    * @param {number|null} [y] world y, or null to leave unpositioned
@@ -92,11 +95,31 @@ export class Character extends Element
   /**
    * Advance the walk-cycle clock by the distance walked since the previous
    * update, then re-render.
+   *
+   * The distance is also **remembered**, which is what makes {@link isWalking}
+   * possible: it used to pass straight through to the animator, so an effect
+   * that had to know whether a character was walking had no way to ask. The one
+   * in the demo read the *keyboard* instead — which works for the player and for
+   * nobody else.
    * @param {number} walkedDistance walked pixels since the previous update
    */
   update(walkedDistance = 0) {
-    this._animator.advance(walkedDistance);
+    this._walkedDistance = Number.isFinite(walkedDistance) ? Math.max(0, walkedDistance) : 0;
+    this._animator.advance(this._walkedDistance);
     this.getRenderer().update();
+  }
+
+  /**
+   * Whether the character covered ground on its **last** update.
+   *
+   * Deliberately one frame wide: it falls back to false as soon as an update
+   * reports no distance, so dust stops the instant the feet do rather than
+   * trailing behind. Every mover already feeds this — the player through
+   * `Viewport.moveCharacter`, the NPCs through their behaviors.
+   * @returns {boolean}
+   */
+  isWalking() {
+    return this._walkedDistance > 0;
   }
 
   /**

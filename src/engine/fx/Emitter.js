@@ -68,12 +68,15 @@ export class Emitter
    * its area and keep spawning at a dead thing's position — the very leak that
    * bit `freeArea` before (2026-07-26_14-18).
    *
-   * But **"no parent" is not "destroyed"**: `Viewport.enableMainCharacter()`
-   * builds its character and never attaches it to the scene graph, so an effect
-   * following the player was killed on its first frame (regression of
-   * 2026-08-02). What marks an orphan is having **had** a parent and lost it —
-   * remembered here rather than sampled at construction, since a host may build
-   * the emitter before attaching its target.
+   * But **"no parent" is not "destroyed"**: a host may build an emitter before
+   * attaching its target, and killing it on the first frame would be wrong. What
+   * marks an orphan is having **had** a parent and lost it — remembered here
+   * rather than sampled at construction.
+   *
+   * The case that first exposed this was the player, which `enableMainCharacter`
+   * used to leave outside the scene graph entirely; since 2026-08-03 it lives on
+   * the entity layer like anything else, so it is no longer the example — but the
+   * rule it forced is still the right one.
    * @returns {boolean} whether the emitter still has a reason to run
    */
   isAlive() {
