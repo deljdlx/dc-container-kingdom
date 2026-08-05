@@ -96,15 +96,15 @@ cache. À reprendre si l'usage le réclame — pas avant.
 
 ## Definition of Done
 
-- [ ] `color` accepte un **tableau** ; chaque particule en tire une, via le RNG
+- [x] `color` accepte un **tableau** ; chaque particule en tire une, via le RNG
       injecté — test déterministe à l'appui.
-- [ ] Une **chaîne** continue de fonctionner à l'identique (non-régression).
-- [ ] `fade` permet de modifier la courbe d'opacité, le défaut restant l'actuel.
-- [ ] Le cache de sprites est indexé sur **couleur + taille** : deux tailles pour
+- [x] Une **chaîne** continue de fonctionner à l'identique (non-régression).
+- [x] `fade` permet de modifier la courbe d'opacité, le défaut restant l'actuel.
+- [x] Le cache de sprites est indexé sur **couleur + taille** : deux tailles pour
       une même couleur donnent deux sprites nets (test ou mesure).
-- [ ] **Coût mesuré** : nombre de sprites en cache et ms/frame, avec une palette.
-- [ ] **La démo le montre** : un effet dont la couleur varie visiblement.
-- [ ] `meta/documentation/engine.md` documente la **surcharge de descripteur**
+- [x] **Coût mesuré** : nombre de sprites en cache et ms/frame, avec une palette.
+- [x] **La démo le montre** : un effet dont la couleur varie visiblement.
+- [x] `meta/documentation/engine.md` documente la **surcharge de descripteur**
       (les trois niveaux) et la palette ; `npm run verify` vert.
 
 ## Suite
@@ -117,11 +117,44 @@ _Rempli à la clôture._
 
 ### Travail
 
--
+- [2026-08-05 15:43] **La palette d'abord** : `color` accepte un tableau, chaque
+  particule y tire sa teinte via le **RNG injecté** — pas `Math.random`, sinon les
+  tests ne pinceraient rien. Une chaîne reste le cas dégénéré du tableau à un
+  élément, donc aucune rupture.
+- [2026-08-05 15:44] **`fade`** porte la courbe d'opacité, avec `1` = le fondu
+  linéaire historique. Une **forme déclarative** (une puissance), pas un callback :
+  le fondu tourne pour chaque particule et chaque frame, une fonction utilisateur
+  y serait chère.
+- [2026-08-05 15:45] **Le cache de sprites passe à `couleur@taille`.** Il
+  n'indexait que par couleur et servait le sprite cuit en premier, étiré. Sans
+  conséquence tant que chaque effet avait sa teinte ; encourager les palettes
+  l'aurait rendu visible. C'était le vrai piège caché derrière la demande.
+- [2026-08-05 15:47] **`FootstepDust` part maintenant avec une palette** de trois
+  sables voisins plutôt qu'un ton unique : la demande disait « avec valeurs par
+  défaut », et le défaut le plus utile est celui qui montre la fonctionnalité.
+- [2026-08-05 15:47] **Ce que je n'ai pas fait** : la rampe de couleur sur la
+  durée de vie. Il faudrait interpoler par particule et par frame et multiplier
+  les sprites en cache — écrit comme hors périmètre plutôt que baclé.
 
 ### Vérification
 
--
+- [2026-08-05 15:52] `npm run verify` **vert** : **64 fichiers, 545 tests** (+9).
+- [2026-08-05 15:49] **Critère qui fait foi**, mesuré sur la démo : **six teintes
+  distinctes** vivantes au sol pendant une marche — les **trois sables** du
+  descripteur par défaut de l'effet (le joueur) et les **trois verts** déclarés
+  par le PNJ, qui surcharge aussi son `fade` à 2. La chaîne de fusion tient donc
+  de bout en bout, de la classe à la déclaration.
+- [2026-08-05 15:50] **Le cache est bien indexé sur les deux** : six entrées,
+  `#8fbf6a@7`, `#6fa04d@7`, `#a8cf85@7`, `#e8dcc4@7`, `#d9c9a8@7`, `#f2e8d5@7`.
+- [2026-08-05 15:50] **Coût** : **0,229 ms par frame** avec les deux effets actifs
+  et 115 particules vivantes — inchangé à la mesure près.
+- [2026-08-05 15:51] **Les trois hôtes** sans erreur console : la démo, l'app
+  (49 areas, 529 éléments, 219 conteneurs) et le catalogue (536 sprites).
+- [2026-08-05 15:48] Un contrôle intermédiaire m'a semblé rater : je ne voyais que
+  les teintes vertes. C'était l'échantillonnage — les particules sable du joueur
+  étaient déjà mortes au moment de la lecture. Remesuré en accumulant sur toute la
+  marche : les six sortent.
+- [2026-08-05 15:52] Sonde `window.__vp` retirée (0 résidu).
 
 ### Validation
 
