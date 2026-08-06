@@ -26,6 +26,28 @@ résout toujours. Avec des projectiles qui meurent en vol et des abonnés qui le
 tiennent une frame de trop, c'est le genre de valeur fausse qu'on cherche
 longtemps. Accessoirement, la chaîne remontante n'est pas collectable.
 
+### Ce n'est plus latent : la ceinture anti-fuite des FX est déjà défaite
+
+Trouvé par la passe d'audit A du 2026-08-06. `Emitter.isAlive()` promet qu'« un
+emitter lié à un élément meurt avec lui, quel que soit le chemin qui l'a
+détruit ». Il reconnaît un orphelin à `getParent() === null` — précisément ce que
+`destroy()` **ne fait pas**. Mesuré :
+
+| | |
+|---|---|
+| salves avant `destroy()` | 1 |
+| salves après deux frames de plus | **3** — il émet toujours |
+| `target.getParent()` après `destroy()` | **non nul** |
+| `isAlive()` | **true** |
+| une fois le lien remontant coupé à la main | `isAlive: false`, l'emitter s'arrête |
+
+Autrement dit : la seconde des deux ceintures posées contre les emitters qui
+survivent à leur élément (`2026-07-26_14-18`) **ne tient pas**, et ce ticket en
+est la cause. Ce qui la sauve aujourd'hui, c'est que `Board.freeArea` passe par
+un autre chemin (l'event `element.destroy`, auquel le `FxBinder` s'abonne) — donc
+le cas couvert marche, et c'est le cas **non couvert** qui fuit : un
+`board.despawn()` d'entité, exactement ce que les projectiles vont faire.
+
 ## Spécifications
 
 _À confirmer en « specify »._ Deux issues, et il faut **choisir**, pas subir :
