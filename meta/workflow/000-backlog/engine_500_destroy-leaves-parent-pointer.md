@@ -43,10 +43,20 @@ détruit ». Il reconnaît un orphelin à `getParent() === null` — préciséme
 
 Autrement dit : la seconde des deux ceintures posées contre les emitters qui
 survivent à leur élément (`2026-07-26_14-18`) **ne tient pas**, et ce ticket en
-est la cause. Ce qui la sauve aujourd'hui, c'est que `Board.freeArea` passe par
-un autre chemin (l'event `element.destroy`, auquel le `FxBinder` s'abonne) — donc
-le cas couvert marche, et c'est le cas **non couvert** qui fuit : un
-`board.despawn()` d'entité, exactement ce que les projectiles vont faire.
+est la cause.
+
+**Portée exacte, mesurée par la passe d'audit C** (2026-08-06) — plus étroite que
+ce que la passe A laissait entendre. Un emitter **lié par le `FxBinder`** est
+nettoyé quel que soit le chemin, parce que le binder s'abonne à `element.destroy` :
+60 entités à effet déclaré, nées puis despawnées, laissent **0 emitter et 0
+behavior** derrière elles ; idem après 1 800 frames de marche et 300 projectiles,
+où tous les compteurs reviennent ou restent bornés.
+
+Ce qui fuit, c'est l'emitter **câblé à la main** (`new FootstepDust(...)` +
+`viewport.addBehavior`), qui ne passe pas par le binder et n'a donc que
+`isAlive()` pour mourir — celui que ce ticket casse. La démo en a un : la
+poussière du joueur, dont l'élément ne meurt jamais. Le risque est donc **latent
+mais réel** dès qu'un hôte câblera un effet sur quelque chose de mortel.
 
 ## Spécifications
 
