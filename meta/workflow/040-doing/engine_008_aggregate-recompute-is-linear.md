@@ -2,10 +2,10 @@
 id: 2026-08-06_17-20
 title: Le recalcul d'enveloppe est linéaire en enfants et domine à l'échelle
 type: fix
-branch:
+branch: claude/aggregate-grow-and-tighten
 created: 2026-08-06 17:20
 ready: 2026-08-07 18:32
-doing:
+doing: 2026-08-07 18:33
 verify:
 done:
 ---
