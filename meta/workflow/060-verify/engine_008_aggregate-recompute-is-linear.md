@@ -6,7 +6,7 @@ branch: claude/aggregate-grow-and-tighten
 created: 2026-08-06 17:20
 ready: 2026-08-07 18:32
 doing: 2026-08-07 18:33
-verify:
+verify: 2026-08-07 18:52
 done:
 ---
 
@@ -76,29 +76,66 @@ _À confirmer en « specify »._
 
 ## Definition of Done
 
-- [ ] À ~3 000 éléments dans une area, le recalcul d'enveloppe **ne domine plus**
+- [x] À ~3 000 éléments dans une area, le recalcul d'enveloppe **ne domine plus**
       le temps script — mesure avant/après citée.
-- [ ] La campagne du fuyard reste à **0 traversée sur 36**.
-- [ ] La dérive de l'enveloppe reste bornée — mesure sur une session longue.
-- [ ] Le coût est mesuré **aux deux échelles** (≈300 et ≈3 000 éléments).
-- [ ] `npm run verify` vert.
+- [x] La campagne du fuyard reste à **0 traversée sur 36**.
+- [x] La dérive de l'enveloppe reste bornée — mesure sur une session longue.
+- [x] Le coût est mesuré **aux deux échelles** (≈300 et ≈3 000 éléments).
+- [x] `npm run verify` vert.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **aucune.** Le ticket proposait un resserrage épisodique ; la mesure a montré
+  qu'il n'a pas lieu d'être (voir *Vérification*). Rien à reporter.
+- Le vrai enseignement dépasse ce ticket et est déjà consigné hors périmètre :
+  **une mesure de perf faite à une seule échelle ne conclut rien**. C'est la
+  deuxième fois qu'une décision validée sur la démo nue (≈300 éléments) se
+  retourne à l'échelle.
 
 ## Journal
 
 ### Travail
 
--
+- **Une ligne.** `Element._moved()` appelait `parent.recomputeCollisionAggregate()`
+  (O(enfants du parent), à chaque pas de chaque mobile) ; il appelle désormais
+  `parent.updateCollisionBoundingBox(this)` (O(1)). Les deux gestes existaient
+  déjà — c'est le choix entre eux qui était mauvais.
+- **La spécification n'a pas été suivie jusqu'au bout, et c'est le résultat de la
+  mesure.** Elle demandait de « découpler les deux gestes » : grossir à chaque
+  déplacement *et* recalculer épisodiquement pour resserrer, sur un seuil à
+  mesurer. Le seuil mesuré n'existe pas : la dérive **plafonne d'elle-même**,
+  parce que `removeChild` recalcule déjà (streaming d'area, despawn d'entité).
+  Ajouter un resserrage périodique aurait été du code, un réglage et un risque en
+  échange de rien. Le firewall n° 2 (« le coût du resserrage se déplace ») tombe
+  avec lui.
+- La justification en JSDoc de `_moved()` — qui argumentait *pour* le recalcul en
+  citant la mesure à 300 éléments — a été réécrite avec les deux échelles.
+- Doc : nouvelle sous-section « L'enveloppe suit le mouvement — en grossissant »
+  dans `documentation/engine.md` §6, qui porte la justesse (les 3 traversées) et
+  le coût (les deux échelles) au même endroit.
 
 ### Vérification
 
--
+Mesures au navigateur sur `/engine/demo/`, joueur en marche, moyenne sur 600
+frames. Le monde à ~3 500 éléments est peuplé par le même script qu'à l'audit B.
+
+| | 300 éléments | 3 500 éléments |
+|---|---|---|
+| temps script / frame | 0,222 ms | **2,518 ms** (avant : 12,3) |
+| dont enveloppe | 0,013 ms — 6 % | **0,032 ms — 1 %** (avant : 6,3 ms — 51 %) |
+| appels / frame | 30,2 | 42,5 |
+| enveloppe de l'area | 1,17× sa tuile | 1,38× sa tuile |
+
+- **Dérive bornée, session longue** : l'enveloppe de l'area d'origine monte de
+  2,18× à 2,54× sa tuile pendant les dix premières secondes, puis **ne bouge plus
+  jusqu'à 80 s**. Celle de la couche d'entités **diminue** — 2 457 → 653 kpx²
+  après 200 projectiles tirés et despawnés — chaque `despawn` recalculant.
+- **Justesse** : campagne du fuyard rejouée, **0 traversée sur 36 approches**
+  (le repère de `2026-08-03_19-10`).
+- `npm run verify` vert : 64 fichiers, **545 tests**.
+- Les trois hôtes (app, démo, catalogue) chargés sans erreur console. Sonde
+  `window.__vp` retirée de `demo.js` après mesure (vérifié : 0 résidu).
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.
