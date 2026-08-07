@@ -1,9 +1,9 @@
 ---
-id: 2026-08-07_16-32
+id: 2026-08-07_18-31
 title: Le plafond du rendu DOM est mesuré mais nulle part écrit
 type: docs
 branch:
-created: 2026-08-07 16:32
+created: 2026-08-07 18:31
 ready:
 doing:
 verify:

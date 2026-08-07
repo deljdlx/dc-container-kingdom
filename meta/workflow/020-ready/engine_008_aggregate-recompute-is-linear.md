@@ -4,7 +4,7 @@ title: Le recalcul d'enveloppe est linéaire en enfants et domine à l'échelle
 type: fix
 branch:
 created: 2026-08-06 17:20
-ready:
+ready: 2026-08-07 18:32
 doing:
 verify:
 done:
