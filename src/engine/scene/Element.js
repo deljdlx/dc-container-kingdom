@@ -454,13 +454,21 @@ export class Element
    * intangible: measured on 2026-08-03, a fleeing NPC the player walked straight
    * through.
    *
-   * It **recomputes** rather than grows. Growing would be enough for
-   * correctness — a box that is too wide makes the broad phase less sharp, never
-   * wrong — but it never comes back down, and an envelope that only swells stops
-   * pruning anything. Measured on the demo over 25 s of NPCs roaming: growing
-   * took the origin area's envelope to **3.7× its own tile (+144 %)**, while
-   * recomputing kept it at the true union of its children (**+37 %**, i.e. what
-   * they actually occupy) — at the **same 60 fps**.
+   * It **grows** rather than recomputes, and that is O(1) against O(children).
+   *
+   * Recomputing looked free when measured on the bare demo (~300 elements). At
+   * ~3 500 it was **51 % of the frame's script time** — 28 calls a frame scanning
+   * 30 000 children — because every step of every mover rebuilt its parent's
+   * whole envelope. Growing is 1 % of a frame that is itself **5× shorter**
+   * (2,5 ms against 12,3).
+   *
+   * Growing is enough for correctness: a box that is too wide makes the broad
+   * phase less sharp, never wrong. And it does not swell without end — removal
+   * still recomputes ({@link CollisionSystem#recomputeAggregates} via
+   * `removeChild`), so an envelope tightens whenever a child leaves. Measured
+   * over 80 s of NPCs roaming, an area's envelope settles at **2,5× its tile by
+   * the tenth second and stops there**; the entity layer *shrinks* after 200
+   * projectiles have flown and despawned.
    */
   _moved() {
     // Ask to be repainted. Without it the pruned walk never descends this far,
@@ -470,7 +478,7 @@ export class Element
 
     const parent = this.getParent();
     if(parent) {
-      parent.recomputeCollisionAggregate();
+      parent.updateCollisionBoundingBox(this);
     }
   }
 

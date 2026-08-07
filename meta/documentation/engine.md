@@ -550,6 +550,31 @@ flowchart LR
     REC --> EV["émet start / end<br/>seulement pour ce qui change"]
 ```
 
+### L'enveloppe suit le mouvement — en grossissant
+
+Quand un enfant bouge, son parent **étend** son agrégat pour l'inclure
+(`updateCollisionBoundingBox`) ; il ne le **recalcule** pas. Sans ce geste,
+l'enveloppe restait sur la position de départ et le broad phase élaguait un
+sous-arbre pourtant en contact : mesuré, **3 traversées sur 36 approches** d'un
+PNJ fuyant.
+
+Étendre suffit à la justesse — une enveloppe trop large élague moins bien, elle
+ne ment jamais — et coûte O(1), là où recalculer coûte O(enfants du parent) **à
+chaque pas de chaque mobile**. L'écart est invisible sur la démo (≈300 éléments)
+et décisif à l'échelle :
+
+| | ≈300 éléments | ≈3 500 éléments |
+|---|---|---|
+| temps script / frame | 0,22 ms | 12,3 → **2,5 ms** |
+| dont enveloppe | 6 % | 51 % → **1 %** |
+
+Et elle ne gonfle pas sans fin : **le retrait d'un enfant recalcule**
+(`removeChild` → `recomputeAggregates`), ce qui la resserre à chaque libération
+d'area ou despawn d'entité. Mesuré sur 80 s de marche, l'enveloppe d'une area se
+stabilise à **2,5× sa tuile dès la dixième seconde** ; celle de la couche
+d'entités *diminue* après 200 projectiles tirés. Aucun resserrage périodique
+n'est donc nécessaire.
+
 Deux types de zones :
 
 - **collision** — solides : bloquent le déplacement.
