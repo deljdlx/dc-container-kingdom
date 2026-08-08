@@ -17,18 +17,38 @@ Pour valider un rendu / un comportement de jeu (pas seulement `npm run verify`).
 La game loop tourne sur `requestAnimationFrame` : **rAF est en pause quand
 l'onglet est en arrière-plan** → joueur et PNJ **gèlent**, et une sonde qui
 `await` un rAF **timeout**. Pour vérifier de façon déterministe, **piloter la
-boucle à la main** :
+boucle à la main**.
 
-1. Exposer temporairement le viewport dans `src/engine/demo/demo.js` :
-   `window.__vp = viewport;` — **à RETIRER avant de committer** (0 résidu de debug).
-2. Dans la console (ou via l'automation), avancer la boucle :
-   ```js
-   const vp = window.__vp;
-   let t = performance.now();
-   vp.move('down');                       // ou vp.press('down'); vp.press('right'); en diagonale
-   for (let i = 0; i < 40; i++) { t += 16; vp.update(t); } // ~40 frames à 16 ms
-   ```
-   `vp.update(t)` est **le même chemin** que celui appelé par rAF → vérification
-   fidèle.
+**Sans toucher au code** : le moteur est servi en modules ES, donc le ré-importer
+depuis la console rend **le même module** — et avec lui l'application courante.
+Plus de `window.__vp` à poser puis à oublier :
+
+```js
+const { Application } = await import('/engine/index.js');  // racine vite = src/
+const app = Application.mainInstance;
+const vp = app.getViewport();
+const clock = app.getClock();
+
+let t = 100000;                        // horloge à soi : le rAF réel fausserait le dt
+vp.press('down'); vp.press('right');   // en diagonale
+for (let i = 0; i < 40; i++) { t += 16; vp.update(t); }   // ~40 frames à 16 ms
+```
+
+`vp.update(t)` est **le même chemin** que celui appelé par rAF → vérification
+fidèle.
+
+## L'horloge, pour observer
+
+`app.getClock()` est la source unique du temps de jeu, et elle sert à mesurer :
+
+```js
+clock.pause();        // fige le monde — la frame se peint quand même
+clock.scale(0.25);    // ralenti : tout ralentit du même facteur, particules comprises
+clock.step(16);       // avancer d'une frame sans passer par le viewport
+clock.now();          // temps de JEU écoulé (figé en pause) — c'est aussi le `at` des events
+```
+
+Dans la démo, `p` met en pause et `s` fait tourner l'échelle (×1 → ×0,25 → ×2) :
+de quoi voir à l'œil ce qu'une mesure affirme.
 
 Voir aussi `../documentation/development.md` et [`agents/workflow.md`](../agents/workflow.md).

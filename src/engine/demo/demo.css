@@ -146,6 +146,13 @@ body {
   gap: 3px;
 }
 
+/* Reads back what the single clock is doing — the demo's only state readout. */
+.demo-hint__state {
+  min-width: 3.5em;
+  color: #d9e3ee;
+  font-variant-numeric: tabular-nums;
+}
+
 kbd {
   display: inline-flex;
   align-items: center;

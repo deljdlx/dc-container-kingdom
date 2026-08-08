@@ -112,17 +112,24 @@ function now() {
  * Bubbling must not re-stamp: an event already carrying this trunk for the same
  * name is passed through untouched, so `at` keeps dating the **origin** and
  * `source` keeps naming the emitter rather than the last relay.
+ * `at` is **game time** whenever the emitter can reach a clock — so events stay
+ * comparable with everything else the engine measures, and two events emitted in
+ * the same paused instant carry the same instant. An emitter with no clock (a
+ * detached element, built before it joins a world) falls back to the wall clock:
+ * it is outside the game's timeline anyway, and dating it `0` would place it
+ * before the world began.
  * @param {string} type the event name, from {@link EngineEvents}
  * @param {Object} source what emitted it (an element, the viewport, the application)
  * @param {Object} [data] the event's own payload
+ * @param {?number} [at] game milliseconds; omit to fall back to the wall clock
  * @returns {Object} the payload, stamped
  */
-export function makeEvent(type, source, data = {}) {
+export function makeEvent(type, source, data = {}, at = null) {
   if (data.type === type && typeof data.at === 'number') {
     return data;
   }
 
-  return { ...data, type, source: data.source ?? source, at: now() };
+  return { ...data, type, source: data.source ?? source, at: at ?? now() };
 }
 
 /**

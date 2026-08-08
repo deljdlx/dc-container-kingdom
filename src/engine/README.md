@@ -57,6 +57,16 @@ core — a game built on it should be able to ignore the village.
 - `world/` — `Board` and `Area`: the tiling and its streaming.
 - `view/` — `Viewport` (the game loop), `ViewportTransform`, `Camera`,
   `DirectionalInput`.
+- `time/` — `Clock`: the single source of game time. Everything that advances
+  reads it, which is what makes pause (`dt = 0`, the loop keeps painting) and
+  slow motion possible:
+
+  ```js
+  const clock = app.getClock();
+  clock.scale(0.25);   // slow motion — world, NPCs and particles alike
+  clock.pause();       // the world freezes, the frame is still painted
+  ```
+
 - `character/` — `Character`, its `CharacterAnimator`, and the interchangeable
   behaviors (`CharacterBehavior`, `PatrolBehavior`, `FleeBehavior`).
 - `render/` — the DOM renderers (element, sprite, board, area, character).

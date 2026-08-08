@@ -29,6 +29,15 @@ export class ViewportRenderer
    */
   _lastCss = null;
 
+  /** Last clock state pushed to the CSS, so it is only written when it changes. @type {?string} */
+  _lastClockState = null;
+
+  /**
+   * How long a character's CSS transition lasts at scale 1, in ms — kept in
+   * step with `character.css`.
+   */
+  static STEP_TRANSITION = 200;
+
   /**
    * @param {import('../Viewport.js').Viewport} viewport
    */
@@ -74,6 +83,35 @@ export class ViewportRenderer
   }
 
   /** Feed the camera into the transform and wear it, only when it changed. */
+  /**
+   * Hand the clock's state to the stylesheet.
+   *
+   * NPCs step 4 px every 60 ms — a sixth of the frames — and a CSS transition
+   * smooths that cadence. It is the one piece of animation the engine does not
+   * tick itself, so it must be told what the clock is doing, or it runs on wall
+   * time: a paused NPC would keep gliding, and in slow motion the browser would
+   * still spend 200 real milliseconds easing a step the engine now takes four
+   * times slower.
+   *
+   * Written only when the state changes — this runs every frame.
+   * @param {import('../time/Clock.js').Clock} clock
+   */
+  applyClockState(clock) {
+    const scale = clock.scale();
+    const frozen = clock.isPaused() || scale === 0;
+    const state = `${frozen}:${scale}`;
+    if (state === this._lastClockState) {
+      return;
+    }
+    this._lastClockState = state;
+
+    this._container.classList.toggle('engine--frozen', frozen);
+    this._container.style.setProperty(
+      '--engine-step-duration',
+      `${frozen ? 0 : ViewportRenderer.STEP_TRANSITION / scale}ms`,
+    );
+  }
+
   update() {
     const camera = this._viewport.getCamera();
 

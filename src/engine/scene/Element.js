@@ -252,9 +252,10 @@ export class Element
    * @param {object} [data] the event's own payload
    */
   handle(name, data = {}) {
-    const event = makeEvent(name, this, data);
+    const application = this.getApplication();
+    const event = makeEvent(name, this, data, application?.getClock?.().now() ?? null);
     this._events.emit(name, event);
-    this.getApplication()?.handle(name, event);
+    application?.handle(name, event);
   }
 
   // ===========================
