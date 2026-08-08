@@ -6,7 +6,7 @@ branch: claude/engine-clock
 created: 2026-08-08 17:55
 ready: 2026-08-08 18:10
 doing: 2026-08-08 18:15
-verify:
+verify: 2026-08-08 19:25
 done:
 ---
 
@@ -162,41 +162,132 @@ rendre possibles plus tard sans se réécrire, pas les livrer ici.
 
 ## Definition of Done
 
-- [ ] Une horloge, **un seul point d'avancement**, exportée depuis
+- [x] Une horloge, **un seul point d'avancement**, exportée depuis
       `src/engine/index.js` ; aucun accès au temps réel ailleurs dans le moteur
       (hors outillage) — preuve par grep dans le journal.
-- [ ] `pause()` démontré au navigateur : PNJ, joueur **et particules** figés, et
+- [x] `pause()` démontré au navigateur : PNJ, joueur **et particules** figés, et
       la frame **se peint quand même**.
-- [ ] `scale` démontré : à 0,25 tout ralentit **du même facteur**, particules
+- [x] `scale` démontré : à 0,25 tout ralentit **du même facteur**, particules
       comprises (mesure, pas impression).
-- [ ] Le sort du `at` des events est tranché, écrit, et `EventConsole` marche
+- [x] Le sort du `at` des events est tranché, écrit, et `EventConsole` marche
       encore.
-- [ ] La règle sur les animations CSS des objets de jeu est écrite, et tenue par
+- [x] La règle sur les animations CSS des objets de jeu est écrite, et tenue par
       le moteur.
-- [ ] Le contrat d'affichage est documenté : « ce qui avance prend `dt`, ce qui
+- [x] Le contrat d'affichage est documenté : « ce qui avance prend `dt`, ce qui
       place n'en a pas besoin », l'animation à la distance, et ce que fait le
       rendu en pause.
-- [ ] Le sort de la transition CSS des PNJ est **tranché et appliqué**, pas
+- [x] Le sort de la transition CSS des PNJ est **tranché et appliqué**, pas
       constaté.
-- [ ] `meta/documentation/engine.md` et `recipes/verify-in-browser.md` à jour ;
+- [x] `meta/documentation/engine.md` et `recipes/verify-in-browser.md` à jour ;
       `npm run verify` vert.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **`Character.quickReaction()` reste sur un `setTimeout`** — une bulle de
+  dialogue continue donc de se refermer pendant la pause. Reconnu et documenté,
+  pas corrigé : le corriger proprement demande l'ordonnanceur, dont c'est le
+  **premier client** (`2026-08-08_17-56`). Rien à déposer, le ticket suivant le
+  porte déjà.
+- **La transition CSS des PNJ est outillée, pas supprimée.** La bonne fin serait
+  que les behaviors déplacent au `dt` comme le joueur (pas de 4 px toutes les
+  60 ms → pas de cadence à masquer), et la transition disparaîtrait avec le
+  problème. Candidat déposé en `100-follow-up/`.
+- Le pas fixe et l'interpolation de rendu restent ouverts, et le restent
+  volontairement : rien ne les réclame, et l'horloge ne leur ferme pas la porte.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-08-08 18:15] Branche `claude/engine-clock`. `Clock` dans `src/engine/time/`,
+  exportée par le baril : `advance` / `now` / `dt` / `frame` / `scale` / `pause` /
+  `resume` / `step`. Elle appartient à l'`Application` — **pas** de singleton de
+  module, deux applications coexistent déjà (catalogue et jeu) et un global
+  mettrait l'une en pause avec l'autre.
+- [2026-08-08 18:20] `Viewport.update()` ne calcule plus son `dt` : il le demande
+  à l'horloge. Le plafond de 100 ms, jusque-là planqué dans la boucle, devient
+  une **politique de l'horloge** (`Clock.MAX_STEP`), documentée avec ce qu'elle
+  protège.
+- [2026-08-08 18:25] **La pause est `dt = 0`**, pas une boucle arrêtée. Rien
+  d'autre n'a eu à changer : le joueur doit `dt × vitesse`, les behaviors
+  accumulent `dt`, les particules vieillissent de `dt` — tout gèle seul, et la
+  frame continue d'être peinte.
+- [2026-08-08 18:30] **La bifurcation du renderer, tranchée dans l'autre sens que
+  prévu.** La spécification demandait de choisir entre « le renderer reçoit un
+  `dt` » et « le renderer lit l'horloge » ; la bonne réponse était **ni l'un ni
+  l'autre**. Le renderer *place*, il n'*avance* pas : lui passer un `dt` qu'aucune
+  de ses six sous-classes n'utilise aurait été de la généralité spéculative payée
+  tout de suite. La règle écrite à la place est durable : **ce qui avance prend
+  `dt`, ce qui place n'en a pas besoin**.
+- [2026-08-08 18:40] Le vrai impact affichage, lui, était bien réel :
+  `character.css` lissait les PNJ par `transition: left/top 0.2s` — donc sur le
+  temps du **navigateur**. Traité en donnant l'horloge au CSS :
+  `ViewportRenderer.applyClockState()` écrit `--engine-step-duration`
+  (200 ms ÷ échelle) et pose `engine--frozen` en pause. Écrit **seulement quand
+  l'état change** — la méthode tourne à chaque frame.
+- [2026-08-08 18:45] `at` des events → **temps de jeu**. `makeEvent()` prend
+  l'heure en paramètre, `Element.handle()` la tire de l'horloge de son
+  application ; un élément détaché retombe sur le temps du mur, ce qui est
+  documenté comme « hors timeline » plutôt que subi.
+- [2026-08-08 18:50] Les 23 doublures d'`Application` des tests n'ont **pas** été
+  réécrites : `getClock?.()` les tolère, dans la même logique que le « un élément
+  sans application reste silencieux plutôt que de jeter » déjà en place.
+- [2026-08-08 19:00] Démo : `p` met en pause, `s` fait tourner l'échelle
+  (×1 → ×0,25 → ×2), avec un affichage d'état. C'est ce qui rend l'horloge
+  observable à l'œil, et pas seulement mesurable.
 
 ### Vérification
 
--
+`npm run verify` vert : **66 fichiers, 564 tests** (19 nouveaux — `Clock` seule,
+puis le viewport et les events sur l'horloge).
+
+Mesures au navigateur (`/engine/demo/`, boucle pilotée à la main, 60 frames de
+16 ms), **sans sonde ajoutée au code** : `await import('/engine/index.js')` rend
+le même module, donc `Application.mainInstance` — la recipe a été mise à jour, il
+n'y a plus de `window.__vp` à poser puis à oublier.
+
+**Pause** — l'horloge s'arrête, le monde avec, l'écran non :
+
+| | avant pause | après 60 frames de pause |
+|---|---|---|
+| temps de jeu | 944 ms | **944 ms** |
+| joueur `x` | 488 | **488** |
+| PNJ (DOM `left`) | 385px | **385px** |
+| particules vivantes | 91 | **91** |
+| frames comptées | 60 | **120** |
+
+Et le rendu tourne bien pendant ce temps : un élément déplacé à la main horloge
+arrêtée est **repeint** (`left` 980px → 1057px).
+
+**Échelle** — mesuré à vitesse 300 px/s sur 15 frames, sans obstacle :
+
+| échelle | distance mesurée | théorique |
+|---|---|---|
+| ×1 | 72 px | 72 |
+| ×0,25 | 18 px | 18 |
+| ×2 | 144 px | 144 |
+
+Les FX suivent la même horloge : la poussière fait **7 salves** à ×1 (960 ms de
+jeu, cadence 120 ms) et **2** à ×0,25 (240 ms de jeu). Compter les salves et non
+les particules vivantes est délibéré — au ralenti elles vieillissent aussi quatre
+fois moins vite, donc le stock ne dit rien.
+
+**La transition CSS obéit** (`transition-duration` calculée, lue dans le
+navigateur) :
+
+| | PNJ | joueur |
+|---|---|---|
+| ×1 | 0,2 s | 0 s |
+| ×0,25 | **0,8 s** | 0 s |
+| pause | **0 s** | 0 s |
+
+Reste : les trois hôtes (app, démo, catalogue) chargés **sans erreur console** ;
+la console d'events sous `?debug=1` coalesce toujours (`map.update ×111`) avec
+les estampilles en temps de jeu ; les commandes `p` et `s` de la démo vérifiées
+une à une ; le patch temporaire posé sur `FootstepDust.shouldEmit` pour compter
+les salves **retiré** (`delete`, pas réassignation — une réassignation laisse une
+propriété propre qui masque le prototype).
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.
