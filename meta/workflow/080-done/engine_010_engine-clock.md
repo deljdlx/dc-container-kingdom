@@ -7,7 +7,7 @@ created: 2026-08-08 17:55
 ready: 2026-08-08 18:10
 doing: 2026-08-08 18:15
 verify: 2026-08-08 19:25
-done:
+done: 2026-08-08 19:30 (merge c1c7d20)
 ---
 
 ## Objectif
@@ -290,4 +290,4 @@ propriété propre qui masque le prototype).
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `c1c7d20`.
