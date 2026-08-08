@@ -2,10 +2,10 @@
 id: 2026-08-08_17-55
 title: Une horloge de moteur, source unique du temps
 type: feat
-branch:
+branch: claude/engine-clock
 created: 2026-08-08 17:55
 ready: 2026-08-08 18:10
-doing:
+doing: 2026-08-08 18:15
 verify:
 done:
 ---
