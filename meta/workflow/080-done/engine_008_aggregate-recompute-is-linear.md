@@ -7,7 +7,7 @@ created: 2026-08-06 17:20
 ready: 2026-08-07 18:32
 doing: 2026-08-07 18:33
 verify: 2026-08-07 18:52
-done:
+done: 2026-08-07 18:56 (merge 243e96c)
 ---
 
 ## Objectif
@@ -138,4 +138,4 @@ frames. Le monde à ~3 500 éléments est peuplé par le même script qu'à l'au
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `243e96c`.
