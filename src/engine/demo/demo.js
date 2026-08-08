@@ -332,6 +332,34 @@ document.body.addEventListener('keydown', (event) => {
   }
 });
 
+// ── The clock, made visible ──────────────────────────────────────────────────
+// P pauses, S cycles the time scale. Both act on the ONE clock, so everything
+// that advances obeys at once — player, NPCs, projectiles and particles — while
+// the frame keeps being painted. That last point is the whole reason pause is
+// «dt = 0» and not «stop the loop»: the world freezes, the screen stays alive.
+const SCALES = [1, 0.25, 2];
+let scaleIndex = 0;
+
+document.body.addEventListener('keydown', (event) => {
+  const clock = app.getClock();
+
+  if (event.code === 'KeyP' && !event.repeat) {
+    if (clock.isPaused()) {
+      clock.resume();
+    }
+    else {
+      clock.pause();
+    }
+  }
+  if (event.code === 'KeyS' && !event.repeat) {
+    scaleIndex = (scaleIndex + 1) % SCALES.length;
+    clock.scale(SCALES[scaleIndex]);
+  }
+
+  document.querySelector('.demo-hint--clock .demo-hint__state').textContent =
+    clock.isPaused() ? 'paused' : `×${clock.scale()}`;
+});
+
 // ── Touch D-pad ──────────────────────────────────────────────────────────────
 // Dispatch synthetic keyboard events so the viewport's existing keydown/keyup
 // handlers pick them up without touching the engine internals.

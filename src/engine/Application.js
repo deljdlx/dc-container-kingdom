@@ -1,3 +1,4 @@
+import { Clock } from './time/Clock.js';
 import { makeEvent } from './events/EngineEvents.js';
 import { EventEmitter } from './events/EventEmitter.js';
 import { Viewport } from './view/Viewport.js';
@@ -25,6 +26,14 @@ export class Application
    * @type {EventEmitter}
    */
   _events = new EventEmitter();
+
+  /**
+   * The application's own clock — not a module-level singleton, on purpose: the
+   * catalogue page and a game can hold two applications at once, and a shared
+   * global would pause one by pausing the other.
+   * @type {Clock}
+   */
+  _clock = new Clock();
 
   apiGetAreaUrl = './backend/index.php';
 
@@ -92,6 +101,11 @@ export class Application
     return this._events.onAny(callback);
   }
 
+  /** @returns {Clock} the single source of game time */
+  getClock() {
+    return this._clock;
+  }
+
   /**
    * Emit an application-level event. Relayed emissions arrive already stamped
    * and are passed through, so `at` keeps dating the origin.
@@ -99,7 +113,7 @@ export class Application
    * @param {Object} [data]
    */
   handle(name, data = {}) {
-    this._events.emit(name, makeEvent(name, this, data));
+    this._events.emit(name, makeEvent(name, this, data, this._clock.now()));
   }
 
   /**

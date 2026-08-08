@@ -1,5 +1,6 @@
 import { Board } from '../world/Board.js';
 import { Camera } from './Camera.js';
+import { Clock } from '../time/Clock.js';
 import { Character } from '../character/Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
 import { EngineEvents, makeEvent } from '../events/EngineEvents.js';
@@ -49,9 +50,12 @@ export class Viewport
   interval = 4;
 
   /**
-   * @type {number}
+   * Fallback clock, for a viewport built without an application (tests, probes).
+   * A viewport that has one reads **its** clock — two worlds must not share a
+   * pause.
+   * @type {Clock}
    */
-  _timestamp;
+  _ownClock = new Clock();
 
 
   /**
@@ -449,9 +453,11 @@ export class Viewport
    * @param {number} timestamp rAF high-resolution timestamp (ms)
    */
   update(timestamp) {
-    // Clamp dt so the first frame after a pause doesn't teleport the character.
-    const dt = this._timestamp ? Math.min(timestamp - this._timestamp, 100) : 0;
-    this._timestamp = timestamp;
+    // The clock owns the whole time policy — the cap that stops a backgrounded
+    // tab from teleporting the character, the scale, and the pause. Pause is
+    // simply `dt = 0`: everything below owes nothing, and the frame is still
+    // painted, which is what lets a paused game survive a resize or an overlay.
+    const dt = this.getClock().advance(timestamp);
 
     if(this.character && this._input.isMoving()) {
       // Bank the distance owed on each axis, spend whole pixels only. Rounding
@@ -498,6 +504,7 @@ export class Viewport
 
     // The camera follows its target; the viewport renderer applies the offset.
     this._camera.update();
+    this.renderer.applyClockState(this.getClock());
     this.renderer.update();
 
     // Particles paint LAST: drawing before the camera moved would offset them by
@@ -606,6 +613,14 @@ export class Viewport
   }
 
   // ===========================
+
+  /**
+   * @returns {Clock} the application's clock, or this viewport's own when it was
+   * built without one
+   */
+  getClock() {
+    return this._application?.getClock?.() ?? this._ownClock;
+  }
 
   /** @returns {DirectionalInput} the directions currently held */
   getInput() {

@@ -1,6 +1,18 @@
+/* NPCs move in 4 px steps every 60 ms, a sixth of the frames; this transition
+   smooths that cadence. It is browser time, not engine time, so its duration is
+   fed by the clock (`ViewportRenderer.applyClockState`) — otherwise slow motion
+   would still ease each step in 200 real milliseconds. The main character is
+   placed every frame and needs none of it. */
 .map-element.character {
   will-change: transform;
-  transition: left 0.2s linear, top 0.2s linear;
+  transition:
+    left var(--engine-step-duration, 0.2s) linear,
+    top var(--engine-step-duration, 0.2s) linear;
+}
+
+/* A frozen clock takes the browser's animation with it: no gliding under pause. */
+.engine--frozen .map-element.character {
+  transition: none;
 }
 
 .map-element.character.character--main {

@@ -41,6 +41,9 @@ export { FxBinder } from './fx/FxBinder.js';
 export { FountainSpray } from './fx/FountainSpray.js';
 export { FootstepDust } from './fx/FootstepDust.js';
 
+// --- Time: the single clock everything that advances reads ---
+export { Clock } from './time/Clock.js';
+
 // --- Events: the bus, its catalogue and its envelope ---
 export { EventEmitter } from './events/EventEmitter.js';
 export {

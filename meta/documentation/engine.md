@@ -171,7 +171,7 @@ Le `Viewport` porte la **boucle de jeu** (une seule, sur `requestAnimationFrame`
 
 ```mermaid
 flowchart TD
-    U["update(timestamp)"] --> DT["dt = clamp(Δt, 0, 100 ms)<br/>pas de téléport après une pause"]
+    U["update(timestamp)"] --> DT["dt = clock.advance(timestamp)<br/>borné, mis à l'échelle, nul en pause"]
     DT --> Q{"input.isMoving() ?"}
     Q -->|oui| ACC["vecteur unitaire = input.getVector()<br/>resteX/resteY += dt × vitesse / 1000 × composante"]
     Q -->|non| RST["resteX = resteY = 0"]
@@ -181,14 +181,14 @@ flowchart TD
     MC --> B["chaque behavior enregistré : update(dt)<br/>PNJ sur la MÊME horloge"]
     B --> W["board.update()<br/>parcours élagué : monte ce qui a rejoint la scène"]
     W --> C["camera.update"]
-    C --> R["renderer.update"]
+    C --> R["renderer.applyClockState · renderer.update"]
 ```
 
 Points clés :
 
-- **Une seule horloge.** Joueur et PNJ sont tickés par la même game loop avec le
-  même `dt` (les behaviors s'enregistrent via `viewport.addBehavior`). Pas de
-  `setTimeout` maison.
+- **Une seule horloge**, et c'est un objet — voir §3.5. Joueur, PNJ, particules
+  sont tickés par la même boucle avec le même `dt` (les behaviors s'enregistrent
+  via `viewport.addBehavior`). Pas de `setTimeout` maison.
 - **Le monde se pose avant d'être peint** — `board.update()` chaque frame. C'est
   ce parcours, et lui seul, qui **monte ce qui a rejoint la scène** : une area
   streamée, une entité apparue en cours de partie. Attacher un élément suffit ;
@@ -496,6 +496,78 @@ filtrée : **1,4 nœud par frame** monde immobile, **2,4** joueur en marche, pou
 par frame. Le balayage de montage du board tourne **exactement une fois** par
 frame de marche — c'est lui, désormais, le poste principal.
 
+### 3.5 `Clock` : la source unique du temps
+
+Tout ce qui **avance** lit ses millisecondes au même endroit : `application.getClock()`.
+C'est ce qui rend la pause et le ralenti possibles — un sous-système qui garde son
+propre minuteur continue de tourner quand le jeu s'arrête.
+
+| | |
+|---|---|
+| `advance(timestamp)` | **seul** point d'avancement, appelé par la boucle ; rend le `dt` de la frame |
+| `now()` | temps de **jeu** écoulé, monotone, **figé en pause** |
+| `dt()` · `frame()` | pas courant · index de frame |
+| `scale(v)` | 0,25 = ralenti, 2 = accéléré ; refuse le négatif |
+| `pause()` · `resume()` · `isPaused()` | |
+| `step(ms)` | avancer à la main — tests et sondes (piège rAF) |
+
+Elle appartient à l'`Application` — **pas** de singleton de module : la page
+catalogue et un jeu peuvent tenir deux applications à la fois, et un global
+mettrait l'une en pause en mettant l'autre en pause.
+
+**Le plafond de `dt` (100 ms) est une politique de l'horloge.** Restaurer un
+onglet en arrière-plan livre une frame de plusieurs secondes ; dépensée telle
+quelle, elle téléporte le personnage à travers les murs, puisque les collisions
+se testent au pas. Le monde tourne au ralenti pendant une frame — invisible —
+plutôt que de sauter.
+
+#### La pause, c'est `dt = 0` — pas une boucle arrêtée
+
+C'est la clé de voûte, et elle évite d'écrire du code de pause partout : le
+joueur doit `dt × vitesse` pixels, les behaviors accumulent `dt`, les particules
+vieillissent de `dt` — tous gèlent d'eux-mêmes. La boucle, elle, **continue** :
+une frame en pause se peint (mesuré : un élément déplacé à la main pendant la
+pause est bien repeint), ce qui permet un menu, un overlay, un redimensionnement.
+
+Arrêter la boucle est une autre opération, avec d'autres conséquences (entrées,
+teardown).
+
+#### Ce qui lit l'horloge, et ce qui n'en a pas besoin
+
+**Ce qui avance prend `dt` ; ce qui place n'en a pas besoin.** Le `Renderer` ne
+reçoit donc pas de temps : il pose des éléments là où le monde dit qu'ils sont.
+Le jour où il **interpolera** (caméra lissée, sprite qui encaisse un coup), il
+deviendra quelque chose qui avance et recevra `dt` comme le reste.
+
+Deux exceptions, volontaires :
+
+- **`CharacterAnimator` est piloté par la distance parcourue**, pas par le temps
+  — c'est ce qui rend le cycle de marche identique à 60, 120 ou 240 Hz. Ne pas
+  le « corriger » en le branchant sur l'horloge.
+- **Une transition CSS est du temps que le moteur ne possède pas.** Les PNJ se
+  déplacent par pas de 4 px toutes les 60 ms (un sixième des frames) et une
+  transition CSS lisse cette cadence. Le navigateur la compte en temps réel :
+  au ralenti, il finirait d'animer un pas avant que le moteur ne l'ait terminé.
+  Alors l'horloge la lui dicte — `ViewportRenderer.applyClockState()` écrit
+  `--engine-step-duration` (200 ms ÷ échelle) et pose `engine--frozen` en pause,
+  qui coupe la transition. Mesuré : ×1 → 0,2 s, ×0,25 → 0,8 s, pause → 0 s.
+
+  **Règle générale : un objet de jeu ne s'anime pas en CSS.** L'horloge ne peut
+  pas suivre ce qu'elle ne tick pas ; le cas ci-dessus est une exception héritée,
+  outillée faute de mieux.
+
+#### Les events sont datés en temps de jeu
+
+`at` vient de l'horloge (§9) : deux events émis dans le même instant figé
+**portent le même instant**, et une mesure faite sur le bus se compare à tout le
+reste. Un émetteur sans horloge — un élément détaché, construit avant de rejoindre
+un monde — retombe sur le temps du mur : il est hors de la timeline du jeu de
+toute façon.
+
+Un seul minuteur y échappe encore, sciemment : la bulle de dialogue
+(`Character.quickReaction`) se referme sur un `setTimeout`, donc pendant une
+pause aussi. Elle attend l'ordonnanceur.
+
 ## 4. Camera
 
 `Camera` est un objet de première classe qui **suit une cible** (`follow(target)`)
@@ -741,6 +813,11 @@ utile — `makeEvent()` l'appose. C'est ce tronc qui rend un observateur
 **générique** possible (une console qui affiche n'importe quel event sans un `if`
 par nom). Le relais ne réestampille pas : `at` date **l'origine**, et `source`
 nomme l'émetteur, pas le dernier relais.
+
+`at` est du **temps de jeu** (§3.5), pas du temps du mur : il se compare à tout
+ce que le moteur mesure, et deux events émis dans le même instant figé portent le
+même instant. Un émetteur sans horloge — un élément détaché — retombe sur le
+temps du mur, faute de timeline à laquelle appartenir.
 
 > ⚠️ Héritage conservé : sur un *début* de contact, les deux côtés reçoivent le
 > **détecteur** dans `element` ; sur une *fin*, chacun se reçoit lui-même.
