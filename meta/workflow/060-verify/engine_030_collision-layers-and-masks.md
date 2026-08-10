@@ -2,11 +2,11 @@
 id: 2026-08-08_17-57
 title: Des couches de collision et des masques, pour que tout ne touche pas tout
 type: feat
-branch:
+branch: claude/collision-layers
 created: 2026-08-08 17:57
 ready: 2026-08-10 16:05
-doing:
-verify:
+doing: 2026-08-10 16:10
+verify: 2026-08-10 16:40
 done:
 ---
 
@@ -106,31 +106,84 @@ compte comme un contact*.
 
 ## Definition of Done
 
-- [ ] Une zone déclare sa couche ; une interrogation déclare son masque ; les
+- [x] Une zone déclare sa couche ; une interrogation déclare son masque ; les
       deux ont un défaut qui **reproduit le comportement actuel**.
-- [ ] Le broad phase élague sur le masque — mesure du gain à ~3 000 éléments.
-- [ ] Le projectile de la démo n'utilise plus `exclude` pour dire « je ne touche
+- [x] Le broad phase élague sur le masque — mesure du gain à ~3 000 éléments.
+- [x] Le projectile de la démo n'utilise plus `exclude` pour dire « je ne touche
       pas mon camp ».
-- [ ] Campagne du fuyard : 0 traversée sur 36 ; sweep : 0 % de tunneling.
-- [ ] Le sort du côté passif (events, payload) est écrit.
-- [ ] `engine.md` §6 à jour, `npm run verify` vert.
+- [x] Campagne du fuyard : 0 traversée sur 36 ; sweep : 0 % de tunneling.
+- [x] Le sort du côté passif (events, payload) est écrit.
+- [x] `engine.md` §6 à jour, `npm run verify` vert.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Renommer une zone après coup élargit l'union sans la resserrer.** Assumé et
+  documenté (une union trop large élague moins, elle ne nie jamais un contact),
+  mais c'est un cousin du ticket « muter une zone ne rafraîchit aucune
+  enveloppe » (`2026-08-01_12-05`), qui gagnerait à traiter les deux d'un coup.
+- **Les couches ne servent encore à personne d'autre que la démo.** C'est la
+  tranche de combat (`2026-08-08_17-58`) qui dira si `layer` / `mask` sur la
+  zone était la bonne granularité — c'est là qu'il y aura deux camps.
+- Rien à déposer en `100-follow-up/`.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-08-10 16:10] Branche `claude/collision-layers`. `src/engine/scene/layers.js` :
+  `DEFAULT_LAYER`, `toMask`, `maskAccepts`, `maskAcceptsAny`. Des **noms**, pas des
+  bits — décidé en *specify*, et la représentation pourra changer derrière la
+  même API le jour où une mesure le réclamera.
+- [2026-08-10 16:15] La **zone** porte `layer` et `mask` (pas l'élément) : un
+  personnage a un corps et un capteur de vue, qui ne s'interrogent pas pareil.
+  Défauts : `'default'` et `null` (= tout), donc le comportement historique **à
+  la lettre** — les 584 tests existants sont passés sans un changement.
+- [2026-08-10 16:20] L'enveloppe agrégée porte en plus l'**union des couches du
+  sous-arbre**, entretenue par les deux mêmes chemins qu'elle : `_addLayer` grimpe
+  jusqu'à la racine à l'ajout, `recomputeCollisionAggregate` la reconstruit au
+  retrait. C'est ce qui fait du masque un filtre de **broad phase** et pas un
+  filtre tardif.
+- [2026-08-10 16:25] Narrow phase **paire par paire** (masque de la zone qui
+  détecte contre couche de la zone visée) plutôt qu'un masque unique par
+  détecteur : l'union sert à élaguer, elle est volontairement plus grossière que
+  la vérité.
+- [2026-08-10 16:30] La démo : le corps du joueur est étiqueté `'player'`, et le
+  projectile déclare `mask: ['default']` au lieu d'`exclude: [bolt, player]`. Une
+  liste d'appartenance remplace une liste d'individus.
 
 ### Vérification
 
--
+`npm run verify` vert : **69 fichiers, 594 tests** (10 nouveaux).
+
+**Le gain du broad phase**, mesuré au navigateur sur une area peuplée de 3 000
+corps (un dixième sur la couche `enemy`, le reste sur `scenery`), interrogation
+de toute l'area, moyenne sur 60 passes :
+
+| | temps | trouvés |
+|---|---|---|
+| sans masque | 4,162 ms | 3 074 |
+| masque présent (`enemy`) | **1,305 ms** | 300 |
+| masque absent (`loot`) | **0,002 ms** | 0 |
+
+Même forme sur la détection par élément (300 passes) : 0,896 ms sans masque,
+**0,0013 ms** quand le masque ne nomme rien de présent — le sous-arbre est sauté
+sans être descendu.
+
+**Non-régression**, les deux repères du moteur :
+
+- **campagne du fuyard : 0 traversée sur 36 approches** (9 angles × 4 poussées,
+  60 frames chacune, 746 frames passées au contact rapproché) ;
+- **tunneling : 0 %** — cible de 14 px, projectile de 6 px, toutes les phases de
+  départ essayées, à 20, 24 et 64 px par pas, avec et sans masque. Et 100 % de
+  « ratés » avec un masque qui ne nomme rien de présent, ce qui est la réponse
+  juste : ce n'est pas une cible.
+
+**Le masque tient dans la démo** : un balayage posé sur le joueur lui-même
+touche `sans masque` et `masque player`, et **ne touche pas** avec
+`masque default` — c'est exactement ce qui a remplacé `exclude`.
+
+Les trois hôtes (app, démo, catalogue) chargés sans erreur console.
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.

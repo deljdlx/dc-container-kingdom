@@ -9,6 +9,10 @@ import { SpriteRenderer } from '../render/SpriteRenderer.js';
  * @property {[number, number]} frame background-position [x, y] into the atlas
  * @property {[number, number, number, number]} [collision] solid box [x, y, w, h]
  * @property {[number, number, number, number]} [trigger] trigger box [x, y, w, h]
+ * @property {string} [collisionLayer] what the solid box **is** (`'wall'`…)
+ * @property {string[]} [collisionMask] what it may **touch**; omit for everything
+ * @property {string} [triggerLayer] what the trigger box **is**
+ * @property {string[]} [triggerMask] what it may **touch**; omit for everything
  * @property {boolean|{width?: number, height?: number, top?: number, left?: number, borderRadius?: string}} [shadow]
  *   drop shadow: true (default) | false | explicit geometry
  * @property {boolean} [manualZ] opt out of y-based depth sorting (e.g. ground)
@@ -46,10 +50,16 @@ export class SpriteElement extends Element {
       this.manualZ = true;
     }
     if (descriptor.collision) {
-      this.createCollisionZone(...descriptor.collision);
+      this.createCollisionZone(...descriptor.collision, 'collision', {
+        layer: descriptor.collisionLayer,
+        mask: descriptor.collisionMask,
+      });
     }
     if (descriptor.trigger) {
-      this.createTriggerZone(...descriptor.trigger);
+      this.createTriggerZone(...descriptor.trigger, {
+        layer: descriptor.triggerLayer,
+        mask: descriptor.triggerMask,
+      });
     }
 
     this.setRenderer(new SpriteRenderer(this));

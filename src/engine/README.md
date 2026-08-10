@@ -53,7 +53,8 @@ core — a game built on it should be able to ignore the village.
 
 - `Application.js` — the top-level entry point, next to the barrel.
 - `scene/` — `Element` (scene node) and what composes it: `SceneGraph`,
-  `CollisionSystem`, `Geometry`, `Coordinates`, `BoundingBox`, `SpriteElement`.
+  `CollisionSystem`, `Geometry`, `Coordinates`, `BoundingBox`, `SpriteElement`,
+  `WorldQuery` and `layers` (what a zone is, and what it may touch).
 - `world/` — `Board` and `Area`: the tiling and its streaming.
 - `view/` — `Viewport` (the game loop), `ViewportTransform`, `Camera`,
   `DirectionalInput`.

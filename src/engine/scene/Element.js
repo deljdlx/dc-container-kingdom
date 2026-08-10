@@ -537,8 +537,13 @@ export class Element
    * @param {'collision'|'trigger'} type
    * @returns {import('./BoundingBox.js').BoundingBox} the created zone
    */
-  createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision') {
-    return this.collision.createCollisionZone(x, y, width, height, type);
+  createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision', options = {}) {
+    return this.collision.createCollisionZone(x, y, width, height, type, options);
+  }
+
+  /** @returns {Set<string>} the collision layers found in this element's subtree */
+  getLayers() {
+    return this.collision.getLayers();
   }
 
   /**
@@ -549,8 +554,8 @@ export class Element
    * @param {?number} height
    * @returns {import('./BoundingBox.js').BoundingBox} the created zone
    */
-  createTriggerZone(x = null, y = null, width = null, height = null) {
-    return this.collision.createTriggerZone(x, y, width, height);
+  createTriggerZone(x = null, y = null, width = null, height = null, options = {}) {
+    return this.collision.createTriggerZone(x, y, width, height, options);
   }
 
   /**

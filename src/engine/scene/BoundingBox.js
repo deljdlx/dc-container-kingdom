@@ -1,3 +1,5 @@
+import { DEFAULT_LAYER, toMask } from './layers.js';
+
 /**
  * Axis-aligned rectangle in an element's local space, expressed as two corners
  * (`x0,y0` top-left → `x1,y1` bottom-right). Backs both a single element's box
@@ -38,6 +40,12 @@ export class BoundingBox
    */
   _collided = false;
 
+  /** @type {string} what this zone IS — see {@link layers.js} */
+  _layer = DEFAULT_LAYER;
+
+  /** @type {?Set<string>} what this zone can TOUCH; null means everything */
+  _mask = null;
+
   /** @type {DomElement} debug overlay node for this zone, set only in debug mode */
   dom;
 
@@ -64,6 +72,39 @@ export class BoundingBox
       this._y1 = element.y() + element.height();
     }
   }
+  /**
+   * Read or set the layer this zone belongs to.
+   *
+   * Relabelling a zone **adds** to its element's layer union; it never removes
+   * the old name, because another zone may still carry it. A union that is too
+   * wide only makes the broad phase descend where it need not — it never denies
+   * a contact, which is the same trade the aggregate envelope makes.
+   * @param {?string} [value]
+   * @returns {string}
+   */
+  layer(value = null) {
+    if (value !== null) {
+      this._layer = value;
+      this._element?.collision?._addLayer(value);
+    }
+
+    return this._layer;
+  }
+
+  /**
+   * Read or set what this zone may touch. `null` means everything, which is the
+   * default and the historical behaviour.
+   * @param {?(string[]|Set<string>|string)} [value]
+   * @returns {?Set<string>}
+   */
+  mask(value = null) {
+    if (value !== null) {
+      this._mask = toMask(value);
+    }
+
+    return this._mask;
+  }
+
 
   /**
    * Get or set the collided flag. When set, the debug overlay box (if any) is

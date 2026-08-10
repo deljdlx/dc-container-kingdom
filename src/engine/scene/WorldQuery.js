@@ -16,6 +16,8 @@
  * introduced. One will be worth it when a measurement says so.
  */
 
+import { maskAccepts, maskAcceptsAny, toMask } from './layers.js';
+
 /**
  * @typedef {Object} WorldRect a rectangle in world coordinates
  * @property {number} x0 left
@@ -54,12 +56,16 @@ function envelopeOf(element) {
  * @param {'collision'|'trigger'} [options.type] which zones to test
  * @param {Array<Object>} [options.exclude] elements to ignore — a shooter must
  * not hit itself, and it is the caller who knows who fired
+ * @param {?(string[]|string)} [options.mask] which collision layers count;
+ * `null` (the default) means every one of them. Say what you are looking for
+ * rather than listing what to skip: `exclude` is for the one-off exception,
+ * a mask is for belonging.
  * @returns {Array<import('./Element.js').Element>} the elements found, in
  * traversal order
  */
-export function queryRect(root, rect, { type = 'collision', exclude = [] } = {}) {
+export function queryRect(root, rect, { type = 'collision', exclude = [], mask = null } = {}) {
   const found = [];
-  collect(root, rect, type, exclude, found);
+  collect(root, rect, type, exclude, toMask(mask), found);
 
   return found;
 }
@@ -70,22 +76,27 @@ export function queryRect(root, rect, { type = 'collision', exclude = [] } = {})
  * @param {WorldRect} rect
  * @param {'collision'|'trigger'} type
  * @param {Array<Object>} exclude
+ * @param {?Set<string>} mask normalised layers, null for every one
  * @param {Array<Object>} found out param, appended in place
  */
-function collect(element, rect, type, exclude, found) {
+function collect(element, rect, type, exclude, mask, found) {
   if (!overlaps(rect, envelopeOf(element))) {
     return; // whole subtree pruned
+  }
+  // Same prune, on layers: nothing here belongs to what is being looked for.
+  if (!maskAcceptsAny(mask, element.getLayers())) {
+    return;
   }
 
   if (!exclude.includes(element)) {
     const hit = element.getCollisionZones(type)
-      .some(zone => overlaps(rect, zone.offsets()));
+      .some(zone => maskAccepts(mask, zone.layer()) && overlaps(rect, zone.offsets()));
     if (hit) {
       found.push(element);
     }
   }
 
-  element.getChildren().forEach(child => collect(child, rect, type, exclude, found));
+  element.getChildren().forEach(child => collect(child, rect, type, exclude, mask, found));
 }
 
 /**
@@ -110,10 +121,11 @@ function collect(element, rect, type, exclude, found) {
  * @param {Object} [options]
  * @param {'collision'|'trigger'} [options.type]
  * @param {Array<Object>} [options.exclude]
+ * @param {?(string[]|string)} [options.mask] which collision layers count
  * @returns {{element: Object, at: {x: number, y: number}}|null} the **first**
  * contact along the path, or null when the way is clear
  */
-export function sweepRect(root, from, to, size, { type = 'collision', exclude = [] } = {}) {
+export function sweepRect(root, from, to, size, { type = 'collision', exclude = [], mask = null } = {}) {
   const deltaX = to.x - from.x;
   const deltaY = to.y - from.y;
   const distance = Math.hypot(deltaX, deltaY);
@@ -130,7 +142,7 @@ export function sweepRect(root, from, to, size, { type = 'collision', exclude = 
     const [element] = queryRect(
       root,
       { x0: x, y0: y, x1: x + size.width, y1: y + size.height },
-      { type, exclude },
+      { type, exclude, mask },
     );
     if (element) {
       return { element, at: { x, y } };

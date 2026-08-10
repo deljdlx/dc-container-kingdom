@@ -688,6 +688,57 @@ Deux types de zones :
 - **collision** — solides : bloquent le déplacement.
 - **trigger** — capteurs : émettent `element.trigger` / `.trigger.end` sans bloquer.
 
+### Couches et masques : ce que chaque zone peut toucher
+
+Sans elles, tout entre en collision avec tout, et on filtre en listant des
+individus (`exclude: [bolt, player]`) — ce qui cesse de tenir dès qu'il y a vingt
+projectiles et deux camps. Deux notions, portées par la **zone** et non par
+l'élément (un personnage a un corps *et* un capteur de vue, qui ne s'interrogent
+pas pareil) :
+
+- **`layer`** — ce que la zone **est**. Défaut `'default'`.
+- **`mask`** — ce qu'elle peut **toucher**. Défaut `null` = **tout**, donc le
+  comportement historique à la lettre, et **gratuit** : le test est une
+  comparaison à `null`.
+
+```js
+bolt.createCollisionZone(0, 0, 8, 8, 'collision', { layer: 'bullet', mask: ['wall', 'enemy'] });
+board.query(rect, { mask: ['enemy'] });
+board.sweep(from, to, size, { mask: ['wall', 'enemy'] });
+```
+
+Les descripteurs déclaratifs suivent : `collisionLayer` / `collisionMask` (et
+leurs jumeaux `trigger*`) à côté de `collision` / `trigger`.
+
+**Ce sont des noms, pas des bits.** Un champ de bits serait plus rapide et
+illisible ; le nombre de couches d'un jeu tient sur une main, et lire `'enemy'`
+dans un débogueur vaut mieux que des nanosecondes qu'aucune mesure ne réclame.
+
+**Le gain est au broad phase.** L'enveloppe agrégée porte l'**union des couches
+de son sous-arbre**, entretenue par les deux mêmes chemins qu'elle (croissance à
+l'ajout, recalcul au retrait). Un sous-arbre dont aucune couche ne croise le
+masque est **sauté entier**. Mesuré sur une area de 3 000 corps :
+
+| interroger toute l'area | temps | trouvés |
+|---|---|---|
+| sans masque | 4,16 ms | 3 074 |
+| masque présent (`enemy`) | **1,31 ms** | 300 |
+| masque absent (`loot`) | **0,002 ms** | 0 |
+
+Le narrow phase, lui, teste **paire par paire** : le masque de la zone qui
+détecte contre la couche de la zone visée. L'union sert à élaguer, elle est
+volontairement plus grossière que la vérité.
+
+**Asymétrie assumée.** Un tir voit un mur, un mur n'interroge personne : c'est le
+masque du **détecteur** qui décide qu'il y a contact. Pas de contact, pas d'events
+— d'aucun côté. Quand il y a contact, les deux côtés sont notifiés comme avant.
+Le masque ne change pas *qui* est prévenu, il change *ce qui compte comme un
+contact*.
+
+**Renommer une zone après coup ajoute à l'union sans en retirer** : une autre
+zone peut porter l'ancien nom. Une union trop large fait descendre là où ce
+n'était pas utile — elle ne nie jamais un contact, même compromis que l'enveloppe.
+
 ### Passe unique collision + trigger
 
 Le joueur détecte les deux en **une seule traversée** :

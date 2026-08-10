@@ -1,4 +1,5 @@
 import { BoundingBox } from './BoundingBox.js';
+import { DEFAULT_LAYER, maskAccepts, maskAcceptsAny } from './layers.js';
 import { collisionEventName } from '../events/EngineEvents.js';
 
 /**
@@ -22,6 +23,18 @@ export class CollisionSystem {
 
   /** @type {{collision: BoundingBox[], trigger: BoundingBox[]}} the element's own zones per type */
   _zones = { collision: [], trigger: [] };
+
+  /**
+   * Union of the layers carried by this element's zones **and its whole
+   * subtree**. This is what makes the mask a broad-phase filter rather than a
+   * late one: a subtree holding nothing the detector can touch is skipped
+   * without being descended.
+   *
+   * Maintained by the same two paths as the aggregate box — grown on add, and
+   * rebuilt by {@link recomputeCollisionAggregate} when a child leaves.
+   * @type {Set<string>}
+   */
+  _layers = new Set();
 
   /** @type {{collision: import('./Element.js').Element[], trigger: import('./Element.js').Element[]}} last frame's hits per type */
   _collidedWith = { collision: [], trigger: [] };
@@ -77,17 +90,31 @@ export class CollisionSystem {
    * @param {?number} width
    * @param {?number} height
    * @param {'collision'|'trigger'} type
+   * @param {Object} [options]
+   * @param {string} [options.layer] what the zone **is**; defaults to `default`
+   * @param {?(string[]|string)} [options.mask] what it may **touch**; `null`
+   *   (the default) means everything, which is the historical behaviour
    * @returns {BoundingBox} the created zone
    */
-  createCollisionZone(x = null, y = null, width = null, height = null, type = 'collision') {
+  createCollisionZone(
+    x = null,
+    y = null,
+    width = null,
+    height = null,
+    type = 'collision',
+    { layer = DEFAULT_LAYER, mask = null } = {},
+  ) {
     const zone = new BoundingBox(this._element);
     zone.x0(x);
     zone.y0(y);
     zone.width(width);
     zone.height(height);
+    zone.layer(layer);
+    zone.mask(mask);
 
     this._zones[type].push(zone);
     this._collisionBoundingBox.updateWithBoundingBox(zone);
+    this._addLayer(layer);
 
     const parent = this._element.getParent();
     if (parent) {
@@ -98,6 +125,46 @@ export class CollisionSystem {
   }
 
   /**
+   * Record a layer on this node and every ancestor — the union has to be true
+   * at each level for the broad phase to trust it.
+   * @param {string} layer
+   */
+  _addLayer(layer) {
+    if (this._layers.has(layer)) {
+      return;   // already known here, hence already known above
+    }
+    this._layers.add(layer);
+    this._element.getParent()?.collision._addLayer(layer);
+  }
+
+  /** @returns {Set<string>} the layers found in this element's subtree */
+  getLayers() {
+    return this._layers;
+  }
+
+  /**
+   * The mask used to prune whole subtrees: the union of what this element's
+   * **body** zones may touch. One body zone that touches everything (the
+   * default) makes the whole detector touch everything, which is what keeps
+   * every host written before layers behaving to the letter.
+   * @returns {?Set<string>} null for «everything»
+   */
+  _bodyMask() {
+    const body = this._zones.collision;
+    const union = new Set();
+
+    for (const zone of body) {
+      const mask = zone.mask();
+      if (mask === null) {
+        return null;
+      }
+      mask.forEach(layer => union.add(layer));
+    }
+
+    return body.length ? union : null;
+  }
+
+  /**
    * Convenience wrapper: add a zone of type `trigger`.
    * @param {?number} x
    * @param {?number} y
@@ -105,8 +172,8 @@ export class CollisionSystem {
    * @param {?number} height
    * @returns {BoundingBox} the created zone
    */
-  createTriggerZone(x = null, y = null, width = null, height = null) {
-    return this.createCollisionZone(x, y, width, height, 'trigger');
+  createTriggerZone(x = null, y = null, width = null, height = null, options = {}) {
+    return this.createCollisionZone(x, y, width, height, 'trigger', options);
   }
 
   /**
@@ -115,6 +182,7 @@ export class CollisionSystem {
    */
   updateCollisionBoundingBox(element) {
     this._collisionBoundingBox.updateWithRelativeElement(element);
+    element.getLayers().forEach(layer => this._layers.add(layer));
     const parent = this._element.getParent();
     if (parent) {
       parent.updateCollisionBoundingBox(this._element);
@@ -178,17 +246,22 @@ export class CollisionSystem {
    */
   recomputeCollisionAggregate() {
     const collisionBoundingBox = new BoundingBox(this._element, false);
+    const layers = new Set();
     this._zones.collision.forEach((zone) => {
       collisionBoundingBox.updateWithBoundingBox(zone);
+      layers.add(zone.layer());
     });
     this._zones.trigger.forEach((zone) => {
       collisionBoundingBox.updateWithBoundingBox(zone);
+      layers.add(zone.layer());
     });
 
     this._element.getChildren().forEach((child) => {
       collisionBoundingBox.updateWithRelativeElement(child);
+      child.getLayers().forEach(layer => layers.add(layer));
     });
     this._collisionBoundingBox = collisionBoundingBox;
+    this._layers = layers;
 
     return collisionBoundingBox;
   }
@@ -246,6 +319,7 @@ export class CollisionSystem {
       type === 'trigger',
       collisionHits,
       triggerHits,
+      this._bodyMask(),
     );
     const hits = type === 'collision' ? collisionHits : triggerHits;
     this._reconcile(hits, type);
@@ -268,7 +342,7 @@ export class CollisionSystem {
   detectCollisionAndTrigger(element) {
     const collision = [];
     const trigger = [];
-    this._detect(element, true, true, collision, trigger);
+    this._detect(element, true, true, collision, trigger, this._bodyMask());
     this._reconcile(collision, 'collision');
     return { collision, trigger };
   }
@@ -299,6 +373,7 @@ export class CollisionSystem {
       type === 'trigger',
       collisionHits,
       triggerHits,
+      this._bodyMask(),
     );
     return (type === 'collision' ? collisionHits : triggerHits).length > 0;
   }
@@ -319,8 +394,9 @@ export class CollisionSystem {
    * @param {boolean} seekTrigger whether to collect trigger hits
    * @param {import('./Element.js').Element[]} collisionHits out param, appended in place
    * @param {import('./Element.js').Element[]} triggerHits out param, appended in place
+   * @param {?Set<string>} mask what this detector's body may touch, `null` for everything
    */
-  _detect(element, seekCollision, seekTrigger, collisionHits, triggerHits) {
+  _detect(element, seekCollision, seekTrigger, collisionHits, triggerHits, mask = null) {
     if (element === this._element) {
       return;
     }
@@ -329,6 +405,11 @@ export class CollisionSystem {
     }
     if (!this._collisionBoundingBox.isCollided(element.getCollisionBoundingBox())) {
       return; // whole subtree pruned
+    }
+    // Second prune, on layers: a subtree holding nothing this detector can
+    // touch is skipped without being descended. Free for a mask of `null`.
+    if (!maskAcceptsAny(mask, element.getLayers())) {
+      return;
     }
 
     const collisionHit = seekCollision && this._hitZones(element, 'collision', collisionHits);
@@ -343,6 +424,7 @@ export class CollisionSystem {
         childSeekTrigger,
         collisionHits,
         triggerHits,
+        mask,
       ));
     }
   }
@@ -365,7 +447,11 @@ export class CollisionSystem {
     const body = this._element.getCollisionZones('collision');
     let hit = false;
     element.getCollisionZones(type).forEach(zone => {
-      const zoneHit = body.some(bodyZone => bodyZone.isCollided(zone));
+      // Pair by pair rather than against a single detector-wide mask: a
+      // character's body and its sight sensor do not test the same things, and
+      // the union used for pruning is deliberately coarser than the truth.
+      const zoneHit = body.some(bodyZone =>
+        maskAccepts(bodyZone.mask(), zone.layer()) && bodyZone.isCollided(zone));
       zone.collided(zoneHit, type);
       if (zoneHit) {
         hit = true;
