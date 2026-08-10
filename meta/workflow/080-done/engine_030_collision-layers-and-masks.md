@@ -7,7 +7,7 @@ created: 2026-08-08 17:57
 ready: 2026-08-10 16:05
 doing: 2026-08-10 16:10
 verify: 2026-08-10 16:40
-done:
+done: 2026-08-10 16:45 (merge 5e32b72)
 ---
 
 ## Objectif
@@ -186,4 +186,4 @@ Les trois hôtes (app, démo, catalogue) chargés sans erreur console.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `5e32b72`.
