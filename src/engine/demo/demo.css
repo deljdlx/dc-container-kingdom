@@ -271,13 +271,3 @@ kbd {
     display: none;
   }
 }
-
-
-/* ── Projectile de démonstration ────────────────────────────────────────────
-   Pas de sprite : l'intérêt est le trajet, pas le dessin. */
-
-.demo-bolt {
-  background: radial-gradient(circle at 40% 35%, #fff3b0 0%, #ffd166 55%, #f4a24c 100%);
-  border-radius: 50%;
-  box-shadow: 0 0 8px 2px #ffd16688;
-}

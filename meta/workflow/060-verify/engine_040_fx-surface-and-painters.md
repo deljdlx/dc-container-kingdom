@@ -2,11 +2,11 @@
 id: 2026-08-06_17-57
 title: La surface FX cesse de savoir ce qu'est une particule
 type: refactor
-branch:
+branch: claude/fx-painters
 created: 2026-08-06 17:57
 ready: 2026-08-10 17:00
-doing:
-verify:
+doing: 2026-08-10 17:05
+verify: 2026-08-10 20:25
 done:
 ---
 
@@ -145,37 +145,93 @@ police.
 
 ## Definition of Done
 
-- [ ] La surface **ne référence plus `ParticleSystem`** : elle parcourt des
+- [x] La surface **ne référence plus `ParticleSystem`** : elle parcourt des
       peintres. C'est le critère du refactor.
-- [ ] Chaque peintre est isolé par `save()` / `restore()` — un peintre qui laisse
+- [x] Chaque peintre est isolé par `save()` / `restore()` — un peintre qui laisse
       `globalAlpha` de travers ne casse pas les suivants (test).
-- [ ] **Le repos reste gratuit** : rien de vivant → aucun `clearRect` (test, celui
+- [x] **Le repos reste gratuit** : rien de vivant → aucun `clearRect` (test, celui
       qui existe déjà doit continuer de passer).
-- [ ] Un **sprite en coordonnées monde** se dessine, taille et rotation comprises.
-- [ ] Une **explosion animée** tient sans classe dédiée dans le moteur.
-- [ ] **Le projectile de la démo passe sur le canvas** — plus aucun `Element` DOM
+- [x] Un **sprite en coordonnées monde** se dessine, taille et rotation comprises.
+- [x] Une **explosion animée** tient sans classe dédiée dans le moteur.
+- [x] **Le projectile de la démo passe sur le canvas** — plus aucun `Element` DOM
       pour un objet temporaire.
-- [ ] `sweep()` sert toujours un projectile qui n'est **pas** un `Element` (test).
-- [ ] **Coût mesuré** avec 1, 10 et 100 objets temporaires.
-- [ ] `meta/documentation/engine.md` §3.2 décrit la surface et ses peintres ;
+- [x] `sweep()` sert toujours un projectile qui n'est **pas** un `Element` (test).
+- [x] **Coût mesuré** avec 1, 10 et 100 objets temporaires.
+- [x] `meta/documentation/engine.md` §3.2 décrit la surface et ses peintres ;
       `npm run verify` vert.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **La règle DOM/canvas peut enfin s'écrire** (`2026-08-06_17-56`, le ticket
+  suivant) : elle avait pour firewall « ne pas énoncer une règle que le moteur ne
+  peut pas tenir ». Il peut, maintenant.
+- **Le `ttl` de `spawn` n'a plus d'utilisateur dans la démo** — le projectile
+  n'est plus une entité. Il reste juste et testé pour ce qu'il vise vraiment :
+  une entité DOM temporaire (un butin qui s'efface, un piège qui expire).
+- **Pas de préchargeur d'images.** `SpritePainter` saute une image incomplète
+  plutôt que d'attendre ; le jour où un hôte dessinera de vrais sprites au
+  canvas, il lui faudra un chargeur — ce sera un ticket, et il n'existe pas.
+- Rien à déposer en `100-follow-up/`.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-08-10 17:05] Branche `claude/fx-painters`. `FxSurface` extraite de
+  `ParticleLayer` : dimension, placement, transformation, effacement, parcours de
+  peintres. Un peintre répond `hasWork()` et `paint(context, transform)`, et
+  reçoit `attach(surface)` en rejoignant — de quoi cuire ses sprites hors écran
+  sans que la surface sache pourquoi.
+- [2026-08-10 17:20] `ParticlePainter` : le dessin des particules, déplacé tel
+  quel. `SpritePainter` : le nouveau, des objets **plats** en coordonnées monde
+  que l'hôte mute lui-même — position, taille, rotation, alpha, couleur ou image.
+- [2026-08-10 17:30] **`ParticleLayer` reste, en assemblage** (`extends FxSurface`
+  + son peintre). C'était le choix le moins coûteux et le plus honnête : le cas
+  courant garde son API (`emit`, `update`, `getSystem`), l'`Emitter`, le
+  `FxBinder` et leurs tests n'ont pas bougé d'une ligne — et la **surface**, elle,
+  ne référence plus `ParticleSystem`, ce qui est le critère du ticket.
+- [2026-08-10 17:40] La démo : le projectile **n'est plus un `Element`**. Ni nœud
+  DOM, ni scene-graph, ni `spawn` — un `{x, y}` peint au canvas et déplacé par
+  l'ordonnanceur. Son explosion est un `tween` qui grossit un cercle et le fait
+  disparaître : **aucune classe « explosion » dans le moteur**. La classe CSS
+  `.demo-bolt`, devenue morte, est supprimée.
 
 ### Vérification
 
--
+`npm run verify` vert : **70 fichiers, 609 tests** (15 nouveaux).
+
+**Le refactor est transparent** : les 594 tests existants sont passés sans une
+modification, avant même que le premier nouveau test soit écrit.
+
+Mesures au navigateur (`/engine/demo/`, boucle pilotée à la main) :
+
+| | |
+|---|---|
+| peintres montés sur la surface | `ParticlePainter`, `SpritePainter` |
+| après un tir | **1 sprite canvas, 0 nœud DOM**, entités inchangées (3) |
+| vitesse du projectile | 14 px/frame (900 px/s au `dt` près) |
+| pixels non transparents sur le canvas | 0 → **130** pendant le vol → 0 après |
+| explosion | vue (le cercle passe de 8 à 52 px), disparue en 26 frames |
+| nœuds `.demo-bolt` restants | **0** |
+
+**Coût, rendu d'une frame, moyenne sur 200 passes** — les objets bougent à chaque
+frame, comme de vrais projectiles :
+
+| objets temporaires | canvas | DOM (parcours moteur seul) |
+|---|---|---|
+| 1 | 0,064 ms | 0,022 ms |
+| 10 | 0,093 ms | 0,043 ms |
+| 100 | **0,150 ms** | **0,282 ms** |
+
+À lire honnêtement : le canvas part avec un coût fixe (effacer + la passe
+particules, que la démo ne met jamais au repos — ses fontaines émettent en
+permanence) et grimpe à peine ; le DOM part deux à trois fois moins cher et
+**double tous les dix objets**. Le croisement est vers la dizaine. Et la colonne
+DOM ne compte que le **script** : le layout du navigateur, non mesuré ici, est ce
+qui franchit le budget d'une frame vers 1 000 éléments (passe d'audit B).
+
+Les trois hôtes chargés sans erreur console.
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.

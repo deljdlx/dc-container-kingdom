@@ -77,7 +77,9 @@ core — a game built on it should be able to ignore the village.
 - `render/` — the DOM renderers (element, sprite, board, area, character).
 - `events/` — the bus: `EventEmitter` (revocable subscriptions, `onAny`) and
   `EngineEvents` (the catalogue of names and the payload envelope).
-- `fx/` — particles, emitters and their canvas surfaces.
+- `fx/` — the canvas side: `FxSurface` (a surface and its painters),
+  `ParticlePainter`, `SpritePainter` (temporary things in world coordinates),
+  emitters and `ParticleLayer` (surface + particle painter, the common case).
 - `content/` — built-in sprites (houses, trees, fences, fountain),
   `MapSprites01/` (curated autonomous trees from `map-sprites-01`: conifers,
   leafy trees, dead trees, saplings),

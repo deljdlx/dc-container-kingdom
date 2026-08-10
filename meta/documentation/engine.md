@@ -237,11 +237,56 @@ puis l'axe horizontal seul, puis le vertical (« slide along wall »). Sans cett
 dégradation, marcher en biais contre un mur bloque **tout** le déplacement au lieu
 de longer le mur.
 
-### 3.2 `fx/` : particules et émetteurs
+### 3.2 `fx/` : une surface, des peintres
 
 Le rendu DOM est le bon choix pour des sprites persistants et collidables, le
-mauvais pour des **centaines d'objets éphémères**. Les particules vivent donc sur
-un `<canvas>`, monté par `viewport.enableParticles()`.
+mauvais pour des **centaines d'objets éphémères**. Ce qui est temporaire par
+conception vit donc sur un `<canvas>`, monté par `viewport.enableParticles()`.
+
+La surface (`FxSurface`) ne sait **que** se dimensionner, se placer sur le monde,
+appliquer la transformation, effacer — et parcourir une liste de **peintres** :
+
+| | |
+|---|---|
+| `FxSurface` | le canvas et rien d'autre ; ne connaît ni particule ni sprite |
+| `ParticlePainter` | dessine les particules d'une couche (cache de sprites, fondu) |
+| `SpritePainter` | dessine des objets temporaires en coordonnées monde |
+| `ParticleLayer` | l'assemblage courant : une surface + son peintre à particules |
+
+```js
+const fx = viewport.getParticles().addPainter(new SpritePainter());
+const bolt = fx.add({ x, y, width: 8, height: 8, color: '#ffd166', shape: 'circle' });
+scheduler.tween(600, p => { bolt.x = from + p * range; });   // l'hôte anime
+fx.remove(bolt);
+```
+
+**Chaque peintre est encadré par `save()` / `restore()`** — et c'est ce qui rend
+un second canvas inutile pour l'isolation : un peintre qui laisse `globalAlpha` à
+0,2 ne peut pas éteindre le suivant. Une surface de plus coûterait un plein écran
+effacé et repeint par frame au `devicePixelRatio` du mobile, **et** rouvrirait la
+question « à quel cran de profondeur ? », qui n'a pas de bonne réponse.
+
+**Le repos reste gratuit** : aucun peintre n'a de travail et rien n'a été peint la
+frame d'avant → même pas de `clearRect`.
+
+Le premier consommateur est le projectile de la démo : **il n'est plus un
+`Element` du tout**, juste un `{x, y}` peint sur le canvas et déplacé par
+l'ordonnanceur. La détection ne s'en aperçoit pas — `sweep()` parle en rectangles
+monde, pas en éléments. Son explosion est un `tween` qui grossit un cercle : pas
+de classe « explosion » dans le moteur.
+
+Coût mesuré (rendu d'une frame, moyenne sur 200) :
+
+| objets temporaires | canvas | DOM (parcours moteur seul) |
+|---|---|---|
+| 1 | 0,064 ms | 0,022 ms |
+| 10 | 0,093 ms | 0,043 ms |
+| 100 | **0,150 ms** | **0,282 ms** |
+
+Le canvas part avec un coût fixe (effacer, la passe particules) et grimpe à peine ;
+le DOM part moins cher et double tous les dix objets. Et la colonne DOM **ne
+compte que le script** : le layout du navigateur, lui, franchit le budget d'une
+frame vers 1 000 éléments — c'est précisément ce que la règle de routage protège.
 
 Tout le sous-système vit dans **`src/engine/fx/`** — il n'a rien à voir avec la
 carte. C'était le premier dossier extrait de l'ancien `map/`, avant que celui-ci
