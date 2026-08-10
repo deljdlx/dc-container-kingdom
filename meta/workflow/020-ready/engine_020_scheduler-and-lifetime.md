@@ -4,7 +4,7 @@ title: Programmer dans le temps — délais, cadences, interpolations, durées d
 type: feat
 branch:
 created: 2026-08-08 17:56
-ready:
+ready: 2026-08-10 15:40
 doing:
 verify:
 done:
@@ -28,23 +28,60 @@ temporaire se câble à la main.
 
 ## Spécifications
 
-_À confirmer en « specify »._
+### Où il vit, et qui le ticke
 
-- **Sur l'horloge du moteur** (`2026-08-08_17-55`), jamais sur `setTimeout` : ce
-  qui est programmé doit **geler avec la pause** et suivre `scale`. C'est la
-  raison d'être du ticket ; un `setTimeout` continuerait de courir pendant un
-  menu.
-- Les primitives, à doser : `after(ms, fn)`, `every(ms, fn)`, `tween(ms, fn)`
-  (progression 0→1, avec une courbe passée en paramètre plutôt qu'un catalogue
-  d'easings). Chacune rend de quoi **annuler**.
-- **Une durée de vie sur ce qu'on fait naître** : `spawn(entity, { ttl })`, pour
-  que « ce truc existe 2 secondes » cesse d'être un compteur dans un behavior.
-- **Mourir avec ce à quoi c'est accroché** : une chose programmée sur un élément
-  détruit doit s'annuler seule. Le patron existe déjà — le `FxBinder` s'abonne à
-  `element.destroy` — et c'est celui à suivre, pas un second mécanisme.
-- **Hors périmètre, explicitement : le pooling.** Recycler les entités n'est
-  justifié que par une mesure, et cette mesure n'existe pas encore. Ne pas
-  l'anticiper dans l'API au point de la déformer, ne pas l'écrire.
+`Scheduler`, dans `src/engine/time/` à côté de l'horloge, **possédé et tické par
+le `Viewport`** : programmer n'a de sens que là où il y a une boucle. Il rejoint
+le registre `_behaviors` existant plutôt que d'ouvrir une seconde liste —
+un ordonnanceur *est* un behavior. `Application.getScheduler()` délègue au
+viewport, pour que l'hôte n'ait pas à savoir lequel des deux le porte.
+
+Il lit le `dt` que la boucle lui passe, donc **il hérite de la pause et de
+l'échelle sans une ligne** : c'est toute la raison de ne pas s'appuyer sur
+`setTimeout`, qui continuerait de courir pendant un menu.
+
+### L'API
+
+```js
+const scheduler = app.getScheduler();
+
+const handle = scheduler.after(300, () => explode());       // handle.cancel()
+scheduler.every(1000, () => tickPoison());
+scheduler.tween(200, progress => sprite.scale(1 + progress * 0.3));
+scheduler.after(2000, fadeOut, { owner: bolt });            // meurt avec l'élément
+board.spawn(bolt, x, y, { ttl: 2000 });                     // et meurt tout seul
+```
+
+- Tout rend un **handle** portant `cancel()`, idempotent.
+- `tween(ms, fn)` appelle `fn(progress)` **chaque frame**, de 0 à 1, et garantit
+  un **dernier appel exactement à 1** : un tween qui s'arrête à 0,97 laisse un
+  sprite à 97 % de sa taille pour toujours. Pas de catalogue d'easings — l'hôte
+  compose sa courbe sur le `progress`.
+- `{ owner: element }` : le handle s'annule quand l'élément est détruit, en
+  s'abonnant à `element.destroy`. C'est le patron du `FxBinder`, pas un second
+  mécanisme.
+
+### La cadence de `every`, tranchée
+
+**Sans dérive, avec rattrapage** : `every(1000)` déclenche à 1 000, 2 000, 3 000 ms
+de temps de jeu, jamais à 1 016, 2 033… Le reste est reporté, comme la banque de
+sous-pixels du déplacement et comme la cadence des emitters — c'est l'idiome déjà
+en place.
+
+Le rattrapage est **borné par le plafond de `dt`** (100 ms) : au pire, un
+`every(10)` se déclenche dix fois dans la frame qui suit un retour d'onglet. C'est
+le même compromis que les behaviors, et il vaut mieux que l'alternative (sauter
+des tics, donc perdre des faits de jeu).
+
+### La durée de vie
+
+`Board.spawn(element, x, y, { ttl })` programme le `despawn`. Le moteur ne *cull*
+toujours pas de lui-même — c'est l'appelant qui **demande** une durée de vie.
+
+### Hors périmètre, explicitement
+
+**Le pooling.** Recycler les entités n'est justifié que par une mesure, et cette
+mesure n'existe pas. Ne pas déformer l'API pour l'anticiper.
 
 ## Firewalls / risques
 
