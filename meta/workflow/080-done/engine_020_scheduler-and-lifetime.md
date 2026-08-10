@@ -7,7 +7,7 @@ created: 2026-08-08 17:56
 ready: 2026-08-10 15:40
 doing: 2026-08-10 15:45
 verify: 2026-08-10 15:50
-done:
+done: 2026-08-10 15:55 (merge a91fe81)
 ---
 
 ## Objectif
@@ -193,4 +193,4 @@ sonde ajoutée au code : la mesure passe par
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `a91fe81`.
