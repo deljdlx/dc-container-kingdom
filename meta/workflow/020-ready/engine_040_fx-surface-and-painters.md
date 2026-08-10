@@ -4,7 +4,7 @@ title: La surface FX cesse de savoir ce qu'est une particule
 type: refactor
 branch:
 created: 2026-08-06 17:57
-ready:
+ready: 2026-08-10 17:00
 doing:
 verify:
 done:
@@ -31,9 +31,46 @@ règle : le canvas ne pouvait pas l'accueillir.
 
 ## Spécifications
 
-_Amorce — à confirmer en « specify »._
+### La couture, tranchée
 
-### La couture : une surface, des peintres
+- **`FxSurface`** — la surface seule : dimension, placement, transformation,
+  effacement, et un parcours de **peintres**. Elle ne connaît ni particule ni
+  sprite.
+- **`ParticlePainter`** — le dessin des particules d'aujourd'hui, extrait tel
+  quel (cache de sprites, fondu, filtre par couche).
+- **`SpritePainter`** — le nouveau : des objets temporaires en coordonnées
+  monde, que l'hôte mute lui-même.
+- **`ParticleLayer` reste**, mais devient un **assemblage** : une `FxSurface`
+  qui se monte un `ParticlePainter`. C'est le cas courant, et le garder évite de
+  réécrire l'`Emitter`, le `FxBinder` et leurs tests pour un renommage. La
+  surface, elle, ne référence plus `ParticleSystem` — ce qui est le critère.
+
+### Ce que le peintre doit savoir faire
+
+```js
+painter.hasWork()             // rien à peindre → la surface reste au repos
+painter.paint(context, transform)
+```
+
+`SpritePainter` porte une liste d'objets **plats**, que l'hôte crée et déplace :
+
+```js
+const bolt = painter.add({ x, y, width: 8, height: 8, color: '#ffd166', shape: 'circle' });
+bolt.x += 15;                 // c'est l'hôte qui anime — l'ordonnanceur est là pour ça
+painter.remove(bolt);
+```
+
+Ni animation ni tweening dans le moteur : l'ordonnanceur (`2026-08-08_17-56`)
+vient d'arriver pour ça, et une explosion est un `tween` qui grossit un cercle.
+
+### Le chargement des images
+
+Un objet peut porter une `image` déjà résolue. Tant qu'elle n'est pas complète,
+**elle est sautée** — pas d'exception, pas de clignotement, et le moteur ne
+gère pas de file de chargement (ce serait un autre ticket, et il n'existe pas
+encore de préchargeur).
+
+
 
 - Une **surface** qui ne sait que se dimensionner, se placer, appliquer la
   transformation, effacer — et parcourir une liste de **peintres**.
