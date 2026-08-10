@@ -107,6 +107,15 @@ export class Application
   }
 
   /**
+   * The scheduler lives on the viewport, which is what ticks it; this is the
+   * shortcut, so a host does not have to know which of the two holds it.
+   * @returns {import('./time/Scheduler.js').Scheduler}
+   */
+  getScheduler() {
+    return this._viewport.getScheduler();
+  }
+
+  /**
    * Emit an application-level event. Relayed emissions arrive already stamped
    * and are passed through, so `at` keeps dating the origin.
    * @param {string} name one of {@link EngineEvents}

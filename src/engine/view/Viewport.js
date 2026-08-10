@@ -1,6 +1,7 @@
 import { Board } from '../world/Board.js';
 import { Camera } from './Camera.js';
 import { Clock } from '../time/Clock.js';
+import { Scheduler } from '../time/Scheduler.js';
 import { Character } from '../character/Character.js';
 import { DirectionalInput } from './DirectionalInput.js';
 import { EngineEvents, makeEvent } from '../events/EngineEvents.js';
@@ -56,6 +57,12 @@ export class Viewport
    * @type {Clock}
    */
   _ownClock = new Clock();
+
+  /**
+   * @type {Scheduler} registered as a behavior in the constructor — scheduling
+   * only means anything where there is a loop to tick it
+   */
+  _scheduler = new Scheduler();
 
 
   /**
@@ -169,6 +176,7 @@ export class Viewport
     this.renderer = new ViewportRenderer(this);
 
     this.board = new Board(this);
+    this.addBehavior(this._scheduler);
   }
 
   /** @returns {ViewportTransform} the world ↔ screen relation for this viewport */
@@ -620,6 +628,11 @@ export class Viewport
    */
   getClock() {
     return this._application?.getClock?.() ?? this._ownClock;
+  }
+
+  /** @returns {Scheduler} the loop's scheduler */
+  getScheduler() {
+    return this._scheduler;
   }
 
   /** @returns {DirectionalInput} the directions currently held */

@@ -91,10 +91,21 @@ export class Board extends Element
    * @param {Element} element
    * @param {number} x world
    * @param {number} y world
+   * @param {Object} [options]
+   * @param {?number} [options.ttl] game milliseconds after which the entity is
+   *   despawned. The engine still culls nothing on its own — a caller **asks**
+   *   for a lifetime, which is the difference between a projectile and a dropped
+   *   sword. Counted in game time, so a paused world does not outlive anything.
    * @returns {Element} the element, attached and due to be mounted next frame
    */
-  spawn(element, x = 0, y = 0) {
-    return this.getEntityLayer().addElement(x, y, element);
+  spawn(element, x = 0, y = 0, { ttl = null } = {}) {
+    this.getEntityLayer().addElement(x, y, element);
+
+    if (ttl !== null) {
+      this._viewport.getScheduler().after(ttl, () => this.despawn(element), { owner: element });
+    }
+
+    return element;
   }
 
   /**

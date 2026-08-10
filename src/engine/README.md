@@ -57,7 +57,8 @@ core — a game built on it should be able to ignore the village.
 - `world/` — `Board` and `Area`: the tiling and its streaming.
 - `view/` — `Viewport` (the game loop), `ViewportTransform`, `Camera`,
   `DirectionalInput`.
-- `time/` — `Clock`: the single source of game time. Everything that advances
+- `time/` — `Clock` (the single source of game time) and `Scheduler` (delays,
+  cadences and tweens that run on it, so they freeze with the game). Everything that advances
   reads it, which is what makes pause (`dt = 0`, the loop keeps painting) and
   slow motion possible:
 
@@ -65,6 +66,9 @@ core — a game built on it should be able to ignore the village.
   const clock = app.getClock();
   clock.scale(0.25);   // slow motion — world, NPCs and particles alike
   clock.pause();       // the world freezes, the frame is still painted
+
+  app.getScheduler().after(300, () => explode());
+  board.spawn(bolt, x, y, { ttl: 1100 });   // an entity with a lifetime
   ```
 
 - `character/` — `Character`, its `CharacterAnimator`, and the interchangeable

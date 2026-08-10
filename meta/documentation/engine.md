@@ -568,6 +568,42 @@ Un seul minuteur y échappe encore, sciemment : la bulle de dialogue
 (`Character.quickReaction`) se referme sur un `setTimeout`, donc pendant une
 pause aussi. Elle attend l'ordonnanceur.
 
+### 3.6 `Scheduler` : programmer dans le temps
+
+Le pendant de l'horloge : elle **mesure**, il **déclenche**. C'est un behavior
+comme les autres, tické par la boucle avec son `dt` — donc tout ce qu'il tient
+**gèle avec l'horloge** et suit son échelle. C'est exactement ce que `setTimeout`
+ne sait pas faire : un cooldown ne doit pas s'écouler derrière un menu.
+
+```js
+const scheduler = app.getScheduler();          // le viewport le porte, l'app y donne accès
+
+scheduler.after(300, () => explode());          // → handle.cancel()
+scheduler.every(1000, () => tickPoison());
+scheduler.tween(200, progress => flash(1 - progress));
+scheduler.after(2000, fade, { owner: bolt });   // meurt avec l'élément
+board.spawn(bolt, x, y, { ttl: 1100 });         // et l'entité meurt toute seule
+```
+
+- **`tween` finit exactement à 1.** Un tween qui s'arrête à 0,97 laisse un sprite
+  à 97 % de sa taille pour le reste de la partie. Pas de catalogue d'easings :
+  la courbe se compose sur le `progress`.
+- **`{ owner }` s'abonne à `element.destroy`** — le patron du `FxBinder`, pas un
+  second mécanisme de durée de vie.
+- **Muter pendant un tic est sûr** : la liste est copy-on-write, comme les buckets
+  de l'`EventEmitter`. Un callback peut s'annuler, annuler son voisin, ou
+  programmer sa suite.
+
+**Deux cadences, deux politiques — et c'est voulu.** `every` **rattrape** : le
+reste est reporté, un `every(1000)` consomme exactement 1 000 ms par déclenchement
+et une frame longue en doit plusieurs (borné par le plafond de `dt`). L'`Emitter`
+de particules, lui, **remet à zéro** : après un gel, rattraper ferait sortir tout
+le retard en une salve géante. Un fait de jeu ne doit pas être perdu ; une salve
+visuelle ne doit pas être doublée. L'`Emitter` n'a donc **pas** été porté sur
+l'ordonnanceur.
+
+Ce qui n'y est pas, faute de mesure qui le réclame : le **pooling** d'entités.
+
 ## 4. Camera
 
 `Camera` est un objet de première classe qui **suit une cible** (`follow(target)`)
