@@ -2,11 +2,11 @@
 id: 2026-08-08_17-56
 title: Programmer dans le temps — délais, cadences, interpolations, durées de vie
 type: feat
-branch:
+branch: claude/scheduler
 created: 2026-08-08 17:56
 ready: 2026-08-10 15:40
-doing:
-verify:
+doing: 2026-08-10 15:45
+verify: 2026-08-10 15:50
 done:
 ---
 
@@ -109,33 +109,88 @@ mesure n'existe pas. Ne pas déformer l'API pour l'anticiper.
 
 ## Definition of Done
 
-- [ ] Le projectile de la démo est **réécrit** avec les nouvelles primitives, et
+- [x] Le projectile de la démo est **réécrit** avec les nouvelles primitives, et
       le journal cite le nombre de lignes avant / après.
-- [ ] Ce qui est programmé **gèle en pause** et suit `scale` — démontré au
+- [x] Ce qui est programmé **gèle en pause** et suit `scale` — démontré au
       navigateur.
-- [ ] Une chose programmée sur un élément détruit **s'annule seule** — test.
-- [ ] L'annulation depuis l'intérieur d'un callback est sûre — test.
-- [ ] `Emitter` utilise l'ordonnanceur au lieu de sa propre cadence, ou le
+- [x] Une chose programmée sur un élément détruit **s'annule seule** — test.
+- [x] L'annulation depuis l'intérieur d'un callback est sûre — test.
+- [x] `Emitter` utilise l'ordonnanceur au lieu de sa propre cadence, ou le
       journal dit pourquoi non.
-- [ ] API exportée depuis `src/engine/index.js`, JSDoc + `engine.md` à jour,
+- [x] API exportée depuis `src/engine/index.js`, JSDoc + `engine.md` à jour,
       `npm run verify` vert.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Le pooling reste hors périmètre**, et rien ne le réclame encore : 200
+  projectiles tirés et despawnés ne laissent ni tâche ni entité. Le jour où une
+  mesure le demandera, l'API n'a pas été déformée pour l'anticiper.
+- **`Emitter` garde sa cadence** (voir *Travail*) : les deux politiques sont
+  légitimes et différentes. Si un troisième client réclame un jour la remise à
+  zéro, ce sera une option de `every`, pas une refonte.
+- Ouvre directement la suite : les couches de collision (`2026-08-08_17-57`),
+  puis la tranche de combat, où `after` / `tween` / `ttl` seront le squelette des
+  explosions et des cooldowns.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-08-10 15:45] Branche `claude/scheduler`. `Scheduler` dans
+  `src/engine/time/`, **possédé et tické par le `Viewport`** : il s'inscrit dans
+  le registre `_behaviors` existant plutôt que d'ouvrir une seconde liste (le
+  firewall n° 1 du ticket). `Application.getScheduler()` délègue, pour que
+  l'hôte n'ait pas à savoir lequel des deux le porte.
+- [2026-08-10 15:47] `after` / `every` / `tween`, chacun rendant un handle avec
+  `cancel()` idempotent, plus `{ owner: element }` qui s'abonne à
+  `element.destroy` — le patron du `FxBinder`, **pas** un second mécanisme de
+  durée de vie.
+- [2026-08-10 15:48] Liste **copy-on-write**, comme les buckets de
+  l'`EventEmitter` : un callback peut s'annuler, annuler son voisin ou programmer
+  sa suite sans faire sauter le parcours. Une tâche à un coup est **retirée avant
+  d'être appelée**, sinon celle qu'elle programme se ferait annuler par le
+  retrait de sa devancière.
+- [2026-08-10 15:49] `Board.spawn(element, x, y, { ttl })`. Le moteur ne *cull*
+  toujours pas de lui-même : l'appelant **demande** une durée de vie, ce qui est
+  la différence entre un projectile et une épée lâchée au sol.
+- [2026-08-10 15:50] **`Emitter` n'a pas été porté sur l'ordonnanceur, et c'est
+  la bonne réponse.** Les deux cadences ont des politiques **opposées et toutes
+  deux justifiées** : `every` **rattrape** (un fait de jeu ne se perd pas), un
+  emitter **remet à zéro** (« après un gel, le retard sortirait en une salve
+  géante » — commentaire déjà présent, mesuré à l'époque). Les unifier aurait
+  cassé l'un des deux. La distinction est désormais **écrite** dans `engine.md`.
 
 ### Vérification
 
--
+`npm run verify` vert : **68 fichiers, 584 tests** (20 nouveaux : l'ordonnanceur
+seul, puis dans le monde).
+
+**Le projectile de la démo, réécrit** — et le compte de lignes mérite une
+précision, parce qu'il ne dit pas ce qu'on attendrait : **30 lignes de code avant,
+32 après**. Ce n'est pas un échec, c'est que la nouvelle version **gagne une
+fonction** : un cooldown de 250 ms (5 lignes). À fonctionnalité égale, elle en
+fait 27. Ce qui a disparu, c'est la **plomberie** : plus d'objet behavior écrit à
+la main, plus d'accumulateur `travelled`, plus de `addBehavior`/`removeBehavior`,
+plus de despawn manuel. Le vol est un `tween`, la portée un `ttl`, le cooldown un
+`after`.
+
+Mesures au navigateur (boucle pilotée à la main, `/engine/demo/`) :
+
+| | |
+|---|---|
+| 4 tirs d'une traite | **1 projectile** (cooldown 250 ms) |
+| après 256 ms | un 2ᵉ part |
+| vitesse | 14,5 px/frame — 900 px/s au dt près |
+| fin de portée (1 111 ms) | l'entité **disparaît seule**, 0 tâche restante |
+| en pause | le projectile **se fige**, et tirer **ne fait rien** |
+| à la reprise | il repart où il était |
+| à ×0,25 | **36 px** en 10 frames contre **144** à ×1 — exactement ¼ |
+| après 200 frames | **0 entité, 0 tâche** |
+
+Les trois hôtes (app, démo, catalogue) chargés **sans erreur console**. Aucune
+sonde ajoutée au code : la mesure passe par
+`await import('/engine/index.js')`, comme la recipe le décrit maintenant.
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.

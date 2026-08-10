@@ -43,6 +43,7 @@ export { FootstepDust } from './fx/FootstepDust.js';
 
 // --- Time: the single clock everything that advances reads ---
 export { Clock } from './time/Clock.js';
+export { Scheduler } from './time/Scheduler.js';
 
 // --- Events: the bus, its catalogue and its envelope ---
 export { EventEmitter } from './events/EventEmitter.js';
