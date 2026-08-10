@@ -7,7 +7,7 @@ created: 2026-08-06 17:57
 ready: 2026-08-10 17:00
 doing: 2026-08-10 17:05
 verify: 2026-08-10 20:25
-done:
+done: 2026-08-10 20:30 (merge 389bfeb)
 ---
 
 ## Objectif
@@ -234,4 +234,4 @@ Les trois hôtes chargés sans erreur console.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `389bfeb`.
