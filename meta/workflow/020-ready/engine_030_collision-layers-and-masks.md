@@ -4,7 +4,7 @@ title: Des couches de collision et des masques, pour que tout ne touche pas tout
 type: feat
 branch:
 created: 2026-08-08 17:57
-ready:
+ready: 2026-08-10 16:05
 doing:
 verify:
 done:
@@ -29,23 +29,54 @@ la zone, un **masque** porté par l'interrogation.
 
 ## Spécifications
 
-_À confirmer en « specify »._
+### Des noms, pas des bits
 
-- **Une couche par zone** (pas par élément) : un personnage peut avoir un corps
-  `body` et un capteur de vue `sense`, qui ne s'interrogent pas pareil.
-- **Un masque à l'interrogation** : « ce tir touche `enemy` et `wall`, pas
-  `player` ni `pickup` ». À trancher en *specify* : jeu de noms (lisible,
-  débogable, `Set`) ou champ de bits (rapide, opaque). Le nombre de couches
-  attendu est petit — trancher sur une mesure, pas sur l'habitude.
-- **Défauts rétrocompatibles** : une zone sans couche déclarée et une
-  interrogation sans masque doivent se comporter **exactement comme aujourd'hui**.
-  Le moteur a des hôtes qui ne connaissent pas encore les couches.
-- **Le broad phase doit en profiter** : un sous-arbre dont aucune couche ne croise
-  le masque s'élague **sans descendre**. C'est l'occasion de gagner du temps, pas
-  seulement de la justesse — l'enveloppe agrégée pourrait porter l'union des
-  couches de son sous-arbre.
-- `exclude:` **reste** pour ce qu'il fait bien (s'exclure soi-même, une exception
-  ponctuelle) ; il cesse d'être le moyen d'exprimer une appartenance.
+Tranché : les couches sont des **chaînes** (`'wall'`, `'enemy'`, `'bullet'`), et
+un masque est un **jeu de noms**. Un champ de bits serait plus rapide et
+illisible ; le nombre de couches attendu se compte sur une main, et la lisibilité
+au débogage vaut plus que des nanosecondes qu'aucune mesure ne réclame. Le jour
+où une mesure les réclamera, la représentation changera derrière la même API.
+
+### La zone porte son appartenance et ce qu'elle teste
+
+Deux notions distinctes, sur la **zone** et non sur l'élément — un personnage a
+un corps et un capteur de vue, qui ne s'interrogent pas pareil :
+
+- **`layer`** — ce que la zone **est** (`'enemy'`). Défaut : `'default'`.
+- **`mask`** — ce que la zone **peut toucher** (`['wall', 'enemy']`). Défaut :
+  `null`, c'est-à-dire **tout** — donc le comportement actuel, à la lettre.
+
+```js
+bolt.createCollisionZone(0, 0, 8, 8, 'collision', { layer: 'bullet', mask: ['wall', 'enemy'] });
+npc.createCollisionZone(6, 8, 20, 16, 'collision', { layer: 'enemy' });
+
+board.query(rect, { mask: ['enemy'] });
+board.sweep(from, to, size, { mask: ['wall', 'enemy'] });
+```
+
+Les descripteurs déclaratifs suivent : `collisionLayer` / `triggerLayer` à côté
+de `collision` / `trigger`, sans nouveau chemin de configuration.
+
+### Le gain est au broad phase, ou il n'est pas
+
+Filtrer en narrow phase, c'est avoir déjà descendu l'arbre. L'enveloppe agrégée
+porte donc en plus **l'union des couches de son sous-arbre**, entretenue par les
+deux mêmes chemins qu'elle : croissance à l'ajout, recalcul au retrait. Un
+sous-arbre dont aucune couche ne croise le masque est **sauté entier**.
+
+Le coût de ce test n'existe que pour ceux qui s'en servent : avec `mask === null`
+— tous les hôtes actuels — c'est une comparaison à `null`, rien de plus.
+
+### La symétrie, tranchée
+
+Un masque est **asymétrique** par nature : un tir voit un mur, un mur
+n'interroge personne. La règle retenue est la plus simple à tenir et à
+expliquer : **le masque du détecteur décide qu'il y a contact ou non**. Pas de
+contact, pas d'events — ni d'un côté ni de l'autre. Quand il y a contact, les
+deux côtés sont notifiés comme aujourd'hui.
+
+Autrement dit, le masque ne change pas *qui* est prévenu, il change *ce qui
+compte comme un contact*.
 
 ## Firewalls / risques
 
