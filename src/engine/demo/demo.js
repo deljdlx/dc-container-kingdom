@@ -254,6 +254,12 @@ viewport.addBehavior({
 // The player. Placed at the viewport centre; the camera keeps it centred.
 viewport.enableMainCharacter(VIEW_W / 2, VIEW_H / 2);
 
+// Its body is labelled, so anything fired from it can say what it hits rather
+// than listing who to skip. Everything else in this world keeps the default
+// layer — which is exactly what makes a mask cheap to adopt: you name the one
+// thing that is special.
+viewport.getCharacter().getCollisionZones('collision').forEach(zone => zone.layer('player'));
+
 viewport.render();
 viewport.run();
 viewport.renderDebug(); // draws zone boxes only when ?debug=1
@@ -298,6 +304,10 @@ const BOLT_RANGE = 1000;
 const BOLT_FLIGHT = BOLT_RANGE / BOLT_SPEED * 1000;
 const BOLT_COOLDOWN = 250;
 const BOLT_SIZE = { width: 8, height: 8 };
+// What the bolt is allowed to hit. Saying it this way is what replaced
+// `exclude: [bolt, player]` — an allow-list of belonging rather than a list of
+// individuals, which stops working the moment there are twenty of them.
+const BOLT_HITS = ['default'];
 const AIM = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 const scheduler = app.getScheduler();
@@ -322,7 +332,7 @@ function fire() {
     const travelled = progress * BOLT_RANGE;
     const to = { x: from.x + aimX * travelled, y: from.y + aimY * travelled };
 
-    if (board.sweep({ x: bolt.offsetX(), y: bolt.offsetY() }, to, BOLT_SIZE, { exclude: [bolt, player] })) {
+    if (board.sweep({ x: bolt.offsetX(), y: bolt.offsetY() }, to, BOLT_SIZE, { mask: BOLT_HITS })) {
       flight.cancel();
       board.despawn(bolt);
       return;
