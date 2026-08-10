@@ -123,6 +123,31 @@ describe('sweepRect - what a moving box runs into', () => {
   });
 });
 
+describe('sweepRect - serving a projectile that is not an element', () => {
+  it('flies a plain {x, y} across the world and reports what it hits', () => {
+    const { root, placed } = world([{ x: 600, y: 300 }]);
+
+    // The bolt the demo fires: a canvas sprite, nothing in the scene graph, no
+    // DOM node, no zones. It exists only as two numbers and a size.
+    const bolt = { x: 100, y: 300, width: 8, height: 8 };
+    const step = 15;
+    let hit = null;
+
+    for (let frame = 0; frame < 60 && !hit; frame += 1) {
+      const to = { x: bolt.x + step, y: bolt.y };
+      hit = sweepRect(root, bolt, to, { width: bolt.width, height: bolt.height });
+      if (!hit) {
+        bolt.x = to.x;
+      }
+    }
+
+    expect(hit?.element).toBe(placed[0]);
+    // And it reports WHERE, which is what an explosion needs to be placed.
+    expect(hit.at.x).toBeGreaterThan(560);
+    expect(hit.at.x).toBeLessThanOrEqual(600);
+  });
+});
+
 describe('sweepRect - the tunneling campaign', () => {
   it('misses nothing, at any speed and any phase', () => {
     const { root } = world([{ x: 500, y: 300 }]);

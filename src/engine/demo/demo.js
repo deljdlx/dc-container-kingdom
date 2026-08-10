@@ -38,7 +38,6 @@ import {
   Toadstool01,
   WaterLily00,
   Well00,
-  Element,
   PatrolBehavior,
   FleeBehavior,
   FootstepDust,
@@ -46,6 +45,7 @@ import {
   applyDebugFlag,
   isDebugEnabled,
   EventConsole,
+  SpritePainter,
 } from '../index.js';
 
 // Debug visualisation (outlines + collision/trigger zones) when the URL has
@@ -291,26 +291,30 @@ if (isDebugEnabled()) {
 
 // ── A projectile, wired from engine primitives ───────────────────────────────
 // Press space. There is no `Projectile` class in the engine, and that is the
-// point: an entity on the board's layer, flown by the scheduler, asking the
-// world `sweep()` what it crosses. At 900 px/s it covers 15 px a frame — more
-// than the capture window of the bodies it flies at, so testing positions alone
-// would miss them intermittently. Sweeping asks about the path, not the endpoints.
+// point: the bolt is **not an element at all** — a plain `{x, y}` painted on the
+// FX canvas, flown by the scheduler, asking the world `sweep()` what it crosses.
+// The DOM carries what is alive or persistent; a bolt is temporary by design, so
+// it never enters the scene graph. Detection does not care: `sweep()` speaks in
+// world rectangles, not in elements.
 //
-// Nothing here counts milliseconds or unregisters anything: the flight is a
-// tween, the range is a lifetime, the cooldown is a delay — and all three run on
-// game time, so a paused game fires nothing and slow motion slows the bolt.
+// At 900 px/s it covers 15 px a frame — more than the capture window of the
+// bodies it flies at, so testing positions alone would miss them intermittently.
+// Sweeping asks about the path, not the endpoints.
 const BOLT_SPEED = 900;
 const BOLT_RANGE = 1000;
 const BOLT_FLIGHT = BOLT_RANGE / BOLT_SPEED * 1000;
 const BOLT_COOLDOWN = 250;
 const BOLT_SIZE = { width: 8, height: 8 };
+const AIM = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 // What the bolt is allowed to hit. Saying it this way is what replaced
 // `exclude: [bolt, player]` — an allow-list of belonging rather than a list of
 // individuals, which stops working the moment there are twenty of them.
 const BOLT_HITS = ['default'];
-const AIM = { up: [0, -1], down: [0, 1], left: [-1, 0], right: [1, 0] };
 
 const scheduler = app.getScheduler();
+// A second painter on the surface the particles already use: one canvas, two
+// concerns, each isolated by save()/restore().
+const fx = viewport.getParticles().addPainter(new SpritePainter());
 let loaded = true;
 
 function fire() {
@@ -323,23 +327,42 @@ function fire() {
   const player = viewport.getCharacter();
   const [aimX, aimY] = AIM[player.getDirection()] ?? AIM.down;
   const from = { x: player.offsetX() + 20, y: player.offsetY() + 26 };
-
-  const bolt = new Element(0, 0, BOLT_SIZE.width, BOLT_SIZE.height);
-  bolt.addClass('demo-bolt');
-  board.spawn(bolt, from.x, from.y, { ttl: BOLT_FLIGHT });
+  const bolt = fx.add({ ...from, width: 8, height: 8, color: '#ffd166', shape: 'circle' });
+  const corner = point => ({ x: point.x - BOLT_SIZE.width / 2, y: point.y - BOLT_SIZE.height / 2 });
 
   const flight = scheduler.tween(BOLT_FLIGHT, progress => {
     const travelled = progress * BOLT_RANGE;
     const to = { x: from.x + aimX * travelled, y: from.y + aimY * travelled };
 
-    if (board.sweep({ x: bolt.offsetX(), y: bolt.offsetY() }, to, BOLT_SIZE, { mask: BOLT_HITS })) {
+    const hit = board.sweep(corner(bolt), corner(to), BOLT_SIZE, { mask: BOLT_HITS });
+    if (hit) {
       flight.cancel();
-      board.despawn(bolt);
+      fx.remove(bolt);
+      explode(hit.at.x + BOLT_SIZE.width / 2, hit.at.y + BOLT_SIZE.height / 2);
+
       return;
     }
-    bolt.x(Math.round(to.x));
-    bolt.y(Math.round(to.y));
-  }, { owner: bolt });
+    bolt.x = to.x;
+    bolt.y = to.y;
+    if (progress >= 1) {
+      fx.remove(bolt);
+    }
+  });
+}
+
+// An explosion, with no explosion class anywhere in the engine: a sprite that
+// grows and fades over 260 ms of game time. Slow motion slows it down, a pause
+// freezes it mid-bloom.
+function explode(x, y) {
+  const blast = fx.add({ x, y, width: 8, height: 8, color: '#ffb347', shape: 'circle' });
+  scheduler.tween(260, progress => {
+    blast.width = 8 + progress * 44;
+    blast.height = blast.width;
+    blast.alpha = 1 - progress;
+    if (progress >= 1) {
+      fx.remove(blast);
+    }
+  });
 }
 
 document.body.addEventListener('keydown', (event) => {

@@ -36,6 +36,9 @@ export { ViewportTransform } from './view/ViewportTransform.js';
 // --- FX: particles and emitters ---
 export { ParticleSystem } from './fx/ParticleSystem.js';
 export { ParticleLayer } from './fx/ParticleLayer.js';
+export { FxSurface } from './fx/FxSurface.js';
+export { ParticlePainter } from './fx/ParticlePainter.js';
+export { SpritePainter } from './fx/SpritePainter.js';
 export { Emitter } from './fx/Emitter.js';
 export { FxBinder } from './fx/FxBinder.js';
 export { FountainSpray } from './fx/FountainSpray.js';
