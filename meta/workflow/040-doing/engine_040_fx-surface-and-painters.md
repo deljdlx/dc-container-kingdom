@@ -2,10 +2,10 @@
 id: 2026-08-06_17-57
 title: La surface FX cesse de savoir ce qu'est une particule
 type: refactor
-branch:
+branch: claude/fx-painters
 created: 2026-08-06 17:57
 ready: 2026-08-10 17:00
-doing:
+doing: 2026-08-10 17:05
 verify:
 done:
 ---
