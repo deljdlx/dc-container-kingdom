@@ -2,10 +2,10 @@
 id: 2026-08-08_17-57
 title: Des couches de collision et des masques, pour que tout ne touche pas tout
 type: feat
-branch:
+branch: claude/collision-layers
 created: 2026-08-08 17:57
 ready: 2026-08-10 16:05
-doing:
+doing: 2026-08-10 16:10
 verify:
 done:
 ---
