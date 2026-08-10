@@ -2,10 +2,10 @@
 id: 2026-08-08_17-56
 title: Programmer dans le temps — délais, cadences, interpolations, durées de vie
 type: feat
-branch:
+branch: claude/scheduler
 created: 2026-08-08 17:56
 ready: 2026-08-10 15:40
-doing:
+doing: 2026-08-10 15:45
 verify:
 done:
 ---
