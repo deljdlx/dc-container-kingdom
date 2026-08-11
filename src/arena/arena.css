@@ -1,0 +1,198 @@
+/* Arena — a portrait lane defence. Mobile-first: the layout is sized for a
+   phone held upright, and simply centres itself on a large screen. */
+
+body {
+  background: #10161f;
+  color: #dbe4ef;
+  font-family: system-ui, sans-serif;
+  overscroll-behavior: none;
+}
+
+.arena {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  min-height: 100dvh;
+}
+
+/* ── HUD ───────────────────────────────────────────────────────────────── */
+
+.arena-hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  max-width: var(--arena-width, 420px);
+  padding: 6px 10px;
+  background: #18212e;
+  border: 1px solid #26303f;
+  border-radius: 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.arena-hud__item {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.arena-hud__item--seeds {
+  color: #ffd166;
+}
+
+/* ── The board ─────────────────────────────────────────────────────────── */
+
+.arena-stage {
+  position: relative;
+}
+
+.arena-viewport {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #26303f;
+  border-radius: 8px;
+  background: #1d2a1c;
+  /* Sprites are 32 px pixel art and the board is scaled up to be playable on a
+     phone. Without this they turn to mush — the engine's own stylesheet does not
+     set it (noted as a gap). */
+  image-rendering: pixelated;
+}
+
+.arena-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: #0b0f16d9;
+  border-radius: 8px;
+  text-align: center;
+  z-index: 20000000;   /* over the FX canvas, which sits at FX_DEPTH */
+}
+
+.arena-overlay[hidden] {
+  display: none;
+}
+
+.arena-overlay__title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #ff8b6b;
+}
+
+.arena-overlay__text {
+  color: #9fb0c0;
+}
+
+.arena-overlay__button {
+  margin-top: 6px;
+  padding: 10px 20px;
+  background: #2f8f5b;
+  color: #fff;
+  border: 0;
+  border-radius: 8px;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.arena-overlay__button:active {
+  background: #256f47;
+}
+
+/* ── Touch controls ────────────────────────────────────────────────────── */
+
+.arena-controls {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+  max-width: var(--arena-width, 420px);
+}
+
+.arena-dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 46px);
+  grid-template-rows: repeat(3, 46px);
+  gap: 3px;
+}
+
+.arena-dpad__btn {
+  background: #1e2836;
+  border: 1px solid #2b3948;
+  border-radius: 8px;
+  color: #9fb0c0;
+  font-size: 1rem;
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.arena-dpad__btn.pressed {
+  background: #2b3948;
+  color: #dbe4ef;
+}
+
+.arena-dpad__btn--up { grid-area: 1 / 2; }
+.arena-dpad__btn--left { grid-area: 2 / 1; }
+.arena-dpad__btn--right { grid-area: 2 / 3; }
+.arena-dpad__btn--down { grid-area: 3 / 2; }
+
+.arena-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.arena-action {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  width: 64px;
+  padding: 8px 0;
+  background: #1e2836;
+  border: 1px solid #2b3948;
+  border-radius: 10px;
+  color: #dbe4ef;
+  font: inherit;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.arena-action:disabled {
+  opacity: 0.4;
+}
+
+.arena-action__icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.arena-action__cost {
+  font-size: 0.8rem;
+  color: #ffd166;
+  font-variant-numeric: tabular-nums;
+}
+
+.arena-hint {
+  max-width: var(--arena-width, 420px);
+  color: #6e8095;
+  font-size: 0.78rem;
+  text-align: center;
+}
+
+/* The written hint is for keyboards; a touch screen has the pad instead. */
+@media (pointer: coarse) {
+  .arena-hint {
+    display: none;
+  }
+}
+
+/* A pointer means a desktop: the pad is redundant next to the arrow keys, but
+   it stays — a phone emulator is a pointer too, and hiding it would make the
+   game untestable in a desktop browser. */

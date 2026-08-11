@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Arena — lane defence</title>
+
+  <!-- Engine styles. The host loads them itself: the engine ships CSS, it does
+       not inject any. -->
+  <link rel="stylesheet" href="../engine/css/reset.css">
+  <link rel="stylesheet" href="../engine/css/_variables.css">
+  <link rel="stylesheet" href="../engine/css/map.css">
+  <link rel="stylesheet" href="../engine/css/character.css">
+  <link rel="stylesheet" href="../engine/css/map-debug.css">
+
+  <link rel="stylesheet" href="./arena.css">
+</head>
+<body>
+  <div class="arena">
+    <header class="arena-hud">
+      <span class="arena-hud__item arena-hud__item--seeds" id="seeds">🌱 50</span>
+      <span class="arena-hud__item" id="wave">Wave 1</span>
+      <span class="arena-hud__item" id="score">0</span>
+    </header>
+
+    <div class="arena-stage">
+      <div id="viewport" class="arena-viewport"></div>
+
+      <div class="arena-overlay" id="overlay" hidden>
+        <p class="arena-overlay__title" id="overlay-title">Breached</p>
+        <p class="arena-overlay__text" id="overlay-text">They got through.</p>
+        <button class="arena-overlay__button" id="restart" type="button">Play again</button>
+      </div>
+    </div>
+
+    <div class="arena-controls">
+      <div class="arena-dpad">
+        <button class="arena-dpad__btn arena-dpad__btn--up" data-key="ArrowUp" type="button">▲</button>
+        <button class="arena-dpad__btn arena-dpad__btn--left" data-key="ArrowLeft" type="button">◀</button>
+        <button class="arena-dpad__btn arena-dpad__btn--right" data-key="ArrowRight" type="button">▶</button>
+        <button class="arena-dpad__btn arena-dpad__btn--down" data-key="ArrowDown" type="button">▼</button>
+      </div>
+
+      <div class="arena-actions">
+        <button class="arena-action" id="plant-seeder" type="button">
+          <span class="arena-action__icon">🌻</span>
+          <span class="arena-action__cost">25</span>
+        </button>
+        <button class="arena-action" id="plant-shooter" type="button">
+          <span class="arena-action__icon">🌵</span>
+          <span class="arena-action__cost">50</span>
+        </button>
+      </div>
+    </div>
+
+    <p class="arena-hint">
+      Move with the pad or the arrow keys · <kbd>A</kbd> plants a seeder ·
+      <kbd>E</kbd> plants a shooter · <kbd>P</kbd> pauses
+    </p>
+  </div>
+
+  <script type="module" src="./arena.js"></script>
+</body>
+</html>
