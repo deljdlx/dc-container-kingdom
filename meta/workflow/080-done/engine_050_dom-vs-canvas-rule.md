@@ -7,7 +7,7 @@ created: 2026-08-06 17:56
 ready: 2026-08-11 08:26
 doing: 2026-08-11 08:30
 verify: 2026-08-11 08:40
-done:
+done: 2026-08-11 08:45 (merge 2d04aa8)
 ---
 
 ## Objectif
@@ -115,4 +115,4 @@ n'est donc plus un vœu — elle décrit ce que le moteur fait.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `2d04aa8`.
