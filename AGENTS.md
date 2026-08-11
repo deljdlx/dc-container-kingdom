@@ -31,6 +31,8 @@ Debug : `?debug=1` (zones de collision/trigger, magenta au contact).
   (`meta/agents/recipes/workflow/work-a-task.md` : `000-backlog` → `020-ready` →
   `040-doing` → `060-verify` → `080-done`, puis **suite**).
 - **Frontière** : app → moteur uniquement ; importer le moteur via `src/engine/index.js`.
+- **Rendu** : le **DOM** porte le vivant et le persistant, le **canvas** ce qui est
+  temporaire par conception (projectiles, explosions) — défaut, pas police.
 - **Langue** : code, JSDoc et **tout nom de fichier/dossier** — titres de tickets
   compris — en **anglais** ; commits, contenu des tickets et échanges en
   **français**.
