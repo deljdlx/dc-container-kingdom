@@ -1,4 +1,5 @@
 import { Application } from '../Application.js';
+import { resolveBlueprint } from './blueprint.js';
 import { CollisionSystem } from './CollisionSystem.js';
 import { EngineEvents, makeEvent } from '../events/EngineEvents.js';
 import { EventEmitter } from '../events/EventEmitter.js';
@@ -15,8 +16,32 @@ import { SceneGraph } from './SceneGraph.js';
  */
 export class Element
 {
-  /** @type {object} arbitrary caller-attached data bag */
+  /**
+   * This instance's **state**: what *this* entity is right now — 7 hit points
+   * left, a cooldown running, the Docker container it stands for. Plain,
+   * mutable, and owned by the caller.
+   *
+   * Its shared counterpart is the class's {@link blueprint} — what a *goblin*
+   * is, read by every goblin and written to by none. See `scene/blueprint.js`.
+   * @type {object}
+   */
   data = {};
+
+  /**
+   * The **shared** half: what this kind of entity is, for every instance of the
+   * class. Declared on the class, merged along the prototype chain, and frozen.
+   *
+   * ```js
+   * class Goblin extends Character { static blueprint = { maxHp: 12, damage: 3 }; }
+   * class Orc extends Goblin       { static blueprint = { maxHp: 30 }; }   // damage: 3 inherited
+   * ```
+   *
+   * The engine defines **no key** here: it resolves, merges and freezes, and the
+   * game says what `maxHp` means. Nothing in `src/engine/` may read a game key —
+   * the engine has to keep running with an empty blueprint.
+   * @type {object}
+   */
+  static blueprint = {};
 
   /** @type {Application} */
   _application;
@@ -109,6 +134,69 @@ export class Element
     this.height(height);
 
     this.collision.initBoundingBox();
+  }
+
+  /**
+   * @returns {object} the class's resolved blueprint — frozen, and shared by
+   * every instance of that class
+   */
+  getBlueprint() {
+    return resolveBlueprint(this.constructor);
+  }
+
+  /**
+   * Read a value, **state first, blueprint second**.
+   *
+   * That order is what lets one goblin differ from the others without copying
+   * the definition: `get('maxHp')` answers 12 for the whole class, and 36 for
+   * the one that was seeded with more.
+   * @param {string} key
+   * @param {*} [fallback] returned when neither side holds the key
+   * @returns {*}
+   */
+  get(key, fallback = undefined) {
+    if (key in this.data) {
+      return this.data[key];
+    }
+    const blueprint = this.getBlueprint();
+
+    return key in blueprint ? blueprint[key] : fallback;
+  }
+
+  /**
+   * Write a value **into the state**. The blueprint is never touched — it is
+   * frozen, and reaching it would change every instance of the class.
+   *
+   * It does nothing `data[key] = value` does not already do, and exists to be
+   * the hook the day change notification is settled by actual use: callers will
+   * not have to be rewritten.
+   * @param {string} key
+   * @param {*} value
+   * @returns {Element} this
+   */
+  set(key, value) {
+    this.data[key] = value;
+
+    return this;
+  }
+
+  /**
+   * Seed the state, chainable — how one instance differs from its blueprint.
+   *
+   * ```js
+   * board.spawn(new Goblin().withState({ maxHp: 36 }), x, y);   // a boss
+   * ```
+   *
+   * Constructors are deliberately left alone: threading an options argument
+   * through `Element`, `SpriteElement` and `Character` would be a lot of
+   * plumbing for a surface meant to stay small.
+   * @param {object} state
+   * @returns {Element} this
+   */
+  withState(state) {
+    Object.assign(this.data, state);
+
+    return this;
   }
 
   /**

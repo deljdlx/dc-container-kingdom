@@ -60,6 +60,7 @@ export {
 // --- Element subsystems (composed by Element) ---
 export { CollisionSystem } from './scene/CollisionSystem.js';
 export { SceneGraph } from './scene/SceneGraph.js';
+export { resolveBlueprint } from './scene/blueprint.js';
 
 // --- Asking the world what is where (no need to be part of it) ---
 export { queryRect, sweepRect } from './scene/WorldQuery.js';
