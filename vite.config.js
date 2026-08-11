@@ -6,6 +6,7 @@ const htmlEntries = {
   main: fileURLToPath(new URL('./src/index.html', import.meta.url)),
   'engine/demo/index': fileURLToPath(new URL('./src/engine/demo/index.html', import.meta.url)),
   'engine/catalog/index': fileURLToPath(new URL('./src/engine/catalog/index.html', import.meta.url)),
+  'arena/index': fileURLToPath(new URL('./src/arena/index.html', import.meta.url)),
 };
 
 // The app's index.html and assets live under src/. Serving from there keeps the
