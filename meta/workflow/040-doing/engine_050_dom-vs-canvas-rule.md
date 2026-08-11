@@ -2,10 +2,10 @@
 id: 2026-08-06_17-56
 title: Écrire la règle DOM / canvas — vivant et persistant contre temporaire
 type: docs
-branch:
+branch: claude/dom-vs-canvas-rule
 created: 2026-08-06 17:56
 ready: 2026-08-11 09:30
-doing:
+doing: 2026-08-11 08:30
 verify:
 done:
 ---
