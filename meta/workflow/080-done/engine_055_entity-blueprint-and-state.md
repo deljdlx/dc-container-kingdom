@@ -7,7 +7,7 @@ created: 2026-08-11 08:52
 ready: 2026-08-11 09:05
 doing: 2026-08-11 09:10
 verify: 2026-08-11 09:20
-done:
+done: 2026-08-11 09:55 (merge e99177e)
 ---
 
 ## Objectif
@@ -220,4 +220,4 @@ condition.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `e99177e`.
