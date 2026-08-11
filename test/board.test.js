@@ -21,7 +21,11 @@ const PIPELINE_COLUMNS = ['000-backlog', '020-ready', '040-doing', '060-verify',
 const OUT_OF_PIPELINE = ['100-follow-up', '200-ideas'];
 const ACTIVE_COLUMNS = ['000-backlog', '020-ready', '040-doing', '060-verify'];
 
-const PROJECTS = ['engine', 'container-kingdom', 'infra', 'board'];
+// Adding a name here is how a new sub-project is declared: the list is the
+// repo's future split axis, so it is deliberately an enum and not a free field.
+// `arena` is the first host built to BE a game rather than to demonstrate the
+// engine (2026-08-11_08-55).
+const PROJECTS = ['engine', 'arena', 'container-kingdom', 'infra', 'board'];
 const TYPES = ['feat', 'fix', 'refactor', 'docs', 'test', 'chore'];
 
 const ENTRY_POINTS = ['CLAUDE.md', 'AGENTS.md', '.github/copilot-instructions.md'];

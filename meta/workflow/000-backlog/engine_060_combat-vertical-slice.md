@@ -35,9 +35,13 @@ un **résultat du ticket**, pas un échec.
 
 _À confirmer en « specify »._
 
-- La tranche, dans la démo : le joueur tire un projectile **typé** vers une
-  direction ou une cible ; il vole ; il touche un PNJ ; le PNJ perd des points de
-  vie et le montre ; à zéro il meurt ; un effet d'impact et une explosion jouent.
+- La tranche, **dans l'arène** (`2026-08-11_08-55`) et non dans la démo — amendé
+  le 2026-08-11 : le banc de conformité est câblé par quelqu'un qui connaît tous
+  les internes, donc il flatte le moteur ; un hôte neuf est le test sévère, et ça
+  évite d'écrire le combat deux fois. Le joueur tire un projectile **typé** vers
+  une direction ou une cible ; il vole ; il touche un PNJ ; le PNJ perd des points
+  de vie et le montre ; à zéro il meurt ; un effet d'impact et une explosion
+  jouent.
 - **Ce que le moteur doit fournir**, et rien de plus : la façon dont une entité
   porte son état, et les **events** qui disent qu'il a changé (touché, mort). Les
   points de vie, les dégâts, les résistances sont du **jeu** — le moteur fournit
@@ -54,8 +58,8 @@ _À confirmer en « specify »._
    forte à la première entité qui a trois propriétés. Le moteur est un
    scene-graph à behaviors ; y greffer un ECS est une refonte, pas une tranche.
    Si l'usage le réclame vraiment, c'est un ticket à part, argumenté.
-2. **Ne pas faire de Container Kingdom la cible.** La tranche vit dans la démo
-   moteur, qui est là pour ça.
+2. **Ne pas faire de Container Kingdom la cible**, ni la démo : la tranche vit
+   dans l'arène, qui est là pour ça.
 3. **Ne pas cacher des règles de jeu dans le moteur** : « 10 dégâts », « 3 points
    de vie », « meurt à zéro » sont de l'hôte. La frontière se juge à ça.
 4. **Le son est hors périmètre**, faute d'exister (aucune ligne d'audio dans le
@@ -65,15 +69,17 @@ _À confirmer en « specify »._
 
 - Vérifié : **rien d'équivalent au board le 2026-08-08**, `080-done` compris.
 - Dépend de : `2026-08-08_17-55` (horloge), `2026-08-08_17-56` (ordonnanceur),
-  `2026-08-08_17-57` (couches), `2026-08-06_17-56` (règle DOM/canvas).
-- `src/engine/demo/demo.js` — le projectile actuel, point de départ.
+  `2026-08-08_17-57` (couches), `2026-08-06_17-56` (règle DOM/canvas),
+  `2026-08-11_08-52` (blueprint et état), `2026-08-11_08-55` (l'arène).
+- `src/engine/demo/demo.js` — le projectile canvas, point de départ à recopier
+  dans l'arène.
 - `src/engine/scene/WorldQuery.js` — `sweep()`, déjà écrit pour ça.
 - `src/engine/events/EngineEvents.js` — le catalogue à étendre.
 - `meta/documentation/engine.md` §6 et §7.
 
 ## Definition of Done
 
-- [ ] La boucle complète tourne dans la démo : tirer → toucher → infliger →
+- [ ] La boucle complète tourne **dans l'arène** : tirer → toucher → infliger →
       mourir → effet.
 - [ ] Le contrat d'état est **écrit** (JSDoc + `engine.md`) : comment une entité
       porte son état, quels events le moteur émet, ce qui reste au jeu.
