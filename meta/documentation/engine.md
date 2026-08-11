@@ -54,6 +54,55 @@ au-dessus d'eux :
 Coordonnées : **locales** (`x()`, `y()`) vs **monde** (`offsetX()`, `offsetY()`).
 La collision et la profondeur raisonnent en coordonnées monde.
 
+### 1.1 Ce qu'une entité *est* : blueprint et état
+
+Une entité porte **deux** sortes de données, et les confondre est le bug
+classique du domaine :
+
+| | blueprint | état |
+|---|---|---|
+| répond à | ce qu'un *gobelin* est | ce que *ce* gobelin est |
+| porté par | la **classe** (`static blueprint`) | l'instance (`element.data`) |
+| partagé | par toutes les instances | par personne |
+| écriture | **impossible** — gelé | permanente |
+| sauvegardé | non (c'est du code) | **oui** (c'est la partie qui change) |
+
+```js
+class Goblin extends Character { static blueprint = { maxHp: 12, damage: 3 }; }
+class Orc extends Goblin       { static blueprint = { maxHp: 30 }; }  // damage: 3 hérité
+
+goblin.get('damage');      // → 3   — résolu : état d'abord, blueprint ensuite
+goblin.set('hp', 9);       // écrit dans l'ÉTAT, jamais dans le blueprint
+new Goblin().withState({ maxHp: 36 });   // un boss, sans copier la définition
+```
+
+Sans ce découpage, un gobelin qui prend un coup écrit dans la structure partagée
+et les 199 autres voient leurs PV max baisser. Ça ne se voit qu'en jeu, et tard.
+D'où le **gel profond** : un gel superficiel laisserait `blueprint.loot.gold`
+accessible, c'est le même bug un étage plus bas. Il se paie **une fois par
+classe**, à la première résolution.
+
+Ce que le gel garantit, c'est que **l'écriture n'a pas d'effet** — pas qu'elle
+lève une erreur. Lever est le fait du mode strict : les modules ES le sont, donc
+tout le moteur l'est, mais un hôte qui charge un script classique verra
+l'affectation **échouer en silence** (vérifié au navigateur). La protection tient
+dans les deux cas ; seul le bruit change.
+
+**Le blueprint fusionne le long de la chaîne de classes ; `descriptor`, non.** La
+divergence est voulue : un descripteur décrit **un sprite**, et hériter le
+`frame` du parent n'aurait aucun sens — un sprite dérivé est un *autre* sprite.
+Un blueprint décrit des **traits**, et fusionner est exactement ce que veut dire
+hériter.
+
+**Le moteur ne définit aucune clé.** Il résout, fusionne, gèle ; le jeu dit ce que
+`maxHp` signifie. Rien dans `src/engine/` ne lit une clé de jeu — le moteur doit
+tourner avec un blueprint vide.
+
+**Pas d'event par écriture.** La règle du bus (§9) dit « les faits de jeu, pas les
+pas de simulation » : un event à chaque `hp -= 3` la violerait et noierait tout
+observateur. `set()` existe pour être le point d'accroche du jour où la question
+sera tranchée par l'usage — pas pour y répondre d'avance.
+
 ## 2. Board, Area et streaming
 
 - **`Area`** — une tuile de carte (taille du viewport) contenant des éléments en
