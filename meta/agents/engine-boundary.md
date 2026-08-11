@@ -12,6 +12,23 @@
 C'est ce qui rend le moteur réutilisable ; la démo `src/engine/demo/` le prouve
 (elle pilote le moteur sans rien de Container Kingdom).
 
+## Routage du rendu (impératif par défaut)
+
+**Le DOM porte ce qui est vivant et/ou persistant ; ce qui est temporaire par
+conception passe par le canvas.** Le critère est la **durée de vie voulue**, pas
+la taille ni le nombre : ce que le joueur peut retrouver, ramasser ou tuer est un
+`Element` ; un projectile, une explosion, une étincelle sont peints sur une
+`FxSurface`.
+
+Ce que ça coûte de l'ignorer : le layout du navigateur franchit le budget d'une
+frame vers **1 000 éléments DOM**. Ce que ça coûte de l'appliquer : le canvas
+occupe **un cran de profondeur fixe**, donc un projectile passe toujours au-dessus
+du décor.
+
+C'est un **défaut, pas une police** — un objet temporaire qui doit vraiment
+s'intercaler dans la profondeur peut rester un `Element`. Détail et mesures :
+`documentation/engine.md` §5.
+
 ## Repères d'architecture (moteur)
 
 - `Element` = nœud de scene-graph ; `Board`/`Area` = tuilage streamé **7×7** autour

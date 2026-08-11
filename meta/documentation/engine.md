@@ -97,10 +97,17 @@ pas dessinée) : ses enfants ont donc pour offsets leurs coordonnées monde. Ell
 est créée au premier `spawn`, et `Board.clear()` l'emporte avec le reste — remise
 à zéro du monde, entités comprises.
 
-**L'appelant possède la durée de vie.** Le moteur ne *cull* pas : un projectile
-meurt de lui-même, un objet au sol est censé rester. `despawn()` est fourni, rien
-ne l'appelle à votre place — et `Element.destroy()` nettoie désormais le DOM du
-sous-arbre, donc despawner ne fuit pas.
+**Ce qu'elle porte : le persistant sans tuile — pas le temporaire.** Un butin
+lâché, un puits qui survit au streaming de son area, un PNJ qui traverse la carte.
+Un projectile ou une explosion, eux, relèvent de la règle de routage (§5) et vont
+au **canvas** : ils n'ont besoin ni de hit-testing, ni de CSS, ni d'exister quand
+personne ne regarde. Le premier commentaire de ce paragraphe les citait en
+exemple, avant que le canvas sache les dessiner.
+
+**L'appelant possède la durée de vie.** Le moteur ne *cull* pas : une entité meurt
+quand on le lui demande, un objet au sol est censé rester. `despawn()` est fourni,
+rien ne l'appelle à votre place — sauf si l'on demande un `ttl` au `spawn` — et
+`Element.destroy()` nettoie le DOM du sous-arbre, donc despawner ne fuit pas.
 
 **Déplacer une entité la repeint.** Écrire `x()` ou `y()` lève le drapeau de
 redessin ; `Renderer.update()` appelle `render()`, qui synchronise position,
@@ -672,6 +679,46 @@ z = DEPTH_BASE + offsetY() + height()
 - `DEPTH_BASE` (grande constante positive) garde le z **au-dessus du sol** même au
   nord de l'origine, où `offsetY` devient négatif (sinon l'élément passe derrière
   l'herbe, qui est le background des areas à z ≈ 0).
+
+### Où va quoi : DOM ou canvas
+
+Le moteur a **deux surfaces de rendu**, et le choix entre elles n'est ni une
+question de taille ni une question de nombre. Le critère est la **durée de vie
+voulue** :
+
+> **Le DOM porte ce qui est vivant et/ou persistant. Ce qui est temporaire par
+> conception passe par le canvas.**
+
+| | DOM (`Element`) | canvas (`FxSurface`) |
+|---|---|---|
+| pour | personnages, décor, butin au sol, tout ce que le joueur peut retrouver, ramasser, tuer | projectiles, explosions, étincelles, décalques, texte flottant |
+| donne | hit-testing, CSS, events, inspection, **profondeur par élément** | un `drawImage`, et rien d'autre |
+| coûte | 3 nœuds et du layout par objet | un cran de profondeur **fixe**, aucune interaction |
+
+Le test qui tranche : **le joueur peut-il le retrouver ?** Une épée lâchée au sol
+existe même quand personne ne regarde — DOM. Une étincelle n'est qu'un instant du
+rendu — canvas.
+
+**Le chiffre qui la justifie.** Mesuré (passe d'audit du 2026-08-06), le layout du
+navigateur franchit le budget d'une frame vers **1 000 éléments DOM**. La règle
+est ce qui garde ce budget pour ce qui en a besoin. Côté script, le croisement
+arrive bien plus tôt : à 100 objets en mouvement, 0,150 ms au canvas contre
+0,282 ms en DOM (§3.2).
+
+**Ce que le canvas ne sait pas faire, et qui est assumé.** Une surface occupe un
+**cran de profondeur fixe** — `ground` sous les entités, `above` par-dessus tout.
+Or « au niveau des entités » n'est pas un cran mais une valeur *par élément*
+(`DEPTH_BASE + offsetY + height`) : un missile à y = 300 devrait passer derrière
+un arbre à y = 350 et devant un à y = 250. Il ne le fait pas — il passe au-dessus
+des deux.
+
+Ce qui rouvrirait le sujet n'est pas un troisième canvas mais un **découpage par
+bandes de profondeur**, et seulement le jour où la gêne se voit à l'écran.
+
+**C'est un défaut, pas une police.** Un projectile qui doit vraiment s'intercaler
+dans le décor peut redevenir un `Element` DOM ; un hôte qui sait ce qu'il fait
+choisit autrement. La règle dit ce qu'on fait quand on n'a pas de raison de faire
+exception.
 
 ## 6. Collisions
 
