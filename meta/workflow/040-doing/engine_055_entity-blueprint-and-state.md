@@ -2,10 +2,10 @@
 id: 2026-08-11_08-52
 title: Une entité porte un blueprint partagé et un état par instance
 type: feat
-branch:
+branch: claude/entity-blueprint
 created: 2026-08-11 08:52
 ready: 2026-08-11 09:05
-doing:
+doing: 2026-08-11 09:10
 verify:
 done:
 ---
