@@ -2,10 +2,10 @@
 id: 2026-08-11_08-55
 title: Un quatrième hôte, qui est un jeu et pas une vitrine
 type: feat
-branch:
+branch: claude/arena
 created: 2026-08-11 08:55
 ready: 2026-08-11 10:30
-doing:
+doing: 2026-08-11 10:35
 verify:
 done:
 ---
