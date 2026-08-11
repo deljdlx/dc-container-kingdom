@@ -4,7 +4,7 @@ title: Une entité porte un blueprint partagé et un état par instance
 type: feat
 branch:
 created: 2026-08-11 08:52
-ready:
+ready: 2026-08-11 09:05
 doing:
 verify:
 done:
@@ -63,16 +63,42 @@ Pas de `hp` dans `src/engine/`. Le moteur fournit la mécanique — résolution,
 fusion — le jeu fournit le vocabulaire. **Critère de réussite : le moteur tourne
 avec un sac vide.**
 
-### À trancher en specify
+### Tranché en specify
 
-- **La fusion le long de la chaîne de classes.** `descriptor` ne fusionne
-  **pas** (`new.target.descriptor` prend le plus dérivé, point). Pour un
-  blueprint, `class Orc extends Goblin` sans réécrire les cinq clés du parent est
-  utile — mais ça crée une divergence avec `descriptor`, qu'il faudra assumer et
-  écrire.
-- **Le gel est-il profond ?** Un blueprint qui contient un objet imbriqué
-  (`{ loot: { gold: 5 } }`) reste mutable au second niveau si le gel est
-  superficiel. Trancher : gel profond, ou contrat « pas d'imbriqué ».
+**La fusion le long de la chaîne : oui**, et la divergence avec `descriptor` est
+assumée parce qu'elle est **justifiée**, pas subie. Un descripteur décrit **un
+sprite** : fusionner le `frame` du parent dans l'enfant n'aurait aucun sens — un
+sprite dérivé est un *autre* sprite. Un blueprint décrit des **traits** : la
+fusion est exactement ce que veut dire hériter (« un orque est un gobelin avec
+plus de PV »). Deux patrons voisins, deux sémantiques, écrites toutes les deux.
+
+**Le gel est profond.** Tout l'intérêt est qu'aucune instance ne puisse atteindre
+le côté partagé ; un gel superficiel laisse `blueprint.loot.gold = 0` accessible,
+c'est le même bug un étage plus bas. Il se paie **une fois par classe**, à la
+première résolution, pas par instance.
+
+**Les constructeurs ne sont pas touchés.** `new Goblin({ maxHp: 36 })`
+demanderait de faire passer un paramètre d'options par `Element`, `SpriteElement`
+et `Character` — beaucoup de plomberie pour une surface qu'on veut minimale. À la
+place, une méthode chaînable :
+
+```js
+board.spawn(new Goblin().withState({ maxHp: 36 }), x, y);
+```
+
+### La surface, au complet
+
+```js
+entity.getBlueprint()        // le blueprint résolu, gelé, partagé par la classe
+entity.get('damage')         // résolu : état d'abord, blueprint ensuite
+entity.set('hp', 9)          // écrit dans l'ÉTAT, jamais dans le blueprint
+entity.withState({ ... })    // sème l'état, chaînable
+entity.data                  // l'état lui-même, inchangé — Container Kingdom y écrit
+```
+
+`set()` n'apporte rien que `data.hp = 9` ne fasse déjà : il existe pour être le
+**point d'accroche** du jour où la notification aura été tranchée par l'usage,
+sans avoir à réécrire les appelants.
 
 ### Hors périmètre, explicitement
 
