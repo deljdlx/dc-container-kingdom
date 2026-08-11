@@ -4,7 +4,7 @@ title: Écrire la règle DOM / canvas — vivant et persistant contre temporaire
 type: docs
 branch:
 created: 2026-08-06 17:56
-ready:
+ready: 2026-08-11 09:30
 doing:
 verify:
 done:
@@ -27,7 +27,9 @@ faire re-trancher à chaque fois, différemment.
 
 ## Spécifications
 
-_À confirmer en « specify »._
+Le firewall n° 1 est levé : `2026-08-06_17-57` a livré la surface et ses
+peintres, et le projectile de la démo est **déjà** passé au canvas. La règle
+n'est donc plus un vœu — elle décrit ce que le moteur fait.
 
 - **La règle et son critère** : ce qui départage n'est ni la taille ni le nombre,
   c'est la **durée de vie voulue**. Une entité que le joueur peut retrouver,
