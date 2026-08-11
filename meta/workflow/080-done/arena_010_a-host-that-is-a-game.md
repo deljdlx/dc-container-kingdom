@@ -7,7 +7,7 @@ created: 2026-08-11 08:55
 ready: 2026-08-11 10:30
 doing: 2026-08-11 10:35
 verify: 2026-08-11 15:20
-done:
+done: 2026-08-11 15:25 (merge 1992195)
 ---
 
 ## Objectif
@@ -255,4 +255,4 @@ La recipe le dit ; je l'ai rappris.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `1992195`.
