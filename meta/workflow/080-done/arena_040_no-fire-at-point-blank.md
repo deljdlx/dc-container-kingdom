@@ -3,11 +3,11 @@ id: 2026-08-17_19-50
 title: Le héros ne tire pas sur ce qui le touche
 type: fix
 branch: claude/point-blank
-created: 2026-08-17 19:50
-ready: 2026-08-17 19:50
-doing: 2026-08-17 19:52
-verify: 2026-08-17 20:05
-done:
+created: 2026-08-17 19:25
+ready: 2026-08-17 19:26
+doing: 2026-08-17 19:28
+verify: 2026-08-17 19:42
+done: 2026-08-17 19:45 (merge eb02bef)
 ---
 
 ## Objectif
@@ -73,12 +73,12 @@ Le réglage de ce rayon est **la** difficulté, et il a fallu le mesurer :
 
 ### Travail
 
-- [2026-08-17 19:52] Branche `claude/point-blank`. `targetInArc()` saute le test
+- [2026-08-17 19:28] Branche `claude/point-blank`. `targetInArc()` saute le test
   du cône sous `POINT_BLANK`.
-- [2026-08-17 19:58] Premier réglage à 46 px : le tir au contact revient (**25
+- [2026-08-17 19:33] Premier réglage à 46 px : le tir au contact revient (**25
   corps abattus sur 26** entrés dans le rayon) mais un cap figé survit jusqu'à la
   vague 6. Ramené à **30 px**.
-- [2026-08-17 20:02] À 30 px, viser ne servait toujours pas beaucoup : la cadence
+- [2026-08-17 19:38] À 30 px, viser ne servait toujours pas beaucoup : la cadence
   suffisait à broyer tout le monde au corps-à-corps. Points de vie relevés — 2/4/3
   → 4/8/5 (trop dur), puis **3/6/4**.
 
@@ -97,4 +97,4 @@ reste trop mince — voir `## Suite`.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `eb02bef`.
