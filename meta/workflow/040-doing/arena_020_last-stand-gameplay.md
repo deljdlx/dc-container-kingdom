@@ -2,10 +2,10 @@
 id: 2026-08-17_18-10
 title: Le gameplay devient un dernier carré — un héros fixe qui oriente son tir
 type: feat
-branch:
+branch: claude/last-stand
 created: 2026-08-17 18:10
 ready: 2026-08-17 18:25
-doing:
+doing: 2026-08-17 18:26
 verify:
 done:
 ---
