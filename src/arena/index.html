@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-  <title>Arena — lane defence</title>
+  <title>Arena — last stand</title>
 
   <!-- Engine styles. The host loads them itself: the engine ships CSS, it does
        not inject any. -->
@@ -18,8 +18,9 @@
 <body>
   <div class="arena">
     <header class="arena-hud">
-      <span class="arena-hud__item arena-hud__item--seeds" id="seeds">🌱 50</span>
+      <span class="arena-hud__item arena-hud__item--hp" id="hp">❤️❤️❤️❤️❤️</span>
       <span class="arena-hud__item" id="wave">Wave 1</span>
+      <span class="arena-hud__item arena-hud__item--gold" id="gold">🪙 0</span>
       <span class="arena-hud__item" id="score">0</span>
     </header>
 
@@ -27,9 +28,10 @@
       <div id="viewport" class="arena-viewport"></div>
 
       <div class="arena-overlay" id="overlay" hidden>
-        <p class="arena-overlay__title" id="overlay-title">Breached</p>
-        <p class="arena-overlay__text" id="overlay-text">They got through.</p>
-        <button class="arena-overlay__button" id="restart" type="button">Play again</button>
+        <p class="arena-overlay__title" id="overlay-title">Wave held</p>
+        <p class="arena-overlay__text" id="overlay-text">0 gold to spend.</p>
+        <div class="arena-shop" id="shop"></div>
+        <button class="arena-overlay__button" id="overlay-action" type="button">Start</button>
       </div>
     </div>
 
@@ -41,21 +43,14 @@
         <button class="arena-dpad__btn arena-dpad__btn--down" data-key="ArrowDown" type="button">▼</button>
       </div>
 
-      <div class="arena-actions">
-        <button class="arena-action" id="plant-seeder" type="button">
-          <span class="arena-action__icon">🌻</span>
-          <span class="arena-action__cost">25</span>
-        </button>
-        <button class="arena-action" id="plant-shooter" type="button">
-          <span class="arena-action__icon">🌵</span>
-          <span class="arena-action__cost">50</span>
-        </button>
-      </div>
+      <p class="arena-aim-hint">
+        The pad <strong>aims</strong>.<br>
+        He fires on his own — but only<br>at what he is facing.
+      </p>
     </div>
 
     <p class="arena-hint">
-      Move with the pad or the arrow keys · <kbd>A</kbd> plants a seeder ·
-      <kbd>E</kbd> plants a shooter · <kbd>P</kbd> pauses
+      Arrow keys or the pad to aim · two at once for a diagonal · <kbd>P</kbd> pauses
     </p>
   </div>
 

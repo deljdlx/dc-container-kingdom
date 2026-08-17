@@ -1,5 +1,5 @@
-/* Arena — a portrait lane defence. Mobile-first: the layout is sized for a
-   phone held upright, and simply centres itself on a large screen. */
+/* Arena — a portrait last stand. Mobile-first: the layout is sized for a phone
+   held upright, and simply centres itself on a large screen. */
 
 body {
   background: #10161f;
@@ -38,7 +38,12 @@ body {
   font-weight: 600;
 }
 
-.arena-hud__item--seeds {
+.arena-hud__item--hp {
+  color: #ff6b6b;
+  letter-spacing: -2px;
+}
+
+.arena-hud__item--gold {
   color: #ffd166;
 }
 
@@ -79,7 +84,7 @@ body {
 }
 
 .arena-overlay__title {
-  font-size: 1.6rem;
+  font-size: 1.4rem;
   font-weight: 700;
   color: #ff8b6b;
 }
@@ -143,38 +148,64 @@ body {
 .arena-dpad__btn--right { grid-area: 2 / 3; }
 .arena-dpad__btn--down { grid-area: 3 / 2; }
 
-.arena-actions {
-  display: flex;
-  gap: 8px;
+/* The pad is the only control, so it gets a caption: «it aims» is the one thing
+   a new player has to unlearn from every other game with a pad. */
+.arena-aim-hint {
+  flex: 1;
+  color: #6e8095;
+  font-size: 0.8rem;
+  line-height: 1.35;
+  text-align: right;
 }
 
-.arena-action {
+.arena-aim-hint strong {
+  color: #9fb0c0;
+}
+
+/* ── The shop, between waves ───────────────────────────────────────────── */
+
+.arena-shop {
   display: flex;
   flex-direction: column;
+  gap: 5px;
+  width: min(240px, 80%);
+}
+
+.arena-shop[hidden] {
+  display: none;
+}
+
+.arena-upgrade {
+  display: flex;
   align-items: center;
-  gap: 2px;
-  width: 64px;
-  padding: 8px 0;
+  gap: 8px;
+  padding: 7px 10px;
   background: #1e2836;
   border: 1px solid #2b3948;
-  border-radius: 10px;
+  border-radius: 8px;
   color: #dbe4ef;
   font: inherit;
+  font-size: 0.85rem;
+  text-align: left;
   touch-action: manipulation;
   cursor: pointer;
 }
 
-.arena-action:disabled {
-  opacity: 0.4;
+.arena-upgrade:disabled {
+  opacity: 0.35;
+  cursor: default;
 }
 
-.arena-action__icon {
-  font-size: 1.5rem;
+.arena-upgrade__icon {
+  font-size: 1.1rem;
   line-height: 1;
 }
 
-.arena-action__cost {
-  font-size: 0.8rem;
+.arena-upgrade__label {
+  flex: 1;
+}
+
+.arena-upgrade__cost {
   color: #ffd166;
   font-variant-numeric: tabular-nums;
 }
