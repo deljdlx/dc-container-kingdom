@@ -7,7 +7,7 @@ created: 2026-08-17 19:25
 ready: 2026-08-17 19:25
 doing: 2026-08-17 19:26
 verify: 2026-08-17 19:30
-done:
+done: 2026-08-17 19:35 (merge 014d8a4)
 ---
 
 ## Objectif
@@ -91,4 +91,4 @@ qu'à `y > 136`. Les deux fenêtres ne se recoupent pas.
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `014d8a4`.
