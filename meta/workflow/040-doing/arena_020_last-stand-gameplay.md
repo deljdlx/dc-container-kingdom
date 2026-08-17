@@ -6,7 +6,7 @@ branch: claude/last-stand
 created: 2026-08-17 18:10
 ready: 2026-08-17 18:25
 doing: 2026-08-17 18:26
-verify:
+verify: 2026-08-17 18:45
 done:
 ---
 
@@ -125,36 +125,99 @@ la lui voler.
 
 ## Definition of Done
 
-- [ ] Le pad **vise** et ne déplace plus ; le cap est **retenu** au relâchement.
-- [ ] Le tir est automatique, borné par un **cône** et une portée, et prend la
+- [x] Le pad **vise** et ne déplace plus ; le cap est **retenu** au relâchement.
+- [x] Le tir est automatique, borné par un **cône** et une portée, et prend la
       cible la plus proche — démontré à l'écran, cible hors cône ignorée.
-- [ ] **On ne peut pas tout couvrir** : mesuré, un joueur qui garde un cap fixe
+- [x] **On ne peut pas tout couvrir** : mesuré, un joueur qui garde un cap fixe
       finit par se faire toucher.
-- [ ] Le héros a des PV, les perd au contact, et la partie se termine à zéro.
-- [ ] Les vagues montent en intensité ; la **boutique entre les vagues** modifie
+- [x] Le héros a des PV, les perd au contact, et la partie se termine à zéro.
+- [x] Les vagues montent en intensité ; la **boutique entre les vagues** modifie
       réellement le tir.
-- [ ] Le gameplay des couloirs est **supprimé**, pas désactivé.
-- [ ] **Zéro import** hors `src/engine/index.js` ; aucun lien avec Container
+- [x] Le gameplay des couloirs est **supprimé**, pas désactivé.
+- [x] **Zéro import** hors `src/engine/index.js` ; aucun lien avec Container
       Kingdom.
-- [ ] Les manques du moteur rencontrés partent en candidats `100-follow-up/`.
-- [ ] `npm run verify` vert ; les quatre hôtes sans erreur console.
+- [x] Les manques du moteur rencontrés partent en candidats `100-follow-up/`.
+- [x] `npm run verify` vert ; les quatre hôtes sans erreur console.
 
 ## Suite
 
-_Rempli à la clôture._
-
--
+- **Un manque déposé, et c'est le plus intéressant de la série** : les entrées
+  directionnelles déplacent *toujours* le joueur. Le viewport est le seul endroit
+  du moteur où un comportement est câblé en dur alors que tout le reste passe par
+  des behaviors composables.
+- **L'équilibrage est un premier jet, pas un réglage fin.** Les vagues montent
+  linéairement, les coûts sont fixes, il n'y a pas de courbe. À reprendre quand
+  le jeu méritera d'être joué longtemps.
+- **La tranche de combat** (`2026-08-08_17-58`) a maintenant sa matière : des PV
+  de héros, des PV d'assaillants, des dégâts et une mort, tous tenus dans des
+  `Map` de ce fichier. C'est ce qu'elle doit remplacer par le contrat du moteur.
+- Ce que le jeu n'a toujours pas, et qui n'est pas un manque du moteur : du son,
+  un écran-titre, une raison de rejouer autre que le score.
 
 ## Journal
 
 ### Travail
 
--
+- [2026-08-17 18:26] Branche `claude/last-stand`. Le gameplay des couloirs est
+  **supprimé** — plantes, graines, coût de pose, ligne au sol. `src/arena/` garde
+  sa coquille (entrée vite, HUD, pad tactile, overlay) et change de moteur de jeu.
+- [2026-08-17 18:35] La visée : `DirectionalInput.getVector()` lu comme un cap et
+  **retenu** — relâcher ne remet pas à zéro. Le cône se teste par produit
+  scalaire, après un élagage par rectangle du moteur : demander une requête
+  conique au moteur aurait été une fonctionnalité que rien ne mesure.
+- [2026-08-17 18:38] La boutique entre les vagues, cinq améliorations, plus un
+  écran de fin et un rejeu. `every()` porte la cadence de tir et l'apparition.
 
 ### Vérification
 
--
+`npm run verify` vert : **71 fichiers, 623 tests**. Les quatre hôtes répondent et
+se chargent sans erreur console. Frontière prouvée par grep : un seul `import`
+dans `src/arena/`, celui du baril ; aucun lien avec Container Kingdom.
+
+**Un bug qui a invalidé toutes mes mesures, et qu'il faut raconter dans l'ordre.**
+
+Les trois premières campagnes d'équilibrage disaient « cap figé au nord, quarante
+secondes, **zéro dégât** » — le jeu se jouait tout seul. J'ai d'abord accusé la
+géométrie (à raison, partiellement), puis la densité. Ce n'est qu'en regardant
+les positions que la vérité est sortie : les assaillants étaient à **y = −4351**,
+loin au-dessus de la carte. **Le héros marchait.** Le `Viewport` déplace le
+personnage principal dès qu'une direction est tenue ; lire le vecteur comme une
+visée ne défait pas ce couplage. Il sortait par le haut, la vague à ses trousses,
+et bien sûr personne ne le touchait.
+
+Contourné par `hero.moveSpeed(0)` — la boucle dépense `dt × moveSpeed` — et
+**déposé en candidat**, parce que c'est un effet de bord et pas une intention.
+
+**L'équilibrage, une fois les mesures valides.** Le critère du ticket est « on ne
+peut pas tout couvrir ». Il a fallu trois corrections pour l'obtenir, chacune
+mesurée :
+
+| | cap figé au nord |
+|---|---|
+| convergence dès la naissance, arc 90°, portée 150 | **survit ≥ 60 s, 0 dégât** |
+| descente puis rabattement, portée 116 | survit, vague 13 |
+| + arc ramené à **60°** | **mort à 33 s, vague 1** |
+
+Le calcul qui a tranché : un corps tombant dans la colonne extérieure entre en
+**portée** alors qu'il n'est encore qu'à 38° de l'axe — donc dans un cône de 90°,
+mais hors d'un cône de 60°. La géométrie décidait, pas l'intuition.
+
+**Et jouer doit payer** — mesuré avec un pilote simulé qui réoriente vers la
+menace la plus proche deux fois par seconde :
+
+| | sans achat | avec achats |
+|---|---|---|
+| cap figé | mort à **33 s** (vague 1) | mort à **54 s** (vague 2) |
+| visée active | mort à **155 s** (vague 5) | survit 200 s (vague 8) |
+
+Soit **4,7× plus longtemps en jouant qu'en subissant**, et acheter ne sauve pas
+un joueur passif : c'est l'ordre voulu.
+
+Dernier réglage, trouvé en mesurant : l'amélioration « Arc » non bornée poussait
+le cône **au-delà de 180°** en quatre achats — le héros couvrait de nouveau tout
+le terrain, et la propriété qui fait ce jeu se revendait contre de l'or. Plafonnée
+à 120°.
 
 ### Validation
 
--
+- Fusionné sur `main` en `--no-ff`.
