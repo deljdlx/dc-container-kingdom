@@ -7,7 +7,7 @@ created: 2026-08-17 18:10
 ready: 2026-08-17 18:25
 doing: 2026-08-17 18:26
 verify: 2026-08-17 18:45
-done:
+done: 2026-08-17 18:50 (merge 11ff7f4)
 ---
 
 ## Objectif
@@ -220,4 +220,4 @@ le terrain, et la propriété qui fait ce jeu se revendait contre de l'or. Plafo
 
 ### Validation
 
-- Fusionné sur `main` en `--no-ff`.
+- Fusionné sur `main` en `--no-ff` : `11ff7f4`.
