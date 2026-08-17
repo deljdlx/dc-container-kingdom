@@ -94,6 +94,22 @@ const RANGE_BASE = 132;
 const FIRE_INTERVAL_BASE = 380;
 const SHOT_SPEED = 220;
 const SHOT_SIZE = { width: 6, height: 6 };
+// Inside this radius, facing stops mattering: anything this close is a valid
+// target whatever the aim.
+//
+// A cone of fixed ANGLE is a knife at close range — at 25 px, ±30° is only ±14 px
+// of lateral tolerance, and they converge off-axis. Measured over a minute with
+// the aim held north: **0 %** of the attackers within 80 px were ever inside the
+// cone, at any range band. The hero could not shoot what was eating him, which
+// is both maddening and physically silly — you do not need to *face* something
+// pressed against you.
+//
+// Barely past the contact radius (22), and the tightness is the point. At 46 it
+// became a bubble: a passive hero simply let the wave walk into it and shot
+// everything at leisure, surviving to wave 6 without ever turning — the core
+// property, sold back for comfort. At 30 he can always answer what is biting
+// him, and nothing else: the crowd closing at 40-80 px still has to be faced.
+const POINT_BLANK = 30;
 const HERO_HP = 10;
 const CONTACT_RADIUS = 22;
 const CONTACT_INTERVAL = 850;   // how often a body in contact hurts
@@ -103,10 +119,20 @@ const CONTACT_INTERVAL = 850;   // how often a body in contact hurts
 // with five attackers visible on screen — which reads exactly like «he stopped
 // firing», and was reported as such. Dead time is a bug even when every part
 // works.
+// Tough enough that point-blank fire alone cannot keep up. That is what makes
+// aiming matter: with 2 hit points they died as fast as they arrived, and a hero
+// who never turned scored the same as one who tracked every threat — the cone had
+// become decoration. The seconds spent shooting them *during their descent* are
+// the difference, and those seconds are only available to a hero who faces them.
+//
+// These numbers are a **middle**, not a settled balance. They were tuned against
+// a simulated pilot that re-aims at the nearest threat twice a second, which
+// thrashes and wastes shots — a poor yardstick for a human, and one that pushed
+// the values harder than a person would need. To be re-judged by playing.
 const ATTACKERS = [
-  { Class: Man01, hp: 2, speed: 30, bounty: 5 },
-  { Class: Man02, hp: 4, speed: 21, bounty: 12 },
-  { Class: Man03, hp: 3, speed: 44, bounty: 8 },
+  { Class: Man01, hp: 3, speed: 30, bounty: 5 },
+  { Class: Man02, hp: 6, speed: 21, bounty: 12 },
+  { Class: Man03, hp: 4, speed: 44, bounty: 8 },
 ];
 
 const UPGRADES = [
@@ -231,8 +257,9 @@ function targetInArc() {
       continue;
     }
     // Inside the cone: the angle between the aim and the target, read off the
-    // dot product of two unit vectors.
-    if ((dx / distance) * aim.x + (dy / distance) * aim.y < cosineLimit) {
+    // dot product of two unit vectors. Point-blank targets skip the test.
+    if (distance > POINT_BLANK
+      && (dx / distance) * aim.x + (dy / distance) * aim.y < cosineLimit) {
       continue;
     }
     if (distance < bestDistance) {
