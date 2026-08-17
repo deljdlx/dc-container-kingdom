@@ -4,7 +4,7 @@ title: Le gameplay devient un dernier carré — un héros fixe qui oriente son 
 type: feat
 branch:
 created: 2026-08-17 18:10
-ready:
+ready: 2026-08-17 18:25
 doing:
 verify:
 done:
