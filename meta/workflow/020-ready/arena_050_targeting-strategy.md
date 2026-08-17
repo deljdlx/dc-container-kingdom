@@ -4,7 +4,7 @@ title: Monter le ciblage sur une stratégie interchangeable
 type: refactor
 branch:
 created: 2026-08-17 20:55
-ready:
+ready: 2026-08-17 21:19
 doing:
 verify:
 done:
