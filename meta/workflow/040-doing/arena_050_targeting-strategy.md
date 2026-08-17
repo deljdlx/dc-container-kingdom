@@ -2,10 +2,10 @@
 id: 2026-08-17_20-55
 title: Monter le ciblage sur une stratégie interchangeable
 type: refactor
-branch:
+branch: claude/targeting-strategy
 created: 2026-08-17 20:55
 ready: 2026-08-17 21:19
-doing:
+doing: 2026-08-17 21:20
 verify:
 done:
 ---
