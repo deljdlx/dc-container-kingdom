@@ -86,18 +86,27 @@ const ARC = Math.PI / 3;
 // falling**, when they are almost due north of him and therefore inside any
 // north-facing cone — measured: sixty seconds, zero damage. At 100 the far
 // column only comes into range once it is 46° off his axis, i.e. outside it.
-const RANGE_BASE = 116;
-const FIRE_INTERVAL_BASE = 450;
+// 132, and the ceiling is 144: past that a body in the outermost column comes
+// into range while it is still inside a 60° cone aimed north, and the flanks
+// stop being flanks. Reaction time is bought right up to that wall, not through
+// it.
+const RANGE_BASE = 132;
+const FIRE_INTERVAL_BASE = 380;
 const SHOT_SPEED = 220;
 const SHOT_SIZE = { width: 6, height: 6 };
 const HERO_HP = 10;
 const CONTACT_RADIUS = 22;
 const CONTACT_INTERVAL = 850;   // how often a body in contact hurts
 
+// Fast enough that the hero is not left idle. At half these speeds a body took
+// thirteen seconds to fall into range, and the hero stood there doing nothing
+// with five attackers visible on screen — which reads exactly like «he stopped
+// firing», and was reported as such. Dead time is a bug even when every part
+// works.
 const ATTACKERS = [
-  { Class: Man01, hp: 2, speed: 15, bounty: 5 },
-  { Class: Man02, hp: 5, speed: 10, bounty: 12 },
-  { Class: Man03, hp: 3, speed: 24, bounty: 8 },
+  { Class: Man01, hp: 2, speed: 30, bounty: 5 },
+  { Class: Man02, hp: 4, speed: 21, bounty: 12 },
+  { Class: Man03, hp: 3, speed: 44, bounty: 8 },
 ];
 
 const UPGRADES = [
@@ -302,7 +311,7 @@ function spawnAttacker() {
   const tier = Math.min(ATTACKERS.length, 1 + Math.floor(game.wave / 2));
   const kind = ATTACKERS[Math.floor(Math.random() * tier)];
   const x = 8 + Math.random() * (WORLD_W - 64);
-  const attacker = board.spawn(new kind.Class(), Math.round(x), -48);
+  const attacker = board.spawn(new kind.Class(), Math.round(x), -32);
   attacker.setDirection('down');
   attacker.getCollisionZones('collision').forEach(zone => zone.layer(ENEMY));
 
@@ -313,7 +322,7 @@ function spawnAttacker() {
   // the host banks its own. Filed as a gap.
   game.attackers.set(attacker, {
     hp: kind.hp, speed: kind.speed, bounty: kind.bounty,
-    x, y: -48, contact: 0,
+    x, y: -32, contact: 0,
   });
 }
 
@@ -402,7 +411,7 @@ function startWave() {
 
   // Density is the other half of «you cannot cover everything»: a thin trickle
   // is dealt with one body at a time, whatever the geometry says.
-  const interval = Math.max(260, 1150 - game.wave * 75);
+  const interval = Math.max(220, 850 - game.wave * 60);
   game.spawnTask = scheduler.every(interval, () => {
     if (game.remaining <= 0) {
       game.spawnTask.cancel();
