@@ -1,26 +1,27 @@
 /**
- * Arena — a portrait lane defence, built on the RPG engine.
+ * Arena — a last stand, built on the RPG engine.
  *
  * The engine's fourth host, and the first that is a **game**: the other three
  * demonstrate it. Nothing here reaches into the engine's internals — the only
  * import is its public barrel, which is what makes the boundary a proof rather
  * than a claim.
  *
- * Deliberately, the game's own state (hit points, costs, scores) is **local to
+ * One hero, planted at the bottom of the field. **The pad does not move him: it
+ * aims.** He fires on his own, at the nearest target *inside the arc he faces*,
+ * so turning your back on a flank is letting it through. That single decision —
+ * which threat to cover, and which to accept — is the whole game.
+ *
+ * Deliberately, the game's own state (hit points, damage, score) is **local to
  * this file**: no `blueprint`, no `data`, no engine event. Replacing that
  * bookkeeping with the engine's contract is the next ticket, and the friction of
  * doing so is the measurement.
  */
 import {
   Application,
-  Element,
   Man01,
   Man02,
   Man03,
-  Sunflower00,
-  Toadstool01,
   SpritePainter,
-  FootstepDust,
   setAssetsBase,
   applyDebugFlag,
 } from '../engine/index.js';
@@ -29,33 +30,28 @@ applyDebugFlag();
 setAssetsBase('/engine/images');
 
 // ── The field ────────────────────────────────────────────────────────────────
-// Vertical lanes: in portrait the screen gives HEIGHT, and a defence needs
-// DEPTH — the time an attacker takes to cross is the game. Lanes running down
-// also mean the axis of progress is the axis of depth, so the painter's
-// algorithm sorts attackers in front of the plants they walk past for free.
-const CELL = 32;
-const COLUMNS = 4;
-const ROWS = 10;
-const WORLD_W = COLUMNS * CELL;
-const WORLD_H = ROWS * CELL;
+// Portrait, one screen, no scrolling: the hero stands at the bottom and they
+// come down at him. Depth is what gives him time to fire, which is why the field
+// is tall — and since progress is downwards, the painter's algorithm sorts the
+// wave for free.
+const WORLD_W = 208;
+const WORLD_H = 288;
+const HERO = { x: Math.round(WORLD_W / 2 - 24), y: WORLD_H - 72 };
 
-/** The line they must not cross, in world coordinates. */
-const BREACH_Y = WORLD_H;
+// They **descend before they close in**, and that is the difference between a
+// game and a demo. Converging from birth put every approach inside a 34° pencil
+// — measured — so a hero facing north covered the whole field and took no damage
+// in forty seconds. Falling straight down first means the one born on the far
+// left arrives from due **west**: an angle the north-facing cone cannot hold.
+const ENGAGE_OFFSET = 40;
 
-// Scale the board up: 32 px sprites are unplayable at 1:1 on a phone. The
-// viewport is sized in CSS pixels, the transform does the zoom.
-//
 // Fitting on **both** axes matters more than it sounds: sized on width alone,
-// the board grew taller than the window and pushed its own HUD and pad off the
-// screen — on a phone, where neither can be scrolled to.
-const CHROME = 260;   // HUD, pad and hint, in CSS pixels
-const available = {
-  width: Math.min(window.innerWidth - 16, 460),
-  height: window.innerHeight - CHROME,
-};
-const scale = Math.max(1.4, Math.min(3.4,
-  available.width / WORLD_W,
-  available.height / WORLD_H,
+// the board grew taller than the window and pushed its own HUD off the screen —
+// on a phone, where you cannot scroll to find it.
+const CHROME = 250;
+const scale = Math.max(1.4, Math.min(3.6,
+  Math.min(window.innerWidth - 16, 460) / WORLD_W,
+  (window.innerHeight - CHROME) / WORLD_H,
 ));
 document.documentElement.style.setProperty('--arena-width', `${Math.round(WORLD_W * scale)}px`);
 
@@ -69,214 +65,226 @@ board.initialize();
 viewport.getTransform().scale(scale);
 
 // ── Layers ───────────────────────────────────────────────────────────────────
-// What each thing IS, and what it may touch. This is what replaces naming
-// individuals: attackers walk through each other and through the hero (contact
-// is damage, not a wall), everything is stopped by the edges, and a pea ignores
-// the plant that fired it without anyone being excluded by name.
-const WALL = 'wall';
+// What each thing IS. Attackers are *labelled* rather than masked: their walk is
+// scripted (they steer at the hero by assignment), so they never ask the
+// collision system anything. The layer is what lets shots and queries find them.
 const ENEMY = 'enemy';
-const TOWER = 'tower';
-const PLAYER = 'player';
+const HERO_LAYER = 'hero';
+
+// ── Tuning ───────────────────────────────────────────────────────────────────
+// The one number that decides whether this is a game: the arc must NOT let the
+// hero cover everything.
+//
+// 90° was the first guess and it failed, arithmetically. A body falling down the
+// outermost column enters **range** while it is still only 38° off his axis —
+// inside a 90° cone — so facing north covered the whole field and survived
+// thirteen waves without a scratch. At 60° the same body is out of the cone for
+// as long as it is in range: the flanks are genuinely unreachable, and buying
+// «Arc» buys something real.
+const ARC = Math.PI / 3;
+// Short on purpose. At 150 he reached the outer columns **while they were still
+// falling**, when they are almost due north of him and therefore inside any
+// north-facing cone — measured: sixty seconds, zero damage. At 100 the far
+// column only comes into range once it is 46° off his axis, i.e. outside it.
+const RANGE_BASE = 116;
+const FIRE_INTERVAL_BASE = 450;
+const SHOT_SPEED = 220;
+const SHOT_SIZE = { width: 6, height: 6 };
+const HERO_HP = 10;
+const CONTACT_RADIUS = 22;
+const CONTACT_INTERVAL = 850;   // how often a body in contact hurts
+
+const ATTACKERS = [
+  { Class: Man01, hp: 2, speed: 15, bounty: 5 },
+  { Class: Man02, hp: 5, speed: 10, bounty: 12 },
+  { Class: Man03, hp: 3, speed: 24, bounty: 8 },
+];
+
+const UPGRADES = [
+  { icon: '⚡', label: 'Fire rate', cost: 40, apply: () => { stats.fireInterval *= 0.82; } },
+  { icon: '🗡️', label: 'Damage', cost: 55, apply: () => { stats.damage += 1; } },
+  // Capped at 120°, and the cap is the point: uncapped, four purchases took the
+  // cone past 180° and the hero covered the field again — the one property this
+  // game is built on, sold back for gold.
+  { icon: '📐', label: 'Arc', cost: 45, apply: () => { stats.arc = Math.min(Math.PI * 2 / 3, stats.arc * 1.18); } },
+  { icon: '🎯', label: 'Range', cost: 35, apply: () => { stats.range *= 1.15; } },
+  { icon: '❤️', label: 'Repair', cost: 30, apply: () => { stats.hp = Math.min(stats.maxHp, stats.hp + 4); } },
+];
 
 // ── State, deliberately local to the host ────────────────────────────────────
-const COST = { seeder: 25, shooter: 50 };
-const SEED_START = 50;
-const SEED_INTERVAL = 5000;
-const SEED_YIELD = 25;
-const SHOOTER_INTERVAL = 1400;
-const PEA_SPEED = 90;
-const PEA_DAMAGE = 1;
-const CHEW_INTERVAL = 900;
-
+const stats = {};
 const game = {
   running: false,
-  seeds: SEED_START,
+  wave: 0,
+  gold: 0,
   score: 0,
-  wave: 1,
-  towers: new Map(),      // element → { kind, hp, tasks: [] }
-  attackers: new Map(),   // element → { hp, speed, chewing, elapsed }
-  edges: [],
-  waveTask: null,
+  attackers: new Map(),   // element → { hp, speed, bounty, x, y, contact }
   spawnTask: null,
+  fireTask: null,
+  remaining: 0,
 };
 
+/** Where the hero looks, as a unit vector. Remembered: releasing keeps the aim. */
+const aim = { x: 0, y: -1 };
+
 const dom = {
-  seeds: document.querySelector('#seeds'),
+  hp: document.querySelector('#hp'),
   wave: document.querySelector('#wave'),
   score: document.querySelector('#score'),
+  gold: document.querySelector('#gold'),
   overlay: document.querySelector('#overlay'),
   overlayTitle: document.querySelector('#overlay-title'),
   overlayText: document.querySelector('#overlay-text'),
-  restart: document.querySelector('#restart'),
-  seeder: document.querySelector('#plant-seeder'),
-  shooter: document.querySelector('#plant-shooter'),
+  shop: document.querySelector('#shop'),
+  action: document.querySelector('#overlay-action'),
 };
 
-function refreshHud() {
-  dom.seeds.textContent = `🌱 ${game.seeds}`;
-  dom.wave.textContent = `Wave ${game.wave}`;
-  dom.score.textContent = String(game.score);
-  dom.seeder.disabled = game.seeds < COST.seeder;
-  dom.shooter.disabled = game.seeds < COST.shooter;
-}
-
 // ── Surfaces and the hero ────────────────────────────────────────────────────
-// The FX canvas first: everything temporary is painted there, peas included.
 viewport.enableParticles();
 const sprites = viewport.getParticles().addPainter(new SpritePainter());
 
-buildEdges();
-viewport.enableMainCharacter(CELL, WORLD_H - CELL * 2);
+viewport.enableMainCharacter(HERO.x, HERO.y);
 const hero = viewport.getCharacter();
-hero.moveSpeed(110);
+hero.getCollisionZones('collision').forEach(zone => zone.layer(HERO_LAYER));
 
-// One fixed screen: the camera is parked instead of following the hero — a lane
-// defence has nothing to scroll to. It must be parked **after**
-// `enableMainCharacter`, which makes the camera follow the player it creates.
-//
-// And parking it is not only a taste here: the camera centres its target using
-// the viewport's size in **CSS pixels** while the world is drawn through a
-// ×2.7 transform, so a zoomed host gets a centring that is off by the zoom
-// factor — the hero landed at the very bottom edge, out of sight until it
-// moved. Noted as a gap; parking the camera side-steps it entirely.
-// `moveTo` alone is not enough: it moves the camera but does not stop it
-// following, so the target overwrites the position on the very next frame.
-// Letting go of the target has no name of its own — it is `follow(null)`.
+// **He must not walk.** The viewport moves the player character whenever a
+// direction is held — that coupling is built into the loop, and reading the
+// vector as an aim does not undo it: the hero strolled off the top of the map
+// with the wave in tow, which is how this was found. Zero speed is the only
+// lever a host has, and it works because the loop spends `dt × moveSpeed`.
+// Filed as a gap: an input with no walking attached has no name.
+hero.moveSpeed(0);
+
+// The camera is parked rather than following: a last stand has nothing to scroll
+// to. `follow(null)` comes first — `moveTo` alone does not let go of the target,
+// so the position would be overwritten on the very next frame.
 viewport.getCamera().follow(null).moveTo(0, 0);
-// Only the edges stop the hero: attackers and plants are walked over, and that
-// is a mask, not a special case in the movement code.
-hero.getCollisionZones('collision').forEach(zone => {
-  zone.layer(PLAYER);
-  zone.mask([WALL]);
-});
-viewport.addBehavior(new FootstepDust(viewport.getGroundParticles(), {
-  follow: hero,
-  offset: { x: 16, y: 30 },
-}));
 
-// ── Building the field ───────────────────────────────────────────────────────
+/** @returns {{x: number, y: number}} the hero's centre, in world coordinates */
+function heroCentre() {
+  return { x: hero.x() + 24, y: hero.y() + 30 };
+}
+
+// ── Aiming ───────────────────────────────────────────────────────────────────
+// `DirectionalInput` already turns held keys into a **unit** vector, diagonals
+// included. Read as an aim rather than as a walk, it is the whole control
+// scheme — and it is remembered, so letting go keeps the heading.
+//
+// The sprite has only four faces (`up`/`down`/`left`/`right`), so the arc is
+// continuous while the drawing snaps to the nearest of the four: aiming
+// up-and-left shows a hero in profile. Accepted; an eight-faced sheet does not
+// exist, and inventing one is not this ticket.
+viewport.addBehavior({
+  update() {
+    const vector = viewport.getInput().getVector();
+    if (vector.x === 0 && vector.y === 0) {
+      return;
+    }
+    aim.x = vector.x;
+    aim.y = vector.y;
+    hero.setDirection(Math.abs(vector.x) > Math.abs(vector.y)
+      ? (vector.x > 0 ? 'right' : 'left')
+      : (vector.y > 0 ? 'down' : 'up'));
+    hero.getRenderer().update();
+  },
+});
 
 /**
- * A solid, invisible edge. The hero is stopped by these and by nothing else —
- * not by plants, not by attackers — which is a **mask**, not a special case in
- * the movement code.
- * @param {number} x world
- * @param {number} y world
- * @param {number} width
- * @param {number} height
+ * The nearest attacker inside the aimed cone.
+ *
+ * The world is asked by **rectangle** — that is what the engine prunes on — and
+ * the cone is applied here, by angle. Asking the engine for a conical query
+ * would be a feature nobody has measured a need for.
+ * @returns {?{element: Object, at: {x: number, y: number}}}
  */
-function addEdge(x, y, width, height) {
-  const edge = new Element(0, 0, width, height);
-  edge.createCollisionZone(0, 0, width, height, 'collision', { layer: WALL });
-  board.spawn(edge, x, y);
-  game.edges.push(edge);
-}
+function targetInArc() {
+  const from = heroCentre();
+  const reach = stats.range;
+  const candidates = board.query({
+    x0: from.x - reach, y0: from.y - reach,
+    x1: from.x + reach, y1: from.y + reach,
+  }, { mask: [ENEMY] });
 
-/** Left, right and bottom: nothing walks off the field. */
-function buildEdges() {
-  addEdge(-CELL, -CELL * 3, CELL, WORLD_H + CELL * 4);        // left
-  addEdge(WORLD_W, -CELL * 3, CELL, WORLD_H + CELL * 4);      // right
-  addEdge(-CELL, WORLD_H - 4, WORLD_W + CELL * 2, CELL);      // bottom
-}
+  const cosineLimit = Math.cos(stats.arc / 2);
+  let best = null;
+  let bestDistance = Infinity;
 
-/** @returns {number} the column (0…COLUMNS-1) a world x falls in */
-function columnAt(x) {
-  return Math.max(0, Math.min(COLUMNS - 1, Math.floor(x / CELL)));
-}
-
-/** @returns {number} the row a world y falls in */
-function rowAt(y) {
-  return Math.max(0, Math.min(ROWS - 1, Math.floor(y / CELL)));
-}
-
-/** @returns {?{x: number, y: number}} the free cell the hero stands on */
-function cellUnderHero() {
-  const column = columnAt(hero.x() + 16);
-  const row = rowAt(hero.y() + 24);
-  const x = column * CELL;
-  const y = row * CELL;
-  const taken = [...game.towers.keys()].some(
-    tower => columnAt(tower.x() + 16) === column && rowAt(tower.y() + 16) === row,
-  );
-
-  return taken ? null : { x, y };
-}
-
-// ── Towers ───────────────────────────────────────────────────────────────────
-
-const TOWER_KINDS = {
-  seeder: { Class: Sunflower00, hp: 4 },
-  shooter: { Class: Toadstool01, hp: 3 },
-};
-
-function plant(kind) {
-  if (!game.running || game.seeds < COST[kind]) {
-    return;
+  for (const element of candidates) {
+    const record = game.attackers.get(element);
+    if (!record) {
+      continue;
+    }
+    const at = { x: record.x + 24, y: record.y + 30 };
+    const dx = at.x - from.x;
+    const dy = at.y - from.y;
+    const distance = Math.hypot(dx, dy);
+    if (distance > reach || distance === 0) {
+      continue;
+    }
+    // Inside the cone: the angle between the aim and the target, read off the
+    // dot product of two unit vectors.
+    if ((dx / distance) * aim.x + (dy / distance) * aim.y < cosineLimit) {
+      continue;
+    }
+    if (distance < bestDistance) {
+      bestDistance = distance;
+      best = { element, at };
+    }
   }
-  const cell = cellUnderHero();
-  if (!cell) {
-    return;
-  }
-  game.seeds -= COST[kind];
 
-  const { Class, hp } = TOWER_KINDS[kind];
-  const tower = board.spawn(new Class(), cell.x, cell.y);
-  tower.getCollisionZones('collision').forEach(zone => zone.layer(TOWER));
-  const record = { kind, hp, tasks: [] };
-  game.towers.set(tower, record);
-
-  // `every` on the game clock: a pause freezes production and fire alike, and
-  // `{ owner }` means a destroyed plant takes its schedule with it.
-  if (kind === 'seeder') {
-    record.tasks.push(scheduler.every(SEED_INTERVAL, () => {
-      game.seeds += SEED_YIELD;
-      pop(tower.x() + 16, tower.y() + 8, '#ffd166');
-      refreshHud();
-    }, { owner: tower }));
-  } else {
-    record.tasks.push(scheduler.every(SHOOTER_INTERVAL, () => fire(tower), { owner: tower }));
-  }
-  refreshHud();
+  return best;
 }
 
-function destroyTower(tower) {
-  const record = game.towers.get(tower);
-  record?.tasks.forEach(task => task.cancel());
-  game.towers.delete(tower);
-  board.despawn(tower);
-}
-
-// ── Peas ─────────────────────────────────────────────────────────────────────
+// ── Shots ────────────────────────────────────────────────────────────────────
 // Temporary by design, so they are painted on the canvas and never enter the
 // scene graph — the engine's routing rule. Detection does not care: `sweep()`
 // speaks in world rectangles, not in elements.
 
-const PEA_SIZE = { width: 6, height: 6 };
+function fire() {
+  const target = targetInArc();
+  if (!target) {
+    return;
+  }
+  const from = heroCentre();
+  const dx = target.at.x - from.x;
+  const dy = target.at.y - from.y;
+  const distance = Math.hypot(dx, dy) || 1;
+  const step = { x: dx / distance, y: dy / distance };
 
-function fire(tower) {
-  const from = { x: tower.x() + 16, y: tower.y() + 10 };
-  const pea = sprites.add({ ...from, width: 6, height: 6, color: '#c9f27b', shape: 'circle' });
-  const travel = from.y + CELL;   // it flies up out of the field
-  const flight = scheduler.tween(travel / PEA_SPEED * 1000, progress => {
-    const y = from.y - progress * travel;
-    const corner = { x: pea.x - 3, y: pea.y - 3 };
-    const hit = board.sweep(corner, { x: corner.x, y: y - 3 }, PEA_SIZE, { mask: [ENEMY] });
+  const shot = sprites.add({ ...from, width: 6, height: 6, color: '#ffe08a', shape: 'circle' });
+  // A little past the aim point, so a body that kept walking is still met.
+  const flightTime = (distance + 40) / SHOT_SPEED * 1000;
+  const travel = distance + 40;
+
+  const flight = scheduler.tween(flightTime, progress => {
+    const to = {
+      x: from.x + step.x * travel * progress,
+      y: from.y + step.y * travel * progress,
+    };
+    const hit = board.sweep(
+      { x: shot.x - 3, y: shot.y - 3 },
+      { x: to.x - 3, y: to.y - 3 },
+      SHOT_SIZE,
+      { mask: [ENEMY] },
+    );
+
     if (hit) {
       flight.cancel();
-      sprites.remove(pea);
-      damage(hit.element, PEA_DAMAGE, hit.at);
+      sprites.remove(shot);
+      damage(hit.element, stats.damage, { x: hit.at.x + 3, y: hit.at.y + 3 });
 
       return;
     }
-    pea.y = y;
+    shot.x = to.x;
+    shot.y = to.y;
     if (progress >= 1) {
-      sprites.remove(pea);
+      sprites.remove(shot);
     }
   });
 }
 
-/** A short bloom on the canvas — an impact, a harvest. */
-function pop(x, y, color, size = 10) {
+/** A short bloom on the canvas — an impact, a death, a wound. */
+function pop(x, y, color, size = 12) {
   const blast = sprites.add({ x, y, width: 4, height: 4, color, shape: 'circle' });
   scheduler.tween(240, progress => {
     blast.width = 4 + progress * size;
@@ -288,32 +296,25 @@ function pop(x, y, color, size = 10) {
   });
 }
 
-// ── Attackers ────────────────────────────────────────────────────────────────
-
-const ATTACKER_KINDS = [
-  { Class: Man01, hp: 2, speed: 14 },
-  { Class: Man02, hp: 4, speed: 10 },
-  { Class: Man03, hp: 3, speed: 20 },
-];
+// ── The wave ─────────────────────────────────────────────────────────────────
 
 function spawnAttacker() {
-  const kind = ATTACKER_KINDS[Math.min(
-    ATTACKER_KINDS.length - 1,
-    Math.floor(Math.random() * Math.min(game.wave, ATTACKER_KINDS.length)),
-  )];
-  const column = Math.floor(Math.random() * COLUMNS);
-  const attacker = board.spawn(new kind.Class(), column * CELL, -CELL);
+  const tier = Math.min(ATTACKERS.length, 1 + Math.floor(game.wave / 2));
+  const kind = ATTACKERS[Math.floor(Math.random() * tier)];
+  const x = 8 + Math.random() * (WORLD_W - 64);
+  const attacker = board.spawn(new kind.Class(), Math.round(x), -48);
   attacker.setDirection('down');
-  // Labelled, not masked: a lane walker's movement is **scripted** (it advances
-  // down its column by assignment), so it never asks the collision system
-  // anything. The layer is what lets peas and the tower query find it.
   attacker.getCollisionZones('collision').forEach(zone => zone.layer(ENEMY));
-  // `y` is kept here as a FLOAT. Writing a position rounds it to the pixel
-  // (`Coordinates`), so an attacker crossing at 14 px/s would advance 0,23 px a
+
+  // `x`/`y` are kept here as FLOATS. Writing a position rounds it to the pixel
+  // (`Coordinates`), so a body closing in at 15 px/s would advance 0,25 px a
   // frame, round back to where it was, and stand still for ever. The viewport
   // banks that remainder for the player; nothing offers it to anyone else, so
-  // the host banks its own. Noted as a gap.
-  game.attackers.set(attacker, { hp: kind.hp, speed: kind.speed, chewed: 0, y: -CELL });
+  // the host banks its own. Filed as a gap.
+  game.attackers.set(attacker, {
+    hp: kind.hp, speed: kind.speed, bounty: kind.bounty,
+    x, y: -48, contact: 0,
+  });
 }
 
 function damage(attacker, amount, at) {
@@ -322,27 +323,31 @@ function damage(attacker, amount, at) {
     return;
   }
   record.hp -= amount;
-  pop(at?.x ?? attacker.x() + 16, at?.y ?? attacker.y() + 16, '#c9f27b', 8);
+  pop(at.x, at.y, '#ffe08a', 8);
 
-  if (record.hp <= 0) {
-    game.attackers.delete(attacker);
-    pop(attacker.x() + 16, attacker.y() + 20, '#ff8b6b', 22);
-    board.despawn(attacker);
-    game.score += 10;
-    refreshHud();
+  if (record.hp > 0) {
+    return;
+  }
+  game.attackers.delete(attacker);
+  pop(record.x + 24, record.y + 32, '#ff8b6b', 24);
+  board.despawn(attacker);
+  game.gold += record.bounty;
+  game.score += record.bounty;
+  refreshHud();
+
+  if (game.remaining === 0 && game.attackers.size === 0) {
+    endWave();
   }
 }
 
-/** The tower standing in the cell an attacker is about to enter, if any. */
-function towerAhead(attacker) {
-  const [found] = board.query({
-    x0: attacker.x() + 8,
-    y0: attacker.y() + 26,
-    x1: attacker.x() + 24,
-    y1: attacker.y() + 34,
-  }, { mask: [TOWER] });
-
-  return found ?? null;
+function hurtHero(amount) {
+  stats.hp -= amount;
+  const centre = heroCentre();
+  pop(centre.x, centre.y, '#ff5f5f', 20);
+  refreshHud();
+  if (stats.hp <= 0) {
+    lose();
+  }
 }
 
 // One behavior for the whole wave rather than one per attacker: they all do the
@@ -352,92 +357,163 @@ viewport.addBehavior({
     if (!game.running || dt <= 0) {
       return;
     }
-    for (const [attacker, record] of game.attackers) {
-      const blocker = towerAhead(attacker);
+    const centre = heroCentre();
 
-      if (blocker) {
-        record.chewed += dt;
-        if (record.chewed >= CHEW_INTERVAL) {
-          record.chewed = 0;
-          const tower = game.towers.get(blocker);
-          if (tower && --tower.hp <= 0) {
-            pop(blocker.x() + 16, blocker.y() + 16, '#8b6b4a', 18);
-            destroyTower(blocker);
+    for (const [attacker, record] of game.attackers) {
+      const dx = centre.x - (record.x + 24);
+      const dy = centre.y - (record.y + 30);
+      const distance = Math.hypot(dx, dy) || 1;
+
+      if (distance < CONTACT_RADIUS) {
+        record.contact += dt;
+        if (record.contact >= CONTACT_INTERVAL) {
+          record.contact = 0;
+          hurtHero(1);
+          if (!game.running) {
+            return;
           }
         }
         continue;
       }
 
       const step = record.speed * dt / 1000;
-      record.y += step;
-      attacker.y(record.y);    // rounded on the way in — the bank is above
-      attacker.update(step);   // feeds the walk animation, which runs on distance
-
-      if (record.y + CELL >= BREACH_Y) {
-        lose();
-
-        return;
+      if (record.y + 30 < centre.y - ENGAGE_OFFSET) {
+        record.y += step;                       // falling down its own column
+      } else {
+        record.x += dx / distance * step;       // closing in, from wherever it is
+        record.y += dy / distance * step;
       }
+      attacker.x(record.x);   // rounded on the way in — the bank is above
+      attacker.y(record.y);
+      attacker.update(step);  // feeds the walk animation, which runs on distance
     }
   },
 });
 
-// ── Waves ────────────────────────────────────────────────────────────────────
+// ── Waves, and the shop between them ─────────────────────────────────────────
 
-function startWaves() {
-  game.spawnTask = scheduler.every(3200, () => spawnAttacker());
-  game.waveTask = scheduler.every(20000, () => {
-    game.wave += 1;
-    game.spawnTask.cancel();
-    game.spawnTask = scheduler.every(Math.max(900, 3200 - game.wave * 320), () => spawnAttacker());
-    refreshHud();
+function startWave() {
+  game.wave += 1;
+  game.remaining = 3 + game.wave * 2;
+  game.running = true;
+  dom.overlay.hidden = true;
+  refreshHud();
+  clock.resume();
+
+  // Density is the other half of «you cannot cover everything»: a thin trickle
+  // is dealt with one body at a time, whatever the geometry says.
+  const interval = Math.max(260, 1150 - game.wave * 75);
+  game.spawnTask = scheduler.every(interval, () => {
+    if (game.remaining <= 0) {
+      game.spawnTask.cancel();
+
+      return;
+    }
+    game.remaining -= 1;
+    spawnAttacker();
   });
+  game.fireTask = scheduler.every(stats.fireInterval, () => fire());
 }
 
-// ── Losing, and starting over ────────────────────────────────────────────────
-
-function lose() {
+function endWave() {
   game.running = false;
+  game.spawnTask?.cancel();
+  game.fireTask?.cancel();
   clock.pause();
-  dom.overlayTitle.textContent = 'Breached';
-  dom.overlayText.textContent = `They got through on wave ${game.wave}. Score ${game.score}.`;
+
+  dom.overlayTitle.textContent = `Wave ${game.wave} held`;
+  dom.overlayText.textContent = `${game.gold} gold to spend.`;
+  dom.action.textContent = `Start wave ${game.wave + 1}`;
+  dom.shop.hidden = false;
+  renderShop();
   dom.overlay.hidden = false;
 }
 
+function renderShop() {
+  dom.shop.replaceChildren(...UPGRADES.map(upgrade => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'arena-upgrade';
+    button.disabled = game.gold < upgrade.cost;
+
+    const icon = document.createElement('span');
+    icon.className = 'arena-upgrade__icon';
+    icon.textContent = upgrade.icon;
+    const label = document.createElement('span');
+    label.className = 'arena-upgrade__label';
+    label.textContent = upgrade.label;
+    const cost = document.createElement('span');
+    cost.className = 'arena-upgrade__cost';
+    cost.textContent = String(upgrade.cost);
+    button.append(icon, label, cost);
+
+    button.addEventListener('click', () => {
+      if (game.gold < upgrade.cost) {
+        return;
+      }
+      game.gold -= upgrade.cost;
+      upgrade.apply();
+      dom.overlayText.textContent = `${game.gold} gold to spend.`;
+      refreshHud();
+      renderShop();
+    });
+
+    return button;
+  }));
+}
+
+function lose() {
+  game.running = false;
+  game.spawnTask?.cancel();
+  game.fireTask?.cancel();
+  clock.pause();
+
+  dom.overlayTitle.textContent = 'Overrun';
+  dom.overlayText.textContent = `They got you on wave ${game.wave}. Score ${game.score}.`;
+  dom.action.textContent = 'Play again';
+  dom.shop.hidden = true;
+  dom.overlay.hidden = false;
+}
+
+// ── HUD ──────────────────────────────────────────────────────────────────────
+
+function refreshHud() {
+  const hearts = Math.max(0, Math.ceil(stats.hp / 2));
+  dom.hp.textContent = hearts ? '❤️'.repeat(hearts) : '💀';
+  dom.wave.textContent = `Wave ${game.wave}`;
+  dom.score.textContent = String(game.score);
+  dom.gold.textContent = `🪙 ${game.gold}`;
+}
+
+// ── Starting over ────────────────────────────────────────────────────────────
+
 function reset() {
   [...game.attackers.keys()].forEach(attacker => board.despawn(attacker));
-  [...game.towers.keys()].forEach(tower => destroyTower(tower));
   game.attackers.clear();
   game.spawnTask?.cancel();
-  game.waveTask?.cancel();
+  game.fireTask?.cancel();
   sprites.clear();
 
-  game.seeds = SEED_START;
+  Object.assign(stats, {
+    hp: HERO_HP, maxHp: HERO_HP, damage: 1,
+    arc: ARC, range: RANGE_BASE, fireInterval: FIRE_INTERVAL_BASE,
+  });
+  game.wave = 0;
+  game.gold = 0;
   game.score = 0;
-  game.wave = 1;
-  game.running = true;
+  aim.x = 0;
+  aim.y = -1;
+  hero.setDirection('up');
+  hero.getRenderer().update();
 
-  hero.x(CELL);
-  hero.y(WORLD_H - CELL * 2);
-  dom.overlay.hidden = true;
   refreshHud();
-  startWaves();
-  clock.resume();
+  startWave();
 }
 
 // ── Input ────────────────────────────────────────────────────────────────────
 
 document.body.addEventListener('keydown', event => {
-  if (event.repeat) {
-    return;
-  }
-  if (event.code === 'KeyA') {
-    plant('seeder');
-  }
-  if (event.code === 'KeyE') {
-    plant('shooter');
-  }
-  if (event.code === 'KeyP') {
+  if (event.code === 'KeyP' && !event.repeat) {
     if (clock.isPaused()) {
       clock.resume();
     }
@@ -466,9 +542,14 @@ document.querySelectorAll('.arena-dpad__btn').forEach(button => {
   button.addEventListener('pointercancel', release);
 });
 
-dom.seeder.addEventListener('click', () => plant('seeder'));
-dom.shooter.addEventListener('click', () => plant('shooter'));
-dom.restart.addEventListener('click', () => reset());
+dom.action.addEventListener('click', () => {
+  if (stats.hp > 0) {
+    startWave();
+  }
+  else {
+    reset();
+  }
+});
 
 // ── Go ───────────────────────────────────────────────────────────────────────
 
