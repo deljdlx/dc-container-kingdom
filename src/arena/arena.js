@@ -25,6 +25,7 @@ import {
   setAssetsBase,
   applyDebugFlag,
 } from '../engine/index.js';
+import { STRATEGIES, pickTarget } from './targeting.js';
 
 applyDebugFlag();
 setAssetsBase('/engine/images');
@@ -167,6 +168,7 @@ const dom = {
   wave: document.querySelector('#wave'),
   score: document.querySelector('#score'),
   gold: document.querySelector('#gold'),
+  strategy: document.querySelector('#strategy'),
   overlay: document.querySelector('#overlay'),
   overlayTitle: document.querySelector('#overlay-title'),
   overlayText: document.querySelector('#overlay-text'),
@@ -225,26 +227,24 @@ viewport.addBehavior({
 });
 
 /**
- * The nearest attacker inside the aimed cone.
+ * Everything the host knows about what could be shot, as **plain data**.
  *
  * The world is asked by **rectangle** — that is what the engine prunes on — and
- * the cone is applied here, by angle. Asking the engine for a conical query
- * would be a feature nobody has measured a need for.
- * @returns {?{element: Object, at: {x: number, y: number}}}
+ * everything angular is left to `targeting.js`, which can then be tested without
+ * a board, a DOM or a running game. Asking the engine for a conical query would
+ * be a feature nobody has measured a need for.
+ * @returns {Array<Object>} candidates, eligible or not
  */
-function targetInArc() {
+function gatherCandidates() {
   const from = heroCentre();
   const reach = stats.range;
-  const candidates = board.query({
+  const found = board.query({
     x0: from.x - reach, y0: from.y - reach,
     x1: from.x + reach, y1: from.y + reach,
   }, { mask: [ENEMY] });
 
-  const cosineLimit = Math.cos(stats.arc / 2);
-  let best = null;
-  let bestDistance = Infinity;
-
-  for (const element of candidates) {
+  const candidates = [];
+  for (const element of found) {
     const record = game.attackers.get(element);
     if (!record) {
       continue;
@@ -253,22 +253,28 @@ function targetInArc() {
     const dx = at.x - from.x;
     const dy = at.y - from.y;
     const distance = Math.hypot(dx, dy);
-    if (distance > reach || distance === 0) {
-      continue;
-    }
-    // Inside the cone: the angle between the aim and the target, read off the
-    // dot product of two unit vectors. Point-blank targets skip the test.
-    if (distance > POINT_BLANK
-      && (dx / distance) * aim.x + (dy / distance) * aim.y < cosineLimit) {
-      continue;
-    }
-    if (distance < bestDistance) {
-      bestDistance = distance;
-      best = { element, at };
-    }
+    // The angle off the aim, from the dot product of two unit vectors. Clamped
+    // because rounding can push it a hair past ±1, and `acos` answers NaN there.
+    const cosine = distance === 0 ? 1 : (dx / distance) * aim.x + (dy / distance) * aim.y;
+    candidates.push({
+      element,
+      at,
+      distance,
+      offAxis: Math.acos(Math.min(1, Math.max(-1, cosine))),
+      hp: record.hp,
+    });
   }
 
-  return best;
+  return candidates;
+}
+
+/** @returns {?Object} what to shoot at, according to the chosen strategy */
+function currentTarget() {
+  return pickTarget(gatherCandidates(), {
+    range: stats.range,
+    arc: stats.arc,
+    pointBlank: POINT_BLANK,
+  }, STRATEGIES[stats.strategy]);
 }
 
 // ── Shots ────────────────────────────────────────────────────────────────────
@@ -277,7 +283,7 @@ function targetInArc() {
 // speaks in world rectangles, not in elements.
 
 function fire() {
-  const target = targetInArc();
+  const target = currentTarget();
   if (!target) {
     return;
   }
@@ -513,7 +519,15 @@ function lose() {
 
 // ── HUD ──────────────────────────────────────────────────────────────────────
 
+/** Cycle to the next targeting strategy — the proof the seam is real. */
+function cycleStrategy() {
+  stats.strategy = (stats.strategy + 1) % STRATEGIES.length;
+  refreshHud();
+}
+
 function refreshHud() {
+  const strategy = STRATEGIES[stats.strategy];
+  dom.strategy.textContent = `${strategy.icon} ${strategy.label}`;
   const hearts = Math.max(0, Math.ceil(stats.hp / 2));
   dom.hp.textContent = hearts ? '❤️'.repeat(hearts) : '💀';
   dom.wave.textContent = `Wave ${game.wave}`;
@@ -533,6 +547,7 @@ function reset() {
   Object.assign(stats, {
     hp: HERO_HP, maxHp: HERO_HP, damage: 1,
     arc: ARC, range: RANGE_BASE, fireInterval: FIRE_INTERVAL_BASE,
+    strategy: 0,
   });
   game.wave = 0;
   game.gold = 0;
@@ -549,6 +564,9 @@ function reset() {
 // ── Input ────────────────────────────────────────────────────────────────────
 
 document.body.addEventListener('keydown', event => {
+  if (event.code === 'KeyT' && !event.repeat) {
+    cycleStrategy();
+  }
   if (event.code === 'KeyP' && !event.repeat) {
     if (clock.isPaused()) {
       clock.resume();
@@ -577,6 +595,8 @@ document.querySelectorAll('.arena-dpad__btn').forEach(button => {
   button.addEventListener('pointerleave', release);
   button.addEventListener('pointercancel', release);
 });
+
+dom.strategy.addEventListener('click', () => cycleStrategy());
 
 dom.action.addEventListener('click', () => {
   if (stats.hp > 0) {
