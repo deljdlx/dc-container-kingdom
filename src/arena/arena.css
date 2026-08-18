@@ -47,6 +47,25 @@ body {
   color: #ffd166;
 }
 
+/* The targeting strategy, and the only way to see the seam is real. */
+.arena-strategy {
+  width: 100%;
+  max-width: var(--arena-width, 420px);
+  padding: 5px 10px;
+  background: #1e2836;
+  border: 1px solid #2b3948;
+  border-radius: 8px;
+  color: #9fb0c0;
+  font: inherit;
+  font-size: 0.82rem;
+  touch-action: manipulation;
+  cursor: pointer;
+}
+
+.arena-strategy:active {
+  background: #2b3948;
+}
+
 /* ── The board ─────────────────────────────────────────────────────────── */
 
 .arena-stage {
